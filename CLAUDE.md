@@ -69,7 +69,8 @@ These are settled and should not be re-litigated without a reason:
 
 - **Stack**: Expo (SDK 56) + React Native + **TypeScript**
 - **Navigation**: **Expo Router** (file-based routes in `src/app/`)
-- **Database**: **expo-sqlite** with raw SQL (no ORM)
+- **Database**: **expo-sqlite** + **Drizzle ORM** — type-safe schema and
+  queries, migrations generated with `drizzle-kit`
 - **Language (UI)**: **PL + EN** — i18n from the start
 - **Users**: single user, one list (no profiles)
 - **Backup**: simple **JSON export / import** (in scope for v1)

@@ -39,6 +39,9 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# drizzle-kit local artifact
+identifier.sqlite
+
 example
 
 # generated native folders

@@ -1,29 +1,11 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { openDatabaseSync } from 'expo-sqlite';
 
-import { migrations } from './migrations';
+import * as schema from './schema';
 
 export const DATABASE_NAME = 'pillpal.db';
 
-async function migrate(db: SQLiteDatabase): Promise<void> {
-  const row = await db.getFirstAsync<{ user_version: number }>(
-    'PRAGMA user_version',
-  );
-  let current = row?.user_version ?? 0;
+const expo = openDatabaseSync(DATABASE_NAME, { enableChangeListener: true });
+expo.execSync('PRAGMA foreign_keys = ON');
 
-  const pending = migrations
-    .filter((m) => m.version > current)
-    .sort((a, b) => a.version - b.version);
-
-  for (const migration of pending) {
-    await db.withTransactionAsync(async () => {
-      await db.execAsync(migration.up);
-    });
-    await db.execAsync(`PRAGMA user_version = ${migration.version}`);
-    current = migration.version;
-  }
-}
-
-export async function initDatabase(db: SQLiteDatabase): Promise<void> {
-  await db.execAsync('PRAGMA foreign_keys = ON');
-  await migrate(db);
-}
+export const db = drizzle(expo, { schema });

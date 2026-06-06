@@ -1,19 +1,32 @@
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import { SQLiteProvider } from 'expo-sqlite';
-import { useColorScheme } from 'react-native';
+import { Text, useColorScheme, View } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
-import { DATABASE_NAME, initDatabase } from '@/db/database';
+import { db } from '@/db/database';
+import migrations from '../../drizzle/migrations';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { success, error } = useMigrations(db, migrations);
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Migration error: {error.message}</Text>
+      </View>
+    );
+  }
+
+  if (!success) {
+    return null;
+  }
+
   return (
-    <SQLiteProvider databaseName={DATABASE_NAME} onInit={initDatabase}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <AnimatedSplashOverlay />
-        <AppTabs />
-      </ThemeProvider>
-    </SQLiteProvider>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <AnimatedSplashOverlay />
+      <AppTabs />
+    </ThemeProvider>
   );
 }
