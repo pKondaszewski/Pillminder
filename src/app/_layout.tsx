@@ -2,10 +2,10 @@ import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
 import { Text, useColorScheme, View } from 'react-native';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
-import { db } from '@/db/database';
-import '@/i18n';
+import { AnimatedSplashOverlay } from '@/ui/components/animated-icon';
+import AppTabs from '@/ui/components/app-tabs';
+import { db } from '@/config/db/database';
+import '@/config/i18n';
 import migrations from '../../drizzle/migrations';
 
 export default function TabLayout() {
