@@ -53,7 +53,7 @@ export function generatePlannedDoses(
 }
 
 export function isOverdue(dose: Dose, now: Date): boolean {
-  return dose.state === 'pending' && new Date(dose.plannedAt) < now;
+  return dose.state === 'pending' && dose.plannedAt < now;
 }
 
 export function effectiveState(dose: Dose, now: Date): DoseState {

@@ -1,5 +1,7 @@
 import type { Schedule } from './types';
 
+export const DEFAULT_REORDER_LEAD_TIME_DAYS = 7;
+
 export function dosesPerDay(schedule: Schedule): number {
   const interval = Math.max(1, Math.floor(schedule.intervalDays));
   return schedule.timesOfDay.length / interval;
@@ -25,8 +27,9 @@ export function depletionDate(
 
 export function shouldReorder(
   stock: number | null,
-  reorderThreshold: number | null,
+  schedule: Schedule,
+  leadTimeDays: number = DEFAULT_REORDER_LEAD_TIME_DAYS,
 ): boolean {
-  if (stock === null || reorderThreshold === null) return false;
-  return stock <= reorderThreshold;
+  if (stock === null) return false;
+  return daysOfStockLeft(stock, schedule) <= leadTimeDays;
 }

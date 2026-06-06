@@ -18,9 +18,9 @@ export const products = sqliteTable('products', {
     .notNull()
     .default('active'),
   stock: integer('stock'),
-  lastUsedAt: text('last_used_at'),
-  createdAt: text('created_at').notNull(),
-  updatedAt: text('updated_at').notNull(),
+  lastUsedAt: integer('last_used_at', { mode: 'timestamp' }),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
 
 export const schedules = sqliteTable(
@@ -51,11 +51,11 @@ export const doses = sqliteTable(
     scheduleId: text('schedule_id')
       .notNull()
       .references(() => schedules.id, { onDelete: 'cascade' }),
-    plannedAt: text('planned_at').notNull(),
+    plannedAt: integer('planned_at', { mode: 'timestamp' }).notNull(),
     state: text('state', { enum: ['pending', 'taken', 'skipped'] })
       .notNull()
       .default('pending'),
-    takenAt: text('taken_at'),
+    takenAt: integer('taken_at', { mode: 'timestamp' }),
   },
   (table) => [
     uniqueIndex('idx_doses_unique_slot').on(table.scheduleId, table.plannedAt),
@@ -72,8 +72,8 @@ export const notes = sqliteTable(
       .notNull()
       .references(() => products.id, { onDelete: 'cascade' }),
     body: text('body').notNull(),
-    createdAt: text('created_at').notNull(),
-    updatedAt: text('updated_at').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
   },
   (table) => [index('idx_notes_product').on(table.productId)],
 );

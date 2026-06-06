@@ -2,9 +2,9 @@ CREATE TABLE `doses` (
 	`id` text PRIMARY KEY NOT NULL,
 	`product_id` text NOT NULL,
 	`schedule_id` text NOT NULL,
-	`planned_at` text NOT NULL,
+	`planned_at` integer NOT NULL,
 	`state` text DEFAULT 'pending' NOT NULL,
-	`taken_at` text,
+	`taken_at` integer,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`schedule_id`) REFERENCES `schedules`(`id`) ON UPDATE no action ON DELETE cascade
 );
@@ -16,8 +16,8 @@ CREATE TABLE `notes` (
 	`id` text PRIMARY KEY NOT NULL,
 	`product_id` text NOT NULL,
 	`body` text NOT NULL,
-	`created_at` text NOT NULL,
-	`updated_at` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -30,9 +30,9 @@ CREATE TABLE `products` (
 	`store_link` text,
 	`status` text DEFAULT 'active' NOT NULL,
 	`stock` integer,
-	`last_used_at` text,
-	`created_at` text NOT NULL,
-	`updated_at` text NOT NULL
+	`last_used_at` integer,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `schedules` (
