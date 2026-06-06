@@ -1,36 +1,46 @@
 # TODO — PillPal
 
-Bieżące zadania. Wysokopoziomowy roadmap jest w `CLAUDE.md`.
-Odhaczaj `[x]` przy commitcie, który domyka zadanie.
+Current tasks. The high-level roadmap lives in `CLAUDE.md`.
+Tick `[x]` in the commit that closes a task.
 
-## ✅ Setup (gotowe)
-- [x] Init projektu Expo (SDK 56, TypeScript, Expo Router)
-- [x] Instalacja `expo-sqlite`
+## ✅ Setup (done)
+- [x] Expo project init (SDK 56, TypeScript, Expo Router)
+- [x] Install `expo-sqlite`
 - [x] `.gitignore` (+ `.idea/`)
-- [x] Decyzje projektowe spisane w `CLAUDE.md`
+- [x] Project decisions written down in `CLAUDE.md`
+- [x] ESLint + Prettier
+- [x] Architecture: `domain/` (pure logic), `db/`, `app/`, `components/`, `hooks/`
 
-## Weekend 1–2 — karta produktu + branie + przypomnienia
-- [ ] Schemat bazy SQLite (tabele: `products`, `intakes` / sloty dawek) + migracje
-- [ ] Warstwa dostępu do danych (`src/db/`) — funkcje CRUD na produktach
-- [ ] Ekran listy produktów (`src/app/index.tsx`)
-- [ ] Ekran dodawania / edycji produktu (nazwa, dawka, kategoria, notatki, cena, link, status)
-- [ ] Konfiguracja rytmu brania (codziennie / co X dni / o godzinie; okres od–do lub bezterminowo)
-- [ ] Generowanie zaplanowanych dawek (slotów) z rytmu
-- [ ] Przycisk „wzięte" → zapis stanu dawki
-- [ ] Powiadomienia push (Expo) z akcjami „Wzięte" / „Drzemka"
-- [ ] i18n — szkielet tłumaczeń PL + EN
+## Weekend 1–2 — product card + taking + reminders
+- [x] SQLite schema (tables: `products`, `schedules`, `doses`, `notes`) + migrations
+- [ ] Data-access layer (`src/db/`) — CRUD functions for products
+- [ ] Product list screen (`src/app/index.tsx`)
+- [ ] Add / edit product screen (name, category, price, link, status)
+- [ ] Intake rhythm config (daily / every X days / at a time; range from–to or indefinite)
+- [ ] Generate planned doses (slots) from the rhythm
+- [ ] "Taken" button → persist dose state
+- [ ] Push notifications (Expo) with "Taken" / "Snooze" actions
+- [ ] i18n — PL + EN translation scaffold
 
-## Weekend 3 — zapasy + alert o zamówieniu
-- [ ] Licznik sztuk na produkcie
-- [ ] Dekrementacja zapasu przy „wzięte"
-- [ ] Wyliczanie momentu alertu o zamówieniu (z rytmu i stanu)
-- [ ] Wizualny alert o niskim stanie
+## Weekend 3 — stock + reorder alert
+- [ ] Unit counter on the product
+- [ ] Decrement stock on "taken"
+- [ ] Compute reorder alert moment (from rhythm and stock)
+- [ ] Visual low-stock alert
 
-## Weekend 4 — historia + dopracowanie
-- [ ] Ekran historii (wzięte / pominięte)
-- [ ] Widok „co było aktywne w okresie" (pod wizytę u lekarza)
-- [ ] Eksport / import danych do JSON
-- [ ] Dopracowanie UI, statusy aktywny/zarchiwizowany
+## Weekend 4 — history + polish
+- [ ] History screen (taken / skipped)
+- [ ] "What was active in a period" view (for the doctor)
+- [ ] JSON data export / import
+- [ ] UI polish, active/archived statuses
 
-## Backlog / później (kandydaci na GitHub Issues)
-- [ ] (puste — dorzucaj tu pomysły odłożone na potem)
+## Version 2 — app growth (deferred)
+- [ ] Product image on the card — local variant: `expo-image-picker` (camera/gallery)
+      → file in the document directory (`expo-file-system`), store only `imageUri`
+      in the DB (not a blob). Needs: `imageUri` field on `Product`, file cleanup
+      on product delete, decision on images in JSON export/import.
+      Rejected for now: fetching the image from the link (scraping `og:image`) —
+      fragile and conflicts with local-first / no-backend.
+
+## Backlog / later (GitHub Issue candidates)
+- [ ] (empty — drop deferred ideas here)
