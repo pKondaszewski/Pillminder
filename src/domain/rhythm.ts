@@ -1,28 +1,5 @@
 import type { Dose, DoseState, Schedule } from './types';
 
-function parseISODate(date: string): Date {
-  const [y, m, d] = date.split('-').map(Number);
-  return new Date(y, m - 1, d, 0, 0, 0, 0);
-}
-
-function parseTimeOfDay(time: string): [number, number] {
-  const [h, min] = time.split(':').map(Number);
-  return [h, min];
-}
-
-function dayDiff(a: Date, b: Date): number {
-  const msPerDay = 24 * 60 * 60 * 1000;
-  const da = new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime();
-  const db = new Date(b.getFullYear(), b.getMonth(), b.getDate()).getTime();
-  return Math.round((db - da) / msPerDay);
-}
-
-function addDays(date: Date, days: number): Date {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
-}
-
 export function generatePlannedDoses(
   schedule: Schedule,
   rangeStart: Date,
@@ -58,4 +35,27 @@ export function isOverdue(dose: Dose, now: Date): boolean {
 
 export function effectiveState(dose: Dose, now: Date): DoseState {
   return isOverdue(dose, now) ? 'skipped' : dose.state;
+}
+
+function parseISODate(date: string): Date {
+  const [y, m, d] = date.split('-').map(Number);
+  return new Date(y, m - 1, d, 0, 0, 0, 0);
+}
+
+function parseTimeOfDay(time: string): [number, number] {
+  const [h, min] = time.split(':').map(Number);
+  return [h, min];
+}
+
+function dayDiff(a: Date, b: Date): number {
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const da = new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime();
+  const db = new Date(b.getFullYear(), b.getMonth(), b.getDate()).getTime();
+  return Math.round((db - da) / msPerDay);
+}
+
+function addDays(date: Date, days: number): Date {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
 }
