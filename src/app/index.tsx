@@ -1,1 +1,1 @@
-export { default } from '@/products/product-list-screen';
+export { default } from '@/ui/screens/product-list-screen';

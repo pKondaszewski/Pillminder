@@ -2,11 +2,10 @@ import { useTranslation } from 'react-i18next';
 import { Button, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useProducts } from '@/ui/hooks/use-products';
 import { ThemedText } from '@/ui/components/themed-text';
 import { ThemedView } from '@/ui/components/themed-view';
 import { Spacing } from '@/ui/constants/theme';
-
-import { useProducts } from './use-products';
 
 export default function ProductListScreen() {
   const { t } = useTranslation();

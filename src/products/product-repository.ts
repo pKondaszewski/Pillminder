@@ -3,14 +3,10 @@ import * as Crypto from 'expo-crypto';
 import { db } from '@/config/db/database';
 import { products } from '@/config/db/schema';
 
-type Category = (typeof products.$inferInsert)['category'];
+import type { NewProductInput } from './dto/new-product-input';
 
-export interface NewProductInput {
-  name: string;
-  category: Category;
-  price?: number | null;
-  storeLink?: string | null;
-  stock?: number | null;
+export function productsQuery() {
+  return db.select().from(products);
 }
 
 export async function createProduct(input: NewProductInput): Promise<void> {
