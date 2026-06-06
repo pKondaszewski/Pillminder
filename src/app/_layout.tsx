@@ -5,6 +5,7 @@ import { Text, useColorScheme, View } from 'react-native';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
 import { db } from '@/db/database';
+import '@/i18n';
 import migrations from '../../drizzle/migrations';
 
 export default function TabLayout() {

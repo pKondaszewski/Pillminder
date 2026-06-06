@@ -1,0 +1,12 @@
+{
+  "products": {
+    "title": "Produkty",
+    "addTest": "Dodaj testowy produkt",
+    "empty": "Brak produktów"
+  },
+  "category": {
+    "medication": "Lek",
+    "supplement": "Suplement",
+    "care": "Pielęgnacja"
+  }
+}

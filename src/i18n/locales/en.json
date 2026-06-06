@@ -1,0 +1,12 @@
+{
+  "products": {
+    "title": "Products",
+    "addTest": "Add test product",
+    "empty": "No products"
+  },
+  "category": {
+    "medication": "Medication",
+    "supplement": "Supplement",
+    "care": "Care"
+  }
+}
