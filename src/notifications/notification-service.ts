@@ -1,4 +1,5 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
+import type { NotificationResponse } from 'expo-notifications';
 import { Platform } from 'react-native';
 
 import { createLogger } from '@/config/logger';
@@ -23,6 +24,8 @@ const isSupported = Platform.OS !== 'web' && !isExpoGo;
 
 type NotificationsModule = typeof import('expo-notifications');
 let modulePromise: Promise<NotificationsModule> | null = null;
+
+const handledResponses = new Set<string>();
 
 function loadNotifications(): Promise<NotificationsModule> {
   if (!modulePromise) {
@@ -140,10 +143,8 @@ export async function cancelDoseReminders(doseIds: string[]): Promise<void> {
   await Promise.all(doseIds.map(cancelDoseReminder));
 }
 
-const handledResponses = new Set<string>();
-
 function processReminderResponse(
-  response: import('expo-notifications').NotificationResponse,
+  response: NotificationResponse,
   handlers: ReminderResponseHandlers,
 ): void {
   const doseId = response.notification.request.content.data?.doseId;

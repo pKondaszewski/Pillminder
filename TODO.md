@@ -76,11 +76,13 @@ Tick `[x]` in the commit that closes a task.
       (`expo-task-manager` / `registerTaskAsync`) that writes the dose state to
       SQLite while the app is backgrounded/killed. Needs a native module +
       rebuild; iOS has extra limitations.
-- [ ] Notification delivery reliability under load / battery management.
-      Some reminders don't arrive while the device is actively used. On
-      Android 12+ this maps to exact alarms (`SCHEDULE_EXACT_ALARM` /
-      `USE_EXACT_ALARM`) — irrelevant on Android 10, where it's governed by
-      Doze / App Standby / OEM battery optimization. First gather empirical
-      data with battery optimization disabled for the app; then decide whether
-      to add exact-alarm permissions (for 12+) and/or a
-      request-ignore-battery-optimizations flow.
+- [ ] Notification delivery reliability under OEM battery optimization.
+      CONFIRMED cause (Android 10): the app was battery-restricted, so Doze /
+      App Standby coalesced and held scheduled alarms; setting the app to
+      "unrestricted" delivered them (a held alarm fired immediately). Not a
+      code bug and not exactness (`SCHEDULE_EXACT_ALARM` is Android 12+).
+      Productize the fix: a one-time onboarding flow that detects the
+      restriction and deep-links the user to disable battery optimization
+      (`expo-intent-launcher` → battery settings, or
+      `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`). Standard for alarm/medication
+      apps. Consider exact-alarm permissions separately for 12+ devices.
