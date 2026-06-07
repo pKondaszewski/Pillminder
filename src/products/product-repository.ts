@@ -13,11 +13,7 @@ export function productsQuery() {
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {
-  const [product] = await db
-    .select()
-    .from(products)
-    .where(eq(products.id, id))
-    .limit(1);
+  const [product] = await db.select().from(products).where(eq(products.id, id));
   return product;
 }
 

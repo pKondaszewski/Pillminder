@@ -21,14 +21,14 @@ Tick `[x]` in the commit that closes a task.
 - [x] Intake rhythm config (daily / every X days / at a time; range from–to or indefinite)
 - [x] Generate planned doses (slots) from the rhythm
 - [x] "Taken" button → persist dose state (in-app, on the Home/Today tab)
-- [ ] Push notifications (Expo) with "Taken" / "Snooze" actions
+- [x] Decrement stock on "taken" (and restore on undo) — atomic via a single
+      `db.transaction` in setDoseState; guarded by state transition
 - [x] i18n — PL + EN translation scaffold, organize dictionaries in alphabetical order
 
 ## Weekend 3 — stock + reorder alert
 
 - [ ] Unit counter on the product
-- [ ] Decrement stock on "taken" — wrap "mark dose taken" + "decrement stock"
-      in a single `db.transaction` (two writes must be atomic)
+- [ ] Push notifications (Expo) with "Taken" / "Snooze" actions
 - [ ] Compute reorder alert moment (from rhythm and stock)
 - [ ] Visual low-stock alert
 
