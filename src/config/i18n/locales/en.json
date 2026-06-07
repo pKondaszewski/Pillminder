@@ -1,12 +1,30 @@
 {
+  "tabs": {
+    "products": "Products"
+  },
   "products": {
-    "title": "Products",
-    "addTest": "Add test product",
+    "add": "Add new product",
     "empty": "No products"
   },
   "category": {
     "medication": "Medication",
     "supplement": "Supplement",
     "care": "Care"
+  },
+  "editor": {
+    "newTitle": "New product",
+    "editTitle": "Edit product",
+    "name": "Name",
+    "namePlaceholder": "e.g. Vitamin D",
+    "category": "Category",
+    "price": "Price (USD)",
+    "stock": "Stock",
+    "storeLink": "Store link",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "delete": "Delete",
+    "deleteTitle": "Delete product?",
+    "deleteConfirm": "Delete “{{name}}”?"
   }
 }

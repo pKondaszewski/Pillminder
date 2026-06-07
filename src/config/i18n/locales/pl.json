@@ -1,12 +1,30 @@
 {
+  "tabs": {
+    "products": "Produkty"
+  },
   "products": {
-    "title": "Produkty",
-    "addTest": "Dodaj testowy produkt",
+    "add": "Dodaj nowy produkt",
     "empty": "Brak produktów"
   },
   "category": {
     "medication": "Lek",
     "supplement": "Suplement",
     "care": "Pielęgnacja"
+  },
+  "editor": {
+    "newTitle": "Nowy produkt",
+    "editTitle": "Edytuj produkt",
+    "name": "Nazwa",
+    "namePlaceholder": "np. Witamina D",
+    "category": "Kategoria",
+    "price": "Cena (zł)",
+    "stock": "Zapas",
+    "storeLink": "Link do sklepu",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "delete": "Usuń",
+    "deleteTitle": "Usunąć produkt?",
+    "deleteConfirm": "Czy na pewno usunąć „{{name}}”?"
   }
 }

@@ -4,11 +4,20 @@ export interface Logger {
   error: (message: string, ...args: unknown[]) => void;
 }
 
+type Level = 'INFO' | 'WARN' | 'ERROR';
+
+function format(level: Level, scope: string, message: string): string {
+  const timestamp = new Date().toISOString();
+  return `${timestamp}  ${level.padEnd(5)} --- [${scope}] : ${message}`;
+}
+
 export function createLogger(scope: string): Logger {
-  const prefix = `[${scope}]`;
   return {
-    info: (message, ...args) => console.log(prefix, message, ...args),
-    warn: (message, ...args) => console.warn(prefix, message, ...args),
-    error: (message, ...args) => console.error(prefix, message, ...args),
+    info: (message, ...args) =>
+      console.log(format('INFO', scope, message), ...args),
+    warn: (message, ...args) =>
+      console.warn(format('WARN', scope, message), ...args),
+    error: (message, ...args) =>
+      console.error(format('ERROR', scope, message), ...args),
   };
 }
