@@ -1,52 +1,52 @@
 {
-  "tabs": {
-    "products": "Products",
-    "schedules": "Schedules"
+  "category": {
+    "care": "Care",
+    "medication": "Medication",
+    "supplement": "Supplement"
+  },
+  "editor": {
+    "cancel": "Cancel",
+    "category": "Category",
+    "close": "Close",
+    "delete": "Delete",
+    "deleteConfirm": "Delete “{{name}}”?",
+    "deleteTitle": "Delete product?",
+    "editTitle": "Edit product",
+    "name": "Name",
+    "namePlaceholder": "e.g. Vitamin D",
+    "newTitle": "New product",
+    "price": "Price (USD)",
+    "save": "Save",
+    "stock": "Stock",
+    "storeLink": "Store link"
   },
   "products": {
     "add": "Add new product",
     "empty": "No products"
   },
-  "category": {
-    "medication": "Medication",
-    "supplement": "Supplement",
-    "care": "Care"
-  },
-  "editor": {
-    "newTitle": "New product",
-    "editTitle": "Edit product",
-    "name": "Name",
-    "namePlaceholder": "e.g. Vitamin D",
-    "category": "Category",
-    "price": "Price (USD)",
-    "stock": "Stock",
-    "storeLink": "Store link",
-    "save": "Save",
-    "cancel": "Cancel",
-    "close": "Close",
-    "delete": "Delete",
-    "deleteTitle": "Delete product?",
-    "deleteConfirm": "Delete “{{name}}”?"
-  },
   "schedule": {
     "add": "Add schedule",
-    "empty": "No schedules",
-    "newTitle": "New schedule",
-    "editTitle": "Edit schedule",
-    "product": "Product",
-    "noProducts": "Add a product first",
-    "unknownProduct": "Unknown product",
+    "addTime": "Add time",
     "daily": "Daily",
+    "deleteConfirm": "Delete this schedule?",
+    "deleteTitle": "Delete schedule?",
+    "editTitle": "Edit schedule",
+    "empty": "No schedules",
     "everyXDaysShort": "Every {{days}} days",
     "intervalDays": "Frequency",
     "intervalLess": "Less often",
     "intervalMore": "More often",
-    "timesOfDay": "Times",
-    "addTime": "Add time",
-    "removeTime": "Remove time {{time}}",
+    "newTitle": "New schedule",
+    "noProducts": "Add a product first",
     "preview": "Upcoming doses",
     "previewEmpty": "Add a time to see a preview",
-    "deleteTitle": "Delete schedule?",
-    "deleteConfirm": "Delete this schedule?"
+    "product": "Product",
+    "removeTime": "Remove time {{time}}",
+    "timesOfDay": "Times",
+    "unknownProduct": "Unknown product"
+  },
+  "tabs": {
+    "products": "Products",
+    "schedules": "Schedules"
   }
 }

@@ -22,7 +22,7 @@ Tick `[x]` in the commit that closes a task.
 - [ ] Generate planned doses (slots) from the rhythm
 - [ ] "Taken" button → persist dose state
 - [ ] Push notifications (Expo) with "Taken" / "Snooze" actions
-- [ ] i18n — PL + EN translation scaffold, organize dictionaries in alphabetical order
+- [x] i18n — PL + EN translation scaffold, organize dictionaries in alphabetical order
 
 ## Weekend 3 — stock + reorder alert
 

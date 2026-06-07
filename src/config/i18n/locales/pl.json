@@ -1,52 +1,52 @@
 {
-  "tabs": {
-    "products": "Produkty",
-    "schedules": "Harmonogramy"
+  "category": {
+    "care": "Pielęgnacja",
+    "medication": "Lek",
+    "supplement": "Suplement"
+  },
+  "editor": {
+    "cancel": "Anuluj",
+    "category": "Kategoria",
+    "close": "Zamknij",
+    "delete": "Usuń",
+    "deleteConfirm": "Czy na pewno usunąć „{{name}}”?",
+    "deleteTitle": "Usunąć produkt?",
+    "editTitle": "Edytuj produkt",
+    "name": "Nazwa",
+    "namePlaceholder": "np. Witamina D",
+    "newTitle": "Nowy produkt",
+    "price": "Cena (zł)",
+    "save": "Zapisz",
+    "stock": "Zapas",
+    "storeLink": "Link do sklepu"
   },
   "products": {
     "add": "Dodaj nowy produkt",
     "empty": "Brak produktów"
   },
-  "category": {
-    "medication": "Lek",
-    "supplement": "Suplement",
-    "care": "Pielęgnacja"
-  },
-  "editor": {
-    "newTitle": "Nowy produkt",
-    "editTitle": "Edytuj produkt",
-    "name": "Nazwa",
-    "namePlaceholder": "np. Witamina D",
-    "category": "Kategoria",
-    "price": "Cena (zł)",
-    "stock": "Zapas",
-    "storeLink": "Link do sklepu",
-    "save": "Zapisz",
-    "cancel": "Anuluj",
-    "close": "Zamknij",
-    "delete": "Usuń",
-    "deleteTitle": "Usunąć produkt?",
-    "deleteConfirm": "Czy na pewno usunąć „{{name}}”?"
-  },
   "schedule": {
     "add": "Dodaj harmonogram",
-    "empty": "Brak harmonogramów",
-    "newTitle": "Nowy harmonogram",
-    "editTitle": "Edytuj harmonogram",
-    "product": "Produkt",
-    "noProducts": "Najpierw dodaj produkt",
-    "unknownProduct": "Nieznany produkt",
+    "addTime": "Dodaj godzinę",
     "daily": "Codziennie",
+    "deleteConfirm": "Czy na pewno usunąć ten harmonogram?",
+    "deleteTitle": "Usunąć harmonogram?",
+    "editTitle": "Edytuj harmonogram",
+    "empty": "Brak harmonogramów",
     "everyXDaysShort": "Co {{days}} dni",
     "intervalDays": "Częstotliwość",
     "intervalLess": "Rzadziej",
     "intervalMore": "Częściej",
-    "timesOfDay": "Godziny",
-    "addTime": "Dodaj godzinę",
-    "removeTime": "Usuń godzinę {{time}}",
+    "newTitle": "Nowy harmonogram",
+    "noProducts": "Najpierw dodaj produkt",
     "preview": "Najbliższe dawki",
     "previewEmpty": "Dodaj godzinę, aby zobaczyć podgląd",
-    "deleteTitle": "Usunąć harmonogram?",
-    "deleteConfirm": "Czy na pewno usunąć ten harmonogram?"
+    "product": "Produkt",
+    "removeTime": "Usuń godzinę {{time}}",
+    "timesOfDay": "Godziny",
+    "unknownProduct": "Nieznany produkt"
+  },
+  "tabs": {
+    "products": "Produkty",
+    "schedules": "Harmonogramy"
   }
 }
