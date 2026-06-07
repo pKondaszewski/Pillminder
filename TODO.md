@@ -66,3 +66,21 @@ Tick `[x]` in the commit that closes a task.
       paging (material-top-tabs / pager-view across routes) isn't supported.
       Reconsider if expo-router adds swipeable tabs, or move the 3 tabs into a
       non-routed PagerView if drag-follow becomes important.
+- [ ] Version the CD APK build. Inject a version label into the artifact name
+      (and optionally the `.apk` filename) — via a `workflow_dispatch` input
+      and/or the git tag (`github.ref_name`). Decide on a versioning scheme
+      (app `version` in `app.json`, `versionCode`, semver tags) before wiring.
+- [ ] Notification actions without opening the app. Currently both actions use
+      `opensAppToForeground: true`, so "Taken"/"Snooze" launch the app. To act
+      in-place: `opensAppToForeground: false` + a background task
+      (`expo-task-manager` / `registerTaskAsync`) that writes the dose state to
+      SQLite while the app is backgrounded/killed. Needs a native module +
+      rebuild; iOS has extra limitations.
+- [ ] Notification delivery reliability under load / battery management.
+      Some reminders don't arrive while the device is actively used. On
+      Android 12+ this maps to exact alarms (`SCHEDULE_EXACT_ALARM` /
+      `USE_EXACT_ALARM`) — irrelevant on Android 10, where it's governed by
+      Doze / App Standby / OEM battery optimization. First gather empirical
+      data with battery optimization disabled for the app; then decide whether
+      to add exact-alarm permissions (for 12+) and/or a
+      request-ignore-battery-optimizations flow.

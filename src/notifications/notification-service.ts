@@ -11,7 +11,7 @@ export type { DoseReminderStrings } from './dto/dose-reminder-strings';
 
 const log = createLogger('notification-service');
 
-export const CHANNEL_ID = 'dose-reminders';
+export const CHANNEL_ID = 'dose-reminders-v2';
 export const CATEGORY_ID = 'dose-reminder';
 export const TAKE_ACTION = 'TAKE_ACTION';
 export const SNOOZE_ACTION = 'SNOOZE_ACTION';
@@ -71,6 +71,8 @@ export async function initNotifications(
       await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
         name: strings.title,
         importance: Notifications.AndroidImportance.HIGH,
+        sound: 'default',
+        enableVibrate: true,
         vibrationPattern: [0, 250, 250, 250],
       });
     }
@@ -138,6 +140,26 @@ export async function cancelDoseReminders(doseIds: string[]): Promise<void> {
   await Promise.all(doseIds.map(cancelDoseReminder));
 }
 
+const handledResponses = new Set<string>();
+
+function processReminderResponse(
+  response: import('expo-notifications').NotificationResponse,
+  handlers: ReminderResponseHandlers,
+): void {
+  const doseId = response.notification.request.content.data?.doseId;
+  if (typeof doseId !== 'string') return;
+
+  const key = `${response.notification.request.identifier}:${response.actionIdentifier}`;
+  if (handledResponses.has(key)) return;
+  handledResponses.add(key);
+
+  if (response.actionIdentifier === TAKE_ACTION) {
+    handlers.onTake(doseId);
+  } else if (response.actionIdentifier === SNOOZE_ACTION) {
+    handlers.onSnooze(doseId);
+  }
+}
+
 export async function subscribeToReminderResponses(
   handlers: ReminderResponseHandlers,
 ): Promise<() => void> {
@@ -146,17 +168,14 @@ export async function subscribeToReminderResponses(
   try {
     const Notifications = await loadNotifications();
     const subscription = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
-        const doseId = response.notification.request.content.data?.doseId;
-        if (typeof doseId !== 'string') return;
-
-        if (response.actionIdentifier === TAKE_ACTION) {
-          handlers.onTake(doseId);
-        } else if (response.actionIdentifier === SNOOZE_ACTION) {
-          handlers.onSnooze(doseId);
-        }
-      },
+      (response) => processReminderResponse(response, handlers),
     );
+
+    const launchResponse = Notifications.getLastNotificationResponse();
+    if (launchResponse) {
+      processReminderResponse(launchResponse, handlers);
+    }
+
     return () => subscription.remove();
   } catch (err) {
     log.error('Failed to subscribe to reminder responses', err);
