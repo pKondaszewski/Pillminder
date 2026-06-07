@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Modal, Pressable, StyleSheet, TextInput } from 'react-native';
+import {
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { products } from '@/config/db/schema';
@@ -113,74 +120,79 @@ function EditorForm({
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-        <ThemedText type="subtitle">
-          {product ? t('editor.editTitle') : t('editor.newTitle')}
-        </ThemedText>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <ThemedText type="subtitle">
+            {product ? t('editor.editTitle') : t('editor.newTitle')}
+          </ThemedText>
 
-        <ThemedText type="small">{t('editor.name')}</ThemedText>
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          placeholder={t('editor.namePlaceholder')}
-          placeholderTextColor={theme.textSecondary}
-          style={inputStyle}
-        />
+          <ThemedText type="small">{t('editor.name')}</ThemedText>
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            placeholder={t('editor.namePlaceholder')}
+            placeholderTextColor={theme.textSecondary}
+            style={inputStyle}
+          />
 
-        <ThemedText type="small">{t('editor.category')}</ThemedText>
-        <ThemedView style={styles.categoryRow}>
-          {CATEGORIES.map((c) => (
-            <Pressable
-              key={c}
-              onPress={() => setCategory(c)}
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <ThemedView
-                type={
-                  c === category ? 'backgroundSelected' : 'backgroundElement'
-                }
-                style={styles.categoryChip}
+          <ThemedText type="small">{t('editor.category')}</ThemedText>
+          <ThemedView style={styles.categoryRow}>
+            {CATEGORIES.map((c) => (
+              <Pressable
+                key={c}
+                onPress={() => setCategory(c)}
+                style={({ pressed }) => pressed && styles.pressed}
               >
-                <ThemedText
-                  type="small"
-                  themeColor={c === category ? 'text' : 'textSecondary'}
+                <ThemedView
+                  type={
+                    c === category ? 'backgroundSelected' : 'backgroundElement'
+                  }
+                  style={styles.categoryChip}
                 >
-                  {t(`category.${c}`)}
-                </ThemedText>
-              </ThemedView>
-            </Pressable>
-          ))}
-        </ThemedView>
+                  <ThemedText
+                    type="small"
+                    themeColor={c === category ? 'text' : 'textSecondary'}
+                  >
+                    {t(`category.${c}`)}
+                  </ThemedText>
+                </ThemedView>
+              </Pressable>
+            ))}
+          </ThemedView>
 
-        <ThemedText type="small">{t('editor.price')}</ThemedText>
-        <TextInput
-          value={price}
-          onChangeText={setPrice}
-          keyboardType="numeric"
-          placeholder="0"
-          placeholderTextColor={theme.textSecondary}
-          style={inputStyle}
-        />
+          <ThemedText type="small">{t('editor.price')}</ThemedText>
+          <TextInput
+            value={price}
+            onChangeText={setPrice}
+            keyboardType="numeric"
+            placeholder="0"
+            placeholderTextColor={theme.textSecondary}
+            style={inputStyle}
+          />
 
-        <ThemedText type="small">{t('editor.stock')}</ThemedText>
-        <TextInput
-          value={stock}
-          onChangeText={setStock}
-          keyboardType="numeric"
-          placeholder="0"
-          placeholderTextColor={theme.textSecondary}
-          style={inputStyle}
-        />
+          <ThemedText type="small">{t('editor.stock')}</ThemedText>
+          <TextInput
+            value={stock}
+            onChangeText={setStock}
+            keyboardType="numeric"
+            placeholder="0"
+            placeholderTextColor={theme.textSecondary}
+            style={inputStyle}
+          />
 
-        <ThemedText type="small">{t('editor.storeLink')}</ThemedText>
-        <TextInput
-          value={storeLink}
-          onChangeText={setStoreLink}
-          autoCapitalize="none"
-          keyboardType="url"
-          placeholder="https://"
-          placeholderTextColor={theme.textSecondary}
-          style={inputStyle}
-        />
+          <ThemedText type="small">{t('editor.storeLink')}</ThemedText>
+          <TextInput
+            value={storeLink}
+            onChangeText={setStoreLink}
+            autoCapitalize="none"
+            keyboardType="url"
+            placeholder="https://"
+            placeholderTextColor={theme.textSecondary}
+            style={inputStyle}
+          />
+        </ScrollView>
 
         <ThemedView style={styles.actions}>
           <ActionButton label={t('editor.close')} onPress={onClose} />
@@ -233,7 +245,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.four,
+    paddingBottom: Spacing.three,
+  },
+  scrollContent: {
     gap: Spacing.two,
+    paddingBottom: Spacing.four,
   },
   input: {
     borderWidth: 1,

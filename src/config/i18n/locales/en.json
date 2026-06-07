@@ -1,6 +1,7 @@
 {
   "tabs": {
-    "products": "Products"
+    "products": "Products",
+    "schedules": "Schedules"
   },
   "products": {
     "add": "Add new product",
@@ -26,5 +27,26 @@
     "delete": "Delete",
     "deleteTitle": "Delete product?",
     "deleteConfirm": "Delete “{{name}}”?"
+  },
+  "schedule": {
+    "add": "Add schedule",
+    "empty": "No schedules",
+    "newTitle": "New schedule",
+    "editTitle": "Edit schedule",
+    "product": "Product",
+    "noProducts": "Add a product first",
+    "unknownProduct": "Unknown product",
+    "daily": "Daily",
+    "everyXDaysShort": "Every {{days}} days",
+    "intervalDays": "Frequency",
+    "intervalLess": "Less often",
+    "intervalMore": "More often",
+    "timesOfDay": "Times",
+    "addTime": "Add time",
+    "removeTime": "Remove time {{time}}",
+    "preview": "Upcoming doses",
+    "previewEmpty": "Add a time to see a preview",
+    "deleteTitle": "Delete schedule?",
+    "deleteConfirm": "Delete this schedule?"
   }
 }

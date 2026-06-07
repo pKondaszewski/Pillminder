@@ -18,11 +18,11 @@ Tick `[x]` in the commit that closes a task.
 - [x] Data-access layer (`src/db/`) — CRUD functions for products
 - [x] Product list screen (`src/app/index.tsx`)
 - [x] Add / edit / delete product screen (name, category, price, link, stock)
-- [ ] Intake rhythm config (daily / every X days / at a time; range from–to or indefinite)
+- [x] Intake rhythm config (daily / every X days / at a time; range from–to or indefinite)
 - [ ] Generate planned doses (slots) from the rhythm
 - [ ] "Taken" button → persist dose state
 - [ ] Push notifications (Expo) with "Taken" / "Snooze" actions
-- [ ] i18n — PL + EN translation scaffold
+- [ ] i18n — PL + EN translation scaffold, organize dictionaries in alphabetical order
 
 ## Weekend 3 — stock + reorder alert
 
@@ -50,6 +50,8 @@ Tick `[x]` in the commit that closes a task.
       (by name, category, status). Extend to other views as they are defined.
 - [ ] Home tab — summary dashboard with small widgets: what was taken today,
       next doses due in X time, low-stock / reorder reminders. Exact layout TBD.
+      When added, Home becomes the index route (`app/index.tsx`) and the current
+      products screen moves to `app/products.tsx` (update tab triggers + route).
 
 ## Backlog / later (GitHub Issue candidates)
 

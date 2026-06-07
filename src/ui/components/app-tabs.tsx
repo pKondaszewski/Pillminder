@@ -19,10 +19,13 @@ export default function AppTabs() {
         <NativeTabs.Trigger.Label>
           {t('tabs.products')}
         </NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/explore.png')}
-          renderingMode="template"
-        />
+        <NativeTabs.Trigger.Icon sf="pills.fill" md="medication" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="schedules">
+        <NativeTabs.Trigger.Label>
+          {t('tabs.schedules')}
+        </NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="calendar.badge.clock" md="event" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

@@ -8,6 +8,20 @@
       "when": 1780777515375,
       "tag": "0000_daffy_yellow_claw",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1780838723099,
+      "tag": "0001_sharp_zemo",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1780840236767,
+      "tag": "0002_opposite_scream",
+      "breakpoints": true
     }
   ]
 }

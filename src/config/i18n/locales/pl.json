@@ -1,6 +1,7 @@
 {
   "tabs": {
-    "products": "Produkty"
+    "products": "Produkty",
+    "schedules": "Harmonogramy"
   },
   "products": {
     "add": "Dodaj nowy produkt",
@@ -26,5 +27,26 @@
     "delete": "Usuń",
     "deleteTitle": "Usunąć produkt?",
     "deleteConfirm": "Czy na pewno usunąć „{{name}}”?"
+  },
+  "schedule": {
+    "add": "Dodaj harmonogram",
+    "empty": "Brak harmonogramów",
+    "newTitle": "Nowy harmonogram",
+    "editTitle": "Edytuj harmonogram",
+    "product": "Produkt",
+    "noProducts": "Najpierw dodaj produkt",
+    "unknownProduct": "Nieznany produkt",
+    "daily": "Codziennie",
+    "everyXDaysShort": "Co {{days}} dni",
+    "intervalDays": "Częstotliwość",
+    "intervalLess": "Rzadziej",
+    "intervalMore": "Częściej",
+    "timesOfDay": "Godziny",
+    "addTime": "Dodaj godzinę",
+    "removeTime": "Usuń godzinę {{time}}",
+    "preview": "Najbliższe dawki",
+    "previewEmpty": "Dodaj godzinę, aby zobaczyć podgląd",
+    "deleteTitle": "Usunąć harmonogram?",
+    "deleteConfirm": "Czy na pewno usunąć ten harmonogram?"
   }
 }

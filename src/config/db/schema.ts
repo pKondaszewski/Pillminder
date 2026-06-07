@@ -30,13 +30,10 @@ export const schedules = sqliteTable(
     productId: text('product_id')
       .notNull()
       .references(() => products.id, { onDelete: 'cascade' }),
-    type: text('type', { enum: ['daily', 'everyXDays'] }).notNull(),
     intervalDays: integer('interval_days').notNull(),
     timesOfDay: text('times_of_day', { mode: 'json' })
       .$type<string[]>()
       .notNull(),
-    startDate: text('start_date').notNull(),
-    endDate: text('end_date'),
   },
   (table) => [index('idx_schedules_product').on(table.productId)],
 );
