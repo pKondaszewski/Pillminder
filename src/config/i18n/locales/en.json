@@ -20,6 +20,14 @@
     "stock": "Stock",
     "storeLink": "Store link"
   },
+  "home": {
+    "empty": "No doses today",
+    "take": "Take",
+    "undo": "Undo",
+    "undoConfirm": "Undo taking “{{name}}”?",
+    "undoTitle": "Undo taken?",
+    "unknownProduct": "Unknown product"
+  },
   "products": {
     "add": "Add new product",
     "empty": "No products"
@@ -46,6 +54,7 @@
     "unknownProduct": "Unknown product"
   },
   "tabs": {
+    "home": "Today",
     "products": "Products",
     "schedules": "Schedules"
   }

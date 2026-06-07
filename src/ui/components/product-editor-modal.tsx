@@ -14,7 +14,7 @@ import type { products } from '@/config/db/schema';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import { ThemedText } from '@/ui/components/themed-text';
 import { ThemedView } from '@/ui/components/themed-view';
-import { Spacing } from '@/ui/constants/theme';
+import { Spacing } from '@/ui/commons/constants/theme';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Product = typeof products.$inferSelect;

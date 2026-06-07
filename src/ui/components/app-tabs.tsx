@@ -2,7 +2,7 @@ import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from 'react-native';
 
-import { Colors } from '@/ui/constants/theme';
+import { Colors } from '@/ui/commons/constants/theme';
 
 export default function AppTabs() {
   const { t } = useTranslation();
@@ -16,6 +16,10 @@ export default function AppTabs() {
       labelStyle={{ selected: { color: colors.text } }}
     >
       <NativeTabs.Trigger name="index">
+        <NativeTabs.Trigger.Label>{t('tabs.home')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="products">
         <NativeTabs.Trigger.Label>
           {t('tabs.products')}
         </NativeTabs.Trigger.Label>

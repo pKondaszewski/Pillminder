@@ -14,7 +14,7 @@ import { ExternalLink } from './external-link';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
-import { Colors, MaxContentWidth, Spacing } from '@/ui/constants/theme';
+import { Colors, MaxContentWidth, Spacing } from '@/ui/commons/constants/theme';
 
 export default function AppTabs() {
   const { t } = useTranslation();
@@ -25,6 +25,9 @@ export default function AppTabs() {
       <TabList asChild>
         <CustomTabList>
           <TabTrigger name="home" href="/" asChild>
+            <TabButton>{t('tabs.home')}</TabButton>
+          </TabTrigger>
+          <TabTrigger name="products" href="/products" asChild>
             <TabButton>{t('tabs.products')}</TabButton>
           </TabTrigger>
           <TabTrigger name="schedules" href="/schedules" asChild>

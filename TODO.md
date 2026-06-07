@@ -20,7 +20,7 @@ Tick `[x]` in the commit that closes a task.
 - [x] Add / edit / delete product screen (name, category, price, link, stock)
 - [x] Intake rhythm config (daily / every X days / at a time; range from–to or indefinite)
 - [x] Generate planned doses (slots) from the rhythm
-- [ ] "Taken" button → persist dose state
+- [x] "Taken" button → persist dose state (in-app, on the Home/Today tab)
 - [ ] Push notifications (Expo) with "Taken" / "Snooze" actions
 - [x] i18n — PL + EN translation scaffold, organize dictionaries in alphabetical order
 
@@ -49,11 +49,16 @@ Tick `[x]` in the commit that closes a task.
       fragile and conflicts with local-first / no-backend.
 - [ ] Search / filter / sort for list views — starting with the product list
       (by name, category, status). Extend to other views as they are defined.
-- [ ] Home tab — summary dashboard with small widgets: what was taken today,
-      next doses due in X time, low-stock / reorder reminders. Exact layout TBD.
-      When added, Home becomes the index route (`app/index.tsx`) and the current
-      products screen moves to `app/products.tsx` (update tab triggers + route).
+- [ ] Home tab dashboard — expand beyond today's doses: next doses due in X
+      time, low-stock / reorder reminders, summary widgets. Exact layout TBD.
+      (Home is already the index route with today's doses + "Taken".)
 
 ## Backlog / later (GitHub Issue candidates)
 
-- [ ] (empty — drop deferred ideas here)
+- [ ] Revisit tab swiping (`TabSwipe`). Current impl: Fling gesture → router
+      navigate + a Keyframe enter animation, with a `key` remount on focus
+      (resets scroll / re-subscribes live queries). It's a workaround because
+      expo-router 56 dropped classic react-navigation, so real drag-follow
+      paging (material-top-tabs / pager-view across routes) isn't supported.
+      Reconsider if expo-router adds swipeable tabs, or move the 3 tabs into a
+      non-routed PagerView if drag-follow becomes important.

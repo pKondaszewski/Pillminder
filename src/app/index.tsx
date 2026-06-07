@@ -1,105 +1,82 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, StyleSheet } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { products as productsTable } from '@/config/db/schema';
-import type { NewProductInput } from '@/products/dto/new-product-input';
-import { ProductEditorModal } from '@/ui/components/product-editor-modal';
+import type { TodayDose } from '@/doses/dose-service';
 import { ThemedText } from '@/ui/components/themed-text';
 import { ThemedView } from '@/ui/components/themed-view';
-import { Spacing } from '@/ui/constants/theme';
-import { useProducts } from '@/ui/hooks/use-products';
+import { Spacing } from '@/ui/commons/constants/theme';
+import { formatTime } from '@/ui/commons/format-date';
+import { TabSwipe } from '@/ui/components/tab-swipe';
+import { useTodaysDoses } from '@/ui/hooks/use-todays-doses';
 
-type Product = typeof productsTable.$inferSelect;
-
-export default function ProductListScreen() {
+export default function HomeScreen() {
   const { t } = useTranslation();
-  const { products, addProduct, editProduct, removeProduct } = useProducts();
+  const { doses, takeDose, untakeDose } = useTodaysDoses();
 
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editing, setEditing] = useState<Product | null>(null);
+  const displayName = (dose: TodayDose) =>
+    dose.productName ?? t('home.unknownProduct');
 
-  const openCreate = () => {
-    setEditing(null);
-    setEditorOpen(true);
+  const confirmUndo = (item: TodayDose) => {
+    Alert.alert(
+      t('home.undoTitle'),
+      t('home.undoConfirm', { name: displayName(item) }),
+      [
+        { text: t('editor.cancel'), style: 'cancel' },
+        { text: t('home.undo'), onPress: () => untakeDose(item.id) },
+      ],
+    );
   };
 
-  const openEdit = (product: Product) => {
-    setEditing(product);
-    setEditorOpen(true);
-  };
+  const renderItem = ({ item }: { item: TodayDose }) => {
+    return (
+      <ThemedView type="backgroundElement" style={styles.row}>
+        <ThemedView style={styles.rowInfo}>
+          <ThemedText type="smallBold">{formatTime(item.plannedAt)}</ThemedText>
+          <ThemedText>{displayName(item)}</ThemedText>
+        </ThemedView>
 
-  const closeEditor = () => setEditorOpen(false);
-
-  const handleSave = async (input: NewProductInput) => {
-    try {
-      if (editing) {
-        await editProduct(editing.id, input);
-      } else {
-        await addProduct(input);
-      }
-      closeEditor();
-    } catch {
-      // save failed — keep modal open so the user's input is not lost
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await removeProduct(id);
-      closeEditor();
-    } catch {
-      // delete failed — keep modal open
-    }
+        {item.taken ? (
+          <Pressable
+            onPress={() => confirmUndo(item)}
+            style={({ pressed }) => pressed && styles.pressed}
+          >
+            <ThemedText type="small" themeColor="textSecondary">
+              ✓ {item.takenAt ? formatTime(item.takenAt) : ''}
+            </ThemedText>
+          </Pressable>
+        ) : (
+          <Pressable
+            onPress={() => takeDose(item.id)}
+            style={({ pressed }) => pressed && styles.pressed}
+          >
+            <ThemedView type="backgroundSelected" style={styles.takeButton}>
+              <ThemedText type="smallBold" style={styles.takeText}>
+                {t('home.take')}
+              </ThemedText>
+            </ThemedView>
+          </Pressable>
+        )}
+      </ThemedView>
+    );
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <FlatList
-          data={products}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
-            <Pressable
-              onPress={() => openEdit(item)}
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <ThemedView type="backgroundElement" style={styles.row}>
-                <ThemedText>{item.name}</ThemedText>
-                <ThemedText type="small">
-                  {t(`category.${item.category}`)}
-                </ThemedText>
-              </ThemedView>
-            </Pressable>
-          )}
-          ListEmptyComponent={
-            <ThemedText type="small">{t('products.empty')}</ThemedText>
-          }
-          ListFooterComponent={
-            <Pressable
-              onPress={openCreate}
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <ThemedView type="backgroundElement" style={styles.addRow}>
-                <ThemedText style={styles.addText}>
-                  + {t('products.add')}
-                </ThemedText>
-              </ThemedView>
-            </Pressable>
-          }
-        />
-      </SafeAreaView>
-
-      <ProductEditorModal
-        visible={editorOpen}
-        product={editing}
-        onClose={closeEditor}
-        onSave={handleSave}
-        onDelete={handleDelete}
-      />
-    </ThemedView>
+    <TabSwipe>
+      <ThemedView style={styles.container}>
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
+          <FlatList
+            data={doses}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+            renderItem={renderItem}
+            ListEmptyComponent={
+              <ThemedText type="small">{t('home.empty')}</ThemedText>
+            }
+          />
+        </SafeAreaView>
+      </ThemedView>
+    </TabSwipe>
   );
 }
 
@@ -117,18 +94,22 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.three,
   },
   row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: Spacing.three,
     borderRadius: Spacing.three,
+  },
+  rowInfo: {
     gap: Spacing.one,
   },
-  addRow: {
-    padding: Spacing.three,
+  takeButton: {
+    paddingVertical: Spacing.two,
+    paddingHorizontal: Spacing.three,
     borderRadius: Spacing.three,
-    alignItems: 'center',
   },
-  addText: {
+  takeText: {
     color: '#3c87f7',
-    fontWeight: '600',
   },
   pressed: {
     opacity: 0.7,

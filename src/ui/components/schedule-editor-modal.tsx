@@ -21,7 +21,8 @@ import {
 import type { Product } from '@/products/product-service';
 import { ThemedText } from '@/ui/components/themed-text';
 import { ThemedView } from '@/ui/components/themed-view';
-import { Spacing } from '@/ui/constants/theme';
+import { Spacing } from '@/ui/commons/constants/theme';
+import { formatTime } from '@/ui/commons/format-date';
 
 interface Props {
   visible: boolean;
@@ -30,12 +31,6 @@ interface Props {
   onClose: () => void;
   onSave: (input: NewScheduleInput) => void;
   onDelete: (id: string) => void;
-}
-
-function formatTime(date: Date): string {
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${hours}:${minutes}`;
 }
 
 function formatOccurrence(date: Date): string {

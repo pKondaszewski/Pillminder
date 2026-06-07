@@ -1,10 +1,8 @@
-import { products } from '@/config/db/schema';
-
-type Category = (typeof products.$inferInsert)['category'];
+export type ProductCategory = 'medication' | 'supplement' | 'care';
 
 export interface NewProductInput {
   name: string;
-  category: Category;
+  category: ProductCategory;
   price?: number | null;
   storeLink?: string | null;
   stock?: number | null;

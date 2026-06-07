@@ -20,6 +20,14 @@
     "stock": "Zapas",
     "storeLink": "Link do sklepu"
   },
+  "home": {
+    "empty": "Brak dawek na dziś",
+    "take": "Wziąłem",
+    "undo": "Cofnij",
+    "undoConfirm": "Cofnąć wzięcie „{{name}}”?",
+    "undoTitle": "Cofnąć wzięcie?",
+    "unknownProduct": "Nieznany produkt"
+  },
   "products": {
     "add": "Dodaj nowy produkt",
     "empty": "Brak produktów"
@@ -46,6 +54,7 @@
     "unknownProduct": "Nieznany produkt"
   },
   "tabs": {
+    "home": "Dziś",
     "products": "Produkty",
     "schedules": "Harmonogramy"
   }

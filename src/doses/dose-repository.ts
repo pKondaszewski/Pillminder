@@ -1,4 +1,4 @@
-import { and, eq, gte } from 'drizzle-orm';
+import { and, eq, gte, lt } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
@@ -12,8 +12,27 @@ export interface NewDoseSlot {
   plannedAt: Date;
 }
 
-export function dosesQuery() {
-  return db.select().from(doses);
+export function todaysDosesQuery() {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 1);
+
+  return db
+    .select()
+    .from(doses)
+    .where(and(gte(doses.plannedAt, start), lt(doses.plannedAt, end)))
+    .orderBy(doses.plannedAt);
+}
+
+export async function setDoseState(
+  id: string,
+  state: 'taken' | 'pending',
+): Promise<void> {
+  await db
+    .update(doses)
+    .set({ state, takenAt: state === 'taken' ? new Date() : null })
+    .where(eq(doses.id, id));
 }
 
 export async function replaceFuturePendingDoses(
