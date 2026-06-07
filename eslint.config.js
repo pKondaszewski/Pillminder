@@ -8,4 +8,21 @@ module.exports = defineConfig([
   {
     ignores: ['dist/*', 'node_modules/*'],
   },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/*/*-repository', '@/*/*-helper'],
+              message:
+                'Cross-module access goes through the module service (facade). Repositories and helpers are module-private — re-export what you need from the service.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);

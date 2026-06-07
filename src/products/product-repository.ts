@@ -12,6 +12,15 @@ export function productsQuery() {
   return db.select().from(products);
 }
 
+export async function getProductById(id: string): Promise<Product | undefined> {
+  const [product] = await db
+    .select()
+    .from(products)
+    .where(eq(products.id, id))
+    .limit(1);
+  return product;
+}
+
 export async function createProduct(input: NewProductInput): Promise<Product> {
   const now = new Date();
   const [created] = await db

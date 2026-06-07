@@ -4,14 +4,22 @@ import type { NewProductInput } from './dto/new-product-input';
 import {
   createProduct,
   deleteProduct,
+  getProductById,
   productsQuery,
   updateProduct,
+  type Product,
 } from './product-repository';
+
+export type { Product } from './product-repository';
 
 const log = createLogger('product-service');
 
 export function getProductsQuery() {
   return productsQuery();
+}
+
+export function getProduct(id: string): Promise<Product | undefined> {
+  return getProductById(id);
 }
 
 export async function addProduct(input: NewProductInput): Promise<void> {

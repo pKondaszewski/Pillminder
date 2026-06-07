@@ -19,7 +19,7 @@ Tick `[x]` in the commit that closes a task.
 - [x] Product list screen (`src/app/index.tsx`)
 - [x] Add / edit / delete product screen (name, category, price, link, stock)
 - [x] Intake rhythm config (daily / every X days / at a time; range from–to or indefinite)
-- [ ] Generate planned doses (slots) from the rhythm
+- [x] Generate planned doses (slots) from the rhythm
 - [ ] "Taken" button → persist dose state
 - [ ] Push notifications (Expo) with "Taken" / "Snooze" actions
 - [x] i18n — PL + EN translation scaffold, organize dictionaries in alphabetical order
@@ -27,7 +27,8 @@ Tick `[x]` in the commit that closes a task.
 ## Weekend 3 — stock + reorder alert
 
 - [ ] Unit counter on the product
-- [ ] Decrement stock on "taken"
+- [ ] Decrement stock on "taken" — wrap "mark dose taken" + "decrement stock"
+      in a single `db.transaction` (two writes must be atomic)
 - [ ] Compute reorder alert moment (from rhythm and stock)
 - [ ] Visual low-stock alert
 

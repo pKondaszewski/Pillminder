@@ -14,9 +14,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
-import { previewOccurrences } from '@/schedules/schedule-preview';
-import type { Schedule } from '@/schedules/schedule-repository';
-import type { Product } from '@/products/product-repository';
+import {
+  previewOccurrences,
+  type Schedule,
+} from '@/schedules/schedule-service';
+import type { Product } from '@/products/product-service';
 import { ThemedText } from '@/ui/components/themed-text';
 import { ThemedView } from '@/ui/components/themed-view';
 import { Spacing } from '@/ui/constants/theme';
@@ -41,8 +43,6 @@ function formatOccurrence(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   return `${day}.${month} · ${formatTime(date)}`;
 }
-
-const PREVIEW_COUNT = 3;
 
 export function ScheduleEditorModal({
   visible,
@@ -115,7 +115,7 @@ function EditorForm({
     setPickerOpen(false);
   };
 
-  const preview = previewOccurrences(intervalDays, times, PREVIEW_COUNT);
+  const preview = previewOccurrences(intervalDays, times);
 
   const handleSave = () => {
     if (productId === '' || times.length === 0) {

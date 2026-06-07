@@ -4,7 +4,7 @@ import { FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
-import type { Schedule } from '@/schedules/schedule-repository';
+import type { Schedule } from '@/schedules/schedule-service';
 import { ScheduleEditorModal } from '@/ui/components/schedule-editor-modal';
 import { ThemedText } from '@/ui/components/themed-text';
 import { ThemedView } from '@/ui/components/themed-view';
