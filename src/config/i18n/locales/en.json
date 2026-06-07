@@ -28,6 +28,12 @@
     "undoTitle": "Undo taken?",
     "unknownProduct": "Unknown product"
   },
+  "notification": {
+    "body": "Time to take {{name}}",
+    "snooze": "Snooze",
+    "take": "Taken",
+    "title": "Dose reminder"
+  },
   "products": {
     "add": "Add new product",
     "empty": "No products"

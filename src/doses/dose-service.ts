@@ -1,17 +1,33 @@
+import i18n from '@/config/i18n';
 import { createLogger } from '@/config/logger';
+import {
+  cancelDoseReminder,
+  cancelDoseReminders,
+  scheduleDoseReminder,
+  SNOOZE_MINUTES,
+} from '@/notifications/notification-service';
 import { getProduct } from '@/products/product-service';
 import { nextOccurrences, type Schedule } from '@/schedules/schedule-service';
 
 import {
+  getDoseById,
   replaceFuturePendingDoses,
   setDoseState,
   todaysDosesQuery,
 } from './dose-repository';
+import { isDueInFuture, isPending, isPresent } from './dose-validator';
 
 export { toTodayDose } from './dto/today-dose-output';
 export type { TodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');
+
+function reminderStrings(productName: string) {
+  return {
+    title: i18n.t('notification.title'),
+    body: i18n.t('notification.body', { name: productName }),
+  };
+}
 
 export function getTodaysDosesQuery() {
   return todaysDosesQuery();
@@ -21,6 +37,7 @@ export async function takeDose(id: string): Promise<void> {
   log.info(`Marking dose ${id} as taken`);
   try {
     await setDoseState(id, 'taken');
+    await cancelDoseReminder(id);
   } catch (err) {
     log.error(`Failed to mark dose ${id} as taken`, err);
     throw err;
@@ -31,9 +48,38 @@ export async function untakeDose(id: string): Promise<void> {
   log.info(`Reverting dose ${id} to pending`);
   try {
     await setDoseState(id, 'pending');
+
+    const dose = await getDoseById(id);
+    if (!isPresent(dose) || !isDueInFuture(dose)) return;
+
+    const product = await getProduct(dose.productId);
+    if (!isPresent(product)) return;
+
+    await scheduleDoseReminder(
+      { id: dose.id, productName: product.name, plannedAt: dose.plannedAt },
+      reminderStrings(product.name),
+    );
   } catch (err) {
     log.error(`Failed to revert dose ${id}`, err);
     throw err;
+  }
+}
+
+export async function snoozeDose(id: string): Promise<void> {
+  log.info(`Snoozing dose ${id} by ${SNOOZE_MINUTES} min`);
+  try {
+    const dose = await getDoseById(id);
+    if (!isPresent(dose) || !isPending(dose)) return;
+    const product = await getProduct(dose.productId);
+    if (!isPresent(product)) return;
+
+    const when = new Date(Date.now() + SNOOZE_MINUTES * 60 * 1000);
+    await scheduleDoseReminder(
+      { id: dose.id, productName: product.name, plannedAt: when },
+      reminderStrings(product.name),
+    );
+  } catch (err) {
+    log.error(`Failed to snooze dose ${id}`, err);
   }
 }
 
@@ -52,7 +98,7 @@ export async function syncDosesForSchedule(schedule: Schedule): Promise<void> {
     `Syncing ${slots.length} dose slot(s) for schedule ${schedule.id} (stock ${stock})`,
   );
   try {
-    await replaceFuturePendingDoses(
+    const { removedIds, inserted } = await replaceFuturePendingDoses(
       schedule.id,
       from,
       slots.map((plannedAt) => ({
@@ -60,6 +106,22 @@ export async function syncDosesForSchedule(schedule: Schedule): Promise<void> {
         scheduleId: schedule.id,
         plannedAt,
       })),
+    );
+
+    await cancelDoseReminders(removedIds);
+    if (!isPresent(product)) return;
+
+    await Promise.all(
+      inserted.map((dose) =>
+        scheduleDoseReminder(
+          {
+            id: dose.id,
+            productName: product.name,
+            plannedAt: dose.plannedAt,
+          },
+          reminderStrings(product.name),
+        ),
+      ),
     );
   } catch (err) {
     log.error(`Failed to sync doses for schedule ${schedule.id}`, err);

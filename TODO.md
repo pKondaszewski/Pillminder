@@ -24,11 +24,15 @@ Tick `[x]` in the commit that closes a task.
 - [x] Decrement stock on "taken" (and restore on undo) — atomic via a single
       `db.transaction` in setDoseState; guarded by state transition
 - [x] i18n — PL + EN translation scaffold, organize dictionaries in alphabetical order
+- [x] Push notifications (Expo) with "Taken" / "Snooze" actions — local
+      scheduled notifications per dose (`expo-notifications`), category actions
+      open the app and run the handler (`takeDose` / `snoozeDose`). Synced with
+      doses on schedule create/edit, cancelled on take, rescheduled on undo.
+      Note: true background action handling (act without opening app) deferred.
 
 ## Weekend 3 — stock + reorder alert
 
 - [ ] Unit counter on the product
-- [ ] Push notifications (Expo) with "Taken" / "Snooze" actions
 - [ ] Compute reorder alert moment (from rhythm and stock)
 - [ ] Visual low-stock alert
 

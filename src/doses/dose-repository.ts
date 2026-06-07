@@ -4,6 +4,8 @@ import * as Crypto from 'expo-crypto';
 import { db } from '@/config/db/database';
 import { doses, products } from '@/config/db/schema';
 
+import type { ReplaceDosesQueryResult } from './dto/replace-doses-query-result';
+
 export type Dose = typeof doses.$inferSelect;
 
 export interface NewDoseSlot {
@@ -55,25 +57,35 @@ export async function setDoseState(
   });
 }
 
+export async function getDoseById(id: string): Promise<Dose | undefined> {
+  const [dose] = await db.select().from(doses).where(eq(doses.id, id));
+  return dose;
+}
+
 export async function replaceFuturePendingDoses(
   scheduleId: string,
   from: Date,
   slots: NewDoseSlot[],
-): Promise<void> {
-  await db.transaction(async (tx) => {
-    await tx
-      .delete(doses)
-      .where(
-        and(
-          eq(doses.scheduleId, scheduleId),
-          eq(doses.state, 'pending'),
-          gte(doses.plannedAt, from),
-        ),
-      );
+): Promise<ReplaceDosesQueryResult> {
+  return db.transaction(async (tx) => {
+    const futurePending = and(
+      eq(doses.scheduleId, scheduleId),
+      eq(doses.state, 'pending'),
+      gte(doses.plannedAt, from),
+    );
 
-    if (slots.length === 0) return;
+    const removed = await tx
+      .select({ id: doses.id })
+      .from(doses)
+      .where(futurePending);
 
-    await tx
+    await tx.delete(doses).where(futurePending);
+
+    const removedIds = removed.map((row) => row.id);
+
+    if (slots.length === 0) return { removedIds, inserted: [] };
+
+    const inserted = await tx
       .insert(doses)
       .values(
         slots.map((slot) => ({
@@ -85,6 +97,9 @@ export async function replaceFuturePendingDoses(
           takenAt: null,
         })),
       )
-      .onConflictDoNothing();
+      .onConflictDoNothing()
+      .returning();
+
+    return { removedIds, inserted };
   });
 }

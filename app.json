@@ -37,6 +37,12 @@
       ],
       "expo-sqlite",
       "expo-localization",
+      [
+        "expo-notifications",
+        {
+          "color": "#208AEF"
+        }
+      ],
       "@react-native-community/datetimepicker"
     ],
     "experiments": {

@@ -28,6 +28,12 @@
     "undoTitle": "Cofnąć wzięcie?",
     "unknownProduct": "Nieznany produkt"
   },
+  "notification": {
+    "body": "Czas wziąć {{name}}",
+    "snooze": "Drzemka",
+    "take": "Wziąłem",
+    "title": "Przypomnienie o dawce"
+  },
   "products": {
     "add": "Dodaj nowy produkt",
     "empty": "Brak produktów"
