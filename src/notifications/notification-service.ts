@@ -143,24 +143,6 @@ export async function cancelDoseReminders(doseIds: string[]): Promise<void> {
   await Promise.all(doseIds.map(cancelDoseReminder));
 }
 
-function processReminderResponse(
-  response: NotificationResponse,
-  handlers: ReminderResponseHandlers,
-): void {
-  const doseId = response.notification.request.content.data?.doseId;
-  if (typeof doseId !== 'string') return;
-
-  const key = `${response.notification.request.identifier}:${response.actionIdentifier}`;
-  if (handledResponses.has(key)) return;
-  handledResponses.add(key);
-
-  if (response.actionIdentifier === TAKE_ACTION) {
-    handlers.onTake(doseId);
-  } else if (response.actionIdentifier === SNOOZE_ACTION) {
-    handlers.onSnooze(doseId);
-  }
-}
-
 export async function subscribeToReminderResponses(
   handlers: ReminderResponseHandlers,
 ): Promise<() => void> {
@@ -168,13 +150,20 @@ export async function subscribeToReminderResponses(
 
   try {
     const Notifications = await loadNotifications();
-    const subscription = Notifications.addNotificationResponseReceivedListener(
-      (response) => processReminderResponse(response, handlers),
-    );
+
+    const handle = (response: NotificationResponse) => {
+      if (!processReminderResponse(response, handlers)) return;
+      void Notifications.dismissNotificationAsync(
+        response.notification.request.identifier,
+      );
+    };
+
+    const subscription =
+      Notifications.addNotificationResponseReceivedListener(handle);
 
     const launchResponse = Notifications.getLastNotificationResponse();
     if (launchResponse) {
-      processReminderResponse(launchResponse, handlers);
+      handle(launchResponse);
     }
 
     return () => subscription.remove();
@@ -182,4 +171,27 @@ export async function subscribeToReminderResponses(
     log.error('Failed to subscribe to reminder responses', err);
     return () => {};
   }
+}
+
+function processReminderResponse(
+  response: NotificationResponse,
+  handlers: ReminderResponseHandlers,
+): boolean {
+  const doseId = response.notification.request.content.data?.doseId;
+  if (typeof doseId !== 'string') return false;
+
+  const key = `${response.notification.request.identifier}:${response.actionIdentifier}`;
+  if (handledResponses.has(key)) return false;
+
+  if (response.actionIdentifier === TAKE_ACTION) {
+    handledResponses.add(key);
+    handlers.onTake(doseId);
+    return true;
+  }
+  if (response.actionIdentifier === SNOOZE_ACTION) {
+    handledResponses.add(key);
+    handlers.onSnooze(doseId);
+    return true;
+  }
+  return false;
 }
