@@ -27,6 +27,24 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
 
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Cache Android NDK & CMake
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.ANDROID_HOME }}/ndk
+            ${{ env.ANDROID_HOME }}/cmake
+          key: android-sdk-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: android-sdk-${{ runner.os }}-
+
       - name: Install dependencies
         run: npm ci
 
@@ -40,6 +58,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
-          name: pillpal-apk-${{ github.ref_name }}
+          name: pillpal-apk
           path: android/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
