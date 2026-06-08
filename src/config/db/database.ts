@@ -3,7 +3,7 @@ import { openDatabaseSync } from 'expo-sqlite';
 
 import * as schema from './schema';
 
-export const DATABASE_NAME = 'pillpal.db';
+export const DATABASE_NAME = 'pillminder.db';
 
 const expo = openDatabaseSync(DATABASE_NAME, { enableChangeListener: true });
 expo.execSync('PRAGMA foreign_keys = ON');

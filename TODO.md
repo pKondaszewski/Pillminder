@@ -1,4 +1,4 @@
-# TODO — PillPal
+# TODO — Pillminder
 
 Current tasks. The high-level roadmap lives in `CLAUDE.md`.
 Tick `[x]` in the commit that closes a task.

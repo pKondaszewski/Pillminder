@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "PillPal",
-    "slug": "pillpal",
+    "name": "Pillminder",
+    "slug": "pillminder",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "pillpal",
+    "scheme": "pillminder",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
     },
     "android": {
-      "package": "com.pkondaszewski.pillpal",
+      "package": "com.pkondaszewski.pillminder",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
