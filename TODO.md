@@ -52,12 +52,31 @@ Tick `[x]` in the commit that closes a task.
 
 ## Version 2 — app growth (deferred)
 
-- [ ] Product image on the card — local variant: `expo-image-picker` (camera/gallery)
-      → file in the document directory (`expo-file-system`), store only `imageUri`
-      in the DB (not a blob). Needs: `imageUri` field on `Product`, file cleanup
-      on product delete, decision on images in JSON export/import.
+- [ ] Product images — multiple per product, not one field. Use case: at the
+      pharmacy you forget the name/look, so you show a photo. Roles: box (name +
+      dose backup), pill (recognise loose tablets in an organiser), receipt /
+      prescription (price + where to buy + refill). Local: `expo-image-picker`
+      (camera/gallery) → file in the document directory (`expo-file-system`),
+      store only the path in the DB (not a blob). Schema: a `product_images`
+      table (`productId`, `uri`, `role`), not an `imageUri` column. Needs: file
+      cleanup on product delete, decision on images in JSON export/import.
       Rejected for now: fetching the image from the link (scraping `og:image`) —
       fragile and conflicts with local-first / no-backend.
+- [ ] Escalating reminders — miss the first → a sharper one after X min → a
+      third. Pure notifications + timers over the existing dose slots. Biggest
+      lever on "I forgot". Extend Snooze with a time picker while here.
+- [ ] Adherence stats — "22/30 this month" + streak ("12 days in a row"). Data
+      already exists in the dose slots; this is a view + a counter. Real value
+      at the doctor and for motivation.
+- [ ] Quiet hours / smart timing — don't fire at night; shift a dose into the
+      user's active window. Fewer ignored notifications = fewer misses.
+- [ ] Bulk confirm — evening review: list today's pending doses, confirm them in
+      one tap. Lowers confirmation friction.
+- [ ] Travel planning — given a trip (away N days), compute the doses needed
+      (from the rhythm) and check against current stock. Two prompts: "buy a
+      refill now — you'll run out while away / right after you get back" and
+      "pack X portions for the trip — you can't buy them there". Reuses the
+      rhythm + stock the reorder logic already needs.
 - [ ] Search / filter / sort for list views — starting with the product list
       (by name, category, status). Extend to other views as they are defined.
 - [ ] Home tab dashboard — expand beyond today's doses: next doses due in X

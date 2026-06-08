@@ -36,6 +36,9 @@ yarn-error.*
 # local env files
 .env*.local
 
+# personal scratchpad (not part of the committed roadmap)
+IDEAS.md
+
 # typescript
 *.tsbuildinfo
 
