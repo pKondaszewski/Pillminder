@@ -29,6 +29,13 @@ Tick `[x]` in the commit that closes a task.
       open the app and run the handler (`takeDose` / `snoozeDose`). Synced with
       doses on schedule create/edit, cancelled on take, rescheduled on undo.
       Note: true background action handling (act without opening app) deferred.
+- [x] In-app "taken" also dismisses the delivered notification (not just the
+      scheduled one) — `dismissDoseReminder`. Double-take (app + notification) is
+      already stock-safe via the state-transition guard in `setDoseState`.
+- [x] Dose status indicator on the Today tab — pulsing blue dot = pending,
+      solid green = taken (`DoseStatusDot`, reanimated).
+- [x] Snooze is persisted (`doses.snoozed_until`) and surfaced on the Today tab
+      ("snoozed → HH:MM"); cleared on take/undo.
 
 ## Weekend 3 — stock + reorder alert
 
@@ -86,3 +93,9 @@ Tick `[x]` in the commit that closes a task.
       (`expo-intent-launcher` → battery settings, or
       `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`). Standard for alarm/medication
       apps. Consider exact-alarm permissions separately for 12+ devices.
+- [ ] Speed up the dev/test loop. The CD APK build is slow (~15-20 min per
+      change), too slow for iterating on notification behaviour. Use a faster
+      path for everyday testing: an Android emulator + dev build with Metro
+      (`expo run:android` / `--dev-client`) so JS changes hot-reload without a
+      full rebuild, reserving the CD APK for milestone/device checks. Evaluate
+      a local emulator setup and/or EAS build caching to cut turnaround.

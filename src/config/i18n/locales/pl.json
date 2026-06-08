@@ -22,6 +22,7 @@
   },
   "home": {
     "empty": "Brak dawek na dziś",
+    "snoozed": "drzemka → {{time}}",
     "take": "Wziąłem",
     "undo": "Cofnij",
     "undoConfirm": "Cofnąć wzięcie „{{name}}”?",

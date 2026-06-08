@@ -7,6 +7,7 @@ import { ThemedText } from '@/ui/components/themed-text';
 import { ThemedView } from '@/ui/components/themed-view';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatTime } from '@/ui/commons/format-date';
+import { DoseStatusDot } from '@/ui/components/dose-status-dot';
 import { TabSwipe } from '@/ui/components/tab-swipe';
 import { useTodaysDoses } from '@/ui/hooks/use-todays-doses';
 
@@ -31,9 +32,19 @@ export default function HomeScreen() {
   const renderItem = ({ item }: { item: TodayDose }) => {
     return (
       <ThemedView type="backgroundElement" style={styles.row}>
-        <ThemedView style={styles.rowInfo}>
-          <ThemedText type="smallBold">{formatTime(item.plannedAt)}</ThemedText>
-          <ThemedText>{displayName(item)}</ThemedText>
+        <ThemedView style={styles.rowLeading}>
+          <DoseStatusDot taken={item.taken} />
+          <ThemedView style={styles.rowInfo}>
+            <ThemedText type="smallBold">
+              {formatTime(item.plannedAt)}
+            </ThemedText>
+            <ThemedText>{displayName(item)}</ThemedText>
+            {!item.taken && item.snoozedUntil ? (
+              <ThemedText type="small" themeColor="textSecondary">
+                {t('home.snoozed', { time: formatTime(item.snoozedUntil) })}
+              </ThemedText>
+            ) : null}
+          </ThemedView>
         </ThemedView>
 
         {item.taken ? (
@@ -100,8 +111,15 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     borderRadius: Spacing.three,
   },
+  rowLeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.three,
+    backgroundColor: 'transparent',
+  },
   rowInfo: {
     gap: Spacing.one,
+    backgroundColor: 'transparent',
   },
   takeButton: {
     paddingVertical: Spacing.two,

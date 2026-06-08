@@ -22,6 +22,7 @@
   },
   "home": {
     "empty": "No doses today",
+    "snoozed": "snoozed → {{time}}",
     "take": "Take",
     "undo": "Undo",
     "undoConfirm": "Undo taking “{{name}}”?",

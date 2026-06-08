@@ -143,6 +143,16 @@ export async function cancelDoseReminders(doseIds: string[]): Promise<void> {
   await Promise.all(doseIds.map(cancelDoseReminder));
 }
 
+export async function dismissDoseReminder(doseId: string): Promise<void> {
+  if (!isSupported) return;
+  try {
+    const Notifications = await loadNotifications();
+    await Notifications.dismissNotificationAsync(doseId);
+  } catch (err) {
+    log.warn(`Failed to dismiss delivered reminder for dose ${doseId}`, err);
+  }
+}
+
 export async function subscribeToReminderResponses(
   handlers: ReminderResponseHandlers,
 ): Promise<() => void> {

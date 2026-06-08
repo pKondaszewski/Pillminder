@@ -37,7 +37,11 @@ export async function setDoseState(
 
     await tx
       .update(doses)
-      .set({ state, takenAt: state === 'taken' ? new Date() : null })
+      .set({
+        state,
+        takenAt: state === 'taken' ? new Date() : null,
+        snoozedUntil: null,
+      })
       .where(eq(doses.id, id));
 
     const [product] = await tx
@@ -55,6 +59,13 @@ export async function setDoseState(
       })
       .where(eq(products.id, dose.productId));
   });
+}
+
+export async function setDoseSnoozedUntil(
+  id: string,
+  when: Date,
+): Promise<void> {
+  await db.update(doses).set({ snoozedUntil: when }).where(eq(doses.id, id));
 }
 
 export async function getDoseById(id: string): Promise<Dose | undefined> {

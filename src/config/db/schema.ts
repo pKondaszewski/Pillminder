@@ -53,6 +53,7 @@ export const doses = sqliteTable(
       .notNull()
       .default('pending'),
     takenAt: integer('taken_at', { mode: 'timestamp' }),
+    snoozedUntil: integer('snoozed_until', { mode: 'timestamp' }),
   },
   (table) => [
     uniqueIndex('idx_doses_unique_slot').on(table.scheduleId, table.plannedAt),

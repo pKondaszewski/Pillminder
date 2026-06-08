@@ -3,6 +3,7 @@ import { createLogger } from '@/config/logger';
 import {
   cancelDoseReminder,
   cancelDoseReminders,
+  dismissDoseReminder,
   scheduleDoseReminder,
   SNOOZE_MINUTES,
 } from '@/notifications/notification-service';
@@ -12,6 +13,7 @@ import { nextOccurrences, type Schedule } from '@/schedules/schedule-service';
 import {
   getDoseById,
   replaceFuturePendingDoses,
+  setDoseSnoozedUntil,
   setDoseState,
   todaysDosesQuery,
 } from './dose-repository';
@@ -37,7 +39,7 @@ export async function takeDose(id: string): Promise<void> {
   log.info(`Marking dose ${id} as taken`);
   try {
     await setDoseState(id, 'taken');
-    await cancelDoseReminder(id);
+    await Promise.all([cancelDoseReminder(id), dismissDoseReminder(id)]);
   } catch (err) {
     log.error(`Failed to mark dose ${id} as taken`, err);
     throw err;
@@ -78,6 +80,7 @@ export async function snoozeDose(id: string): Promise<void> {
       { id: dose.id, productName: product.name, plannedAt: when },
       reminderStrings(product.name),
     );
+    await setDoseSnoozedUntil(dose.id, when);
   } catch (err) {
     log.error(`Failed to snooze dose ${id}`, err);
   }

@@ -6,6 +6,7 @@ export interface TodayDose {
   plannedAt: Date;
   taken: boolean;
   takenAt: Date | null;
+  snoozedUntil: Date | null;
 }
 
 export function toTodayDose(dose: Dose, productName: string | null): TodayDose {
@@ -15,5 +16,6 @@ export function toTodayDose(dose: Dose, productName: string | null): TodayDose {
     plannedAt: dose.plannedAt,
     taken: dose.state === 'taken',
     takenAt: dose.takenAt,
+    snoozedUntil: dose.snoozedUntil,
   };
 }
