@@ -18,6 +18,8 @@
     "price": "Cena (zł)",
     "save": "Zapisz",
     "stock": "Zapas",
+    "stockLess": "Zmniejsz zapas",
+    "stockMore": "Zwiększ zapas",
     "storeLink": "Link do sklepu"
   },
   "home": {

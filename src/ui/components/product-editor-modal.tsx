@@ -112,6 +112,11 @@ function EditorForm({
     );
   };
 
+  const bumpStock = (delta: number) => {
+    const current = toNumber(stock) ?? 0;
+    setStock(String(Math.max(0, current + delta)));
+  };
+
   const inputStyle = [
     styles.input,
     { color: theme.text, borderColor: theme.backgroundSelected },
@@ -173,14 +178,36 @@ function EditorForm({
           />
 
           <ThemedText type="small">{t('editor.stock')}</ThemedText>
-          <TextInput
-            value={stock}
-            onChangeText={setStock}
-            keyboardType="numeric"
-            placeholder="0"
-            placeholderTextColor={theme.textSecondary}
-            style={inputStyle}
-          />
+          <ThemedView style={styles.stepperRow}>
+            <Pressable
+              onPress={() => bumpStock(-1)}
+              hitSlop={Spacing.two}
+              accessibilityLabel={t('editor.stockLess')}
+              style={({ pressed }) => pressed && styles.pressed}
+            >
+              <ThemedView type="backgroundElement" style={styles.stepperButton}>
+                <ThemedText type="subtitle">−</ThemedText>
+              </ThemedView>
+            </Pressable>
+            <TextInput
+              value={stock}
+              onChangeText={setStock}
+              keyboardType="numeric"
+              placeholder="0"
+              placeholderTextColor={theme.textSecondary}
+              style={[inputStyle, styles.stepperInput]}
+            />
+            <Pressable
+              onPress={() => bumpStock(1)}
+              hitSlop={Spacing.two}
+              accessibilityLabel={t('editor.stockMore')}
+              style={({ pressed }) => pressed && styles.pressed}
+            >
+              <ThemedView type="backgroundElement" style={styles.stepperButton}>
+                <ThemedText type="subtitle">+</ThemedText>
+              </ThemedView>
+            </Pressable>
+          </ThemedView>
 
           <ThemedText type="small">{t('editor.storeLink')}</ThemedText>
           <TextInput
@@ -266,6 +293,22 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.two,
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.three,
+  },
+  stepperRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  stepperButton: {
+    width: 48,
+    height: 48,
+    borderRadius: Spacing.three,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepperInput: {
+    flex: 1,
+    textAlign: 'center',
   },
   pressed: {
     opacity: 0.7,

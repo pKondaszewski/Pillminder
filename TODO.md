@@ -39,7 +39,8 @@ Tick `[x]` in the commit that closes a task.
 
 ## Weekend 3 — stock + reorder alert
 
-- [ ] Unit counter on the product
+- [x] Unit counter on the product — stock field with +/- stepper buttons in
+      the editor for quick top-ups; auto-decrement on take already in place.
 - [x] Compute reorder alert moment (from rhythm and stock) — pure
       `reorderStatus` in `src/products/reorder.ts`: dailyConsumption summed
       across schedules, `daysLeft = stock / dailyConsumption`, low when fewer

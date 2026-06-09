@@ -18,6 +18,8 @@
     "price": "Price (USD)",
     "save": "Save",
     "stock": "Stock",
+    "stockLess": "Decrease stock",
+    "stockMore": "Increase stock",
     "storeLink": "Store link"
   },
   "home": {
