@@ -46,6 +46,12 @@ Tick `[x]` in the commit that closes a task.
       than the threshold (default 7) days of supply remain.
 - [x] Visual low-stock alert — amber badge on the product list, fed by
       `useReorderStatuses` (joins each product's stock with its schedules).
+- [ ] Reorder notification — a dedicated, fire-once notification when a product
+      crosses the low-stock threshold (`reorderStatus.isLow`), separate from the
+      per-dose "take" reminder. Different timing (one-shot, not per dose) and a
+      different action ("Buy" → `storeLink`). Reuses the existing
+      `notification-service` plumbing with a new category. Re-arm after stock is
+      topped up so it can fire again next time.
 
 ## Weekend 4 — history + polish
 
