@@ -37,7 +37,9 @@
   },
   "products": {
     "add": "Add new product",
-    "empty": "No products"
+    "empty": "No products",
+    "lowStock": "Low stock",
+    "lowStockDays": "~{{days}}d left"
   },
   "schedule": {
     "add": "Add schedule",

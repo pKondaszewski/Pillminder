@@ -40,8 +40,12 @@ Tick `[x]` in the commit that closes a task.
 ## Weekend 3 — stock + reorder alert
 
 - [ ] Unit counter on the product
-- [ ] Compute reorder alert moment (from rhythm and stock)
-- [ ] Visual low-stock alert
+- [x] Compute reorder alert moment (from rhythm and stock) — pure
+      `reorderStatus` in `src/products/reorder.ts`: dailyConsumption summed
+      across schedules, `daysLeft = stock / dailyConsumption`, low when fewer
+      than the threshold (default 7) days of supply remain.
+- [x] Visual low-stock alert — amber badge on the product list, fed by
+      `useReorderStatuses` (joins each product's stock with its schedules).
 
 ## Weekend 4 — history + polish
 

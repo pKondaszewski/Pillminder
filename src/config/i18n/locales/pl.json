@@ -37,7 +37,9 @@
   },
   "products": {
     "add": "Dodaj nowy produkt",
-    "empty": "Brak produktów"
+    "empty": "Brak produktów",
+    "lowStock": "Niski zapas",
+    "lowStockDays": "~{{days}} dni"
   },
   "schedule": {
     "add": "Dodaj harmonogram",

@@ -11,12 +11,14 @@ import { ThemedView } from '@/ui/components/themed-view';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { TabSwipe } from '@/ui/components/tab-swipe';
 import { useProducts } from '@/ui/hooks/use-products';
+import { useReorderStatuses } from '@/ui/hooks/use-reorder';
 
 type Product = typeof productsTable.$inferSelect;
 
 export default function ProductListScreen() {
   const { t } = useTranslation();
   const { products, addProduct, editProduct, removeProduct } = useProducts();
+  const reorderStatuses = useReorderStatuses();
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
@@ -63,19 +65,30 @@ export default function ProductListScreen() {
             data={products}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
-            renderItem={({ item }) => (
-              <Pressable
-                onPress={() => openEdit(item)}
-                style={({ pressed }) => pressed && styles.pressed}
-              >
-                <ThemedView type="backgroundElement" style={styles.row}>
-                  <ThemedText>{item.name}</ThemedText>
-                  <ThemedText type="small">
-                    {t(`category.${item.category}`)}
-                  </ThemedText>
-                </ThemedView>
-              </Pressable>
-            )}
+            renderItem={({ item }) => {
+              const reorder = reorderStatuses[item.id];
+              return (
+                <Pressable
+                  onPress={() => openEdit(item)}
+                  style={({ pressed }) => pressed && styles.pressed}
+                >
+                  <ThemedView type="backgroundElement" style={styles.row}>
+                    <ThemedText>{item.name}</ThemedText>
+                    <ThemedText type="small">
+                      {t(`category.${item.category}`)}
+                    </ThemedText>
+                    {reorder?.isLow && reorder.daysLeft !== null && (
+                      <ThemedText type="small" style={styles.lowStock}>
+                        {t('products.lowStock')} ·{' '}
+                        {t('products.lowStockDays', {
+                          days: Math.ceil(reorder.daysLeft),
+                        })}
+                      </ThemedText>
+                    )}
+                  </ThemedView>
+                </Pressable>
+              );
+            }}
             ListEmptyComponent={
               <ThemedText type="small">{t('products.empty')}</ThemedText>
             }
@@ -131,6 +144,10 @@ const styles = StyleSheet.create({
   },
   addText: {
     color: '#3c87f7',
+    fontWeight: '600',
+  },
+  lowStock: {
+    color: '#d97706',
     fontWeight: '600',
   },
   pressed: {
