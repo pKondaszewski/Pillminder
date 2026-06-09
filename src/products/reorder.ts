@@ -13,16 +13,24 @@ export function reorderStatus(
   const dailyConsumption = totalDailyConsumption(schedules);
 
   if (stock == null || dailyConsumption <= 0) {
-    return { dailyConsumption, daysLeft: null, runOutAt: null, isLow: false };
+    return {
+      dailyConsumption,
+      daysLeft: null,
+      runOutAt: null,
+      reorderAt: null,
+      isLow: false,
+    };
   }
 
   const daysLeft = stock / dailyConsumption;
   const runOutAt = new Date(now.getTime() + daysLeft * MS_PER_DAY);
+  const reorderAt = new Date(runOutAt.getTime() - thresholdDays * MS_PER_DAY);
 
   return {
     dailyConsumption,
     daysLeft,
     runOutAt,
+    reorderAt,
     isLow: daysLeft < thresholdDays,
   };
 }

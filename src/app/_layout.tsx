@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AnimatedSplashOverlay } from '@/ui/components/animated-icon';
 import AppTabs from '@/ui/components/app-tabs';
 import { useNotifications } from '@/ui/hooks/use-notifications';
+import { useReorderNotifications } from '@/ui/hooks/use-reorder-notifications';
 import { db } from '@/config/db/database';
 import '@/config/i18n';
 import migrations from '../../drizzle/migrations';
@@ -15,6 +16,7 @@ export default function TabLayout() {
   const { success, error } = useMigrations(db, migrations);
 
   useNotifications();
+  useReorderNotifications();
 
   if (error) {
     return (

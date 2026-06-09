@@ -20,7 +20,7 @@
     "stock": "Stock",
     "stockLess": "Decrease stock",
     "stockMore": "Increase stock",
-    "storeLink": "Store link"
+    "storeLink": "Where to buy"
   },
   "home": {
     "empty": "No doses today",
@@ -33,6 +33,9 @@
   },
   "notification": {
     "body": "Time to take {{name}}",
+    "buy": "Buy",
+    "reorderBody": "{{name}} is running low — time to reorder",
+    "reorderTitle": "Running low",
     "snooze": "Snooze",
     "take": "Taken",
     "title": "Dose reminder"

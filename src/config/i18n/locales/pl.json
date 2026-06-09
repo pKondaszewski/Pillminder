@@ -20,7 +20,7 @@
     "stock": "Zapas",
     "stockLess": "Zmniejsz zapas",
     "stockMore": "Zwiększ zapas",
-    "storeLink": "Link do sklepu"
+    "storeLink": "Gdzie kupić"
   },
   "home": {
     "empty": "Brak dawek na dziś",
@@ -33,6 +33,9 @@
   },
   "notification": {
     "body": "Czas wziąć {{name}}",
+    "buy": "Kup",
+    "reorderBody": "{{name}} się kończy — czas dokupić",
+    "reorderTitle": "Kończy się zapas",
     "snooze": "Drzemka",
     "take": "Wziąłem",
     "title": "Przypomnienie o dawce"

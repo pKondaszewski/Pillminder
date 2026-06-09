@@ -6,9 +6,13 @@ import { createLogger } from '@/config/logger';
 
 import type { DoseReminder } from './dto/dose-reminder';
 import type { DoseReminderStrings } from './dto/dose-reminder-strings';
+import type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
+import type { ReorderAlert } from './dto/reorder-alert';
 
 export type { DoseReminder } from './dto/dose-reminder';
 export type { DoseReminderStrings } from './dto/dose-reminder-strings';
+export type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
+export type { ReorderAlert } from './dto/reorder-alert';
 
 const log = createLogger('notification-service');
 
@@ -17,6 +21,12 @@ export const CATEGORY_ID = 'dose-reminder';
 export const TAKE_ACTION = 'TAKE_ACTION';
 export const SNOOZE_ACTION = 'SNOOZE_ACTION';
 export const SNOOZE_MINUTES = 10;
+
+export const REORDER_CHANNEL_ID = 'reorder-alerts-v1';
+export const REORDER_CATEGORY_ID = 'reorder-alert';
+export const BUY_ACTION = 'BUY_ACTION';
+
+const REORDER_PREFIX = 'reorder:';
 
 const isExpoGo =
   Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
@@ -34,13 +44,8 @@ function loadNotifications(): Promise<NotificationsModule> {
   return modulePromise;
 }
 
-export interface ReminderResponseHandlers {
-  onTake: (doseId: string) => void;
-  onSnooze: (doseId: string) => void;
-}
-
 export async function initNotifications(
-  strings: DoseReminderStrings,
+  strings: DoseReminderStrings & { buy: string; reorderChannel: string },
 ): Promise<boolean> {
   if (!isSupported) {
     log.info('Notifications unsupported in this environment, skipping init');
@@ -78,6 +83,10 @@ export async function initNotifications(
         enableVibrate: true,
         vibrationPattern: [0, 250, 250, 250],
       });
+      await Notifications.setNotificationChannelAsync(REORDER_CHANNEL_ID, {
+        name: strings.reorderChannel,
+        importance: Notifications.AndroidImportance.DEFAULT,
+      });
     }
 
     await Notifications.setNotificationCategoryAsync(CATEGORY_ID, [
@@ -89,6 +98,14 @@ export async function initNotifications(
       {
         identifier: SNOOZE_ACTION,
         buttonTitle: strings.snooze,
+        options: { opensAppToForeground: true },
+      },
+    ]);
+
+    await Notifications.setNotificationCategoryAsync(REORDER_CATEGORY_ID, [
+      {
+        identifier: BUY_ACTION,
+        buttonTitle: strings.buy,
         options: { opensAppToForeground: true },
       },
     ]);
@@ -143,6 +160,46 @@ export async function cancelDoseReminders(doseIds: string[]): Promise<void> {
   await Promise.all(doseIds.map(cancelDoseReminder));
 }
 
+export async function scheduleReorderAlert(
+  alert: ReorderAlert,
+  strings: { title: string; body: string },
+): Promise<void> {
+  if (!isSupported) return;
+  if (alert.reorderAt.getTime() <= Date.now()) return;
+
+  try {
+    const Notifications = await loadNotifications();
+    await Notifications.scheduleNotificationAsync({
+      identifier: `${REORDER_PREFIX}${alert.productId}`,
+      content: {
+        title: strings.title,
+        body: strings.body,
+        categoryIdentifier: REORDER_CATEGORY_ID,
+        data: { type: 'reorder', storeLink: alert.storeLink },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: alert.reorderAt,
+        channelId: REORDER_CHANNEL_ID,
+      },
+    });
+  } catch (err) {
+    log.error(`Failed to schedule reorder alert for ${alert.productId}`, err);
+  }
+}
+
+export async function cancelReorderAlert(productId: string): Promise<void> {
+  if (!isSupported) return;
+  try {
+    const Notifications = await loadNotifications();
+    await Notifications.cancelScheduledNotificationAsync(
+      `${REORDER_PREFIX}${productId}`,
+    );
+  } catch (err) {
+    log.warn(`Failed to cancel reorder alert for ${productId}`, err);
+  }
+}
+
 export async function dismissDoseReminder(doseId: string): Promise<void> {
   if (!isSupported) return;
   try {
@@ -187,21 +244,50 @@ function processReminderResponse(
   response: NotificationResponse,
   handlers: ReminderResponseHandlers,
 ): boolean {
-  const doseId = response.notification.request.content.data?.doseId;
+  const data = response.notification.request.content.data ?? {};
+  return data.type === 'reorder'
+    ? processReorderResponse(response, data, handlers)
+    : processDoseResponse(response, data, handlers);
+}
+
+function processReorderResponse(
+  response: NotificationResponse,
+  data: Record<string, unknown>,
+  handlers: ReminderResponseHandlers,
+): boolean {
+  if (response.actionIdentifier !== BUY_ACTION) return false;
+  const storeLink = typeof data.storeLink === 'string' ? data.storeLink : null;
+  return runHandlerOnce(responseKey(response), () =>
+    handlers.onReorder(storeLink),
+  );
+}
+
+function processDoseResponse(
+  response: NotificationResponse,
+  data: Record<string, unknown>,
+  handlers: ReminderResponseHandlers,
+): boolean {
+  const doseId = data.doseId;
   if (typeof doseId !== 'string') return false;
 
-  const key = `${response.notification.request.identifier}:${response.actionIdentifier}`;
-  if (handledResponses.has(key)) return false;
-
   if (response.actionIdentifier === TAKE_ACTION) {
-    handledResponses.add(key);
-    handlers.onTake(doseId);
-    return true;
+    return runHandlerOnce(responseKey(response), () => handlers.onTake(doseId));
   }
   if (response.actionIdentifier === SNOOZE_ACTION) {
-    handledResponses.add(key);
-    handlers.onSnooze(doseId);
-    return true;
+    return runHandlerOnce(responseKey(response), () =>
+      handlers.onSnooze(doseId),
+    );
   }
   return false;
+}
+
+function responseKey(response: NotificationResponse): string {
+  return `${response.notification.request.identifier}:${response.actionIdentifier}`;
+}
+
+function runHandlerOnce(key: string, action: () => void): boolean {
+  if (handledResponses.has(key)) return false;
+  handledResponses.add(key);
+  action();
+  return true;
 }
