@@ -109,12 +109,17 @@ Tick `[x]` in the commit that closes a task.
       (and optionally the `.apk` filename) — via a `workflow_dispatch` input
       and/or the git tag (`github.ref_name`). Decide on a versioning scheme
       (app `version` in `app.json`, `versionCode`, semver tags) before wiring.
-- [ ] Notification actions without opening the app. Currently both actions use
-      `opensAppToForeground: true`, so "Taken"/"Snooze" launch the app. To act
-      in-place: `opensAppToForeground: false` + a background task
-      (`expo-task-manager` / `registerTaskAsync`) that writes the dose state to
-      SQLite while the app is backgrounded/killed. Needs a native module +
-      rebuild; iOS has extra limitations.
+- [ ] Notification actions without opening the app — background-task half.
+      DONE: `TAKE_ACTION` / `SNOOZE_ACTION` now use `opensAppToForeground: false`,
+      so they no longer launch the app while the process is alive
+      (foreground/background) — the existing `subscribeToReminderResponses`
+      listener runs `takeDose` / `snoozeDose` in place. `BUY_ACTION` stays
+      `true` (opens `storeLink` via `Linking`).
+      REMAINING: app fully killed (swiped from recents). The JS listener is dead,
+      so the action only applies when the app next launches. Fix: a background
+      task (`expo-task-manager` + `Notifications.registerTaskAsync`) that writes
+      the dose state straight to SQLite — separate entry point from React, no UI.
+      Needs a native module + rebuild; iOS has extra limitations.
 - [ ] Notification delivery reliability under OEM battery optimization.
       CONFIRMED cause (Android 10): the app was battery-restricted, so Doze /
       App Standby coalesced and held scheduled alarms; setting the app to

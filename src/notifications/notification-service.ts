@@ -93,12 +93,12 @@ export async function initNotifications(
       {
         identifier: TAKE_ACTION,
         buttonTitle: strings.take,
-        options: { opensAppToForeground: true },
+        options: { opensAppToForeground: false },
       },
       {
         identifier: SNOOZE_ACTION,
         buttonTitle: strings.snooze,
-        options: { opensAppToForeground: true },
+        options: { opensAppToForeground: false },
       },
     ]);
 
