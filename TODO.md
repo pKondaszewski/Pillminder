@@ -109,17 +109,18 @@ Tick `[x]` in the commit that closes a task.
       (and optionally the `.apk` filename) — via a `workflow_dispatch` input
       and/or the git tag (`github.ref_name`). Decide on a versioning scheme
       (app `version` in `app.json`, `versionCode`, semver tags) before wiring.
-- [ ] Notification actions without opening the app — background-task half.
-      DONE: `TAKE_ACTION` / `SNOOZE_ACTION` now use `opensAppToForeground: false`,
-      so they no longer launch the app while the process is alive
-      (foreground/background) — the existing `subscribeToReminderResponses`
-      listener runs `takeDose` / `snoozeDose` in place. `BUY_ACTION` stays
-      `true` (opens `storeLink` via `Linking`).
-      REMAINING: app fully killed (swiped from recents). The JS listener is dead,
-      so the action only applies when the app next launches. Fix: a background
-      task (`expo-task-manager` + `Notifications.registerTaskAsync`) that writes
-      the dose state straight to SQLite — separate entry point from React, no UI.
-      Needs a native module + rebuild; iOS has extra limitations.
+- [x] Notification actions without opening the app. `TAKE_ACTION` /
+      `SNOOZE_ACTION` use `opensAppToForeground: false`; while the process is
+      alive the `subscribeToReminderResponses` listener runs `takeDose` /
+      `snoozeDose` in place. Killed-app (Android) handled by a headless task:
+      `src/notifications/background-task.ts` defines `BACKGROUND_RESPONSE_TASK`
+      (`TaskManager.defineTask`, imported at the top of `src/app/_layout` so it
+      registers on a headless launch), registered via `registerTaskAsync` in
+      `initNotifications`. It writes the dose state straight to SQLite and skips
+      when `AppState` is `active` (listener already handled it). `BUY_ACTION`
+      stays `true`. iOS does not deliver action responses to background tasks —
+      the in-app listener covers it there. Needs a native rebuild to ship.
+      Untested on a real device.
 - [ ] Notification delivery reliability under OEM battery optimization.
       CONFIRMED cause (Android 10): the app was battery-restricted, so Doze /
       App Standby coalesced and held scheduled alarms; setting the app to

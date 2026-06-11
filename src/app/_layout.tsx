@@ -9,6 +9,7 @@ import { useNotifications } from '@/ui/hooks/use-notifications';
 import { useReorderNotifications } from '@/ui/hooks/use-reorder-notifications';
 import { db } from '@/config/db/database';
 import '@/config/i18n';
+import '@/notifications/background-task';
 import migrations from '../../drizzle/migrations';
 
 export default function TabLayout() {

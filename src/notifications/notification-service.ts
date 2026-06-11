@@ -8,23 +8,34 @@ import type { DoseReminder } from './dto/dose-reminder';
 import type { DoseReminderStrings } from './dto/dose-reminder-strings';
 import type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
 import type { ReorderAlert } from './dto/reorder-alert';
+import {
+  BACKGROUND_RESPONSE_TASK,
+  BUY_ACTION,
+  CATEGORY_ID,
+  CHANNEL_ID,
+  REORDER_CATEGORY_ID,
+  REORDER_CHANNEL_ID,
+  SNOOZE_ACTION,
+  TAKE_ACTION,
+} from './identifiers';
 
 export type { DoseReminder } from './dto/dose-reminder';
 export type { DoseReminderStrings } from './dto/dose-reminder-strings';
 export type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
 export type { ReorderAlert } from './dto/reorder-alert';
+export {
+  BUY_ACTION,
+  CATEGORY_ID,
+  CHANNEL_ID,
+  REORDER_CATEGORY_ID,
+  REORDER_CHANNEL_ID,
+  SNOOZE_ACTION,
+  TAKE_ACTION,
+} from './identifiers';
 
 const log = createLogger('notification-service');
 
-export const CHANNEL_ID = 'dose-reminders-v2';
-export const CATEGORY_ID = 'dose-reminder';
-export const TAKE_ACTION = 'TAKE_ACTION';
-export const SNOOZE_ACTION = 'SNOOZE_ACTION';
 export const SNOOZE_MINUTES = 10;
-
-export const REORDER_CHANNEL_ID = 'reorder-alerts-v1';
-export const REORDER_CATEGORY_ID = 'reorder-alert';
-export const BUY_ACTION = 'BUY_ACTION';
 
 const REORDER_PREFIX = 'reorder:';
 
@@ -109,6 +120,17 @@ export async function initNotifications(
         options: { opensAppToForeground: true },
       },
     ]);
+
+    // Android only: lets Taken/Snooze run while the app is killed. iOS does not
+    // deliver action responses to background tasks, so the in-app listener
+    // (subscribeToReminderResponses) covers it there.
+    if (Platform.OS === 'android') {
+      try {
+        await Notifications.registerTaskAsync(BACKGROUND_RESPONSE_TASK);
+      } catch (err) {
+        log.warn('Failed to register background response task', err);
+      }
+    }
 
     log.info('Notifications initialized');
     return true;
