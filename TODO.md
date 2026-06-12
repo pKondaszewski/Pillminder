@@ -58,7 +58,11 @@ Tick `[x]` in the commit that closes a task.
 
 ## Weekend 4 — history + polish
 
-- [ ] History screen (taken / skipped)
+- [x] History screen (taken / skipped) — per-product `ProductHistory` list at
+      the bottom of the product editor (above the action buttons), live-queried.
+      `productHistoryQuery` returns past doses (excludes future-pending);
+      "Missed" is display-only — a past dose still stored as `pending` (auto-skip
+      to DB deferred, see Weekend-2 note / v2 adherence stats).
 - [ ] "What was active in a period" view (for the doctor)
 - [ ] JSON data export / import
 - [ ] UI polish, active/archived statuses

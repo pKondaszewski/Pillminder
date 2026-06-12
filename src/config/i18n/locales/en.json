@@ -12,6 +12,8 @@
     "deleteConfirm": "Delete “{{name}}”?",
     "deleteTitle": "Delete product?",
     "editTitle": "Edit product",
+    "history": "History",
+    "historyEmpty": "No history yet",
     "name": "Name",
     "namePlaceholder": "e.g. Vitamin D",
     "newTitle": "New product",
@@ -21,6 +23,10 @@
     "stockLess": "Decrease stock",
     "stockMore": "Increase stock",
     "storeLink": "Where to buy"
+  },
+  "history": {
+    "skipped": "Missed",
+    "taken": "Taken"
   },
   "home": {
     "empty": "No doses today",

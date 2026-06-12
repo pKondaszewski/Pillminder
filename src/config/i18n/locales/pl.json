@@ -12,6 +12,8 @@
     "deleteConfirm": "Czy na pewno usunąć „{{name}}”?",
     "deleteTitle": "Usunąć produkt?",
     "editTitle": "Edytuj produkt",
+    "history": "Historia",
+    "historyEmpty": "Brak historii",
     "name": "Nazwa",
     "namePlaceholder": "np. Witamina D",
     "newTitle": "Nowy produkt",
@@ -21,6 +23,10 @@
     "stockLess": "Zmniejsz zapas",
     "stockMore": "Zwiększ zapas",
     "storeLink": "Gdzie kupić"
+  },
+  "history": {
+    "skipped": "Pominięto",
+    "taken": "Wzięto"
   },
   "home": {
     "empty": "Brak dawek na dziś",

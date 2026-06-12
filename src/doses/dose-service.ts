@@ -12,6 +12,7 @@ import { nextOccurrences, type Schedule } from '@/schedules/schedule-service';
 
 import {
   getDoseById,
+  productHistoryQuery,
   replaceFuturePendingDoses,
   setDoseSnoozedUntil,
   setDoseState,
@@ -21,6 +22,8 @@ import { isDueInFuture, isPending, isPresent } from './dose-validator';
 
 export { toTodayDose } from './dto/today-dose-output';
 export type { TodayDose } from './dto/today-dose-output';
+export { toHistoryEntry } from './dto/history-entry-output';
+export type { HistoryEntry } from './dto/history-entry-output';
 
 const log = createLogger('dose-service');
 
@@ -33,6 +36,10 @@ function reminderStrings(productName: string) {
 
 export function getTodaysDosesQuery() {
   return todaysDosesQuery();
+}
+
+export function getProductHistoryQuery(productId: string) {
+  return productHistoryQuery(productId);
 }
 
 export async function takeDose(id: string): Promise<void> {

@@ -15,11 +15,6 @@ import {
   TAKE_ACTION,
 } from './identifiers';
 
-// Side-effect module: defines the headless task that applies Taken/Snooze while
-// the app is killed (Android). Must be evaluated in module scope of an early
-// import so the OS can find the task on a headless launch — see src/app/_layout.
-// Registration (registerTaskAsync) happens in notification-service.initNotifications.
-
 const log = createLogger('background-task');
 
 const isExpoGo =
@@ -41,8 +36,6 @@ if (isSupported && !TaskManager.isTaskDefined(BACKGROUND_RESPONSE_TASK)) {
 }
 
 async function handleResponse(response: NotificationResponse): Promise<void> {
-  // When the app is alive the in-app listener already handles the response;
-  // bail so we don't apply it twice.
   if (AppState.currentState === 'active') return;
 
   const doseId = response.notification.request.content.data?.doseId;

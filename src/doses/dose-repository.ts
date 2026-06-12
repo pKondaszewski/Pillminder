@@ -1,4 +1,4 @@
-import { and, eq, gte, lt } from 'drizzle-orm';
+import { and, desc, eq, gte, lt, ne, or } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
@@ -25,6 +25,22 @@ export function todaysDosesQuery() {
     .from(doses)
     .where(and(gte(doses.plannedAt, start), lt(doses.plannedAt, end)))
     .orderBy(doses.plannedAt);
+}
+
+export function productHistoryQuery(productId: string, limit = 60) {
+  const now = new Date();
+
+  return db
+    .select()
+    .from(doses)
+    .where(
+      and(
+        eq(doses.productId, productId),
+        or(ne(doses.state, 'pending'), lt(doses.plannedAt, now)),
+      ),
+    )
+    .orderBy(desc(doses.plannedAt))
+    .limit(limit);
 }
 
 export async function setDoseState(

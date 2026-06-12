@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { products } from '@/config/db/schema';
 import type { NewProductInput } from '@/products/dto/new-product-input';
+import { ProductHistory } from '@/ui/components/product-history';
 import { ThemedText } from '@/ui/components/themed-text';
 import { ThemedView } from '@/ui/components/themed-view';
 import { Spacing } from '@/ui/commons/constants/theme';
@@ -219,6 +220,8 @@ function EditorForm({
             placeholderTextColor={theme.textSecondary}
             style={inputStyle}
           />
+
+          {product ? <ProductHistory productId={product.id} /> : null}
         </ScrollView>
 
         <ThemedView style={styles.actions}>
