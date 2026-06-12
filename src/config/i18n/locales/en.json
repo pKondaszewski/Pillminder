@@ -19,6 +19,8 @@
     "newTitle": "New product",
     "price": "Price (USD)",
     "save": "Save",
+    "showLess": "Show less",
+    "showMore": "Show more",
     "stock": "Stock",
     "stockLess": "Decrease stock",
     "stockMore": "Increase stock",

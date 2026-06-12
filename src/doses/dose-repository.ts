@@ -27,7 +27,7 @@ export function todaysDosesQuery() {
     .orderBy(doses.plannedAt);
 }
 
-export function productHistoryQuery(productId: string, limit = 60) {
+export function productHistoryQuery(productId: string, limit = 30) {
   const now = new Date();
 
   return db

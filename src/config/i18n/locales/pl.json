@@ -19,6 +19,8 @@
     "newTitle": "Nowy produkt",
     "price": "Cena (zł)",
     "save": "Zapisz",
+    "showLess": "Pokaż mniej",
+    "showMore": "Pokaż więcej",
     "stock": "Zapas",
     "stockLess": "Zmniejsz zapas",
     "stockMore": "Zwiększ zapas",
