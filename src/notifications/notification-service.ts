@@ -35,7 +35,7 @@ export {
 
 const log = createLogger('notification-service');
 
-export const SNOOZE_MINUTES = 10;
+export const SNOOZE_MINUTES = 15;
 
 const REORDER_PREFIX = 'reorder:';
 
