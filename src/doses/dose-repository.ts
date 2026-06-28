@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, lt, ne, or } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, lt, ne, or } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
@@ -89,6 +89,21 @@ export async function getDoseById(id: string): Promise<Dose | undefined> {
   return dose;
 }
 
+export async function getFuturePendingDosesByProduct(
+  productId: string,
+): Promise<Dose[]> {
+  return db
+    .select()
+    .from(doses)
+    .where(
+      and(
+        eq(doses.productId, productId),
+        eq(doses.state, 'pending'),
+        gte(doses.plannedAt, new Date()),
+      ),
+    );
+}
+
 export async function replaceFuturePendingDoses(
   scheduleId: string,
   from: Date,
@@ -101,21 +116,34 @@ export async function replaceFuturePendingDoses(
       gte(doses.plannedAt, from),
     );
 
-    const removed = await tx
-      .select({ id: doses.id })
+    const existing = await tx
+      .select({ id: doses.id, plannedAt: doses.plannedAt })
       .from(doses)
       .where(futurePending);
 
-    await tx.delete(doses).where(futurePending);
+    const wanted = new Set(slots.map((slot) => slot.plannedAt.getTime()));
+    const existingTimes = new Set(
+      existing.map((row) => row.plannedAt.getTime()),
+    );
 
-    const removedIds = removed.map((row) => row.id);
+    const removedIds = existing
+      .filter((row) => !wanted.has(row.plannedAt.getTime()))
+      .map((row) => row.id);
 
-    if (slots.length === 0) return { removedIds, inserted: [] };
+    if (removedIds.length > 0) {
+      await tx.delete(doses).where(inArray(doses.id, removedIds));
+    }
+
+    const newSlots = slots.filter(
+      (slot) => !existingTimes.has(slot.plannedAt.getTime()),
+    );
+
+    if (newSlots.length === 0) return { removedIds, inserted: [] };
 
     const inserted = await tx
       .insert(doses)
       .values(
-        slots.map((slot) => ({
+        newSlots.map((slot) => ({
           id: Crypto.randomUUID(),
           productId: slot.productId,
           scheduleId: slot.scheduleId,

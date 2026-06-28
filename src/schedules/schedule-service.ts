@@ -4,13 +4,18 @@ import type { NewScheduleInput } from './dto/new-schedule-input';
 import {
   createSchedule,
   deleteSchedule,
+  getAllSchedules,
   getSchedulesByProductId,
   schedulesQuery,
   updateSchedule,
   type Schedule,
 } from './schedule-repository';
 
-export { nextOccurrences, previewOccurrences } from './schedule-helper';
+export {
+  nextOccurrences,
+  occurrencesWithin,
+  previewOccurrences,
+} from './schedule-helper';
 export type { Schedule } from './schedule-repository';
 
 const log = createLogger('schedule-service');
@@ -21,6 +26,10 @@ export function getSchedulesQuery() {
 
 export function getSchedulesByProduct(productId: string): Promise<Schedule[]> {
   return getSchedulesByProductId(productId);
+}
+
+export function getSchedules(): Promise<Schedule[]> {
+  return getAllSchedules();
 }
 
 export async function addSchedule(input: NewScheduleInput): Promise<Schedule> {

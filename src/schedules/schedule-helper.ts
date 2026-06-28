@@ -51,3 +51,30 @@ export function previewOccurrences(
   const PREVIEW_COUNT = 3;
   return nextOccurrences(intervalDays, timesOfDay, PREVIEW_COUNT);
 }
+
+export function occurrencesWithin(
+  intervalDays: number,
+  timesOfDay: string[],
+  horizonDays: number,
+): Date[] {
+  if (timesOfDay.length === 0 || horizonDays <= 0) return [];
+
+  const step = Math.max(1, intervalDays);
+  const times = [...timesOfDay].sort();
+  const now = new Date();
+  const until = addDays(startOfToday(), horizonDays);
+  const result: Date[] = [];
+  let day = startOfToday();
+
+  while (day < until) {
+    for (const time of times) {
+      const occurrence = atTime(day, time);
+      if (occurrence >= now && occurrence < until) {
+        result.push(occurrence);
+      }
+    }
+    day = addDays(day, step);
+  }
+
+  return result;
+}

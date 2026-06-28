@@ -8,10 +8,15 @@ import {
   SNOOZE_MINUTES,
 } from '@/notifications/notification-service';
 import { getProduct } from '@/products/product-service';
-import { nextOccurrences, type Schedule } from '@/schedules/schedule-service';
+import {
+  getSchedules,
+  occurrencesWithin,
+  type Schedule,
+} from '@/schedules/schedule-service';
 
 import {
   getDoseById,
+  getFuturePendingDosesByProduct,
   productHistoryQuery,
   replaceFuturePendingDoses,
   setDoseSnoozedUntil,
@@ -26,6 +31,8 @@ export { toHistoryEntry } from './dto/history-entry-output';
 export type { HistoryEntry } from './dto/history-entry-output';
 
 const log = createLogger('dose-service');
+
+const HORIZON_DAYS = 30;
 
 function reminderStrings(productName: string) {
   return {
@@ -57,6 +64,24 @@ export async function cancelFutureDosesForSchedule(
     log.error(`Failed to cancel future doses for schedule ${scheduleId}`, err);
     throw err;
   }
+}
+
+export async function refreshRemindersForProduct(
+  productId: string,
+): Promise<void> {
+  const product = await getProduct(productId);
+  if (!isPresent(product) || product.status === 'archived') return;
+
+  const pending = await getFuturePendingDosesByProduct(productId);
+  log.info(`Refreshing ${pending.length} reminder(s) for product ${productId}`);
+  await Promise.all(
+    pending.map((dose) =>
+      scheduleDoseReminder(
+        { id: dose.id, productName: product.name, plannedAt: dose.plannedAt },
+        reminderStrings(product.name),
+      ),
+    ),
+  );
 }
 
 export async function takeDose(id: string): Promise<void> {
@@ -110,19 +135,28 @@ export async function snoozeDose(id: string): Promise<void> {
   }
 }
 
+export async function syncAllSchedules(): Promise<void> {
+  const schedules = await getSchedules();
+  log.info(`Syncing doses for ${schedules.length} schedule(s)`);
+  for (const schedule of schedules) {
+    await syncDosesForSchedule(schedule);
+  }
+}
+
 export async function syncDosesForSchedule(schedule: Schedule): Promise<void> {
   const from = new Date();
   const product = await getProduct(schedule.productId);
-  const stock = product?.stock ?? 0;
 
   const slots =
     product?.status === 'archived'
       ? []
-      : nextOccurrences(schedule.intervalDays, schedule.timesOfDay, stock);
+      : occurrencesWithin(
+          schedule.intervalDays,
+          schedule.timesOfDay,
+          HORIZON_DAYS,
+        );
 
-  log.info(
-    `Syncing ${slots.length} dose slot(s) for schedule ${schedule.id} (stock ${stock})`,
-  );
+  log.info(`Syncing ${slots.length} dose slot(s) for schedule ${schedule.id}`);
   try {
     const { removedIds, inserted } = await replaceFuturePendingDoses(
       schedule.id,

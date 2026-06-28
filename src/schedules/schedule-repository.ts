@@ -12,6 +12,10 @@ export function schedulesQuery() {
   return db.select().from(schedules);
 }
 
+export async function getAllSchedules(): Promise<Schedule[]> {
+  return db.select().from(schedules);
+}
+
 export async function getSchedulesByProductId(
   productId: string,
 ): Promise<Schedule[]> {

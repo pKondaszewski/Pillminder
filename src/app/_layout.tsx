@@ -5,6 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AnimatedSplashOverlay } from '@/ui/components/animated-icon';
 import AppTabs from '@/ui/components/app-tabs';
+import { useDoseSync } from '@/ui/hooks/use-dose-sync';
 import { useNotifications } from '@/ui/hooks/use-notifications';
 import { useReorderNotifications } from '@/ui/hooks/use-reorder-notifications';
 import { db } from '@/config/db/database';
@@ -18,6 +19,7 @@ export default function TabLayout() {
 
   useNotifications();
   useReorderNotifications();
+  useDoseSync(success);
 
   if (error) {
     return (
