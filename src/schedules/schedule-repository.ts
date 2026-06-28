@@ -12,6 +12,12 @@ export function schedulesQuery() {
   return db.select().from(schedules);
 }
 
+export async function getSchedulesByProductId(
+  productId: string,
+): Promise<Schedule[]> {
+  return db.select().from(schedules).where(eq(schedules.productId, productId));
+}
+
 export async function createSchedule(
   input: NewScheduleInput,
 ): Promise<Schedule> {

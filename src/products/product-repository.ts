@@ -56,6 +56,16 @@ export async function updateProduct(
   return updated;
 }
 
+export async function setProductStatus(
+  id: string,
+  status: 'active' | 'archived',
+): Promise<void> {
+  await db
+    .update(products)
+    .set({ status, updatedAt: new Date() })
+    .where(eq(products.id, id));
+}
+
 export async function deleteProduct(id: string): Promise<void> {
   await db.delete(products).where(eq(products.id, id));
 }

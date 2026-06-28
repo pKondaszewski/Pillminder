@@ -19,18 +19,27 @@ type Props = {
 
 export function ProductRow({ product, reorder, onPress }: Props) {
   const { t } = useTranslation();
-  const isLow = reorder?.isLow && reorder.daysLeft !== null;
+  const isArchived = product.status === 'archived';
+  const isLow = !isArchived && reorder?.isLow && reorder.daysLeft !== null;
 
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <ThemedView type="backgroundElement" style={styles.row}>
+      <ThemedView
+        type="backgroundElement"
+        style={[styles.row, isArchived && styles.archived]}
+      >
         <ThemedText>{product.name}</ThemedText>
         <ThemedText type="small">
           {t(`category.${product.category}`)}
         </ThemedText>
+        {isArchived && (
+          <ThemedText type="small" themeColor="textSecondary">
+            {t('products.archived')}
+          </ThemedText>
+        )}
         {isLow && (
           <ThemedText type="small" style={styles.lowStock}>
             {t('products.lowStock')} ·{' '}
@@ -49,6 +58,9 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     borderRadius: Spacing.three,
     gap: Spacing.one,
+  },
+  archived: {
+    opacity: 0.5,
   },
   lowStock: {
     color: LOW_STOCK_COLOR,

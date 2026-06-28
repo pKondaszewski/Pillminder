@@ -42,6 +42,23 @@ export function getProductHistoryQuery(productId: string) {
   return productHistoryQuery(productId);
 }
 
+export async function cancelFutureDosesForSchedule(
+  scheduleId: string,
+): Promise<void> {
+  log.info(`Cancelling future doses for schedule ${scheduleId}`);
+  try {
+    const { removedIds } = await replaceFuturePendingDoses(
+      scheduleId,
+      new Date(),
+      [],
+    );
+    await cancelDoseReminders(removedIds);
+  } catch (err) {
+    log.error(`Failed to cancel future doses for schedule ${scheduleId}`, err);
+    throw err;
+  }
+}
+
 export async function takeDose(id: string): Promise<void> {
   log.info(`Marking dose ${id} as taken`);
   try {
@@ -98,11 +115,10 @@ export async function syncDosesForSchedule(schedule: Schedule): Promise<void> {
   const product = await getProduct(schedule.productId);
   const stock = product?.stock ?? 0;
 
-  const slots = nextOccurrences(
-    schedule.intervalDays,
-    schedule.timesOfDay,
-    stock,
-  );
+  const slots =
+    product?.status === 'archived'
+      ? []
+      : nextOccurrences(schedule.intervalDays, schedule.timesOfDay, stock);
 
   log.info(
     `Syncing ${slots.length} dose slot(s) for schedule ${schedule.id} (stock ${stock})`,

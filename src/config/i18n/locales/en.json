@@ -5,6 +5,7 @@
     "supplement": "Supplement"
   },
   "editor": {
+    "archive": "Archive",
     "cancel": "Cancel",
     "category": "Category",
     "close": "Close",
@@ -18,6 +19,7 @@
     "namePlaceholder": "e.g. Vitamin D",
     "newTitle": "New product",
     "price": "Price (USD)",
+    "restore": "Restore",
     "save": "Save",
     "showLess": "Show less",
     "showMore": "Show more",
@@ -50,6 +52,7 @@
   },
   "products": {
     "add": "Add new product",
+    "archived": "Archived",
     "empty": "No products",
     "lowStock": "Low stock",
     "lowStockDays": "~{{days}}d left"

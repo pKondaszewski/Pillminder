@@ -16,10 +16,25 @@ import { useReorderStatuses } from '@/ui/hooks/use-reorder';
 
 type Product = typeof productsTable.$inferSelect;
 
+function statusRank(status: Product['status']): number {
+  return status === 'archived' ? 1 : 0;
+}
+
 export default function ProductListScreen() {
   const { t } = useTranslation();
-  const { products, addProduct, editProduct, removeProduct } = useProducts();
+  const {
+    products,
+    addProduct,
+    editProduct,
+    removeProduct,
+    archiveProduct,
+    restoreProduct,
+  } = useProducts();
   const reorderStatuses = useReorderStatuses();
+
+  const sortedProducts = [...products].sort(
+    (a, b) => statusRank(a.status) - statusRank(b.status),
+  );
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
@@ -58,12 +73,30 @@ export default function ProductListScreen() {
     }
   };
 
+  const handleArchive = async (id: string) => {
+    try {
+      await archiveProduct(id);
+      closeEditor();
+    } catch {
+      // archive failed — keep modal open
+    }
+  };
+
+  const handleRestore = async (id: string) => {
+    try {
+      await restoreProduct(id);
+      closeEditor();
+    } catch {
+      // restore failed — keep modal open
+    }
+  };
+
   return (
     <TabSwipe>
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
           <FlatList
-            data={products}
+            data={sortedProducts}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
             renderItem={({ item }) => (
@@ -97,6 +130,8 @@ export default function ProductListScreen() {
           onClose={closeEditor}
           onSave={handleSave}
           onDelete={handleDelete}
+          onArchive={handleArchive}
+          onRestore={handleRestore}
         />
       </ThemedView>
     </TabSwipe>

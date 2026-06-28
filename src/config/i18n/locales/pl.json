@@ -5,6 +5,7 @@
     "supplement": "Suplement"
   },
   "editor": {
+    "archive": "Archiwizuj",
     "cancel": "Anuluj",
     "category": "Kategoria",
     "close": "Zamknij",
@@ -18,6 +19,7 @@
     "namePlaceholder": "np. Witamina D",
     "newTitle": "Nowy produkt",
     "price": "Cena (zł)",
+    "restore": "Przywróć",
     "save": "Zapisz",
     "showLess": "Pokaż mniej",
     "showMore": "Pokaż więcej",
@@ -50,6 +52,7 @@
   },
   "products": {
     "add": "Dodaj nowy produkt",
+    "archived": "Zarchiwizowany",
     "empty": "Brak produktów",
     "lowStock": "Niski zapas",
     "lowStockDays": "~{{days}} dni"

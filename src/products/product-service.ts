@@ -6,6 +6,7 @@ import {
   deleteProduct,
   getProductById,
   productsQuery,
+  setProductStatus as setProductStatusRow,
   updateProduct,
   type Product,
 } from './product-repository';
@@ -43,6 +44,19 @@ export async function editProduct(
     log.info(`Updated product ${JSON.stringify(updated)}`);
   } catch (err) {
     log.error(`Failed to update product with id ${id}`, err);
+    throw err;
+  }
+}
+
+export async function setProductStatus(
+  id: string,
+  status: 'active' | 'archived',
+): Promise<void> {
+  log.info(`Setting product ${id} status to ${status}`);
+  try {
+    await setProductStatusRow(id, status);
+  } catch (err) {
+    log.error(`Failed to set status for product ${id}`, err);
     throw err;
   }
 }

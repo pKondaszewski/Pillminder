@@ -65,10 +65,22 @@ Tick `[x]` in the commit that closes a task.
       to DB deferred, see Weekend-2 note / v2 adherence stats).
 - [ ] "What was active in a period" view (for the doctor)
 - [ ] JSON data export / import
-- [ ] UI polish, active/archived statuses
+- [x] Active / archived statuses — archive/restore toggle in the product editor.
+      Archiving sets `status='archived'` and cancels future pending doses + their
+      reminders (per schedule, via `cancelFutureDosesForSchedule`); restore
+      re-syncs. `syncDosesForSchedule` generates no slots for archived products,
+      so editing their schedule won't revive doses. Reorder already skips them.
+      List: active on top, archived sunk to the bottom and dimmed with a label.
+- [ ] UI polish
 
 ## Version 2 — app growth (deferred)
 
+- [ ] History as its own tab — promote history out of the product editor into a
+      dedicated tab with a calendar view, showing multiple products at once on a
+      single screen (taken/skipped per day across products). The per-product
+      list in the editor stays as the quick view; this is the cross-product,
+      time-oriented overview. Pairs with adherence stats and the "what was active
+      in a period" doctor view.
 - [ ] Product images — multiple per product, not one field. Use case: at the
       pharmacy you forget the name/look, so you show a photo. Roles: box (name +
       dose backup), pill (recognise loose tablets in an organiser), receipt /

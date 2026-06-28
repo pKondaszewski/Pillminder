@@ -29,6 +29,8 @@ interface Props {
   onClose: () => void;
   onSave: (input: NewProductInput) => void;
   onDelete: (id: string) => void;
+  onArchive: (id: string) => void;
+  onRestore: (id: string) => void;
 }
 
 function toText(value: number | null | undefined) {
@@ -48,6 +50,8 @@ export function ProductEditorModal({
   onClose,
   onSave,
   onDelete,
+  onArchive,
+  onRestore,
 }: Props) {
   return (
     <Modal
@@ -63,6 +67,8 @@ export function ProductEditorModal({
           onClose={onClose}
           onSave={onSave}
           onDelete={onDelete}
+          onArchive={onArchive}
+          onRestore={onRestore}
         />
       ) : null}
     </Modal>
@@ -74,6 +80,8 @@ function EditorForm({
   onClose,
   onSave,
   onDelete,
+  onArchive,
+  onRestore,
 }: Omit<Props, 'visible'>) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -111,6 +119,15 @@ function EditorForm({
         },
       ],
     );
+  };
+
+  const handleToggleStatus = () => {
+    if (!product) return;
+    if (product.status === 'archived') {
+      onRestore(product.id);
+    } else {
+      onArchive(product.id);
+    }
   };
 
   const bumpStock = (delta: number) => {
@@ -221,6 +238,21 @@ function EditorForm({
             style={inputStyle}
           />
 
+          {product ? (
+            <Pressable
+              onPress={handleToggleStatus}
+              style={({ pressed }) => pressed && styles.pressed}
+            >
+              <ThemedView type="backgroundElement" style={styles.statusButton}>
+                <ThemedText type="smallBold">
+                  {product.status === 'archived'
+                    ? t('editor.restore')
+                    : t('editor.archive')}
+                </ThemedText>
+              </ThemedView>
+            </Pressable>
+          ) : null}
+
           {product ? <ProductHistory productId={product.id} /> : null}
         </ScrollView>
 
@@ -312,6 +344,12 @@ const styles = StyleSheet.create({
   stepperInput: {
     flex: 1,
     textAlign: 'center',
+  },
+  statusButton: {
+    marginTop: Spacing.three,
+    paddingVertical: Spacing.three,
+    borderRadius: Spacing.three,
+    alignItems: 'center',
   },
   pressed: {
     opacity: 0.7,

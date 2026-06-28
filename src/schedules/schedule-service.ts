@@ -4,6 +4,7 @@ import type { NewScheduleInput } from './dto/new-schedule-input';
 import {
   createSchedule,
   deleteSchedule,
+  getSchedulesByProductId,
   schedulesQuery,
   updateSchedule,
   type Schedule,
@@ -16,6 +17,10 @@ const log = createLogger('schedule-service');
 
 export function getSchedulesQuery() {
   return schedulesQuery();
+}
+
+export function getSchedulesByProduct(productId: string): Promise<Schedule[]> {
+  return getSchedulesByProductId(productId);
 }
 
 export async function addSchedule(input: NewScheduleInput): Promise<Schedule> {
