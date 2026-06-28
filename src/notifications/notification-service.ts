@@ -214,9 +214,9 @@ export async function cancelReorderAlert(productId: string): Promise<void> {
   if (!isSupported) return;
   try {
     const Notifications = await loadNotifications();
-    await Notifications.cancelScheduledNotificationAsync(
-      `${REORDER_PREFIX}${productId}`,
-    );
+    const id = `${REORDER_PREFIX}${productId}`;
+    await Notifications.cancelScheduledNotificationAsync(id);
+    await Notifications.dismissNotificationAsync(id);
   } catch (err) {
     log.warn(`Failed to cancel reorder alert for ${productId}`, err);
   }
