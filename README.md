@@ -1,56 +1,141 @@
-# Welcome to your Expo app 👋
+# Pillminder 💊
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A local-first mobile app that reminds you to take your medications, supplements,
+and care products on schedule — and tells you when to reorder before you run out.
 
-## Get started
+Configure a product once (rhythm, dose, stock). After that you just tap **Taken**;
+reminders, history, and low-stock alerts happen automatically. All data lives
+**on the device** — no backend, no account, no server.
 
-1. Install dependencies
+> Full product vision and roadmap: [`CLAUDE.md`](./CLAUDE.md).
+> Current granular tasks: [`TODO.md`](./TODO.md).
+
+## Features (v1)
+
+- **Products** — name, category (medication / supplement / care), dose, price,
+  store link, stock, notes, and an active / archived status.
+- **Intake rhythm** — daily or every X days, at one or more times of day, over a
+  date range or indefinitely.
+- **Scheduled doses** — the rhythm generates planned dose "slots", each with a
+  state (pending / taken / skipped). One tap confirms a dose and decrements stock.
+- **Reminders** — local notifications per dose with **Taken** / **Snooze**
+  actions directly on the notification.
+- **Reorder alerts** — the reorder moment is computed from rhythm + stock; you
+  get an amber low-stock badge and a notification with a **Buy** action.
+- **History** — per-product list of what was taken / skipped.
+- **i18n** — Polish and English, auto-selected from the device locale.
+
+## Tech stack
+
+| Area          | Choice                                                                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Framework     | [Expo](https://docs.expo.dev/) SDK 56 (React Native 0.85)                                                                                  |
+| Language      | TypeScript                                                                                                                                 |
+| Navigation    | [Expo Router](https://docs.expo.dev/router/introduction/) (file-based, in `src/app/`)                                                      |
+| Database      | [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/) + [Drizzle ORM](https://orm.drizzle.team/) (migrations via `drizzle-kit`) |
+| Notifications | [expo-notifications](https://docs.expo.dev/versions/latest/sdk/notifications/) + background task                                           |
+| i18n          | i18next / react-i18next + expo-localization                                                                                                |
+| Tooling       | ESLint + Prettier, Husky + lint-staged, GitHub Actions (CI + APK build)                                                                    |
+
+## Project structure
+
+```
+src/
+  app/            # Expo Router routes (index = Today, products, schedules)
+  products/       # product domain: repository, service, reorder logic, DTOs
+  schedules/      # schedule domain: repository, service, helpers
+  doses/          # dose domain: repository, service, validation, DTOs
+  notifications/  # scheduling, actions, background task
+  config/
+    db/           # Drizzle schema + database bootstrap
+    i18n/         # i18next setup + PL/EN locale JSON
+  ui/
+    components/   # screens and reusable components
+    hooks/        # data hooks (live SQLite queries)
+    commons/      # theme, formatting helpers
+drizzle/          # generated SQL migrations + snapshots
+```
+
+## Local setup
+
+### Prerequisites
+
+- **Node.js 22** (matches CI)
+- **npm**
+- A phone with the **Expo Go** app installed
+  ([iOS App Store](https://apps.apple.com/app/expo-go/id982107779) /
+  [Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)),
+  on the **same Wi-Fi network** as your computer.
+
+### Run it
+
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Start the Expo dev server:
 
    ```bash
-   npx expo start
+   npm start
    ```
 
-In the output, you'll find options to open the app in a
+3. A **QR code** appears in the terminal. Open it with your phone:
+   - **Android** — open **Expo Go** → _Scan QR code_.
+   - **iOS** — open the **Camera** app, point it at the QR code, tap the banner.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   The app loads on your phone and hot-reloads as you edit files. Shake the phone
+   for the dev menu.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+> **Emulator / simulator instead of a phone?** With the dev server running, press
+> `a` for an Android emulator or `i` for an iOS simulator in the terminal
+> (or use `npm run android` / `npm run ios`).
 
-## Get a fresh project
+### A note on notifications in Expo Go
 
-When you're ready, run:
+Expo Go is great for the UI and everyday flows. However, the **full notification
+behaviour** — background action handling and responding to **Taken** / **Snooze**
+while the app is killed — relies on native code and a registered background task,
+which Expo Go can't run. For that, use a **development build** or the **release
+APK** (see below). The in-app dose flow and history work fine in Expo Go.
+
+## Database & migrations
+
+The schema lives in [`src/config/db/schema.ts`](./src/config/db/schema.ts) and is
+the single source of truth. After changing it, generate a migration:
 
 ```bash
-npm run reset-project
+npx drizzle-kit generate
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+This diffs the schema against the previous snapshot and writes a new versioned
+`.sql` file into `drizzle/`. Migrations are applied on the device at app startup.
+You don't hand-write SQL or edit the generated files.
 
-### Other setup steps
+## Building a release APK (Android)
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+CI builds an APK automatically on every push to `main` (see
+[`.github/workflows/cd.yml`](./.github/workflows/cd.yml)) and uploads it as a
+build artifact (`pillminder-apk`). To build one locally:
 
-## Learn more
+```bash
+npx expo prebuild --platform android --no-install
+cd android && ./gradlew assembleRelease
+# output: android/app/build/outputs/apk/release/*.apk
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Scripts
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Command                    | What it does                            |
+| -------------------------- | --------------------------------------- |
+| `npm start`                | Start the Expo dev server (QR code)     |
+| `npm run android`          | Start and open on an Android emulator   |
+| `npm run ios`              | Start and open on an iOS simulator      |
+| `npm run web`              | Run in the browser (limited)            |
+| `npm run lint`             | ESLint                                  |
+| `npm run typecheck`        | `tsc --noEmit`                          |
+| `npx drizzle-kit generate` | Generate a DB migration from the schema |
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+CI runs lint + typecheck + test on every push and PR
+([`.github/workflows/ci.yml`](./.github/workflows/ci.yml)).
