@@ -3,11 +3,11 @@ import { createLogger } from '@/config/logger';
 import type { NewProductInput } from './dto/new-product-input';
 import {
   createProduct,
-  deleteProduct,
+  deleteProduct as deleteProductRow,
   getProductById,
   productsQuery,
   setProductStatus as setProductStatusRow,
-  updateProduct,
+  updateProduct as updateProductRow,
   type Product,
 } from './product-repository';
 
@@ -34,13 +34,13 @@ export async function addProduct(input: NewProductInput): Promise<void> {
   }
 }
 
-export async function editProduct(
+export async function updateProduct(
   id: string,
   input: NewProductInput,
 ): Promise<void> {
   log.info(`Updating product with id ${id}`);
   try {
-    const updated = await updateProduct(id, input);
+    const updated = await updateProductRow(id, input);
     log.info(`Updated product ${JSON.stringify(updated)}`);
   } catch (err) {
     log.error(`Failed to update product with id ${id}`, err);
@@ -61,10 +61,10 @@ export async function setProductStatus(
   }
 }
 
-export async function removeProduct(id: string): Promise<void> {
+export async function deleteProduct(id: string): Promise<void> {
   log.info(`Deleting product with id ${id}`);
   try {
-    await deleteProduct(id);
+    await deleteProductRow(id);
   } catch (err) {
     log.error(`Failed to delete product with id ${id}`, err);
     throw err;

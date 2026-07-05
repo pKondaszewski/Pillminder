@@ -2,12 +2,12 @@ import { createLogger } from '@/config/logger';
 
 import type { NewScheduleInput } from './dto/new-schedule-input';
 import {
-  createSchedule,
-  deleteSchedule,
+  createSchedule as createScheduleRow,
+  deleteSchedule as deleteScheduleRow,
   getAllSchedules,
   getSchedulesByProductId,
   schedulesQuery,
-  updateSchedule,
+  updateSchedule as updateScheduleRow,
   type Schedule,
 } from './schedule-repository';
 
@@ -32,10 +32,12 @@ export function getSchedules(): Promise<Schedule[]> {
   return getAllSchedules();
 }
 
-export async function addSchedule(input: NewScheduleInput): Promise<Schedule> {
+export async function createSchedule(
+  input: NewScheduleInput,
+): Promise<Schedule> {
   log.info(`Adding schedule for product ${input.productId}`);
   try {
-    const created = await createSchedule(input);
+    const created = await createScheduleRow(input);
     log.info(`Created schedule ${JSON.stringify(created)}`);
     return created;
   } catch (err) {
@@ -44,13 +46,13 @@ export async function addSchedule(input: NewScheduleInput): Promise<Schedule> {
   }
 }
 
-export async function editSchedule(
+export async function updateSchedule(
   id: string,
   input: NewScheduleInput,
 ): Promise<Schedule> {
   log.info(`Updating schedule with id ${id}`);
   try {
-    const updated = await updateSchedule(id, input);
+    const updated = await updateScheduleRow(id, input);
     log.info(`Updated schedule ${JSON.stringify(updated)}`);
     return updated;
   } catch (err) {
@@ -59,10 +61,10 @@ export async function editSchedule(
   }
 }
 
-export async function removeSchedule(id: string): Promise<void> {
+export async function deleteSchedule(id: string): Promise<void> {
   log.info(`Deleting schedule with id ${id}`);
   try {
-    await deleteSchedule(id);
+    await deleteScheduleRow(id);
   } catch (err) {
     log.error(`Failed to delete schedule with id ${id}`, err);
     throw err;
