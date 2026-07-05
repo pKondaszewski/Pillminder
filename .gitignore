@@ -39,6 +39,9 @@ yarn-error.*
 # personal scratchpad (not part of the committed roadmap)
 IDEAS.md
 
+# personal Claude instructions (not imposed on other contributors)
+CLAUDE.local.md
+
 # typescript
 *.tsbuildinfo
 
