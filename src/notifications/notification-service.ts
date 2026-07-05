@@ -18,6 +18,7 @@ import {
   SNOOZE_ACTION,
   TAKE_ACTION,
 } from './identifiers';
+import { processReminderResponse } from './reminder-response-router';
 
 export type { DoseReminder } from './dto/dose-reminder';
 export type { DoseReminderStrings } from './dto/dose-reminder-strings';
@@ -46,8 +47,6 @@ const isSupported = Platform.OS !== 'web' && !isExpoGo;
 type NotificationsModule = typeof import('expo-notifications');
 let modulePromise: Promise<NotificationsModule> | null = null;
 
-const handledResponses = new Set<string>();
-
 function loadNotifications(): Promise<NotificationsModule> {
   if (!modulePromise) {
     modulePromise = import('expo-notifications');
@@ -56,7 +55,10 @@ function loadNotifications(): Promise<NotificationsModule> {
 }
 
 export async function initNotifications(
-  strings: DoseReminderStrings & { buy: string; reorderChannel: string },
+  strings: Omit<DoseReminderStrings, 'body'> & {
+    buy: string;
+    reorderChannel: string;
+  },
 ): Promise<boolean> {
   if (!isSupported) {
     log.info('Notifications unsupported in this environment, skipping init');
@@ -75,14 +77,7 @@ export async function initNotifications(
       }),
     });
 
-    const { status } = await Notifications.getPermissionsAsync();
-    const granted =
-      status === 'granted'
-        ? true
-        : (await Notifications.requestPermissionsAsync()).status === 'granted';
-
-    if (!granted) {
-      log.warn('Notification permission not granted');
+    if (await isNotificationPermissionDenied(Notifications)) {
       return false;
     }
 
@@ -98,6 +93,11 @@ export async function initNotifications(
         name: strings.reorderChannel,
         importance: Notifications.AndroidImportance.DEFAULT,
       });
+      try {
+        await Notifications.registerTaskAsync(BACKGROUND_RESPONSE_TASK);
+      } catch (err) {
+        log.warn('Failed to register background response task', err);
+      }
     }
 
     await Notifications.setNotificationCategoryAsync(CATEGORY_ID, [
@@ -120,17 +120,6 @@ export async function initNotifications(
         options: { opensAppToForeground: true },
       },
     ]);
-
-    // Android only: lets Taken/Snooze run while the app is killed. iOS does not
-    // deliver action responses to background tasks, so the in-app listener
-    // (subscribeToReminderResponses) covers it there.
-    if (Platform.OS === 'android') {
-      try {
-        await Notifications.registerTaskAsync(BACKGROUND_RESPONSE_TASK);
-      } catch (err) {
-        log.warn('Failed to register background response task', err);
-      }
-    }
 
     log.info('Notifications initialized');
     return true;
@@ -262,54 +251,17 @@ export async function subscribeToReminderResponses(
   }
 }
 
-function processReminderResponse(
-  response: NotificationResponse,
-  handlers: ReminderResponseHandlers,
-): boolean {
-  const data = response.notification.request.content.data ?? {};
-  return data.type === 'reorder'
-    ? processReorderResponse(response, data, handlers)
-    : processDoseResponse(response, data, handlers);
-}
+async function isNotificationPermissionDenied(
+  Notifications: NotificationsModule,
+): Promise<boolean> {
+  const { status } = await Notifications.getPermissionsAsync();
+  const granted =
+    status === 'granted'
+      ? true
+      : (await Notifications.requestPermissionsAsync()).status === 'granted';
 
-function processReorderResponse(
-  response: NotificationResponse,
-  data: Record<string, unknown>,
-  handlers: ReminderResponseHandlers,
-): boolean {
-  if (response.actionIdentifier !== BUY_ACTION) return false;
-  const storeLink = typeof data.storeLink === 'string' ? data.storeLink : null;
-  return runHandlerOnce(responseKey(response), () =>
-    handlers.onReorder(storeLink),
-  );
-}
-
-function processDoseResponse(
-  response: NotificationResponse,
-  data: Record<string, unknown>,
-  handlers: ReminderResponseHandlers,
-): boolean {
-  const doseId = data.doseId;
-  if (typeof doseId !== 'string') return false;
-
-  if (response.actionIdentifier === TAKE_ACTION) {
-    return runHandlerOnce(responseKey(response), () => handlers.onTake(doseId));
+  if (!granted) {
+    log.warn('Notification permission not granted');
   }
-  if (response.actionIdentifier === SNOOZE_ACTION) {
-    return runHandlerOnce(responseKey(response), () =>
-      handlers.onSnooze(doseId),
-    );
-  }
-  return false;
-}
-
-function responseKey(response: NotificationResponse): string {
-  return `${response.notification.request.identifier}:${response.actionIdentifier}`;
-}
-
-function runHandlerOnce(key: string, action: () => void): boolean {
-  if (handledResponses.has(key)) return false;
-  handledResponses.add(key);
-  action();
-  return true;
+  return !granted;
 }

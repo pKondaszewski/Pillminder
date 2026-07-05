@@ -13,36 +13,36 @@ const log = createLogger('use-notifications');
 
 export function useNotifications() {
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
-
-    void (async () => {
-      await initNotifications({
-        title: i18n.t('notification.title'),
-        body: i18n.t('notification.body', { name: '' }),
-        take: i18n.t('notification.take'),
-        snooze: i18n.t('notification.snooze'),
-        buy: i18n.t('notification.buy'),
-        reorderChannel: i18n.t('notification.reorderTitle'),
-      });
-
-      unsubscribe = await subscribeToReminderResponses({
-        onTake: (doseId) =>
-          takeDose(doseId).catch((err) =>
-            log.error('Take from notification failed', err),
-          ),
-        onSnooze: (doseId) =>
-          snoozeDose(doseId).catch((err) =>
-            log.error('Snooze from notification failed', err),
-          ),
-        onReorder: (storeLink) => {
-          if (!storeLink) return;
-          Linking.openURL(storeLink).catch((err) =>
-            log.error('Open store link from notification failed', err),
-          );
-        },
-      });
-    })();
-
-    return () => unsubscribe?.();
+    const ready = startNotifications();
+    return () => {
+      void ready.then((unsubscribe) => unsubscribe());
+    };
   }, []);
+}
+
+async function startNotifications(): Promise<() => void> {
+  await initNotifications({
+    title: i18n.t('notification.title'),
+    take: i18n.t('notification.take'),
+    snooze: i18n.t('notification.snooze'),
+    buy: i18n.t('notification.buy'),
+    reorderChannel: i18n.t('notification.reorderTitle'),
+  });
+
+  return subscribeToReminderResponses({
+    onTake: (doseId) =>
+      takeDose(doseId).catch((err) =>
+        log.error('Take from notification failed', err),
+      ),
+    onSnooze: (doseId) =>
+      snoozeDose(doseId).catch((err) =>
+        log.error('Snooze from notification failed', err),
+      ),
+    onReorder: (storeLink) => {
+      if (!storeLink) return;
+      Linking.openURL(storeLink).catch((err) =>
+        log.error('Open store link from notification failed', err),
+      );
+    },
+  });
 }

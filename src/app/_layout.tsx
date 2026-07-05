@@ -15,21 +15,19 @@ import migrations from '../../drizzle/migrations';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { success, error } = useMigrations(db, migrations);
-
+  const { success: migrationsReady, error: migrationError } = useMigrations(
+    db,
+    migrations,
+  );
   useNotifications();
   useReorderNotifications();
-  useDoseSync(success);
+  useDoseSync(migrationsReady);
 
-  if (error) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Migration error: {error.message}</Text>
-      </View>
-    );
+  if (migrationError) {
+    return <MigrationErrorScreen error={migrationError} />;
   }
 
-  if (!success) {
+  if (!migrationsReady) {
     return null;
   }
 
@@ -40,5 +38,13 @@ export default function TabLayout() {
         <AppTabs />
       </ThemeProvider>
     </GestureHandlerRootView>
+  );
+}
+
+function MigrationErrorScreen({ error }: { error: Error }) {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Migration error: {error.message}</Text>
+    </View>
   );
 }
