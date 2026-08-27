@@ -53,8 +53,10 @@ Tick `[x]` in the commit that closes a task.
       keyed by `reorder:<productId>`. `useReorderNotifications` re-arms reactively
       on any stock/schedule change (cancel + reschedule). Already-low products
       (reorderAt in the past) get no notification — the visual badge covers them.
-      Known gap: deleting a product doesn't cancel its scheduled alert (same as
-      dose reminders); it simply never matches a live product afterwards.
+      Cleanup: `removeProduct` cancels the alert before deleting the row
+      (cancel-then-delete, per the ordering rule). Archiving is covered
+      indirectly — `useReorderStatuses` skips archived products, so
+      `useReorderNotifications` finds no status and cancels the alert.
 
 ## Weekend 4 — history + polish
 
@@ -71,6 +73,20 @@ Tick `[x]` in the commit that closes a task.
       re-syncs. `syncDosesForSchedule` generates no slots for archived products,
       so editing their schedule won't revive doses. Reorder already skips them.
       List: active on top, archived sunk to the bottom and dimmed with a label.
+- [x] Product editor: no preselected category. New products start with nothing
+      chosen (was silently defaulting to `supplement`); save now validates name + category and shows a per-field error instead of the previous silent
+      no-op. Stock stays optional — empty means "not tracking", which the whole
+      chain already honours (`reorderStatus` bails on null, `setDoseState`
+      skips the stock update, `useReorderNotifications` cancels the alert) — so
+      it only needed a visible hint. `bumpStock` no longer turns an empty field
+      into `0` on minus, which used to silently opt the product into reorder.
+- [x] "Where to buy" as free text instead of a raw URL. `resolveStoreUrl`
+      (`src/products/store-link.ts`) opens a `https?://` value directly and
+      sends anything else to a Google Maps search, which resolves "apteka" /
+      "Rossmann" against the device location — no hardcoded store data, no API
+      key. The editor offers category-based quick-fill chips (medication →
+      pharmacy; supplement → Rossmann / Hebe / pharmacy; care → drugstore /
+      Rossmann) over a still-free input. DB column `store_link` unchanged.
 - [ ] UI polish
 
 ## Version 2 — app growth (deferred)

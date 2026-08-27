@@ -23,6 +23,12 @@ type Category = NewProductInput['category'];
 
 const CATEGORIES: Category[] = ['medication', 'supplement', 'care'];
 
+const STORE_SUGGESTIONS: Record<Category, string[]> = {
+  care: ['rossmann', 'hebe', 'biedronka'],
+  medication: ['pharmacy'],
+  supplement: ['rossmann', 'hebe', 'pharmacy'],
+};
+
 interface Props {
   visible: boolean;
   product: Product | null;
@@ -87,15 +93,24 @@ function EditorForm({
   const theme = useTheme();
 
   const [name, setName] = useState(product?.name ?? '');
-  const [category, setCategory] = useState<Category>(
-    product?.category ?? 'supplement',
+  const [category, setCategory] = useState<Category | null>(
+    product?.category ?? null,
   );
   const [price, setPrice] = useState(toText(product?.price));
   const [storeLink, setStoreLink] = useState(product?.storeLink ?? '');
   const [stock, setStock] = useState(toText(product?.stock));
+  const [showErrors, setShowErrors] = useState(false);
+
+  const nameMissing = name.trim() === '';
+  const categoryMissing = category === null;
+  const showNameError = showErrors && nameMissing;
+  const showCategoryError = showErrors && categoryMissing;
 
   const handleSave = () => {
-    if (name.trim() === '') return;
+    if (nameMissing || categoryMissing) {
+      setShowErrors(true);
+      return;
+    }
     onSave({
       name: name.trim(),
       category,
@@ -130,14 +145,24 @@ function EditorForm({
     }
   };
 
-  const bumpStock = (delta: number) => {
+  const increaseStock = () => {
     const current = toNumber(stock) ?? 0;
-    setStock(String(Math.max(0, current + delta)));
+    setStock(String(current + 1));
+  };
+
+  const decreaseStock = () => {
+    const current = toNumber(stock);
+    if (current === null) return;
+    setStock(String(Math.max(0, current - 1)));
   };
 
   const inputStyle = [
     styles.input,
     { color: theme.text, borderColor: theme.backgroundSelected },
+  ];
+  const nameInputStyle = [
+    inputStyle,
+    showNameError ? { borderColor: theme.danger } : null,
   ];
 
   return (
@@ -157,8 +182,9 @@ function EditorForm({
             onChangeText={setName}
             placeholder={t('editor.namePlaceholder')}
             placeholderTextColor={theme.textSecondary}
-            style={inputStyle}
+            style={nameInputStyle}
           />
+          {showNameError && <FieldError message={t('editor.nameRequired')} />}
 
           <ThemedText type="small">{t('editor.category')}</ThemedText>
           <ThemedView style={styles.categoryRow}>
@@ -184,6 +210,9 @@ function EditorForm({
               </Pressable>
             ))}
           </ThemedView>
+          {showCategoryError && (
+            <FieldError message={t('editor.categoryRequired')} />
+          )}
 
           <ThemedText type="small">{t('editor.price')}</ThemedText>
           <TextInput
@@ -198,7 +227,7 @@ function EditorForm({
           <ThemedText type="small">{t('editor.stock')}</ThemedText>
           <ThemedView style={styles.stepperRow}>
             <Pressable
-              onPress={() => bumpStock(-1)}
+              onPress={decreaseStock}
               hitSlop={Spacing.two}
               accessibilityLabel={t('editor.stockLess')}
               style={({ pressed }) => pressed && styles.pressed}
@@ -216,7 +245,7 @@ function EditorForm({
               style={[inputStyle, styles.stepperInput]}
             />
             <Pressable
-              onPress={() => bumpStock(1)}
+              onPress={increaseStock}
               hitSlop={Spacing.two}
               accessibilityLabel={t('editor.stockMore')}
               style={({ pressed }) => pressed && styles.pressed}
@@ -226,17 +255,38 @@ function EditorForm({
               </ThemedView>
             </Pressable>
           </ThemedView>
+          <ThemedText type="small" themeColor="textSecondary">
+            {t('editor.stockHint')}
+          </ThemedText>
 
           <ThemedText type="small">{t('editor.storeLink')}</ThemedText>
           <TextInput
             value={storeLink}
             onChangeText={setStoreLink}
-            autoCapitalize="none"
-            keyboardType="url"
-            placeholder="https://"
+            placeholder={t('editor.storeLinkPlaceholder')}
             placeholderTextColor={theme.textSecondary}
             style={inputStyle}
           />
+          {category ? (
+            <ThemedView style={styles.categoryRow}>
+              {STORE_SUGGESTIONS[category].map((key) => (
+                <Pressable
+                  key={key}
+                  onPress={() => setStoreLink(t(`storeSuggestion.${key}`))}
+                  style={({ pressed }) => pressed && styles.pressed}
+                >
+                  <ThemedView
+                    type="backgroundElement"
+                    style={styles.categoryChip}
+                  >
+                    <ThemedText type="small" themeColor="textSecondary">
+                      {t(`storeSuggestion.${key}`)}
+                    </ThemedText>
+                  </ThemedView>
+                </Pressable>
+              ))}
+            </ThemedView>
+          ) : null}
 
           {product ? (
             <Pressable
@@ -262,7 +312,7 @@ function EditorForm({
             <ActionButton
               label={t('editor.delete')}
               onPress={handleDelete}
-              color="#d9534f"
+              color={theme.danger}
             />
           ) : null}
           <ActionButton
@@ -273,6 +323,14 @@ function EditorForm({
         </ThemedView>
       </SafeAreaView>
     </ThemedView>
+  );
+}
+
+function FieldError({ message }: { message: string }) {
+  return (
+    <ThemedText type="small" themeColor="danger">
+      {message}
+    </ThemedText>
   );
 }
 
@@ -322,6 +380,7 @@ const styles = StyleSheet.create({
   },
   categoryRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: Spacing.two,
   },
   categoryChip: {

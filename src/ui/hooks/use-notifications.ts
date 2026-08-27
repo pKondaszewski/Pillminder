@@ -8,6 +8,7 @@ import {
   initNotifications,
   subscribeToReminderResponses,
 } from '@/notifications/notification-service';
+import { resolveStoreUrl } from '@/products/store-link';
 
 const log = createLogger('use-notifications');
 
@@ -39,8 +40,9 @@ async function startNotifications(): Promise<() => void> {
         log.error('Snooze from notification failed', err),
       ),
     onReorder: (storeLink) => {
-      if (!storeLink) return;
-      Linking.openURL(storeLink).catch((err) =>
+      const url = resolveStoreUrl(storeLink);
+      if (!url) return;
+      Linking.openURL(url).catch((err) =>
         log.error('Open store link from notification failed', err),
       );
     },
