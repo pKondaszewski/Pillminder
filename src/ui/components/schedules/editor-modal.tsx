@@ -19,8 +19,8 @@ import {
   type Schedule,
 } from '@/schedules/schedule-service';
 import type { Product } from '@/products/product-service';
-import { ThemedText } from '@/ui/components/themed-text';
-import { ThemedView } from '@/ui/components/themed-view';
+import { ThemedText } from '@/ui/components/commons/themed-text';
+import { ThemedView } from '@/ui/components/commons/themed-view';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatTime } from '@/ui/commons/format-date';
 

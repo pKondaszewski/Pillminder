@@ -5,12 +5,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { products as productsTable } from '@/config/db/schema';
 import type { NewProductInput } from '@/products/dto/new-product-input';
-import { ProductEditorModal } from '@/ui/components/product-editor-modal';
-import { ProductRow } from '@/ui/components/product-row';
-import { ThemedText } from '@/ui/components/themed-text';
-import { ThemedView } from '@/ui/components/themed-view';
+import { ProductEditorModal } from '@/ui/components/products/editor-modal';
+import { ProductRow } from '@/ui/components/products/row';
+import { ThemedText } from '@/ui/components/commons/themed-text';
+import { ThemedView } from '@/ui/components/commons/themed-view';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { TabSwipe } from '@/ui/components/tab-swipe';
+import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
 

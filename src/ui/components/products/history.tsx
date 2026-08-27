@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet } from 'react-native';
 
 import type { HistoryEntry } from '@/doses/dose-service';
-import { ThemedText } from '@/ui/components/themed-text';
-import { ThemedView } from '@/ui/components/themed-view';
+import { ThemedText } from '@/ui/components/commons/themed-text';
+import { ThemedView } from '@/ui/components/commons/themed-view';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDateTime } from '@/ui/commons/format-date';
 import { useProductHistory } from '@/ui/hooks/use-product-history';

@@ -4,8 +4,8 @@ import { Pressable, StyleSheet } from 'react-native';
 import type { products as productsTable } from '@/config/db/schema';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { ThemedText } from '@/ui/components/themed-text';
-import { ThemedView } from '@/ui/components/themed-view';
+import { ThemedText } from '@/ui/components/commons/themed-text';
+import { ThemedView } from '@/ui/components/commons/themed-view';
 
 const LOW_STOCK_COLOR = '#d97706';
 

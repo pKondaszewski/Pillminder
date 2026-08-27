@@ -85,8 +85,9 @@ Tick `[x]` in the commit that closes a task.
       sends anything else to a Google Maps search, which resolves "apteka" /
       "Rossmann" against the device location — no hardcoded store data, no API
       key. The editor offers category-based quick-fill chips (medication →
-      pharmacy; supplement → Rossmann / Hebe / pharmacy; care → drugstore /
-      Rossmann) over a still-free input. DB column `store_link` unchanged.
+      pharmacy; supplement → Rossmann / Hebe / pharmacy; care → Rossmann /
+      Hebe / Biedronka) over a still-free input. DB column `store_link`
+      unchanged.
 - [ ] UI polish
 
 ## Version 2 — app growth (deferred)
