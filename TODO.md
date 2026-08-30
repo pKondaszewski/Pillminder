@@ -157,13 +157,18 @@ Tick `[x]` in the commit that closes a task.
 - [ ] Notification delivery reliability under OEM battery optimization.
       CONFIRMED cause (Android 10): the app was battery-restricted, so Doze /
       App Standby coalesced and held scheduled alarms; setting the app to
-      "unrestricted" delivered them (a held alarm fired immediately). Not a
-      code bug and not exactness (`SCHEDULE_EXACT_ALARM` is Android 12+).
-      Productize the fix: a one-time onboarding flow that detects the
-      restriction and deep-links the user to disable battery optimization
-      (`expo-intent-launcher` → battery settings, or
-      `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`). Standard for alarm/medication
-      apps. Consider exact-alarm permissions separately for 12+ devices.
+      "unrestricted" delivered them (a held alarm fired immediately).
+      Exactness is now covered: `USE_EXACT_ALARM` is declared in `app.json`
+      (`android.permissions`), so `canScheduleExactAlarms()` is true and
+      `ExpoSchedulingDelegate` takes the `setExactAndAllowWhileIdle` branch
+      instead of the Doze-deferred `setAndAllowWhileIdle` fallback. Granted at
+      install, no user action. `SCHEDULE_EXACT_ALARM` deliberately skipped — it
+      only adds API 31-32 coverage, which is out of scope. Needs a native
+      rebuild; unverified on device.
+      Still open: a one-time onboarding flow that deep-links the user to
+      disable battery optimization (`expo-intent-launcher` →
+      `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`), for the OEM layers (Samsung
+      One UI app sleeping) that no permission can override.
 - [ ] Speed up the dev/test loop. The CD APK build is slow (~15-20 min per
       change), too slow for iterating on notification behaviour. Use a faster
       path for everyday testing: an Android emulator + dev build with Metro
