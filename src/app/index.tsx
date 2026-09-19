@@ -3,10 +3,10 @@ import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { TodayDose } from '@/doses/dose-service';
-import { ThemedText } from '@/ui/components/commons/themed-text';
-import { ThemedView } from '@/ui/components/commons/themed-view';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatTime } from '@/ui/commons/format-date';
+import { ThemedText } from '@/ui/components/commons/themed-text';
+import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DoseStatusDot } from '@/ui/components/doses/status-dot';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { useTodaysDoses } from '@/ui/hooks/use-todays-doses';

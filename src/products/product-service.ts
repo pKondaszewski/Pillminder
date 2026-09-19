@@ -5,10 +5,10 @@ import {
   createProduct,
   deleteProduct as deleteProductRow,
   getProductById,
+  type Product,
   productsQuery,
   setProductStatus as setProductStatusRow,
   updateProduct as updateProductRow,
-  type Product,
 } from './product-repository';
 
 export type { Product } from './product-repository';

@@ -5,11 +5,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
 import type { Schedule } from '@/schedules/schedule-service';
-import { ScheduleEditorModal } from '@/ui/components/schedules/editor-modal';
+import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { Spacing } from '@/ui/commons/constants/theme';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
+import { ScheduleEditorModal } from '@/ui/components/schedules/editor-modal';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 

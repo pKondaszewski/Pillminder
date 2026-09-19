@@ -1,12 +1,12 @@
 import { router, useFocusEffect, usePathname } from 'expo-router';
-import { useCallback, useState, type ReactNode } from 'react';
+import { type ReactNode, useCallback, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import {
   Directions,
   Gesture,
   GestureDetector,
 } from 'react-native-gesture-handler';
 import Animated, { Keyframe } from 'react-native-reanimated';
-import { StyleSheet } from 'react-native';
 
 const TAB_ORDER = ['/', '/products', '/schedules'] as const;
 

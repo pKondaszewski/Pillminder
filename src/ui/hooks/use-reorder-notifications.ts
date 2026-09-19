@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 
-import i18n from '@/config/i18n';
 import type { products as productsTable } from '@/config/db/schema';
-import type { ReorderStatus } from '@/products/dto/reorder-status';
+import i18n from '@/config/i18n';
 import {
   cancelReorderAlert,
   scheduleReorderAlert,
 } from '@/notifications/notification-service';
+import type { ReorderStatus } from '@/products/dto/reorder-status';
 
 import { useProducts } from './use-products';
 import { useReorderStatuses } from './use-reorder';

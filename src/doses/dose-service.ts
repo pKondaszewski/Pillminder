@@ -25,10 +25,10 @@ import {
 } from './dose-repository';
 import { isDueInFuture, isPending, isPresent } from './dose-validator';
 
-export { toTodayDose } from './dto/today-dose-output';
-export type { TodayDose } from './dto/today-dose-output';
-export { toHistoryEntry } from './dto/history-entry-output';
 export type { HistoryEntry } from './dto/history-entry-output';
+export { toHistoryEntry } from './dto/history-entry-output';
+export type { TodayDose } from './dto/today-dose-output';
+export { toTodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');
 

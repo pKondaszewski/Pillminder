@@ -12,10 +12,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { products } from '@/config/db/schema';
 import type { NewProductInput } from '@/products/dto/new-product-input';
-import { ProductHistory } from '@/ui/components/products/history';
+import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { Spacing } from '@/ui/commons/constants/theme';
+import { ProductHistory } from '@/ui/components/products/history';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Product = typeof products.$inferSelect;

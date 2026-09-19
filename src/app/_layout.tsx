@@ -1,15 +1,17 @@
+import '@/config/i18n';
+
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
 import { Text, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { db } from '@/config/db/database';
 import { AnimatedSplashOverlay } from '@/ui/components/commons/animated-icon';
 import AppTabs from '@/ui/components/navigation/app-tabs';
 import { useDoseSync } from '@/ui/hooks/use-dose-sync';
 import { useNotifications } from '@/ui/hooks/use-notifications';
 import { useReorderNotifications } from '@/ui/hooks/use-reorder-notifications';
-import { db } from '@/config/db/database';
-import '@/config/i18n';
+
 import migrations from '../../drizzle/migrations';
 
 export default function TabLayout() {

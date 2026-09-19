@@ -13,16 +13,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import type { Product } from '@/products/product-service';
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
 import {
   previewOccurrences,
   type Schedule,
 } from '@/schedules/schedule-service';
-import type { Product } from '@/products/product-service';
-import { ThemedText } from '@/ui/components/commons/themed-text';
-import { ThemedView } from '@/ui/components/commons/themed-view';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatTime } from '@/ui/commons/format-date';
+import { ThemedText } from '@/ui/components/commons/themed-text';
+import { ThemedView } from '@/ui/components/commons/themed-view';
 
 interface Props {
   visible: boolean;

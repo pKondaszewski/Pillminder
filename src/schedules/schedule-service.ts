@@ -6,9 +6,9 @@ import {
   deleteSchedule as deleteScheduleRow,
   getAllSchedules,
   getSchedulesByProductId,
+  type Schedule,
   schedulesQuery,
   updateSchedule as updateScheduleRow,
-  type Schedule,
 } from './schedule-repository';
 
 export {
