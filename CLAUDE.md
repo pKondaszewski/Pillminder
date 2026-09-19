@@ -94,4 +94,46 @@ These are settled and should not be re-litigated without a reason:
 - `CLAUDE.md` = high-level roadmap (this file)
 - GitHub Issues = granular tasks, bugs, and v2 ideas
 
+## Running locally (dev build)
+
+Notifications require a **dev build** on a physical device — Expo Go disables
+notifications entirely (`isSupported = false`), so all notification testing
+uses `expo run:android`, never Expo Go.
+
+Test device: **Samsung Galaxy S26 Ultra** (SM-S948B, serial `R3GL604XT6K`),
+connected by **USB cable**.
+
+Preconditions (check every time — these silently break the connection):
+
+- **Cable plugged in** — this is a wired workflow, no wireless.
+- **USB debugging ON** — phone: Developer options → USB debugging. On first
+  connect, accept the RSA "Allow USB debugging?" prompt ("Always allow").
+- **Samsung Auto Blocker OFF** — it re-enables itself ~every 30 min and
+  silently disables USB debugging, so `adb devices` goes empty mid-session.
+  Turn it off: Settings → Security and privacy → Auto Blocker. This — not the
+  cable — is the usual cause of the device dropping.
+
+Steps:
+
+```bash
+export ANDROID_SERIAL=R3GL604XT6K
+
+# 1. Verify the device is visible and authorized (status must be "device",
+#    not "unauthorized" or empty)
+adb devices -l
+
+# 2. First build, or after any native / permission / app.json change
+npx expo run:android
+
+# 3. Subsequent JS-only runs (hot reload, no rebuild)
+npx expo start --dev-client
+```
+
+If the app hangs on the splash / "Unable to load script" after an
+`adb kill-server` or restart, the Metro tunnel is lost — re-run
+`adb reverse tcp:8081 tcp:8081`, then relaunch.
+
+Toolchain (Apple Silicon Mac): Temurin JDK 17, Android cmdline-tools, SDK at
+`~/Library/Android/sdk`; env in `~/.zprofile`. RN 0.86 needs JDK 17 (AGP 8.x).
+
 @AGENTS.md
