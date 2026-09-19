@@ -136,4 +136,12 @@ If the app hangs on the splash / "Unable to load script" after an
 Toolchain (Apple Silicon Mac): Temurin JDK 17, Android cmdline-tools, SDK at
 `~/Library/Android/sdk`; env in `~/.zprofile`. RN 0.86 needs JDK 17 (AGP 8.x).
 
-@AGENTS.md
+## Conventions
+
+- **Expo has changed** — read the exact versioned docs at
+  https://docs.expo.dev/versions/v56.0.0/ before writing any code.
+- **Commits** — follow Conventional Commits
+  (https://www.conventionalcommits.org/en/v1.0.0/).
+- **Code style** — order by importance, public first. In every file the
+  exported (`export`) functions go above private helpers: the public API reads
+  first, the implementation details below it.
