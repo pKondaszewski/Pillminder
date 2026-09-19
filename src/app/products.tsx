@@ -106,9 +106,6 @@ export default function ProductListScreen() {
                 onPress={() => openEdit(item)}
               />
             )}
-            ListEmptyComponent={
-              <ThemedText type="small">{t('products.empty')}</ThemedText>
-            }
             ListFooterComponent={
               <Pressable
                 onPress={openCreate}

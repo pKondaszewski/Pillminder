@@ -26,7 +26,6 @@
     "showLess": "Show less",
     "showMore": "Show more",
     "stock": "Stock",
-    "stockHint": "Empty = not tracking stock",
     "stockLess": "Decrease stock",
     "stockMore": "Increase stock",
     "storeLink": "Where to buy",
@@ -37,7 +36,7 @@
     "taken": "Taken"
   },
   "home": {
-    "empty": "No doses today",
+    "empty": "Nothing today, you're free 🎉",
     "snoozed": "snoozed → {{time}}",
     "take": "Take",
     "undo": "Undo",
@@ -57,7 +56,6 @@
   "products": {
     "add": "Add new product",
     "archived": "Archived",
-    "empty": "No products",
     "lowStock": "Low stock",
     "lowStockDays": "~{{days}}d left"
   },
@@ -68,7 +66,6 @@
     "deleteConfirm": "Delete this schedule?",
     "deleteTitle": "Delete schedule?",
     "editTitle": "Edit schedule",
-    "empty": "No schedules",
     "everyXDaysShort": "Every {{days}} days",
     "intervalDays": "Frequency",
     "intervalLess": "Less often",

@@ -255,9 +255,6 @@ function EditorForm({
               </ThemedView>
             </Pressable>
           </ThemedView>
-          <ThemedText type="small" themeColor="textSecondary">
-            {t('editor.stockHint')}
-          </ThemedText>
 
           <ThemedText type="small">{t('editor.storeLink')}</ThemedText>
           <TextInput

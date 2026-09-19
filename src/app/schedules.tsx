@@ -86,9 +86,6 @@ export default function ScheduleListScreen() {
                 </ThemedView>
               </Pressable>
             )}
-            ListEmptyComponent={
-              <ThemedText type="small">{t('schedule.empty')}</ThemedText>
-            }
             ListFooterComponent={
               <Pressable
                 onPress={openCreate}

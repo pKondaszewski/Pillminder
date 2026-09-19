@@ -26,7 +26,6 @@
     "showLess": "Pokaż mniej",
     "showMore": "Pokaż więcej",
     "stock": "Zapas",
-    "stockHint": "Puste = nie śledzę zapasu",
     "stockLess": "Zmniejsz zapas",
     "stockMore": "Zwiększ zapas",
     "storeLink": "Gdzie kupić",
@@ -37,7 +36,7 @@
     "taken": "Wzięto"
   },
   "home": {
-    "empty": "Brak dawek na dziś",
+    "empty": "Nic na dziś, wolne 🎉",
     "snoozed": "drzemka → {{time}}",
     "take": "Wziąłem",
     "undo": "Cofnij",
@@ -57,7 +56,6 @@
   "products": {
     "add": "Dodaj nowy produkt",
     "archived": "Zarchiwizowany",
-    "empty": "Brak produktów",
     "lowStock": "Niski zapas",
     "lowStockDays": "~{{days}} dni"
   },
@@ -68,7 +66,6 @@
     "deleteConfirm": "Czy na pewno usunąć ten harmonogram?",
     "deleteTitle": "Usunąć harmonogram?",
     "editTitle": "Edytuj harmonogram",
-    "empty": "Brak harmonogramów",
     "everyXDaysShort": "Co {{days}} dni",
     "intervalDays": "Częstotliwość",
     "intervalLess": "Rzadziej",
