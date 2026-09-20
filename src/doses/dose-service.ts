@@ -152,6 +152,7 @@ export async function snoozeDose(id: string): Promise<void> {
       reminderStrings(product.name),
     );
     await setDoseSnoozedUntil(dose.id, when);
+    await dismissDoseReminder(dose.id);
   } catch (err) {
     log.error(`Failed to snooze dose ${id}`, err);
   }
