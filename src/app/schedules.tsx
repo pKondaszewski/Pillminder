@@ -29,7 +29,7 @@ export default function ScheduleListScreen() {
     const base =
       s.intervalDays === 1
         ? t('schedule.daily')
-        : t('schedule.everyXDaysShort', { days: s.intervalDays });
+        : t('schedule.everyXDays', { days: s.intervalDays });
     return `${base} · ${s.timesOfDay.join(', ')}`;
   };
 
@@ -44,6 +44,18 @@ export default function ScheduleListScreen() {
   };
 
   const closeEditor = () => setEditorOpen(false);
+
+  const renderItem = ({ item }: { item: Schedule }) => (
+    <Pressable
+      onPress={() => openEdit(item)}
+      style={({ pressed }) => pressed && styles.pressed}
+    >
+      <ThemedView type="backgroundElement" style={styles.row}>
+        <ThemedText>{productName(item.productId)}</ThemedText>
+        <ThemedText type="small">{rhythm(item)}</ThemedText>
+      </ThemedView>
+    </Pressable>
+  );
 
   const handleSave = async (input: NewScheduleInput) => {
     try {
@@ -75,17 +87,7 @@ export default function ScheduleListScreen() {
             data={schedules}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
-            renderItem={({ item }) => (
-              <Pressable
-                onPress={() => openEdit(item)}
-                style={({ pressed }) => pressed && styles.pressed}
-              >
-                <ThemedView type="backgroundElement" style={styles.row}>
-                  <ThemedText>{productName(item.productId)}</ThemedText>
-                  <ThemedText type="small">{rhythm(item)}</ThemedText>
-                </ThemedView>
-              </Pressable>
-            )}
+            renderItem={renderItem}
             ListFooterComponent={
               <Pressable
                 onPress={openCreate}
@@ -93,7 +95,7 @@ export default function ScheduleListScreen() {
               >
                 <ThemedView type="backgroundElement" style={styles.addRow}>
                   <ThemedText style={styles.addText}>
-                    + {t('schedule.add')}
+                    {t('schedule.add')}
                   </ThemedText>
                 </ThemedView>
               </Pressable>

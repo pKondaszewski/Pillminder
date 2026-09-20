@@ -47,27 +47,12 @@ export default function HomeScreen() {
           </ThemedView>
         </ThemedView>
 
-        {item.taken ? (
-          <Pressable
-            onPress={() => confirmUndo(item)}
-            style={({ pressed }) => pressed && styles.pressed}
-          >
-            <ThemedText type="small" themeColor="textSecondary">
-              ✓ {item.takenAt ? formatTime(item.takenAt) : ''}
-            </ThemedText>
-          </Pressable>
-        ) : (
-          <Pressable
-            onPress={() => takeDose(item.id)}
-            style={({ pressed }) => pressed && styles.pressed}
-          >
-            <ThemedView type="backgroundSelected" style={styles.takeButton}>
-              <ThemedText type="smallBold" style={styles.takeText}>
-                {t('home.take')}
-              </ThemedText>
-            </ThemedView>
-          </Pressable>
-        )}
+        <DoseActionButton
+          taken={item.taken}
+          takenAt={item.takenAt}
+          onTake={() => takeDose(item.id)}
+          onUndo={() => confirmUndo(item)}
+        />
       </ThemedView>
     );
   };
@@ -88,6 +73,46 @@ export default function HomeScreen() {
         </SafeAreaView>
       </ThemedView>
     </TabSwipe>
+  );
+}
+
+function DoseActionButton({
+  taken,
+  takenAt,
+  onTake,
+  onUndo,
+}: {
+  taken: boolean;
+  takenAt: Date | null;
+  onTake: () => void;
+  onUndo: () => void;
+}) {
+  const { t } = useTranslation();
+
+  if (taken) {
+    return (
+      <Pressable
+        onPress={onUndo}
+        style={({ pressed }) => pressed && styles.pressed}
+      >
+        <ThemedText type="small" themeColor="textSecondary">
+          {t('home.taken', { time: takenAt ? formatTime(takenAt) : '' })}
+        </ThemedText>
+      </Pressable>
+    );
+  }
+
+  return (
+    <Pressable
+      onPress={onTake}
+      style={({ pressed }) => pressed && styles.pressed}
+    >
+      <ThemedView type="backgroundSelected" style={styles.takeButton}>
+        <ThemedText type="smallBold" style={styles.takeText}>
+          {t('home.take')}
+        </ThemedText>
+      </ThemedView>
+    </Pressable>
   );
 }
 

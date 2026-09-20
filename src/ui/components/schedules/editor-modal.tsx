@@ -194,7 +194,7 @@ function EditorForm({
             <ThemedText style={styles.stepperValue}>
               {intervalDays === 1
                 ? t('schedule.daily')
-                : t('schedule.everyXDaysShort', { days: intervalDays })}
+                : t('schedule.everyXDays', { days: intervalDays })}
             </ThemedText>
             <Pressable
               onPress={() => setIntervalDays(intervalDays + 1)}

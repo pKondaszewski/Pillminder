@@ -51,6 +51,14 @@ export default function ProductListScreen() {
 
   const closeEditor = () => setEditorOpen(false);
 
+  const renderItem = ({ item }: { item: Product }) => (
+    <ProductRow
+      product={item}
+      reorder={reorderStatuses[item.id]}
+      onPress={() => openEdit(item)}
+    />
+  );
+
   const handleSave = async (input: NewProductInput) => {
     try {
       if (editing) {
@@ -99,13 +107,7 @@ export default function ProductListScreen() {
             data={sortedProducts}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
-            renderItem={({ item }) => (
-              <ProductRow
-                product={item}
-                reorder={reorderStatuses[item.id]}
-                onPress={() => openEdit(item)}
-              />
-            )}
+            renderItem={renderItem}
             ListFooterComponent={
               <Pressable
                 onPress={openCreate}

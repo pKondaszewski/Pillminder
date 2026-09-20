@@ -39,6 +39,7 @@
     "empty": "Nic na dziś, wolne 🎉",
     "snoozed": "drzemka → {{time}}",
     "take": "Wziąłem",
+    "taken": "✓ {{time}}",
     "undo": "Cofnij",
     "undoConfirm": "Cofnąć wzięcie „{{name}}”?",
     "undoTitle": "Cofnąć wzięcie?",
@@ -60,13 +61,13 @@
     "lowStockDays": "~{{days}} dni"
   },
   "schedule": {
-    "add": "Dodaj harmonogram",
+    "add": "+ Dodaj harmonogram",
     "addTime": "Dodaj godzinę",
     "daily": "Codziennie",
     "deleteConfirm": "Czy na pewno usunąć ten harmonogram?",
     "deleteTitle": "Usunąć harmonogram?",
     "editTitle": "Edytuj harmonogram",
-    "everyXDaysShort": "Co {{days}} dni",
+    "everyXDays": "Co {{days}} dni",
     "intervalDays": "Częstotliwość",
     "intervalLess": "Rzadziej",
     "intervalMore": "Częściej",

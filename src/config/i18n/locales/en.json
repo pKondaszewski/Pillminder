@@ -39,6 +39,7 @@
     "empty": "Nothing today, you're free 🎉",
     "snoozed": "snoozed → {{time}}",
     "take": "Take",
+    "taken": "✓ {{time}}",
     "undo": "Undo",
     "undoConfirm": "Undo taking “{{name}}”?",
     "undoTitle": "Undo taken?",
@@ -60,13 +61,13 @@
     "lowStockDays": "~{{days}}d left"
   },
   "schedule": {
-    "add": "Add schedule",
+    "add": "+ Add schedule",
     "addTime": "Add time",
     "daily": "Daily",
     "deleteConfirm": "Delete this schedule?",
     "deleteTitle": "Delete schedule?",
     "editTitle": "Edit schedule",
-    "everyXDaysShort": "Every {{days}} days",
+    "everyXDays": "Every {{days}} days",
     "intervalDays": "Frequency",
     "intervalLess": "Less often",
     "intervalMore": "More often",
