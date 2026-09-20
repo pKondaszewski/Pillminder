@@ -5,15 +5,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { TodayDose } from '@/doses/dose-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatTime } from '@/ui/commons/format-date';
+import { Snackbar } from '@/ui/components/commons/snackbar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DoseStatusDot } from '@/ui/components/doses/status-dot';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { useTodaysDoses } from '@/ui/hooks/use-todays-doses';
+import { useUndoableTake } from '@/ui/hooks/use-undoable-take';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { doses, takeDose, untakeDose } = useTodaysDoses();
+  const { undoableId, takeWithUndo, undoLast, dismissUndo } = useUndoableTake(
+    takeDose,
+    untakeDose,
+  );
 
   const displayName = (dose: TodayDose) =>
     dose.productName ?? t('home.unknownProduct');
@@ -50,7 +56,7 @@ export default function HomeScreen() {
         <DoseActionButton
           taken={item.taken}
           takenAt={item.takenAt}
-          onTake={() => takeDose(item.id)}
+          onTake={() => takeWithUndo(item.id)}
           onUndo={() => confirmUndo(item)}
         />
       </ThemedView>
@@ -71,6 +77,15 @@ export default function HomeScreen() {
             }
           />
         </SafeAreaView>
+        {undoableId ? (
+          <Snackbar
+            key={undoableId}
+            message={t('home.takenToast')}
+            actionLabel={t('home.undo')}
+            onAction={undoLast}
+            onDismiss={dismissUndo}
+          />
+        ) : null}
       </ThemedView>
     </TabSwipe>
   );

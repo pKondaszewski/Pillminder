@@ -40,6 +40,7 @@
     "snoozed": "drzemka → {{time}}",
     "take": "Wziąłem",
     "taken": "✓ {{time}}",
+    "takenToast": "✓ Oznaczono jako wzięte",
     "undo": "Cofnij",
     "undoConfirm": "Cofnąć wzięcie „{{name}}”?",
     "undoTitle": "Cofnąć wzięcie?",

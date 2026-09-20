@@ -40,6 +40,7 @@
     "snoozed": "snoozed → {{time}}",
     "take": "Take",
     "taken": "✓ {{time}}",
+    "takenToast": "✓ Marked as taken",
     "undo": "Undo",
     "undoConfirm": "Undo taking “{{name}}”?",
     "undoTitle": "Undo taken?",
