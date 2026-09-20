@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
@@ -15,6 +15,11 @@ export function productsQuery() {
 export async function getProductById(id: string): Promise<Product | undefined> {
   const [product] = await db.select().from(products).where(eq(products.id, id));
   return product;
+}
+
+export async function getProductsByIds(ids: string[]): Promise<Product[]> {
+  if (ids.length === 0) return [];
+  return db.select().from(products).where(inArray(products.id, ids));
 }
 
 export async function createProduct(input: NewProductInput): Promise<Product> {

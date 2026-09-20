@@ -5,6 +5,7 @@ import {
   createProduct,
   deleteProduct as deleteProductRow,
   getProductById,
+  getProductsByIds,
   type Product,
   productsQuery,
   setProductStatus as setProductStatusRow,
@@ -21,6 +22,10 @@ export function getProductsQuery() {
 
 export function getProduct(id: string): Promise<Product | undefined> {
   return getProductById(id);
+}
+
+export function getProducts(ids: string[]): Promise<Product[]> {
+  return getProductsByIds(ids);
 }
 
 export async function addProduct(input: NewProductInput): Promise<void> {

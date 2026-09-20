@@ -1,7 +1,7 @@
 import {
-  cancelFutureDosesForSchedule,
+  cancelFutureDosesForSchedules,
   refreshRemindersForProduct,
-  syncDosesForSchedule,
+  syncDosesForSchedules,
 } from '@/doses/dose-service';
 import { cancelReorderAlert } from '@/notifications/notification-service';
 import { getSchedulesByProduct } from '@/schedules/schedule-service';
@@ -23,9 +23,7 @@ export async function editProduct(
 
 export async function removeProduct(id: string): Promise<void> {
   const schedules = await getSchedulesByProduct(id);
-  await Promise.all(
-    schedules.map((schedule) => cancelFutureDosesForSchedule(schedule.id)),
-  );
+  await cancelFutureDosesForSchedules(schedules.map((s) => s.id));
   await cancelReorderAlert(id);
   await deleteProduct(id);
 }
@@ -33,15 +31,11 @@ export async function removeProduct(id: string): Promise<void> {
 export async function archiveProduct(id: string): Promise<void> {
   await setProductStatus(id, 'archived');
   const schedules = await getSchedulesByProduct(id);
-  await Promise.all(
-    schedules.map((schedule) => cancelFutureDosesForSchedule(schedule.id)),
-  );
+  await cancelFutureDosesForSchedules(schedules.map((s) => s.id));
 }
 
 export async function restoreProduct(id: string): Promise<void> {
   await setProductStatus(id, 'active');
   const schedules = await getSchedulesByProduct(id);
-  await Promise.all(
-    schedules.map((schedule) => syncDosesForSchedule(schedule)),
-  );
+  await syncDosesForSchedules(schedules);
 }

@@ -7,7 +7,11 @@ import {
   scheduleDoseReminder,
   SNOOZE_MINUTES,
 } from '@/notifications/notification-service';
-import { getProduct } from '@/products/product-service';
+import {
+  getProduct,
+  getProducts,
+  type Product,
+} from '@/products/product-service';
 import {
   getSchedules,
   occurrencesWithin,
@@ -15,6 +19,7 @@ import {
 } from '@/schedules/schedule-service';
 
 import {
+  deleteFuturePendingDosesForSchedules,
   getDoseById,
   getFuturePendingDosesByProduct,
   productHistoryQuery,
@@ -62,6 +67,23 @@ export async function cancelFutureDosesForSchedule(
     await cancelDoseReminders(removedIds);
   } catch (err) {
     log.error(`Failed to cancel future doses for schedule ${scheduleId}`, err);
+    throw err;
+  }
+}
+
+export async function cancelFutureDosesForSchedules(
+  scheduleIds: string[],
+): Promise<void> {
+  if (scheduleIds.length === 0) return;
+  log.info(`Cancelling future doses for ${scheduleIds.length} schedule(s)`);
+  try {
+    const removedIds = await deleteFuturePendingDosesForSchedules(
+      scheduleIds,
+      new Date(),
+    );
+    await cancelDoseReminders(removedIds);
+  } catch (err) {
+    log.error('Failed to cancel future doses for schedules', err);
     throw err;
   }
 }
@@ -137,15 +159,39 @@ export async function snoozeDose(id: string): Promise<void> {
 
 export async function syncAllSchedules(): Promise<void> {
   const schedules = await getSchedules();
+  await syncDosesForSchedules(schedules);
+}
+
+export async function syncDosesForSchedules(
+  schedules: Schedule[],
+): Promise<void> {
   log.info(`Syncing doses for ${schedules.length} schedule(s)`);
+
+  // Load every product referenced by the schedules in a single query, then
+  // look each one up in memory — avoids one getProduct() round-trip per
+  // schedule (the N+1 pattern).
+  const productIds = [...new Set(schedules.map((s) => s.productId))];
+  const products = await getProducts(productIds);
+  const productById = new Map(products.map((p) => [p.id, p]));
+
   for (const schedule of schedules) {
-    await syncDosesForSchedule(schedule);
+    await syncDosesForScheduleWith(
+      schedule,
+      productById.get(schedule.productId),
+    );
   }
 }
 
 export async function syncDosesForSchedule(schedule: Schedule): Promise<void> {
-  const from = new Date();
   const product = await getProduct(schedule.productId);
+  return syncDosesForScheduleWith(schedule, product);
+}
+
+async function syncDosesForScheduleWith(
+  schedule: Schedule,
+  product: Product | undefined,
+): Promise<void> {
+  const from = new Date();
 
   const slots =
     product?.status === 'archived'
