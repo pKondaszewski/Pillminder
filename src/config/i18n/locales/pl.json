@@ -99,6 +99,11 @@
   "products": {
     "add": "Dodaj nowy produkt",
     "archived": "Zarchiwizowany",
+    "errorArchive": "Nie udało się zarchiwizować produktu. Spróbuj ponownie.",
+    "errorDelete": "Nie udało się usunąć produktu. Spróbuj ponownie.",
+    "errorRestore": "Nie udało się przywrócić produktu. Spróbuj ponownie.",
+    "errorSave": "Nie udało się zapisać produktu. Wpisane dane nadal są w formularzu.",
+    "errorTitle": "Coś poszło nie tak",
     "lowStock": "Niski zapas",
     "lowStockDays": "~{{days}} dni"
   },

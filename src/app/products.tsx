@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, StyleSheet } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { products as productsTable } from '@/config/db/schema';
@@ -51,6 +51,9 @@ export default function ProductListScreen() {
 
   const closeEditor = () => setEditorOpen(false);
 
+  const showFailure = (messageKey: string) =>
+    Alert.alert(t('products.errorTitle'), t(messageKey));
+
   const renderItem = ({ item }: { item: Product }) => (
     <ProductRow
       product={item}
@@ -68,7 +71,7 @@ export default function ProductListScreen() {
       }
       closeEditor();
     } catch {
-      // save failed — keep modal open so the user's input is not lost
+      showFailure('products.errorSave');
     }
   };
 
@@ -77,7 +80,7 @@ export default function ProductListScreen() {
       await removeProduct(id);
       closeEditor();
     } catch {
-      // delete failed — keep modal open
+      showFailure('products.errorDelete');
     }
   };
 
@@ -86,7 +89,7 @@ export default function ProductListScreen() {
       await archiveProduct(id, completionNote);
       closeEditor();
     } catch {
-      // archive failed — keep modal open
+      showFailure('products.errorArchive');
     }
   };
 
@@ -95,7 +98,7 @@ export default function ProductListScreen() {
       await restoreProduct(id);
       closeEditor();
     } catch {
-      // restore failed — keep modal open
+      showFailure('products.errorRestore');
     }
   };
 
