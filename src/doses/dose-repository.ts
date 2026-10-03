@@ -47,43 +47,45 @@ export async function setDoseState(
   id: string,
   state: 'taken' | 'pending',
 ): Promise<void> {
-  await db.transaction(async (tx) => {
-    const [dose] = await tx.select().from(doses).where(eq(doses.id, id));
+  db.transaction((tx) => {
+    const dose = tx.select().from(doses).where(eq(doses.id, id)).get();
     if (!dose || dose.state === state) return;
 
-    const [schedule] = await tx
+    const schedule = tx
       .select({ quantity: schedules.quantity })
       .from(schedules)
-      .where(eq(schedules.id, dose.scheduleId));
+      .where(eq(schedules.id, dose.scheduleId))
+      .get();
     // Un-taking restores what was actually deducted; doses taken before
     // quantities existed have no snapshot and consumed exactly one unit.
     const quantity =
       state === 'taken' ? (schedule?.quantity ?? 1) : (dose.takenQuantity ?? 1);
 
-    await tx
-      .update(doses)
+    tx.update(doses)
       .set({
         state,
         takenAt: state === 'taken' ? new Date() : null,
         takenQuantity: state === 'taken' ? quantity : null,
         snoozedUntil: null,
       })
-      .where(eq(doses.id, id));
+      .where(eq(doses.id, id))
+      .run();
 
-    const [product] = await tx
+    const product = tx
       .select({ stock: products.stock })
       .from(products)
-      .where(eq(products.id, dose.productId));
+      .where(eq(products.id, dose.productId))
+      .get();
     if (!product || product.stock == null) return;
 
     const delta = state === 'taken' ? -quantity : quantity;
-    await tx
-      .update(products)
+    tx.update(products)
       .set({
         stock: Math.max(0, product.stock + delta),
         updatedAt: new Date(),
       })
-      .where(eq(products.id, dose.productId));
+      .where(eq(products.id, dose.productId))
+      .run();
   });
 }
 
@@ -119,21 +121,22 @@ export async function deleteFuturePendingDosesForSchedules(
   from: Date,
 ): Promise<string[]> {
   if (scheduleIds.length === 0) return [];
-  return db.transaction(async (tx) => {
+  return db.transaction((tx) => {
     const futurePending = and(
       inArray(doses.scheduleId, scheduleIds),
       eq(doses.state, 'pending'),
       gte(doses.plannedAt, from),
     );
 
-    const existing = await tx
+    const existing = tx
       .select({ id: doses.id })
       .from(doses)
-      .where(futurePending);
+      .where(futurePending)
+      .all();
     const removedIds = existing.map((row) => row.id);
 
     if (removedIds.length > 0) {
-      await tx.delete(doses).where(inArray(doses.id, removedIds));
+      tx.delete(doses).where(inArray(doses.id, removedIds)).run();
     }
 
     return removedIds;
@@ -145,17 +148,18 @@ export async function replaceFuturePendingDoses(
   from: Date,
   slots: NewDoseSlot[],
 ): Promise<ReplaceDosesQueryResult> {
-  return db.transaction(async (tx) => {
+  return db.transaction((tx) => {
     const futurePending = and(
       eq(doses.scheduleId, scheduleId),
       eq(doses.state, 'pending'),
       gte(doses.plannedAt, from),
     );
 
-    const existing = await tx
+    const existing = tx
       .select({ id: doses.id, plannedAt: doses.plannedAt })
       .from(doses)
-      .where(futurePending);
+      .where(futurePending)
+      .all();
 
     const wanted = new Set(slots.map((slot) => slot.plannedAt.getTime()));
     const existingTimes = new Set(
@@ -167,7 +171,7 @@ export async function replaceFuturePendingDoses(
       .map((row) => row.id);
 
     if (removedIds.length > 0) {
-      await tx.delete(doses).where(inArray(doses.id, removedIds));
+      tx.delete(doses).where(inArray(doses.id, removedIds)).run();
     }
 
     const newSlots = slots.filter(
@@ -176,7 +180,7 @@ export async function replaceFuturePendingDoses(
 
     if (newSlots.length === 0) return { removedIds, inserted: [] };
 
-    const inserted = await tx
+    const inserted = tx
       .insert(doses)
       .values(
         newSlots.map((slot) => ({
@@ -189,7 +193,8 @@ export async function replaceFuturePendingDoses(
         })),
       )
       .onConflictDoNothing()
-      .returning();
+      .returning()
+      .all();
 
     return { removedIds, inserted };
   });
