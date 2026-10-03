@@ -157,3 +157,8 @@ Toolchain (Apple Silicon Mac): Temurin JDK 17, Android cmdline-tools, SDK at
   commits as soon as the callback returns, so awaited work would run outside
   the transaction. Run queries with `.run()` / `.get()` / `.all()`.
   TypeScript does not catch this.
+- **Tests** — files are `*-test.ts` in a `__tests__` folder next to the code.
+  Every test has three marked sections, in this order: `// given` (input
+  data), `// when` (a single call, result in a variable), `// then`
+  (assertions). Skip only an empty `// given`. Pass `now` and any other source
+  of nondeterminism (random, timers, locale) in explicitly.
