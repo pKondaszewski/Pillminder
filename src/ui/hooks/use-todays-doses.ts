@@ -2,8 +2,10 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 
 import {
   getTodaysDosesQuery,
+  skipDose,
   takeDose,
   toTodayDose,
+  unskipDose,
   untakeDose,
 } from '@/doses/dose-service';
 import { productLabel } from '@/products/product-label';
@@ -30,5 +32,5 @@ export function useTodaysDoses() {
     ),
   );
 
-  return { doses, takeDose, untakeDose };
+  return { doses, takeDose, untakeDose, skipDose, unskipDose };
 }

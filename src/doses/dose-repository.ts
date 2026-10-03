@@ -4,6 +4,7 @@ import * as Crypto from 'expo-crypto';
 import { db } from '@/config/db/database';
 import { doses, products, schedules } from '@/config/db/schema';
 
+import { type DoseState, planDoseTransition } from './dose-transition';
 import type { ReplaceDosesQueryResult } from './dto/replace-doses-query-result';
 
 export type Dose = typeof doses.$inferSelect;
@@ -45,31 +46,36 @@ export function productHistoryQuery(productId: string, limit = 30) {
 
 export async function setDoseState(
   id: string,
-  state: 'taken' | 'pending',
+  state: DoseState,
 ): Promise<void> {
   db.transaction((tx) => {
     const dose = tx.select().from(doses).where(eq(doses.id, id)).get();
-    if (!dose || dose.state === state) return;
+    if (!dose) return;
 
     const schedule = tx
       .select({ quantity: schedules.quantity })
       .from(schedules)
       .where(eq(schedules.id, dose.scheduleId))
       .get();
-    // Un-taking restores what was actually deducted; doses taken before
-    // quantities existed have no snapshot and consumed exactly one unit.
-    const quantity =
-      state === 'taken' ? (schedule?.quantity ?? 1) : (dose.takenQuantity ?? 1);
+    const transition = planDoseTransition(
+      dose,
+      state,
+      schedule?.quantity ?? 1,
+      new Date(),
+    );
+    if (!transition) return;
 
     tx.update(doses)
       .set({
-        state,
-        takenAt: state === 'taken' ? new Date() : null,
-        takenQuantity: state === 'taken' ? quantity : null,
+        state: transition.state,
+        takenAt: transition.takenAt,
+        takenQuantity: transition.takenQuantity,
         snoozedUntil: null,
       })
       .where(eq(doses.id, id))
       .run();
+
+    if (transition.stockDelta === 0) return;
 
     const product = tx
       .select({ stock: products.stock })
@@ -78,10 +84,9 @@ export async function setDoseState(
       .get();
     if (!product || product.stock == null) return;
 
-    const delta = state === 'taken' ? -quantity : quantity;
     tx.update(products)
       .set({
-        stock: Math.max(0, product.stock + delta),
+        stock: Math.max(0, product.stock + transition.stockDelta),
         updatedAt: new Date(),
       })
       .where(eq(products.id, dose.productId))

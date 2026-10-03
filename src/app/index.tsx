@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,15 +12,21 @@ import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DoseStatusDot } from '@/ui/components/doses/status-dot';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { useTodaysDoses } from '@/ui/hooks/use-todays-doses';
-import { useUndoableTake } from '@/ui/hooks/use-undoable-take';
+import { useUndoableDoseAction } from '@/ui/hooks/use-undoable-dose-action';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
-  const { doses, takeDose, untakeDose } = useTodaysDoses();
-  const { undoableId, takeWithUndo, undoLast, dismissUndo } = useUndoableTake(
-    takeDose,
-    untakeDose,
+  const { doses, takeDose, untakeDose, skipDose, unskipDose } =
+    useTodaysDoses();
+  const actions = useMemo(
+    () => ({
+      taken: { apply: takeDose, revert: untakeDose },
+      skipped: { apply: skipDose, revert: unskipDose },
+    }),
+    [takeDose, untakeDose, skipDose, unskipDose],
   );
+  const { undoable, applyWithUndo, undoLast, dismissUndo } =
+    useUndoableDoseAction(actions);
 
   const displayName = (dose: TodayDose) =>
     dose.productName ?? t('home.unknownProduct');
@@ -39,7 +46,7 @@ export default function HomeScreen() {
     return (
       <ThemedView type="backgroundElement" style={styles.row}>
         <ThemedView style={styles.rowLeading}>
-          <DoseStatusDot taken={item.taken} />
+          <DoseStatusDot state={item.state} />
           <ThemedView style={styles.rowInfo}>
             <ThemedText type="smallBold">
               {formatTime(item.plannedAt)}
@@ -50,7 +57,7 @@ export default function HomeScreen() {
                 {t('home.quantity', { count: item.quantity })}
               </ThemedText>
             ) : null}
-            {!item.taken && item.snoozedUntil ? (
+            {item.state === 'pending' && item.snoozedUntil ? (
               <ThemedText type="small" themeColor="textSecondary">
                 {t('home.snoozed', { time: formatTime(item.snoozedUntil) })}
               </ThemedText>
@@ -59,10 +66,12 @@ export default function HomeScreen() {
         </ThemedView>
 
         <DoseActionButton
-          taken={item.taken}
+          state={item.state}
           takenAt={item.takenAt}
-          onTake={() => takeWithUndo(item.id)}
+          onTake={() => applyWithUndo('taken', item.id)}
+          onSkip={() => applyWithUndo('skipped', item.id)}
           onUndo={() => confirmUndo(item)}
+          onUnskip={() => unskipDose(item.id)}
         />
       </ThemedView>
     );
@@ -82,10 +91,14 @@ export default function HomeScreen() {
             }
           />
         </SafeAreaView>
-        {undoableId ? (
+        {undoable ? (
           <Snackbar
-            key={undoableId}
-            message={t('home.takenToast')}
+            key={undoable.id}
+            message={
+              undoable.kind === 'taken'
+                ? t('home.takenToast')
+                : t('home.skippedToast')
+            }
             actionLabel={t('home.undo')}
             onAction={undoLast}
             onDismiss={dismissUndo}
@@ -97,19 +110,23 @@ export default function HomeScreen() {
 }
 
 function DoseActionButton({
-  taken,
+  state,
   takenAt,
   onTake,
+  onSkip,
   onUndo,
+  onUnskip,
 }: {
-  taken: boolean;
+  state: TodayDose['state'];
   takenAt: Date | null;
   onTake: () => void;
+  onSkip: () => void;
   onUndo: () => void;
+  onUnskip: () => void;
 }) {
   const { t } = useTranslation();
 
-  if (taken) {
+  if (state === 'taken') {
     return (
       <Pressable
         onPress={onUndo}
@@ -122,17 +139,41 @@ function DoseActionButton({
     );
   }
 
-  return (
-    <Pressable
-      onPress={onTake}
-      style={({ pressed }) => pressed && styles.pressed}
-    >
-      <ThemedView type="backgroundSelected" style={styles.takeButton}>
-        <ThemedText type="smallBold" themeColor="accent">
-          {t('home.take')}
+  if (state === 'skipped') {
+    return (
+      <Pressable
+        onPress={onUnskip}
+        style={({ pressed }) => pressed && styles.pressed}
+      >
+        <ThemedText type="small" themeColor="textSecondary">
+          {t('home.skipped')}
         </ThemedText>
-      </ThemedView>
-    </Pressable>
+      </Pressable>
+    );
+  }
+
+  return (
+    <ThemedView style={styles.actions}>
+      <Pressable
+        onPress={onSkip}
+        hitSlop={Spacing.two}
+        style={({ pressed }) => pressed && styles.pressed}
+      >
+        <ThemedText type="small" themeColor="textSecondary">
+          {t('home.skip')}
+        </ThemedText>
+      </Pressable>
+      <Pressable
+        onPress={onTake}
+        style={({ pressed }) => pressed && styles.pressed}
+      >
+        <ThemedView type="backgroundSelected" style={styles.takeButton}>
+          <ThemedText type="smallBold" themeColor="accent">
+            {t('home.take')}
+          </ThemedText>
+        </ThemedView>
+      </Pressable>
+    </ThemedView>
   );
 }
 
@@ -164,6 +205,12 @@ const styles = StyleSheet.create({
   },
   rowInfo: {
     gap: Spacing.one,
+    backgroundColor: 'transparent',
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.three,
     backgroundColor: 'transparent',
   },
   takeButton: {

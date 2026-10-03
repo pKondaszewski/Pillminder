@@ -137,24 +137,22 @@ export async function takeDose(id: string): Promise<void> {
 }
 
 export async function untakeDose(id: string): Promise<void> {
-  log.info(`Reverting dose ${id} to pending`);
+  await revertDoseToPending(id);
+}
+
+export async function skipDose(id: string): Promise<void> {
+  log.info(`Marking dose ${id} as skipped`);
   try {
-    await setDoseState(id, 'pending');
-
-    const dose = await getDoseById(id);
-    if (!isPresent(dose) || !isDueInFuture(dose)) return;
-
-    const product = await getProduct(dose.productId);
-    if (!isPresent(product)) return;
-
-    await scheduleDoseReminder(
-      { id: dose.id, productName: product.name, plannedAt: dose.plannedAt },
-      reminderStrings(product, await quantityForDose(dose.scheduleId)),
-    );
+    await setDoseState(id, 'skipped');
+    await Promise.all([cancelDoseReminder(id), dismissDoseReminder(id)]);
   } catch (err) {
-    log.error(`Failed to revert dose ${id}`, err);
+    log.error(`Failed to mark dose ${id} as skipped`, err);
     throw err;
   }
+}
+
+export async function unskipDose(id: string): Promise<void> {
+  await revertDoseToPending(id);
 }
 
 export async function snoozeDose(id: string): Promise<void> {
@@ -259,4 +257,25 @@ async function syncDosesForScheduleWith(
 
 async function quantityForDose(scheduleId: string): Promise<number> {
   return (await getSchedule(scheduleId))?.quantity ?? 1;
+}
+
+async function revertDoseToPending(id: string): Promise<void> {
+  log.info(`Reverting dose ${id} to pending`);
+  try {
+    await setDoseState(id, 'pending');
+
+    const dose = await getDoseById(id);
+    if (!isPresent(dose) || !isDueInFuture(dose)) return;
+
+    const product = await getProduct(dose.productId);
+    if (!isPresent(product)) return;
+
+    await scheduleDoseReminder(
+      { id: dose.id, productName: product.name, plannedAt: dose.plannedAt },
+      reminderStrings(product, await quantityForDose(dose.scheduleId)),
+    );
+  } catch (err) {
+    log.error(`Failed to revert dose ${id}`, err);
+    throw err;
+  }
 }
