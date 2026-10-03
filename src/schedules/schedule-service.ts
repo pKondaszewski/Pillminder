@@ -13,11 +13,9 @@ import {
 } from './schedule-repository';
 
 export {
-  addDays,
   nextOccurrences,
   occurrencesWithin,
   previewOccurrences,
-  startOfDay,
 } from './schedule-helper';
 export type { Schedule } from './schedule-repository';
 

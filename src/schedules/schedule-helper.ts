@@ -1,3 +1,5 @@
+import { addDays, startOfDay } from '@/config/date-utils';
+
 export interface SchedulePeriod {
   startDate?: Date | null;
   endDate?: Date | null;
@@ -58,18 +60,6 @@ export function occurrencesWithin(
     result.push(occurrence);
   }
   return result;
-}
-
-export function startOfDay(date: Date): Date {
-  const start = new Date(date);
-  start.setHours(0, 0, 0, 0);
-  return start;
-}
-
-export function addDays(date: Date, days: number): Date {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
 }
 
 export function daysBetween(from: Date, to: Date): number {
