@@ -81,9 +81,9 @@ export default function ProductListScreen() {
     }
   };
 
-  const handleArchive = async (id: string) => {
+  const handleArchive = async (id: string, completionNote?: string) => {
     try {
-      await archiveProduct(id);
+      await archiveProduct(id, completionNote);
       closeEditor();
     } catch {
       // archive failed — keep modal open

@@ -46,6 +46,18 @@
     "undoTitle": "Undo taken?",
     "unknownProduct": "Unknown product"
   },
+  "notes": {
+    "add": "Add note",
+    "completionPlaceholder": "e.g. taking a break, switched to another product",
+    "completionPrompt": "Why are you archiving this? (optional)",
+    "deleteConfirm": "Delete this note?",
+    "deleteTitle": "Delete note?",
+    "edited": "edited",
+    "edit": "Edit",
+    "empty": "No notes yet",
+    "placeholder": "Write a note…",
+    "title": "Notes"
+  },
   "notification": {
     "body": "Time to take {{name}}",
     "buy": "Buy",
