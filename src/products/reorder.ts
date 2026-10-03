@@ -1,4 +1,4 @@
-import { addDays, startOfDay } from '@/schedules/schedule-service';
+import { addDays, startOfDay } from '@/config/date-utils';
 
 import type { ReorderStatus } from './dto/reorder-status';
 import type { RhythmInput } from './dto/rhythm-input';
