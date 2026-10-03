@@ -115,7 +115,7 @@ export default function ScheduleListScreen() {
                 style={({ pressed }) => pressed && styles.pressed}
               >
                 <ThemedView type="backgroundElement" style={styles.addRow}>
-                  <ThemedText style={styles.addText}>
+                  <ThemedText themeColor="accent" style={styles.addText}>
                     {t('schedule.add')}
                   </ThemedText>
                 </ThemedView>
@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addText: {
-    color: '#3c87f7',
     fontWeight: '600',
   },
   pressed: {

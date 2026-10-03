@@ -128,7 +128,7 @@ function DoseActionButton({
       style={({ pressed }) => pressed && styles.pressed}
     >
       <ThemedView type="backgroundSelected" style={styles.takeButton}>
-        <ThemedText type="smallBold" style={styles.takeText}>
+        <ThemedText type="smallBold" themeColor="accent">
           {t('home.take')}
         </ThemedText>
       </ThemedView>
@@ -170,9 +170,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.two,
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.three,
-  },
-  takeText: {
-    color: '#3c87f7',
   },
   pressed: {
     opacity: 0.7,

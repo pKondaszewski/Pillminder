@@ -74,7 +74,7 @@ export function ProductNotes({
                 hitSlop={Spacing.two}
                 style={({ pressed }) => pressed && styles.pressed}
               >
-                <ThemedText type="smallBold" style={styles.link}>
+                <ThemedText type="smallBold" themeColor="accent">
                   {t('notes.edit')}
                 </ThemedText>
               </Pressable>
@@ -121,7 +121,7 @@ export function ProductNotes({
             !canSubmit && styles.disabled,
           ]}
         >
-          <ThemedText type="smallBold" style={styles.link}>
+          <ThemedText type="smallBold" themeColor="accent">
             {editingId ? t('editor.save') : t('notes.add')}
           </ThemedText>
         </Pressable>
@@ -153,9 +153,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minHeight: 80,
     textAlignVertical: 'top',
-  },
-  link: {
-    color: '#3c87f7',
   },
   pressed: {
     opacity: 0.7,

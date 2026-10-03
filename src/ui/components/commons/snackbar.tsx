@@ -49,7 +49,7 @@ export function Snackbar({
           hitSlop={Spacing.two}
           style={({ pressed }) => pressed && styles.pressed}
         >
-          <ThemedText type="smallBold" style={styles.action}>
+          <ThemedText type="smallBold" themeColor="accent">
             {actionLabel}
           </ThemedText>
         </Pressable>
@@ -85,9 +85,6 @@ const styles = StyleSheet.create({
   },
   message: {
     flex: 1,
-  },
-  action: {
-    color: '#3c87f7',
   },
   pressed: {
     opacity: 0.7,

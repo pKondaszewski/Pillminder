@@ -9,10 +9,12 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-const PENDING_COLOR = '#3c87f7';
+import { useTheme } from '@/ui/hooks/use-theme';
+
 const TAKEN_COLOR = '#34c759';
 
 export function DoseStatusDot({ taken }: { taken: boolean }) {
+  const theme = useTheme();
   const pulse = useSharedValue(1);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export function DoseStatusDot({ taken }: { taken: boolean }) {
     <Animated.View
       style={[
         styles.dot,
-        { backgroundColor: taken ? TAKEN_COLOR : PENDING_COLOR },
+        { backgroundColor: taken ? TAKEN_COLOR : theme.accent },
         animatedStyle,
       ]}
     />

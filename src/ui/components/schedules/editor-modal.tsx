@@ -23,6 +23,7 @@ import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDate, formatTime } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { useTheme } from '@/ui/hooks/use-theme';
 
 interface Props {
   visible: boolean;
@@ -76,6 +77,7 @@ function EditorForm({
   onDelete,
 }: Omit<Props, 'visible'>) {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const [productId, setProductId] = useState(
     schedule?.productId ?? products[0]?.id ?? '',
@@ -285,7 +287,11 @@ function EditorForm({
               style={({ pressed }) => pressed && styles.pressed}
             >
               <ThemedView type="backgroundElement" style={styles.timeChip}>
-                <ThemedText type="small" style={styles.addText}>
+                <ThemedText
+                  type="small"
+                  themeColor="accent"
+                  style={styles.addText}
+                >
                   + {t('schedule.addTime')}
                 </ThemedText>
               </ThemedView>
@@ -311,7 +317,7 @@ function EditorForm({
                   <ActionButton
                     label={t('schedule.addTime')}
                     onPress={confirmIosTime}
-                    color="#3c87f7"
+                    color={theme.accent}
                   />
                 </ThemedView>
               ) : null}
@@ -385,7 +391,7 @@ function EditorForm({
           <ActionButton
             label={t('editor.save')}
             onPress={handleSave}
-            color="#3c87f7"
+            color={theme.accent}
           />
         </ThemedView>
       </SafeAreaView>
@@ -516,7 +522,6 @@ const styles = StyleSheet.create({
     color: '#d9534f',
   },
   addText: {
-    color: '#3c87f7',
     fontWeight: '600',
   },
   previewBox: {
