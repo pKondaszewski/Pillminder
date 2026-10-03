@@ -346,7 +346,7 @@ function EditorForm({
                 <ActionButton
                   label={t('editor.archive')}
                   onPress={handleConfirmArchive}
-                  color="#3c87f7"
+                  color={theme.accent}
                 />
               </ThemedView>
             </ThemedView>
@@ -384,7 +384,7 @@ function EditorForm({
           <ActionButton
             label={t('editor.save')}
             onPress={handleSave}
-            color="#3c87f7"
+            color={theme.accent}
           />
         </ThemedView>
       </SafeAreaView>

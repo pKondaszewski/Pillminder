@@ -27,7 +27,10 @@ export function ThemedText({
   return (
     <Text
       style={[
-        { color: theme[themeColor ?? 'text'] },
+        {
+          color:
+            theme[themeColor ?? (type === 'linkPrimary' ? 'accent' : 'text')],
+        },
         type === 'default' && styles.default,
         type === 'title' && styles.title,
         type === 'small' && styles.small,
@@ -76,7 +79,6 @@ const styles = StyleSheet.create({
   linkPrimary: {
     lineHeight: 30,
     fontSize: 14,
-    color: '#3c87f7',
   },
   code: {
     fontFamily: Fonts.mono,

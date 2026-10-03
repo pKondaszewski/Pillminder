@@ -36,7 +36,11 @@ export function ProductHistory({ productId }: { productId: string }) {
           onPress={() => setExpanded((prev) => !prev)}
           style={({ pressed }) => pressed && styles.pressed}
         >
-          <ThemedText type="smallBold" style={styles.toggle}>
+          <ThemedText
+            type="smallBold"
+            themeColor="accent"
+            style={styles.toggle}
+          >
             {expanded ? t('editor.showLess') : t('editor.showMore')}
           </ThemedText>
         </Pressable>
@@ -76,7 +80,6 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.two,
   },
   toggle: {
-    color: '#3c87f7',
     paddingVertical: Spacing.one,
     textAlign: 'center',
   },
