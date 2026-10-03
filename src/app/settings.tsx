@@ -23,6 +23,7 @@ import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
+import { useBackup } from '@/ui/hooks/use-backup';
 import { useSettings } from '@/ui/hooks/use-settings';
 import { useTheme } from '@/ui/hooks/use-theme';
 
@@ -74,6 +75,8 @@ export default function SettingsScreen() {
               />
             </Section>
 
+            <BackupSection />
+
             <Section title={t('settings.about')}>
               <ThemedText type="small" themeColor="textSecondary">
                 {t('settings.version')}: {Constants.expoConfig?.version ?? '-'}
@@ -103,6 +106,37 @@ function Section({
       </ThemedText>
       {children}
     </ThemedView>
+  );
+}
+
+function BackupSection() {
+  const { t } = useTranslation();
+  const { busy, exportData, importData } = useBackup();
+
+  return (
+    <Section title={t('backup.title')}>
+      <ThemedText type="small" themeColor="textSecondary">
+        {t('backup.description')}
+      </ThemedText>
+      <ThemedView style={styles.chips}>
+        {[
+          { label: t('backup.export'), onPress: exportData },
+          { label: t('backup.import'), onPress: importData },
+        ].map(({ label, onPress }) => (
+          <Pressable
+            key={label}
+            onPress={onPress}
+            disabled={busy}
+            accessibilityRole="button"
+            style={({ pressed }) => (pressed || busy) && styles.pressed}
+          >
+            <ThemedView type="backgroundElement" style={styles.chip}>
+              <ThemedText type="small">{label}</ThemedText>
+            </ThemedView>
+          </Pressable>
+        ))}
+      </ThemedView>
+    </Section>
   );
 }
 
