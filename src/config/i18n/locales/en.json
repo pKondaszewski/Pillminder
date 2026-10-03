@@ -99,6 +99,11 @@
   "products": {
     "add": "Add new product",
     "archived": "Archived",
+    "errorArchive": "Could not archive the product. Try again.",
+    "errorDelete": "Could not delete the product. Try again.",
+    "errorRestore": "Could not restore the product. Try again.",
+    "errorSave": "Could not save the product. Your changes are still in the form.",
+    "errorTitle": "Something went wrong",
     "lowStock": "Low stock",
     "lowStockDays": "~{{days}}d left"
   },
