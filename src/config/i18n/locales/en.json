@@ -64,6 +64,9 @@
   "home": {
     "empty": "Nothing today, you're free 🎉",
     "quantity": "× {{count}}",
+    "skip": "Skip",
+    "skipped": "Skipped",
+    "skippedToast": "Marked as skipped",
     "snoozed": "snoozed → {{time}}",
     "take": "Take",
     "taken": "✓ {{time}}",

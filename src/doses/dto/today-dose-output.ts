@@ -1,11 +1,12 @@
 import type { Dose } from '../dose-repository';
+import type { DoseState } from '../dose-transition';
 
 export interface TodayDose {
   id: string;
   productName: string | null;
   quantity: number;
   plannedAt: Date;
-  taken: boolean;
+  state: DoseState;
   takenAt: Date | null;
   snoozedUntil: Date | null;
 }
@@ -20,7 +21,7 @@ export function toTodayDose(
     productName,
     quantity,
     plannedAt: dose.plannedAt,
-    taken: dose.state === 'taken',
+    state: dose.state,
     takenAt: dose.takenAt,
     snoozedUntil: dose.snoozedUntil,
   };

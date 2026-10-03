@@ -64,6 +64,9 @@
   "home": {
     "empty": "Nic na dziś, wolne 🎉",
     "quantity": "× {{count}}",
+    "skip": "Pomiń",
+    "skipped": "Pominięto",
+    "skippedToast": "Oznaczono jako pominięte",
     "snoozed": "drzemka → {{time}}",
     "take": "Wziąłem",
     "taken": "✓ {{time}}",
