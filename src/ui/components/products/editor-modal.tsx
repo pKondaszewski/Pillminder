@@ -18,6 +18,7 @@ import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductHistory } from '@/ui/components/products/history';
 import { ProductNotes } from '@/ui/components/products/notes';
 import { useNoteDraft } from '@/ui/hooks/use-note-draft';
+import { useSettings } from '@/ui/hooks/use-settings';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Product = typeof products.$inferSelect;
@@ -95,6 +96,7 @@ function EditorForm({
 }: Omit<Props, 'visible'>) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { currency } = useSettings();
 
   const [name, setName] = useState(product?.name ?? '');
   const [category, setCategory] = useState<Category | null>(
@@ -249,7 +251,10 @@ function EditorForm({
             </>
           ) : null}
 
-          <ThemedText type="small">{t('editor.price')}</ThemedText>
+          <ThemedText type="small">
+            {t('editor.price', { currency })}
+          </ThemedText>
+
           <TextInput
             value={price}
             onChangeText={setPrice}

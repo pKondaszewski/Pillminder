@@ -5,12 +5,12 @@ import {
   cancelDoseReminders,
   dismissDoseReminder,
   scheduleDoseReminder,
-  SNOOZE_MINUTES,
 } from '@/notifications/notification-service';
 import { productLabel } from '@/products/product-label';
 import {
   getProduct,
   getProducts,
+  getProductsQuery,
   type Product,
 } from '@/products/product-service';
 import {
@@ -20,6 +20,7 @@ import {
   occurrencesWithin,
   type Schedule,
 } from '@/schedules/schedule-service';
+import { getSnoozeMinutes } from '@/settings/settings-service';
 
 import {
   deleteFuturePendingDosesForSchedules,
@@ -119,6 +120,11 @@ export async function refreshRemindersForProduct(
   );
 }
 
+export async function refreshAllReminders(): Promise<void> {
+  const products = await getProductsQuery();
+  await Promise.all(products.map((p) => refreshRemindersForProduct(p.id)));
+}
+
 export async function takeDose(id: string): Promise<void> {
   log.info(`Marking dose ${id} as taken`);
   try {
@@ -152,14 +158,15 @@ export async function untakeDose(id: string): Promise<void> {
 }
 
 export async function snoozeDose(id: string): Promise<void> {
-  log.info(`Snoozing dose ${id} by ${SNOOZE_MINUTES} min`);
+  const snoozeMinutes = getSnoozeMinutes();
+  log.info(`Snoozing dose ${id} by ${snoozeMinutes} min`);
   try {
     const dose = await getDoseById(id);
     if (!isPresent(dose) || !isPending(dose)) return;
     const product = await getProduct(dose.productId);
     if (!isPresent(product)) return;
 
-    const when = new Date(Date.now() + SNOOZE_MINUTES * 60 * 1000);
+    const when = new Date(Date.now() + snoozeMinutes * 60 * 1000);
     await scheduleDoseReminder(
       { id: dose.id, productName: product.name, plannedAt: when },
       reminderStrings(product, await quantityForDose(dose.scheduleId)),

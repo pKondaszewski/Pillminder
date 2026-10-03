@@ -6,6 +6,7 @@ import { Text, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { db } from '@/config/db/database';
+import { applyStoredTheme } from '@/settings/settings-service';
 import { AnimatedSplashOverlay } from '@/ui/components/commons/animated-icon';
 import AppTabs from '@/ui/components/navigation/app-tabs';
 import { useDoseSync } from '@/ui/hooks/use-dose-sync';
@@ -13,6 +14,8 @@ import { useNotifications } from '@/ui/hooks/use-notifications';
 import { useReorderNotifications } from '@/ui/hooks/use-reorder-notifications';
 
 import migrations from '../../drizzle/migrations';
+
+applyStoredTheme();
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();

@@ -20,7 +20,7 @@
     "namePlaceholder": "np. Witamina D",
     "nameRequired": "Podaj nazwę",
     "newTitle": "Nowy produkt",
-    "price": "Cena (zł)",
+    "price": "Cena ({{currency}})",
     "restore": "Przywróć",
     "save": "Zapisz",
     "showLess": "Pokaż mniej",
@@ -66,6 +66,7 @@
     "bodyQuantity": "Czas wziąć {{quantity}} × {{name}}",
     "buy": "Kup",
     "reorderBody": "{{name}} się kończy — czas dokupić",
+    "reorderBodyWithPrice": "{{name}} się kończy — czas dokupić ({{price}} {{currency}})",
     "reorderTitle": "Kończy się zapas",
     "snooze": "Drzemka",
     "take": "Wziąłem",
@@ -110,6 +111,27 @@
     "timesOfDay": "Godziny",
     "unknownProduct": "Nieznany produkt"
   },
+  "settings": {
+    "about": "O aplikacji",
+    "appearance": "Wygląd",
+    "author": "Autor",
+    "currency": "Waluta",
+    "language": "Język",
+    "languageEn": "English",
+    "languagePl": "Polski",
+    "languageSystem": "Systemowy",
+    "minutesUnit": "min",
+    "notifications": "Powiadomienia",
+    "price": "Cena",
+    "snooze": "Czas drzemki",
+    "snoozeLess": "Zmniejsz czas drzemki",
+    "snoozeMore": "Zwiększ czas drzemki",
+    "theme": "Motyw",
+    "themeDark": "Ciemny",
+    "themeLight": "Jasny",
+    "themeSystem": "Systemowy",
+    "version": "Wersja"
+  },
   "storeSuggestion": {
     "biedronka": "Biedronka",
     "hebe": "Hebe",
@@ -119,6 +141,7 @@
   "tabs": {
     "home": "Dziś",
     "products": "Produkty",
-    "schedules": "Harmonogramy"
+    "schedules": "Harmonogramy",
+    "settings": "Ustawienia"
   }
 }
