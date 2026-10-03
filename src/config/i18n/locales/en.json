@@ -29,7 +29,9 @@
     "stockLess": "Decrease stock",
     "stockMore": "Increase stock",
     "storeLink": "Where to buy",
-    "storeLinkPlaceholder": "e.g. pharmacy or a store link"
+    "storeLinkPlaceholder": "e.g. pharmacy or a store link",
+    "strength": "Strength",
+    "strengthPlaceholder": "e.g. 5mg"
   },
   "history": {
     "skipped": "Missed",
@@ -37,6 +39,7 @@
   },
   "home": {
     "empty": "Nothing today, you're free 🎉",
+    "quantity": "× {{count}}",
     "snoozed": "snoozed → {{time}}",
     "take": "Take",
     "taken": "✓ {{time}}",
@@ -60,6 +63,7 @@
   },
   "notification": {
     "body": "Time to take {{name}}",
+    "bodyQuantity": "Time to take {{quantity}} × {{name}}",
     "buy": "Buy",
     "reorderBody": "{{name}} is running low — time to reorder",
     "reorderTitle": "Running low",
@@ -86,9 +90,22 @@
     "intervalMore": "More often",
     "newTitle": "New schedule",
     "noProducts": "Add a product first",
+    "periodClear": "Clear date",
+    "periodEnd": "End date (optional)",
+    "periodFrom": "from {{date}}",
+    "periodInvalid": "End date is before start date",
+    "periodNone": "Not set",
+    "periodRange": "{{from}} – {{to}}",
+    "periodStart": "Start date (optional)",
+    "periodUntil": "until {{date}}",
     "preview": "Upcoming doses",
     "previewEmpty": "Add a time to see a preview",
+    "previewNone": "No upcoming doses in this period",
     "product": "Product",
+    "quantity": "Units per dose",
+    "quantityLess": "Fewer units",
+    "quantityMore": "More units",
+    "quantityValue": "{{count}} per dose",
     "removeTime": "Remove time {{time}}",
     "timesOfDay": "Times",
     "unknownProduct": "Unknown product"

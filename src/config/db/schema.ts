@@ -12,6 +12,7 @@ export const products = sqliteTable('products', {
   category: text('category', {
     enum: ['medication', 'supplement', 'care'],
   }).notNull(),
+  strength: text('strength'),
   price: integer('price'),
   storeLink: text('store_link'),
   status: text('status', { enum: ['active', 'archived'] })
@@ -34,6 +35,9 @@ export const schedules = sqliteTable(
     timesOfDay: text('times_of_day', { mode: 'json' })
       .$type<string[]>()
       .notNull(),
+    quantity: integer('quantity').notNull().default(1),
+    startDate: integer('start_date', { mode: 'timestamp' }),
+    endDate: integer('end_date', { mode: 'timestamp' }),
   },
   (table) => [index('idx_schedules_product').on(table.productId)],
 );
@@ -53,6 +57,7 @@ export const doses = sqliteTable(
       .notNull()
       .default('pending'),
     takenAt: integer('taken_at', { mode: 'timestamp' }),
+    takenQuantity: integer('taken_quantity'),
     snoozedUntil: integer('snoozed_until', { mode: 'timestamp' }),
   },
   (table) => [

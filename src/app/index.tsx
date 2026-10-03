@@ -45,6 +45,11 @@ export default function HomeScreen() {
               {formatTime(item.plannedAt)}
             </ThemedText>
             <ThemedText>{displayName(item)}</ThemedText>
+            {item.quantity !== 1 ? (
+              <ThemedText type="small" themeColor="textSecondary">
+                {t('home.quantity', { count: item.quantity })}
+              </ThemedText>
+            ) : null}
             {!item.taken && item.snoozedUntil ? (
               <ThemedText type="small" themeColor="textSecondary">
                 {t('home.snoozed', { time: formatTime(item.snoozedUntil) })}

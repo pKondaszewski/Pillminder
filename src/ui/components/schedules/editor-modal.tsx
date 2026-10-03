@@ -20,7 +20,7 @@ import {
   type Schedule,
 } from '@/schedules/schedule-service';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { formatTime } from '@/ui/commons/format-date';
+import { formatDate, formatTime } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 
@@ -82,6 +82,16 @@ function EditorForm({
   );
   const [intervalDays, setIntervalDays] = useState(schedule?.intervalDays ?? 1);
   const [times, setTimes] = useState<string[]>(schedule?.timesOfDay ?? []);
+  const [quantity, setQuantity] = useState(schedule?.quantity ?? 1);
+  const [startDate, setStartDate] = useState<Date | null>(
+    schedule?.startDate ?? null,
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    schedule?.endDate ?? null,
+  );
+  const [datePickerFor, setDatePickerFor] = useState<'start' | 'end' | null>(
+    null,
+  );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerValue, setPickerValue] = useState(new Date());
 
@@ -110,16 +120,32 @@ function EditorForm({
     setPickerOpen(false);
   };
 
-  const preview = previewOccurrences(intervalDays, times);
+  const periodInvalid =
+    startDate !== null && endDate !== null && endDate < startDate;
+
+  const onDateChange = (_event: DateTimePickerChangeEvent, date: Date) => {
+    const day = new Date(date);
+    day.setHours(0, 0, 0, 0);
+    if (datePickerFor === 'start') setStartDate(day);
+    if (datePickerFor === 'end') setEndDate(day);
+    setDatePickerFor(null);
+  };
+
+  const preview = periodInvalid
+    ? []
+    : previewOccurrences(intervalDays, times, { startDate, endDate });
 
   const handleSave = () => {
-    if (productId === '' || times.length === 0) {
+    if (productId === '' || times.length === 0 || periodInvalid) {
       return;
     }
     onSave({
       productId,
       intervalDays: Math.max(1, intervalDays),
       timesOfDay: times,
+      quantity: Math.max(1, quantity),
+      startDate,
+      endDate,
     });
   };
 
@@ -208,6 +234,31 @@ function EditorForm({
             </Pressable>
           </ThemedView>
 
+          <ThemedText type="small">{t('schedule.quantity')}</ThemedText>
+          <ThemedView style={styles.stepper}>
+            <Pressable
+              onPress={() => setQuantity(Math.max(1, quantity - 1))}
+              hitSlop={Spacing.two}
+              accessibilityLabel={t('schedule.quantityLess')}
+              style={({ pressed }) => pressed && styles.pressed}
+            >
+              <ThemedView type="backgroundElement" style={styles.stepperButton}>
+                <ThemedText type="subtitle">−</ThemedText>
+              </ThemedView>
+            </Pressable>
+            <ThemedText style={styles.stepperValue}>{quantity}</ThemedText>
+            <Pressable
+              onPress={() => setQuantity(quantity + 1)}
+              hitSlop={Spacing.two}
+              accessibilityLabel={t('schedule.quantityMore')}
+              style={({ pressed }) => pressed && styles.pressed}
+            >
+              <ThemedView type="backgroundElement" style={styles.stepperButton}>
+                <ThemedText type="subtitle">+</ThemedText>
+              </ThemedView>
+            </Pressable>
+          </ThemedView>
+
           <ThemedText type="small">{t('schedule.timesOfDay')}</ThemedText>
           <ThemedView style={styles.chipsRow}>
             {times.map((time) => (
@@ -267,10 +318,42 @@ function EditorForm({
             </>
           ) : null}
 
+          <ThemedText type="small">{t('schedule.periodStart')}</ThemedText>
+          <DateField
+            value={startDate}
+            onPick={() => setDatePickerFor('start')}
+            onClear={() => setStartDate(null)}
+          />
+          <ThemedText type="small">{t('schedule.periodEnd')}</ThemedText>
+          <DateField
+            value={endDate}
+            onPick={() => setDatePickerFor('end')}
+            onClear={() => setEndDate(null)}
+          />
+          {periodInvalid ? (
+            <ThemedText type="small" style={styles.error}>
+              {t('schedule.periodInvalid')}
+            </ThemedText>
+          ) : null}
+          {datePickerFor ? (
+            <DateTimePicker
+              value={
+                (datePickerFor === 'start' ? startDate : endDate) ?? new Date()
+              }
+              mode="date"
+              onValueChange={onDateChange}
+              onDismiss={() => setDatePickerFor(null)}
+            />
+          ) : null}
+
           <ThemedText type="small">{t('schedule.preview')}</ThemedText>
           {times.length === 0 ? (
             <ThemedText type="small" themeColor="textSecondary">
               {t('schedule.previewEmpty')}
+            </ThemedText>
+          ) : preview.length === 0 ? (
+            <ThemedText type="small" themeColor="textSecondary">
+              {t('schedule.previewNone')}
             </ThemedText>
           ) : (
             <ThemedView type="backgroundElement" style={styles.previewBox}>
@@ -306,6 +389,48 @@ function EditorForm({
           />
         </ThemedView>
       </SafeAreaView>
+    </ThemedView>
+  );
+}
+
+function DateField({
+  value,
+  onPick,
+  onClear,
+}: {
+  value: Date | null;
+  onPick: () => void;
+  onClear: () => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <ThemedView style={styles.dateRow}>
+      <Pressable
+        onPress={onPick}
+        style={({ pressed }) => pressed && styles.pressed}
+      >
+        <ThemedView type="backgroundElement" style={styles.timeChip}>
+          <ThemedText
+            type="small"
+            themeColor={value ? 'text' : 'textSecondary'}
+          >
+            {value ? formatDate(value) : t('schedule.periodNone')}
+          </ThemedText>
+        </ThemedView>
+      </Pressable>
+      {value ? (
+        <Pressable
+          onPress={onClear}
+          hitSlop={Spacing.two}
+          accessibilityLabel={t('schedule.periodClear')}
+          style={({ pressed }) => pressed && styles.pressed}
+        >
+          <ThemedText type="small" themeColor="textSecondary">
+            ✕
+          </ThemedText>
+        </Pressable>
+      ) : null}
     </ThemedView>
   );
 }
@@ -381,6 +506,14 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.two,
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.three,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.three,
+  },
+  error: {
+    color: '#d9534f',
   },
   addText: {
     color: '#3c87f7',

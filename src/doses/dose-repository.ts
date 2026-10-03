@@ -2,7 +2,7 @@ import { and, desc, eq, gte, inArray, lt, ne, or } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
-import { doses, products } from '@/config/db/schema';
+import { doses, products, schedules } from '@/config/db/schema';
 
 import type { ReplaceDosesQueryResult } from './dto/replace-doses-query-result';
 
@@ -51,11 +51,21 @@ export async function setDoseState(
     const [dose] = await tx.select().from(doses).where(eq(doses.id, id));
     if (!dose || dose.state === state) return;
 
+    const [schedule] = await tx
+      .select({ quantity: schedules.quantity })
+      .from(schedules)
+      .where(eq(schedules.id, dose.scheduleId));
+    // Un-taking restores what was actually deducted; doses taken before
+    // quantities existed have no snapshot and consumed exactly one unit.
+    const quantity =
+      state === 'taken' ? (schedule?.quantity ?? 1) : (dose.takenQuantity ?? 1);
+
     await tx
       .update(doses)
       .set({
         state,
         takenAt: state === 'taken' ? new Date() : null,
+        takenQuantity: state === 'taken' ? quantity : null,
         snoozedUntil: null,
       })
       .where(eq(doses.id, id));
@@ -66,7 +76,7 @@ export async function setDoseState(
       .where(eq(products.id, dose.productId));
     if (!product || product.stock == null) return;
 
-    const delta = state === 'taken' ? -1 : 1;
+    const delta = state === 'taken' ? -quantity : quantity;
     await tx
       .update(products)
       .set({

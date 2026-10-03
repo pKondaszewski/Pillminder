@@ -29,7 +29,9 @@
     "stockLess": "Zmniejsz zapas",
     "stockMore": "Zwiększ zapas",
     "storeLink": "Gdzie kupić",
-    "storeLinkPlaceholder": "np. apteka albo link do sklepu"
+    "storeLinkPlaceholder": "np. apteka albo link do sklepu",
+    "strength": "Moc / dawka",
+    "strengthPlaceholder": "np. 5mg"
   },
   "history": {
     "skipped": "Pominięto",
@@ -37,6 +39,7 @@
   },
   "home": {
     "empty": "Nic na dziś, wolne 🎉",
+    "quantity": "× {{count}}",
     "snoozed": "drzemka → {{time}}",
     "take": "Wziąłem",
     "taken": "✓ {{time}}",
@@ -60,6 +63,7 @@
   },
   "notification": {
     "body": "Czas wziąć {{name}}",
+    "bodyQuantity": "Czas wziąć {{quantity}} × {{name}}",
     "buy": "Kup",
     "reorderBody": "{{name}} się kończy — czas dokupić",
     "reorderTitle": "Kończy się zapas",
@@ -86,9 +90,22 @@
     "intervalMore": "Częściej",
     "newTitle": "Nowy harmonogram",
     "noProducts": "Najpierw dodaj produkt",
+    "periodClear": "Wyczyść datę",
+    "periodEnd": "Data końca (opcjonalnie)",
+    "periodFrom": "od {{date}}",
+    "periodInvalid": "Data końca jest przed datą początku",
+    "periodNone": "Nie ustawiono",
+    "periodRange": "{{from}} – {{to}}",
+    "periodStart": "Data początku (opcjonalnie)",
+    "periodUntil": "do {{date}}",
     "preview": "Najbliższe dawki",
     "previewEmpty": "Dodaj godzinę, aby zobaczyć podgląd",
+    "previewNone": "Brak nadchodzących dawek w tym okresie",
     "product": "Produkt",
+    "quantity": "Sztuk na dawkę",
+    "quantityLess": "Mniej sztuk",
+    "quantityMore": "Więcej sztuk",
+    "quantityValue": "{{count}} na dawkę",
     "removeTime": "Usuń godzinę {{time}}",
     "timesOfDay": "Godziny",
     "unknownProduct": "Nieznany produkt"
