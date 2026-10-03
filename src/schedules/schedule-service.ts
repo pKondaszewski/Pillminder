@@ -5,6 +5,7 @@ import {
   createSchedule as createScheduleRow,
   deleteSchedule as deleteScheduleRow,
   getAllSchedules,
+  getScheduleById,
   getSchedulesByProductId,
   type Schedule,
   schedulesQuery,
@@ -12,9 +13,11 @@ import {
 } from './schedule-repository';
 
 export {
+  addDays,
   nextOccurrences,
   occurrencesWithin,
   previewOccurrences,
+  startOfDay,
 } from './schedule-helper';
 export type { Schedule } from './schedule-repository';
 
@@ -26,6 +29,10 @@ export function getSchedulesQuery() {
 
 export function getSchedulesByProduct(productId: string): Promise<Schedule[]> {
   return getSchedulesByProductId(productId);
+}
+
+export function getSchedule(id: string): Promise<Schedule | undefined> {
+  return getScheduleById(id);
 }
 
 export function getSchedules(): Promise<Schedule[]> {

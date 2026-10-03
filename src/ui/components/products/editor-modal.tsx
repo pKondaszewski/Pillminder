@@ -26,6 +26,8 @@ type Category = NewProductInput['category'];
 
 const CATEGORIES: Category[] = ['medication', 'supplement', 'care'];
 
+const STRENGTH_CATEGORIES: Category[] = ['medication', 'supplement'];
+
 const STORE_SUGGESTIONS: Record<Category, string[]> = {
   care: ['rossmann', 'hebe', 'biedronka'],
   medication: ['pharmacy'],
@@ -100,6 +102,7 @@ function EditorForm({
   const [category, setCategory] = useState<Category | null>(
     product?.category ?? null,
   );
+  const [strength, setStrength] = useState(product?.strength ?? '');
   const [price, setPrice] = useState(toText(product?.price));
   const [storeLink, setStoreLink] = useState(product?.storeLink ?? '');
   const [stock, setStock] = useState(toText(product?.stock));
@@ -108,6 +111,8 @@ function EditorForm({
   const [completionNote, setCompletionNote] = useState('');
   const noteDraft = useNoteDraft(product?.id);
 
+  const hasStrength =
+    category !== null && STRENGTH_CATEGORIES.includes(category);
   const nameMissing = name.trim() === '';
   const categoryMissing = category === null;
   const showNameError = showErrors && nameMissing;
@@ -127,6 +132,7 @@ function EditorForm({
     onSave({
       name: name.trim(),
       category,
+      strength: hasStrength ? strength.trim() || null : null,
       price: toNumber(price),
       storeLink: storeLink.trim() || null,
       stock: toNumber(stock),
@@ -232,9 +238,23 @@ function EditorForm({
             <FieldError message={t('editor.categoryRequired')} />
           )}
 
+          {hasStrength ? (
+            <>
+              <ThemedText type="small">{t('editor.strength')}</ThemedText>
+              <TextInput
+                value={strength}
+                onChangeText={setStrength}
+                placeholder={t('editor.strengthPlaceholder')}
+                placeholderTextColor={theme.textSecondary}
+                style={inputStyle}
+              />
+            </>
+          ) : null}
+
           <ThemedText type="small">
             {t('editor.price', { currency })}
           </ThemedText>
+
           <TextInput
             value={price}
             onChangeText={setPrice}

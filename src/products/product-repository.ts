@@ -30,6 +30,7 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
       id: Crypto.randomUUID(),
       name: input.name,
       category: input.category,
+      strength: input.strength ?? null,
       price: input.price ?? null,
       storeLink: input.storeLink ?? null,
       status: 'active',
@@ -51,6 +52,7 @@ export async function updateProduct(
     .set({
       name: input.name,
       category: input.category,
+      strength: input.strength ?? null,
       price: input.price ?? null,
       storeLink: input.storeLink ?? null,
       stock: input.stock ?? null,

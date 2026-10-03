@@ -3,6 +3,7 @@ import { Pressable, StyleSheet } from 'react-native';
 
 import type { products as productsTable } from '@/config/db/schema';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
+import { productLabel } from '@/products/product-label';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
@@ -31,7 +32,7 @@ export function ProductRow({ product, reorder, onPress }: Props) {
         type="backgroundElement"
         style={[styles.row, isArchived && styles.archived]}
       >
-        <ThemedText>{product.name}</ThemedText>
+        <ThemedText>{productLabel(product.name, product.strength)}</ThemedText>
         <ThemedText type="small">
           {t(`category.${product.category}`)}
         </ThemedText>

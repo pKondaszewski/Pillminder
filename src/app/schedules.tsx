@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
 import type { Schedule } from '@/schedules/schedule-service';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { formatDate } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
@@ -30,7 +31,27 @@ export default function ScheduleListScreen() {
       s.intervalDays === 1
         ? t('schedule.daily')
         : t('schedule.everyXDays', { days: s.intervalDays });
-    return `${base} · ${s.timesOfDay.join(', ')}`;
+    const quantity =
+      s.quantity !== 1
+        ? ` · ${t('schedule.quantityValue', { count: s.quantity })}`
+        : '';
+    return `${base} · ${s.timesOfDay.join(', ')}${quantity}${period(s)}`;
+  };
+
+  const period = ({ startDate, endDate }: Schedule) => {
+    if (startDate && endDate) {
+      return ` · ${t('schedule.periodRange', {
+        from: formatDate(startDate),
+        to: formatDate(endDate),
+      })}`;
+    }
+    if (startDate) {
+      return ` · ${t('schedule.periodFrom', { date: formatDate(startDate) })}`;
+    }
+    if (endDate) {
+      return ` · ${t('schedule.periodUntil', { date: formatDate(endDate) })}`;
+    }
+    return '';
   };
 
   const openCreate = () => {

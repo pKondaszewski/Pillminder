@@ -16,6 +16,16 @@ export async function getAllSchedules(): Promise<Schedule[]> {
   return db.select().from(schedules);
 }
 
+export async function getScheduleById(
+  id: string,
+): Promise<Schedule | undefined> {
+  const [schedule] = await db
+    .select()
+    .from(schedules)
+    .where(eq(schedules.id, id));
+  return schedule;
+}
+
 export async function getSchedulesByProductId(
   productId: string,
 ): Promise<Schedule[]> {
@@ -32,6 +42,9 @@ export async function createSchedule(
       productId: input.productId,
       intervalDays: input.intervalDays,
       timesOfDay: input.timesOfDay,
+      quantity: input.quantity ?? 1,
+      startDate: input.startDate ?? null,
+      endDate: input.endDate ?? null,
     })
     .returning();
   return created;
@@ -47,6 +60,9 @@ export async function updateSchedule(
       productId: input.productId,
       intervalDays: input.intervalDays,
       timesOfDay: input.timesOfDay,
+      quantity: input.quantity ?? 1,
+      startDate: input.startDate ?? null,
+      endDate: input.endDate ?? null,
     })
     .where(eq(schedules.id, id))
     .returning();
