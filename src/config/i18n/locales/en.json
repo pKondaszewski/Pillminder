@@ -1,4 +1,28 @@
 {
+  "backup": {
+    "cancel": "Cancel",
+    "confirmAction": "Replace everything",
+    "confirmMessage": "This will delete ALL current data and replace it with the file contents: {{products}} products, {{schedules}} schedules, {{doses}} doses, {{notes}} notes.\n\nSettings are not affected. This cannot be undone.",
+    "confirmTitle": "Replace all data?",
+    "description": "Export saves products, schedules, dose history and notes to a JSON file. Import replaces all current data with the contents of such a file. Settings are not included.",
+    "export": "Export data",
+    "exportFailed": "Export failed",
+    "import": "Import data",
+    "importDone": "✓ Data imported",
+    "importFailed": "Import failed",
+    "importInvalidTitle": "Invalid backup file",
+    "shareTitle": "Save backup",
+    "title": "Backup",
+    "error": {
+      "brokenReference": "A record points to a missing product or schedule.",
+      "duplicateId": "The file contains duplicated records.",
+      "duplicateSlot": "The file contains duplicated doses.",
+      "invalidRow": "A record has a missing or invalid field.",
+      "newerVersion": "The file comes from a newer version of the app.",
+      "notBackup": "This is not a Pillminder backup.",
+      "notJson": "The file is not valid JSON."
+    }
+  },
   "category": {
     "care": "Care",
     "medication": "Medication",
