@@ -29,7 +29,7 @@ reminders, history, and low-stock alerts happen automatically. All data lives
 
 | Area          | Choice                                                                                                                                     |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Framework     | [Expo](https://docs.expo.dev/) SDK 56 (React Native 0.85)                                                                                  |
+| Framework     | [Expo](https://docs.expo.dev/) SDK 57 (React Native 0.86)                                                                                  |
 | Language      | TypeScript                                                                                                                                 |
 | Navigation    | [Expo Router](https://docs.expo.dev/router/introduction/) (file-based, in `src/app/`)                                                      |
 | Database      | [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/) + [Drizzle ORM](https://orm.drizzle.team/) (migrations via `drizzle-kit`) |

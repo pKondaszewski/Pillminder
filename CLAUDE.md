@@ -65,7 +65,9 @@ Does not belong: products without a rhythm and without health consequences.
 ## Platform
 
 - **Expo** (React Native)
-- iOS + Android from a single codebase
+- **Android only for now** — iOS is not supported or tested until decided
+  otherwise; keep the code cross-platform where it costs nothing, but do not
+  spend time on iOS-specific work
 - data stored locally on the device (no backend, no API, no server)
 - push notifications built into Expo
 - priority: smartphone, laptop out of scope
@@ -76,7 +78,7 @@ Does not belong: products without a rhythm and without health consequences.
 
 These are settled and should not be re-litigated without a reason:
 
-- **Stack**: Expo (SDK 56) + React Native + **TypeScript**
+- **Stack**: Expo (SDK 57) + React Native + **TypeScript**
 - **Navigation**: **Expo Router** (file-based routes in `src/app/`)
 - **Database**: **expo-sqlite** + **Drizzle ORM** — type-safe schema and
   queries, migrations generated with `drizzle-kit`
@@ -139,9 +141,19 @@ Toolchain (Apple Silicon Mac): Temurin JDK 17, Android cmdline-tools, SDK at
 ## Conventions
 
 - **Expo has changed** — read the exact versioned docs at
-  https://docs.expo.dev/versions/v56.0.0/ before writing any code.
+  https://docs.expo.dev/versions/v57.0.0/ before writing any code.
 - **Commits** — follow Conventional Commits
   (https://www.conventionalcommits.org/en/v1.0.0/).
 - **Code style** — order by importance, public first. In every file the
   exported (`export`) functions go above private helpers: the public API reads
   first, the implementation details below it.
+- **Migrations** — generate with a descriptive snake_case name, e.g.
+  `npx drizzle-kit generate --name add_dose_note` (the file becomes
+  `0005_add_dose_note.sql`; without `--name` drizzle picks a random one).
+  Already-applied migrations (0000–0004) keep their names — they are on
+  devices.
+- **Transactions** — the body of `db.transaction(...)` must not be `async` or
+  contain `await`. The expo-sqlite driver in drizzle is synchronous and
+  commits as soon as the callback returns, so awaited work would run outside
+  the transaction. Run queries with `.run()` / `.get()` / `.all()`.
+  TypeScript does not catch this.
