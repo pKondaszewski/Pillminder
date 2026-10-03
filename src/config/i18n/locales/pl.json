@@ -1,4 +1,28 @@
 {
+  "backup": {
+    "cancel": "Anuluj",
+    "confirmAction": "Zastąp wszystko",
+    "confirmMessage": "Wszystkie obecne dane zostaną usunięte i zastąpione zawartością pliku: produkty: {{products}}, harmonogramy: {{schedules}}, dawki: {{doses}}, notatki: {{notes}}.\n\nUstawienia nie są zmieniane. Tej operacji nie można cofnąć.",
+    "confirmTitle": "Zastąpić wszystkie dane?",
+    "description": "Eksport zapisuje produkty, harmonogramy, historię dawek i notatki do pliku JSON. Import zastępuje wszystkie obecne dane zawartością takiego pliku. Ustawienia nie są uwzględniane.",
+    "export": "Eksportuj dane",
+    "exportFailed": "Eksport nie powiódł się",
+    "import": "Importuj dane",
+    "importDone": "✓ Dane zaimportowane",
+    "importFailed": "Import nie powiódł się",
+    "importInvalidTitle": "Nieprawidłowy plik kopii",
+    "shareTitle": "Zapisz kopię zapasową",
+    "title": "Kopia zapasowa",
+    "error": {
+      "brokenReference": "Rekord wskazuje na nieistniejący produkt lub harmonogram.",
+      "duplicateId": "Plik zawiera zduplikowane rekordy.",
+      "duplicateSlot": "Plik zawiera zduplikowane dawki.",
+      "invalidRow": "W rekordzie brakuje pola lub ma ono błędną wartość.",
+      "newerVersion": "Plik pochodzi z nowszej wersji aplikacji.",
+      "notBackup": "To nie jest kopia zapasowa Pillminder.",
+      "notJson": "Plik nie jest poprawnym JSON-em."
+    }
+  },
   "category": {
     "care": "Pielęgnacja",
     "medication": "Lek",
