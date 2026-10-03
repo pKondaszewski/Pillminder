@@ -3,7 +3,11 @@ import { Linking } from 'react-native';
 
 import i18n from '@/config/i18n';
 import { createLogger } from '@/config/logger';
-import { snoozeDose, takeDose } from '@/doses/dose-service';
+import {
+  refreshAllReminders,
+  snoozeDose,
+  takeDose,
+} from '@/doses/dose-service';
 import {
   initNotifications,
   subscribeToReminderResponses,
@@ -15,20 +19,38 @@ const log = createLogger('use-notifications');
 export function useNotifications() {
   useEffect(() => {
     const ready = startNotifications();
+    const refreshOnLanguageChange = () => {
+      void refreshNotificationLanguage();
+    };
+    i18n.on('languageChanged', refreshOnLanguageChange);
     return () => {
+      i18n.off('languageChanged', refreshOnLanguageChange);
       void ready.then((unsubscribe) => unsubscribe());
     };
   }, []);
 }
 
-async function startNotifications(): Promise<() => void> {
-  await initNotifications({
+function initNotificationStrings() {
+  return initNotifications({
     title: i18n.t('notification.title'),
     take: i18n.t('notification.take'),
     snooze: i18n.t('notification.snooze'),
     buy: i18n.t('notification.buy'),
     reorderChannel: i18n.t('notification.reorderTitle'),
   });
+}
+
+async function refreshNotificationLanguage(): Promise<void> {
+  try {
+    await initNotificationStrings();
+    await refreshAllReminders();
+  } catch (err) {
+    log.error('Refreshing notifications after language change failed', err);
+  }
+}
+
+async function startNotifications(): Promise<() => void> {
+  await initNotificationStrings();
 
   return subscribeToReminderResponses({
     onTake: (doseId) =>

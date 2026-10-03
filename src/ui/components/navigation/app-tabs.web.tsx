@@ -33,6 +33,9 @@ export default function AppTabs() {
           <TabTrigger name="schedules" href="/schedules" asChild>
             <TabButton>{t('tabs.schedules')}</TabButton>
           </TabTrigger>
+          <TabTrigger name="settings" href="/settings" asChild>
+            <TabButton>{t('tabs.settings')}</TabButton>
+          </TabTrigger>
         </CustomTabList>
       </TabList>
     </Tabs>
