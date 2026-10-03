@@ -46,6 +46,18 @@
     "undoTitle": "Cofnąć wzięcie?",
     "unknownProduct": "Nieznany produkt"
   },
+  "notes": {
+    "add": "Dodaj notatkę",
+    "completionPlaceholder": "np. przerwa w stosowaniu, zamiennik",
+    "completionPrompt": "Dlaczego archiwizujesz? (opcjonalnie)",
+    "deleteConfirm": "Usunąć tę notatkę?",
+    "deleteTitle": "Usunąć notatkę?",
+    "edited": "edytowano",
+    "edit": "Edytuj",
+    "empty": "Brak notatek",
+    "placeholder": "Wpisz notatkę…",
+    "title": "Notatki"
+  },
   "notification": {
     "body": "Czas wziąć {{name}}",
     "buy": "Kup",

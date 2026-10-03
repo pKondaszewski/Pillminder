@@ -3,6 +3,7 @@ import {
   refreshRemindersForProduct,
   syncDosesForSchedules,
 } from '@/doses/dose-service';
+import { addNote } from '@/notes/note-service';
 import { cancelReorderAlert } from '@/notifications/notification-service';
 import { getSchedulesByProduct } from '@/schedules/schedule-service';
 
@@ -28,10 +29,14 @@ export async function removeProduct(id: string): Promise<void> {
   await deleteProduct(id);
 }
 
-export async function archiveProduct(id: string): Promise<void> {
+export async function archiveProduct(
+  id: string,
+  completionNote?: string,
+): Promise<void> {
   await setProductStatus(id, 'archived');
   const schedules = await getSchedulesByProduct(id);
   await cancelFutureDosesForSchedules(schedules.map((s) => s.id));
+  if (completionNote) await addNote(id, completionNote);
 }
 
 export async function restoreProduct(id: string): Promise<void> {

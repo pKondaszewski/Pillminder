@@ -16,6 +16,8 @@ import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductHistory } from '@/ui/components/products/history';
+import { ProductNotes } from '@/ui/components/products/notes';
+import { useNoteDraft } from '@/ui/hooks/use-note-draft';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Product = typeof products.$inferSelect;
@@ -35,7 +37,7 @@ interface Props {
   onClose: () => void;
   onSave: (input: NewProductInput) => void;
   onDelete: (id: string) => void;
-  onArchive: (id: string) => void;
+  onArchive: (id: string, completionNote?: string) => void;
   onRestore: (id: string) => void;
 }
 
@@ -100,15 +102,24 @@ function EditorForm({
   const [storeLink, setStoreLink] = useState(product?.storeLink ?? '');
   const [stock, setStock] = useState(toText(product?.stock));
   const [showErrors, setShowErrors] = useState(false);
+  const [archiving, setArchiving] = useState(false);
+  const [completionNote, setCompletionNote] = useState('');
+  const noteDraft = useNoteDraft(product?.id);
 
   const nameMissing = name.trim() === '';
   const categoryMissing = category === null;
   const showNameError = showErrors && nameMissing;
   const showCategoryError = showErrors && categoryMissing;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (nameMissing || categoryMissing) {
       setShowErrors(true);
+      return;
+    }
+    try {
+      await noteDraft.submit();
+    } catch {
+      // note save failed — keep the editor open so the draft is not lost
       return;
     }
     onSave({
@@ -141,8 +152,13 @@ function EditorForm({
     if (product.status === 'archived') {
       onRestore(product.id);
     } else {
-      onArchive(product.id);
+      setArchiving(true);
     }
+  };
+
+  const handleConfirmArchive = () => {
+    if (!product) return;
+    onArchive(product.id, completionNote.trim() || undefined);
   };
 
   const increaseStock = () => {
@@ -285,7 +301,32 @@ function EditorForm({
             </ThemedView>
           ) : null}
 
-          {product ? (
+          {product && archiving ? (
+            <ThemedView style={styles.archivePrompt}>
+              <ThemedText type="small">
+                {t('notes.completionPrompt')}
+              </ThemedText>
+              <TextInput
+                value={completionNote}
+                onChangeText={setCompletionNote}
+                multiline
+                placeholder={t('notes.completionPlaceholder')}
+                placeholderTextColor={theme.textSecondary}
+                style={[inputStyle, styles.noteInput]}
+              />
+              <ThemedView style={styles.actions}>
+                <ActionButton
+                  label={t('editor.cancel')}
+                  onPress={() => setArchiving(false)}
+                />
+                <ActionButton
+                  label={t('editor.archive')}
+                  onPress={handleConfirmArchive}
+                  color="#3c87f7"
+                />
+              </ThemedView>
+            </ThemedView>
+          ) : product ? (
             <Pressable
               onPress={handleToggleStatus}
               style={({ pressed }) => pressed && styles.pressed}
@@ -298,6 +339,10 @@ function EditorForm({
                 </ThemedText>
               </ThemedView>
             </Pressable>
+          ) : null}
+
+          {product ? (
+            <ProductNotes productId={product.id} noteDraft={noteDraft} />
           ) : null}
 
           {product ? <ProductHistory productId={product.id} /> : null}
@@ -406,6 +451,14 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.three,
     borderRadius: Spacing.three,
     alignItems: 'center',
+  },
+  archivePrompt: {
+    gap: Spacing.two,
+    marginTop: Spacing.three,
+  },
+  noteInput: {
+    minHeight: 80,
+    textAlignVertical: 'top',
   },
   pressed: {
     opacity: 0.7,
