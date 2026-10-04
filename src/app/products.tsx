@@ -10,6 +10,7 @@ import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { ProductEditorModal } from '@/ui/components/products/editor-modal';
+import { ProductOverviewModal } from '@/ui/components/products/overview-modal';
 import { ProductRow } from '@/ui/components/products/row';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
@@ -38,6 +39,7 @@ export default function ProductListScreen() {
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
+  const [overviewOpen, setOverviewOpen] = useState(false);
 
   const openCreate = () => {
     setEditing(null);
@@ -112,16 +114,29 @@ export default function ProductListScreen() {
             contentContainerStyle={styles.list}
             renderItem={renderItem}
             ListFooterComponent={
-              <Pressable
-                onPress={openCreate}
-                style={({ pressed }) => pressed && styles.pressed}
-              >
-                <ThemedView type="backgroundElement" style={styles.addRow}>
-                  <ThemedText themeColor="accent" style={styles.addText}>
-                    + {t('products.add')}
-                  </ThemedText>
-                </ThemedView>
-              </Pressable>
+              <ThemedView style={styles.footer}>
+                <Pressable
+                  onPress={openCreate}
+                  style={({ pressed }) => pressed && styles.pressed}
+                >
+                  <ThemedView type="backgroundElement" style={styles.addRow}>
+                    <ThemedText themeColor="accent" style={styles.addText}>
+                      + {t('products.add')}
+                    </ThemedText>
+                  </ThemedView>
+                </Pressable>
+                <Pressable
+                  onPress={() => setOverviewOpen(true)}
+                  accessibilityRole="button"
+                  style={({ pressed }) => pressed && styles.pressed}
+                >
+                  <ThemedView type="backgroundElement" style={styles.addRow}>
+                    <ThemedText themeColor="accent" style={styles.addText}>
+                      {t('overview.open')}
+                    </ThemedText>
+                  </ThemedView>
+                </Pressable>
+              </ThemedView>
             }
           />
         </SafeAreaView>
@@ -134,6 +149,11 @@ export default function ProductListScreen() {
           onDelete={handleDelete}
           onArchive={handleArchive}
           onRestore={handleRestore}
+        />
+
+        <ProductOverviewModal
+          visible={overviewOpen}
+          onClose={() => setOverviewOpen(false)}
         />
       </ThemedView>
     </TabSwipe>
@@ -152,6 +172,9 @@ const styles = StyleSheet.create({
   list: {
     gap: Spacing.two,
     paddingVertical: Spacing.three,
+  },
+  footer: {
+    gap: Spacing.two,
   },
   addRow: {
     padding: Spacing.three,

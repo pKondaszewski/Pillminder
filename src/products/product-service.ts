@@ -13,6 +13,12 @@ import {
   updateProduct as updateProductRow,
 } from './product-repository';
 
+export type {
+  ProductOverview,
+  ProductOverviewEntry,
+  ProductOverviewStock,
+} from './dto/product-overview-output';
+export type { ProductOverviewContext } from './product-overview';
 export type { Product } from './product-repository';
 
 const log = createLogger('product-service');
