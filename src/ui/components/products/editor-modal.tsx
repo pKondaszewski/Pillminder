@@ -11,6 +11,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { products } from '@/config/db/schema';
+import {
+  BUILT_IN_CATEGORIES,
+  storeSuggestionKeys,
+  supportsStrength,
+} from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
@@ -22,17 +27,6 @@ import { useSettings } from '@/ui/hooks/use-settings';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Product = typeof products.$inferSelect;
-type Category = NewProductInput['category'];
-
-const CATEGORIES: Category[] = ['medication', 'supplement', 'care'];
-
-const STRENGTH_CATEGORIES: Category[] = ['medication', 'supplement'];
-
-const STORE_SUGGESTIONS: Record<Category, string[]> = {
-  care: ['rossmann', 'hebe', 'biedronka'],
-  medication: ['pharmacy'],
-  supplement: ['rossmann', 'hebe', 'pharmacy'],
-};
 
 interface Props {
   visible: boolean;
@@ -99,7 +93,7 @@ function EditorForm({
   const { currency } = useSettings();
 
   const [name, setName] = useState(product?.name ?? '');
-  const [category, setCategory] = useState<Category | null>(
+  const [category, setCategory] = useState<string | null>(
     product?.category ?? null,
   );
   const [strength, setStrength] = useState(product?.strength ?? '');
@@ -111,8 +105,7 @@ function EditorForm({
   const [completionNote, setCompletionNote] = useState('');
   const noteDraft = useNoteDraft(product?.id);
 
-  const hasStrength =
-    category !== null && STRENGTH_CATEGORIES.includes(category);
+  const hasStrength = category !== null && supportsStrength(category);
   const nameMissing = name.trim() === '';
   const categoryMissing = category === null;
   const showNameError = showErrors && nameMissing;
@@ -212,7 +205,7 @@ function EditorForm({
 
           <ThemedText type="small">{t('editor.category')}</ThemedText>
           <ThemedView style={styles.categoryRow}>
-            {CATEGORIES.map((c) => (
+            {BUILT_IN_CATEGORIES.map((c) => (
               <Pressable
                 key={c}
                 onPress={() => setCategory(c)}
@@ -306,7 +299,7 @@ function EditorForm({
           />
           {category ? (
             <ThemedView style={styles.categoryRow}>
-              {STORE_SUGGESTIONS[category].map((key) => (
+              {storeSuggestionKeys(category).map((key) => (
                 <Pressable
                   key={key}
                   onPress={() => setStoreLink(t(`storeSuggestion.${key}`))}

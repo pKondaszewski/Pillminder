@@ -9,9 +9,7 @@ import {
 export const products = sqliteTable('products', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
-  category: text('category', {
-    enum: ['medication', 'supplement', 'care'],
-  }).notNull(),
+  category: text('category').notNull(),
   strength: text('strength'),
   price: integer('price'),
   storeLink: text('store_link'),
