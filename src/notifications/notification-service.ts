@@ -6,6 +6,7 @@ import { createLogger } from '@/config/logger';
 
 import type { DoseReminder } from './dto/dose-reminder';
 import type { DoseReminderStrings } from './dto/dose-reminder-strings';
+import type { NotificationPermission } from './dto/notification-permission';
 import type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
 import type { ReorderAlert } from './dto/reorder-alert';
 import {
@@ -22,6 +23,7 @@ import { processReminderResponse } from './reminder-response-router';
 
 export type { DoseReminder } from './dto/dose-reminder';
 export type { DoseReminderStrings } from './dto/dose-reminder-strings';
+export type { NotificationPermission } from './dto/notification-permission';
 export type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
 export type { ReorderAlert } from './dto/reorder-alert';
 export {
@@ -44,6 +46,7 @@ const isSupported = Platform.OS !== 'web' && !isExpoGo;
 
 type NotificationsModule = typeof import('expo-notifications');
 let modulePromise: Promise<NotificationsModule> | null = null;
+let channelSetup: Promise<unknown> = Promise.resolve();
 
 function loadNotifications(): Promise<NotificationsModule> {
   if (!modulePromise) {
@@ -52,79 +55,34 @@ function loadNotifications(): Promise<NotificationsModule> {
   return modulePromise;
 }
 
-export async function initNotifications(
-  strings: Omit<DoseReminderStrings, 'body'> & {
-    buy: string;
-    reorderChannel: string;
-  },
+export type NotificationStrings = Omit<DoseReminderStrings, 'body'> & {
+  buy: string;
+  reorderChannel: string;
+};
+
+export async function getNotificationPermission(): Promise<NotificationPermission> {
+  if (!isSupported) return { granted: true, canAskAgain: false };
+  const Notifications = await loadNotifications();
+  const { granted, canAskAgain } = await Notifications.getPermissionsAsync();
+  return { granted, canAskAgain };
+}
+
+export async function requestNotificationPermission(): Promise<NotificationPermission> {
+  if (!isSupported) return { granted: true, canAskAgain: false };
+  // Android 13+ shows the system prompt only once a notification channel exists
+  await channelSetup;
+  const Notifications = await loadNotifications();
+  const { granted, canAskAgain } =
+    await Notifications.requestPermissionsAsync();
+  return { granted, canAskAgain };
+}
+
+export function initNotifications(
+  strings: NotificationStrings,
 ): Promise<boolean> {
-  if (!isSupported) {
-    log.info('Notifications unsupported in this environment, skipping init');
-    return false;
-  }
-
-  try {
-    const Notifications = await loadNotifications();
-
-    Notifications.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowBanner: true,
-        shouldShowList: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-      }),
-    });
-
-    if (await isNotificationPermissionDenied(Notifications)) {
-      return false;
-    }
-
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-        name: strings.title,
-        importance: Notifications.AndroidImportance.HIGH,
-        sound: 'default',
-        enableVibrate: true,
-        vibrationPattern: [0, 250, 250, 250],
-      });
-      await Notifications.setNotificationChannelAsync(REORDER_CHANNEL_ID, {
-        name: strings.reorderChannel,
-        importance: Notifications.AndroidImportance.DEFAULT,
-      });
-      try {
-        await Notifications.registerTaskAsync(BACKGROUND_RESPONSE_TASK);
-      } catch (err) {
-        log.warn('Failed to register background response task', err);
-      }
-    }
-
-    await Notifications.setNotificationCategoryAsync(CATEGORY_ID, [
-      {
-        identifier: TAKE_ACTION,
-        buttonTitle: strings.take,
-        options: { opensAppToForeground: false },
-      },
-      {
-        identifier: SNOOZE_ACTION,
-        buttonTitle: strings.snooze,
-        options: { opensAppToForeground: false },
-      },
-    ]);
-
-    await Notifications.setNotificationCategoryAsync(REORDER_CATEGORY_ID, [
-      {
-        identifier: BUY_ACTION,
-        buttonTitle: strings.buy,
-        options: { opensAppToForeground: true },
-      },
-    ]);
-
-    log.info('Notifications initialized');
-    return true;
-  } catch (err) {
-    log.error('Failed to initialize notifications', err);
-    return false;
-  }
+  const setup = setUpNotifications(strings);
+  channelSetup = setup;
+  return setup;
 }
 
 export async function scheduleDoseReminder(
@@ -249,17 +207,70 @@ export async function subscribeToReminderResponses(
   }
 }
 
-async function isNotificationPermissionDenied(
-  Notifications: NotificationsModule,
+async function setUpNotifications(
+  strings: NotificationStrings,
 ): Promise<boolean> {
-  const { status } = await Notifications.getPermissionsAsync();
-  const granted =
-    status === 'granted'
-      ? true
-      : (await Notifications.requestPermissionsAsync()).status === 'granted';
-
-  if (!granted) {
-    log.warn('Notification permission not granted');
+  if (!isSupported) {
+    log.info('Notifications unsupported in this environment, skipping init');
+    return false;
   }
-  return !granted;
+
+  try {
+    const Notifications = await loadNotifications();
+
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
+        name: strings.title,
+        importance: Notifications.AndroidImportance.HIGH,
+        sound: 'default',
+        enableVibrate: true,
+        vibrationPattern: [0, 250, 250, 250],
+      });
+      await Notifications.setNotificationChannelAsync(REORDER_CHANNEL_ID, {
+        name: strings.reorderChannel,
+        importance: Notifications.AndroidImportance.DEFAULT,
+      });
+      try {
+        await Notifications.registerTaskAsync(BACKGROUND_RESPONSE_TASK);
+      } catch (err) {
+        log.warn('Failed to register background response task', err);
+      }
+    }
+
+    await Notifications.setNotificationCategoryAsync(CATEGORY_ID, [
+      {
+        identifier: TAKE_ACTION,
+        buttonTitle: strings.take,
+        options: { opensAppToForeground: false },
+      },
+      {
+        identifier: SNOOZE_ACTION,
+        buttonTitle: strings.snooze,
+        options: { opensAppToForeground: false },
+      },
+    ]);
+
+    await Notifications.setNotificationCategoryAsync(REORDER_CATEGORY_ID, [
+      {
+        identifier: BUY_ACTION,
+        buttonTitle: strings.buy,
+        options: { opensAppToForeground: true },
+      },
+    ]);
+
+    log.info('Notifications initialized');
+    return (await Notifications.getPermissionsAsync()).granted;
+  } catch (err) {
+    log.error('Failed to initialize notifications', err);
+    return false;
+  }
 }

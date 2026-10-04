@@ -105,6 +105,18 @@
     "take": "Taken",
     "title": "Dose reminder"
   },
+  "onboarding": {
+    "allow": "Allow notifications",
+    "blocked": "Notifications are blocked and Android will not ask again. Turn them on in the app's system settings.",
+    "continue": "Continue without notifications",
+    "featureDose": "A reminder when a dose is due, with \"Taken\" and \"Snooze\" buttons right on the notification",
+    "featureReorder": "An alert when a product is running low, so you can reorder in time",
+    "intro": "Pillminder reminds you so you don't have to remember. To do that it needs permission to show notifications:",
+    "notNow": "Not now",
+    "openSettings": "Open system settings",
+    "permissionFailed": "Could not check notification permission",
+    "title": "Never miss a dose"
+  },
   "products": {
     "add": "Add new product",
     "archived": "Archived",

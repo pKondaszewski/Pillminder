@@ -17,6 +17,7 @@ export interface Settings {
   theme: ThemePreference;
   snoozeMinutes: number;
   currency: Currency;
+  notificationsPromptDismissed: boolean;
 }
 
 const STORAGE_KEY = 'settings';
@@ -28,6 +29,7 @@ const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
   snoozeMinutes: SNOOZE_MINUTES_DEFAULT,
   currency: resolveDeviceCurrency(),
+  notificationsPromptDismissed: false,
 };
 
 const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
@@ -35,6 +37,7 @@ const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
   theme: (value) => THEME_OPTIONS.some((option) => option === value),
   snoozeMinutes: isValidSnoozeMinutes,
   currency: (value) => CURRENCY_OPTIONS.some((option) => option === value),
+  notificationsPromptDismissed: (value) => typeof value === 'boolean',
 };
 
 const listeners = new Set<() => void>();
@@ -64,6 +67,10 @@ function readStoredSettings(): Settings {
       theme: pick('theme', stored),
       snoozeMinutes: pick('snoozeMinutes', stored),
       currency: pick('currency', stored),
+      notificationsPromptDismissed: pick(
+        'notificationsPromptDismissed',
+        stored,
+      ),
     };
   } catch {
     return DEFAULT_SETTINGS;

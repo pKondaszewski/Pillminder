@@ -9,8 +9,10 @@ import { db } from '@/config/db/database';
 import { applyStoredTheme } from '@/settings/settings-service';
 import { AnimatedSplashOverlay } from '@/ui/components/commons/animated-icon';
 import AppTabs from '@/ui/components/navigation/app-tabs';
+import { OnboardingScreen } from '@/ui/components/onboarding/onboarding-screen';
 import { useDoseSync } from '@/ui/hooks/use-dose-sync';
 import { useNotifications } from '@/ui/hooks/use-notifications';
+import { useOnboarding } from '@/ui/hooks/use-onboarding';
 import { useReorderNotifications } from '@/ui/hooks/use-reorder-notifications';
 
 import migrations from '../../drizzle/migrations';
@@ -26,12 +28,13 @@ export default function TabLayout() {
   useNotifications();
   useReorderNotifications();
   useDoseSync(migrationsReady);
+  const onboarding = useOnboarding(migrationsReady);
 
   if (migrationError) {
     return <MigrationErrorScreen error={migrationError} />;
   }
 
-  if (!migrationsReady) {
+  if (!migrationsReady || !onboarding.ready) {
     return null;
   }
 
@@ -39,7 +42,14 @@ export default function TabLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <AnimatedSplashOverlay />
-        <AppTabs />
+        {onboarding.visible ? (
+          <OnboardingScreen
+            onFinish={onboarding.finish}
+            onDismiss={onboarding.dismiss}
+          />
+        ) : (
+          <AppTabs />
+        )}
       </ThemeProvider>
     </GestureHandlerRootView>
   );
