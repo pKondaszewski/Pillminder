@@ -7,7 +7,8 @@ export type BackupErrorCode =
   | 'invalidRow'
   | 'duplicateId'
   | 'duplicateSlot'
-  | 'brokenReference';
+  | 'brokenReference'
+  | 'productMismatch';
 
 export interface BackupError {
   code: BackupErrorCode;

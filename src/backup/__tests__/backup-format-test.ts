@@ -466,15 +466,21 @@ describe('parseBackup: file level errors', () => {
     expect(error.code).toBe('notJson');
   });
 
-  it('accepts a file whose app field is missing', () => {
+  it.each([
+    ['missing', undefined],
+    ['another app', 'other'],
+    ['differently cased', 'Pillminder'],
+    ['null', null],
+    ['a number', 1],
+  ])('rejects a file whose app field is %s as notBackup', (_name, app) => {
     // given
-    const text = backupText({ app: undefined });
+    const text = backupText({ app });
 
     // when
-    const result = parseBackup(text);
+    const error = errorOf(text);
 
     // then
-    expect(result.ok).toBe(true);
+    expect(error.code).toBe('notBackup');
   });
 });
 
@@ -637,19 +643,56 @@ describe('parseBackup: invalid rows', () => {
     expect(rows.schedules[0].timesOfDay).toEqual(['8:00', '21:45']);
   });
 
-  // The regexp only checks the shape, so an out-of-range time is imported
-  // and later yields an invalid planned date.
-  it.failing('rejects a time of day outside 00:00-23:59', () => {
+  it.each(['25:99', '24:00', '23:60', '8:60', '-1:00'])(
+    'rejects the time of day %s',
+    (time) => {
+      // given
+      const text = backupText({
+        schedules: [schedule({ timesOfDay: ['08:00', time] })],
+      });
+
+      // when
+      const error = errorOf(text);
+
+      // then
+      expect(error).toEqual({
+        code: 'invalidRow',
+        detail: 'schedules[0].timesOfDay',
+      });
+    },
+  );
+
+  it.each(['00:00', '23:59', '0:00', '9:05'])(
+    'accepts the boundary time of day %s',
+    (time) => {
+      // given
+      const text = backupText({
+        schedules: [schedule({ timesOfDay: [time] })],
+      });
+
+      // when
+      const rows = rowsOf(text);
+
+      // then
+      expect(rows.schedules[0].timesOfDay).toEqual([time]);
+    },
+  );
+
+  it.each([
+    ['empty', ''],
+    ['whitespace only', '   '],
+  ])('rejects a product category that is %s', (_name, category) => {
     // given
-    const text = backupText({
-      schedules: [schedule({ timesOfDay: ['25:99'] })],
-    });
+    const text = backupText({ products: [product({ category })] });
 
     // when
-    const result = parseBackup(text);
+    const error = errorOf(text);
 
     // then
-    expect(result.ok).toBe(false);
+    expect(error).toEqual({
+      code: 'invalidRow',
+      detail: 'products[0].category',
+    });
   });
 });
 
@@ -842,22 +885,27 @@ describe('parseBackup: relations', () => {
     expect(error.code).toBe('duplicateId');
   });
 
-  // validateRelations only checks that ids exist, not that the dose's
-  // product is the schedule's product.
-  it.failing(
-    'rejects a dose whose product differs from its schedule product',
-    () => {
-      // given
-      const text = backupText({
-        products: [product(), product({ id: 'p2', name: 'Other' })],
-        doses: [dose({ productId: 'p2' })],
-      });
+  it('rejects a dose whose product differs from its schedule product', () => {
+    // given
+    const text = backupText({
+      products: [product(), product({ id: 'p2', name: 'Other' })],
+      doses: [
+        dose(),
+        dose({
+          id: 'd2',
+          productId: 'p2',
+          plannedAt: '2026-02-02T08:00:00.000Z',
+        }),
+      ],
+    });
 
-      // when
-      const result = parseBackup(text);
+    // when
+    const error = errorOf(text);
 
-      // then
-      expect(result.ok).toBe(false);
-    },
-  );
+    // then
+    expect(error).toEqual({
+      code: 'productMismatch',
+      detail: 'doses[1].productId',
+    });
+  });
 });

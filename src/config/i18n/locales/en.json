@@ -20,7 +20,8 @@
       "invalidRow": "A record has a missing or invalid field.",
       "newerVersion": "The file comes from a newer version of the app.",
       "notBackup": "This is not a Pillminder backup.",
-      "notJson": "The file is not valid JSON."
+      "notJson": "The file is not valid JSON.",
+      "productMismatch": "A dose belongs to a different product than its schedule."
     }
   },
   "category": {
