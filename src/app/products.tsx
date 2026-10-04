@@ -40,6 +40,7 @@ export default function ProductListScreen() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [overviewOpen, setOverviewOpen] = useState(false);
+  const editedProduct = products.find((p) => p.id === editing?.id) ?? editing;
 
   const openCreate = () => {
     setEditing(null);
@@ -143,7 +144,7 @@ export default function ProductListScreen() {
 
         <ProductEditorModal
           visible={editorOpen}
-          product={editing}
+          product={editedProduct}
           onClose={closeEditor}
           onSave={handleSave}
           onDelete={handleDelete}

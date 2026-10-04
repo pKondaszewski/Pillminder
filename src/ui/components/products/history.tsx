@@ -65,7 +65,7 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
   // Confirmation keeps an accidental tap from silently rewriting history.
   const confirmCorrection = () =>
     Alert.alert(
-      formatDateTime(entry.plannedAt),
+      formatDateTime(entry.occurredAt),
       t(taken ? 'history.confirmSkipped' : 'history.confirmTaken'),
       [
         { text: t('editor.cancel'), style: 'cancel' },
@@ -79,7 +79,7 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
       style={({ pressed }) => pressed && styles.pressed}
     >
       <ThemedView type="backgroundElement" style={styles.row}>
-        <ThemedText type="small">{formatDateTime(entry.plannedAt)}</ThemedText>
+        <ThemedText type="small">{formatDateTime(entry.occurredAt)}</ThemedText>
         <ThemedText
           type="smallBold"
           style={{ color: taken ? TAKEN_COLOR : SKIPPED_COLOR }}

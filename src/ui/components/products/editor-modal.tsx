@@ -18,6 +18,7 @@ import {
 } from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { formatDateTime } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductHistory } from '@/ui/components/products/history';
@@ -360,6 +361,14 @@ function EditorForm({
 
           {product ? (
             <ProductNotes productId={product.id} noteDraft={noteDraft} />
+          ) : null}
+
+          {product?.lastUsedAt ? (
+            <ThemedText type="small" themeColor="textSecondary">
+              {t('editor.lastUsed', {
+                when: formatDateTime(product.lastUsedAt),
+              })}
+            </ThemedText>
           ) : null}
 
           {product ? <ProductHistory productId={product.id} /> : null}

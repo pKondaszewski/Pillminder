@@ -41,6 +41,7 @@
     "editTitle": "Edytuj produkt",
     "history": "Historia",
     "historyEmpty": "Brak historii",
+    "lastUsed": "Ostatnio użyto: {{when}}",
     "name": "Nazwa",
     "namePlaceholder": "np. Witamina D",
     "nameRequired": "Podaj nazwę",

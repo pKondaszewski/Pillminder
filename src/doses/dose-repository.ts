@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, lt, ne, or } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, lt, max, ne, or } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
@@ -89,18 +89,35 @@ export async function setDoseState(
       .where(eq(doses.id, id))
       .run();
 
-    if (transition.stockDelta === 0) return;
-
     const product = tx
-      .select({ stock: products.stock })
+      .select({ stock: products.stock, lastUsedAt: products.lastUsedAt })
       .from(products)
       .where(eq(products.id, dose.productId))
       .get();
-    if (!product || product.stock == null) return;
+    if (!product) return;
+
+    const lastUsedAt =
+      tx
+        .select({ takenAt: max(doses.takenAt) })
+        .from(doses)
+        .where(
+          and(eq(doses.productId, dose.productId), eq(doses.state, 'taken')),
+        )
+        .get()?.takenAt ?? null;
+    const stock =
+      product.stock == null
+        ? null
+        : Math.max(0, product.stock + transition.stockDelta);
+    const stockChanged = stock !== product.stock;
+    const lastUsedChanged =
+      (lastUsedAt?.getTime() ?? null) !==
+      (product.lastUsedAt?.getTime() ?? null);
+    if (!stockChanged && !lastUsedChanged) return;
 
     tx.update(products)
       .set({
-        stock: Math.max(0, product.stock + transition.stockDelta),
+        lastUsedAt,
+        ...(stockChanged ? { stock } : {}),
         updatedAt: new Date(),
       })
       .where(eq(products.id, dose.productId))
