@@ -32,6 +32,14 @@ export function setCurrency(currency: Currency): void {
   updateSettings({ currency });
 }
 
+export function dismissNotificationsPrompt(): void {
+  updateSettings({ notificationsPromptDismissed: true });
+}
+
+export function isNotificationsPromptDismissed(): boolean {
+  return getSettings().notificationsPromptDismissed;
+}
+
 export function getSnoozeMinutes(): number {
   return getSettings().snoozeMinutes;
 }

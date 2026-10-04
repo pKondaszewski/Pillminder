@@ -105,6 +105,18 @@
     "take": "Wziąłem",
     "title": "Przypomnienie o dawce"
   },
+  "onboarding": {
+    "allow": "Zezwól na powiadomienia",
+    "blocked": "Powiadomienia są zablokowane, a Android nie zapyta ponownie. Włącz je w ustawieniach systemowych aplikacji.",
+    "continue": "Kontynuuj bez powiadomień",
+    "featureDose": "Przypomnienie, gdy czas na dawkę, z przyciskami „Wziąłem” i „Drzemka” bezpośrednio w powiadomieniu",
+    "featureReorder": "Alert, gdy produkt się kończy, żebyś zdążył domówić",
+    "intro": "Pillminder przypomina za Ciebie, żebyś nie musiał pamiętać. Do tego potrzebuje zgody na wyświetlanie powiadomień:",
+    "notNow": "Nie teraz",
+    "openSettings": "Otwórz ustawienia systemowe",
+    "permissionFailed": "Nie udało się sprawdzić zgody na powiadomienia",
+    "title": "Nie przegap dawki"
+  },
   "overview": {
     "empty": "Brak aktywnych produktów",
     "emptyHint": "Tutaj pojawią się aktywne produkty z rytmem przyjmowania i zapasem.",
