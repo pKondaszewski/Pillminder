@@ -22,9 +22,11 @@ import {
 } from '@/schedules/schedule-service';
 import { getSnoozeMinutes } from '@/settings/settings-service';
 
+import { calculateAdherence } from './dose-adherence';
 import {
   deleteFuturePendingDosesForSchedules,
   getDoseById,
+  getDosesPlannedBetween,
   getFuturePendingDosesByProduct,
   productHistoryQuery,
   replaceFuturePendingDoses,
@@ -33,7 +35,12 @@ import {
   todaysDosesQuery,
 } from './dose-repository';
 import { isDueInFuture, isPending, isPresent } from './dose-validator';
+import type { AdherenceReport } from './dto/adherence-report-output';
 
+export type {
+  AdherenceCounts,
+  AdherenceReport,
+} from './dto/adherence-report-output';
 export type { HistoryEntry } from './dto/history-entry-output';
 export { toHistoryEntry } from './dto/history-entry-output';
 export type { TodayDose } from './dto/today-dose-output';
@@ -60,6 +67,15 @@ export function getTodaysDosesQuery() {
 
 export function getProductHistoryQuery(productId: string) {
   return productHistoryQuery(productId);
+}
+
+export async function getAdherence(
+  from: Date,
+  to: Date,
+  now: Date = new Date(),
+): Promise<AdherenceReport> {
+  const doses = await getDosesPlannedBetween(from, to);
+  return calculateAdherence(doses, from, to, now);
 }
 
 export async function cancelFutureDosesForSchedule(

@@ -44,6 +44,17 @@ export function productHistoryQuery(productId: string, limit = 30) {
     .limit(limit);
 }
 
+export async function getDosesPlannedBetween(
+  from: Date,
+  to: Date,
+): Promise<Dose[]> {
+  return db
+    .select()
+    .from(doses)
+    .where(and(gte(doses.plannedAt, from), lt(doses.plannedAt, to)))
+    .orderBy(doses.plannedAt);
+}
+
 export async function setDoseState(
   id: string,
   state: DoseState,
