@@ -117,6 +117,16 @@
     "permissionFailed": "Could not check notification permission",
     "title": "Never miss a dose"
   },
+  "overview": {
+    "empty": "No active products",
+    "emptyHint": "Active products with their rhythm and stock will show up here.",
+    "noRhythm": "No schedule set",
+    "open": "Overview",
+    "stockDaysLeft": "~{{days}}d left",
+    "stockUnits": "Stock: {{count}} pcs",
+    "stockUnknown": "Stock not tracked",
+    "title": "Overview"
+  },
   "products": {
     "add": "Add new product",
     "archived": "Archived",

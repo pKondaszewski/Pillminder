@@ -18,6 +18,8 @@ export {
   previewOccurrences,
 } from './schedule-helper';
 export type { Schedule } from './schedule-repository';
+export type { Translate } from './schedule-rhythm';
+export { describeRhythm } from './schedule-rhythm';
 
 const log = createLogger('schedule-service');
 
