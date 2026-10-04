@@ -4,7 +4,7 @@ import { FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
-import type { Schedule } from '@/schedules/schedule-service';
+import { describeRhythm, type Schedule } from '@/schedules/schedule-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDate } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
@@ -26,34 +26,6 @@ export default function ScheduleListScreen() {
   const productName = (id: string) =>
     products.find((p) => p.id === id)?.name ?? t('schedule.unknownProduct');
 
-  const rhythm = (s: Schedule) => {
-    const base =
-      s.intervalDays === 1
-        ? t('schedule.daily')
-        : t('schedule.everyXDays', { days: s.intervalDays });
-    const quantity =
-      s.quantity !== 1
-        ? ` · ${t('schedule.quantityValue', { count: s.quantity })}`
-        : '';
-    return `${base} · ${s.timesOfDay.join(', ')}${quantity}${period(s)}`;
-  };
-
-  const period = ({ startDate, endDate }: Schedule) => {
-    if (startDate && endDate) {
-      return ` · ${t('schedule.periodRange', {
-        from: formatDate(startDate),
-        to: formatDate(endDate),
-      })}`;
-    }
-    if (startDate) {
-      return ` · ${t('schedule.periodFrom', { date: formatDate(startDate) })}`;
-    }
-    if (endDate) {
-      return ` · ${t('schedule.periodUntil', { date: formatDate(endDate) })}`;
-    }
-    return '';
-  };
-
   const openCreate = () => {
     setEditing(null);
     setEditorOpen(true);
@@ -73,7 +45,9 @@ export default function ScheduleListScreen() {
     >
       <ThemedView type="backgroundElement" style={styles.row}>
         <ThemedText>{productName(item.productId)}</ThemedText>
-        <ThemedText type="small">{rhythm(item)}</ThemedText>
+        <ThemedText type="small">
+          {describeRhythm(item, t, formatDate)}
+        </ThemedText>
       </ThemedView>
     </Pressable>
   );

@@ -105,6 +105,16 @@
     "take": "Wziąłem",
     "title": "Przypomnienie o dawce"
   },
+  "overview": {
+    "empty": "Brak aktywnych produktów",
+    "emptyHint": "Tutaj pojawią się aktywne produkty z rytmem przyjmowania i zapasem.",
+    "noRhythm": "Brak harmonogramu",
+    "open": "Przegląd",
+    "stockDaysLeft": "starczy na ~{{days}} d",
+    "stockUnits": "Zapas: {{count}} szt.",
+    "stockUnknown": "Zapas nie jest śledzony",
+    "title": "Przegląd"
+  },
   "products": {
     "add": "Dodaj nowy produkt",
     "archived": "Zarchiwizowany",
