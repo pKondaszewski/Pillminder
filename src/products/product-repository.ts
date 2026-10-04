@@ -1,9 +1,10 @@
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, notInArray } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
 import { products } from '@/config/db/schema';
 
+import { BUILT_IN_CATEGORIES, normalizeCategory } from './category';
 import type { NewProductInput } from './dto/new-product-input';
 
 export type Product = typeof products.$inferSelect;
@@ -22,14 +23,24 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
   return db.select().from(products).where(inArray(products.id, ids));
 }
 
+export async function listCustomCategories(): Promise<string[]> {
+  const rows = await db
+    .selectDistinct({ category: products.category })
+    .from(products)
+    .where(notInArray(products.category, BUILT_IN_CATEGORIES))
+    .orderBy(products.category);
+  return rows.map((row) => row.category);
+}
+
 export async function createProduct(input: NewProductInput): Promise<Product> {
+  const category = await resolveCategory(input.category);
   const now = new Date();
   const [created] = await db
     .insert(products)
     .values({
       id: Crypto.randomUUID(),
       name: input.name,
-      category: input.category,
+      category,
       strength: input.strength ?? null,
       price: input.price ?? null,
       storeLink: input.storeLink ?? null,
@@ -47,11 +58,12 @@ export async function updateProduct(
   id: string,
   input: NewProductInput,
 ): Promise<Product> {
+  const category = await resolveCategory(input.category);
   const [updated] = await db
     .update(products)
     .set({
       name: input.name,
-      category: input.category,
+      category,
       strength: input.strength ?? null,
       price: input.price ?? null,
       storeLink: input.storeLink ?? null,
@@ -75,4 +87,10 @@ export async function setProductStatus(
 
 export async function deleteProduct(id: string): Promise<void> {
   await db.delete(products).where(eq(products.id, id));
+}
+
+async function resolveCategory(raw: string): Promise<string> {
+  const category = normalizeCategory(raw, await listCustomCategories());
+  if (category === null) throw new Error('Product category must not be blank');
+  return category;
 }

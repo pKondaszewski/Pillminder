@@ -6,6 +6,7 @@ import {
   deleteProduct as deleteProductRow,
   getProductById,
   getProductsByIds,
+  listCustomCategories as listCustomCategoryRows,
   type Product,
   productsQuery,
   setProductStatus as setProductStatusRow,
@@ -26,6 +27,10 @@ export function getProduct(id: string): Promise<Product | undefined> {
 
 export function getProducts(ids: string[]): Promise<Product[]> {
   return getProductsByIds(ids);
+}
+
+export function listCustomCategories(): Promise<string[]> {
+  return listCustomCategoryRows();
 }
 
 export async function addProduct(input: NewProductInput): Promise<void> {

@@ -1,8 +1,8 @@
-export type ProductCategory = 'medication' | 'supplement' | 'care';
+export type BuiltInCategory = 'medication' | 'supplement' | 'care';
 
 export interface NewProductInput {
   name: string;
-  category: ProductCategory;
+  category: string;
   strength?: string | null;
   price?: number | null;
   storeLink?: string | null;

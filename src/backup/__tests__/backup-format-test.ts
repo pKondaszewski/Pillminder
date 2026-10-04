@@ -225,6 +225,19 @@ describe('serializeBackup / parseBackup round trip', () => {
     // then
     expect(file.products[0]).not.toHaveProperty('internalCache');
   });
+
+  it('keeps a user-defined category through a round trip', () => {
+    // given
+    const text = backupText({
+      products: [product({ category: 'Eye drops' })],
+    });
+
+    // when
+    const rows = rowsOf(serializeBackup(rowsOf(text), EXPORTED_AT));
+
+    // then
+    expect(rows.products[0].category).toBe('Eye drops');
+  });
 });
 
 describe('parseBackup: older schema and unknown fields', () => {
@@ -519,20 +532,6 @@ describe('parseBackup: invalid rows', () => {
 
     // then
     expect(error).toEqual({ code: 'invalidRow', detail: 'products[0].price' });
-  });
-
-  it('rejects a value outside the enum', () => {
-    // given
-    const text = backupText({ products: [product({ category: 'custom' })] });
-
-    // when
-    const error = errorOf(text);
-
-    // then
-    expect(error).toEqual({
-      code: 'invalidRow',
-      detail: 'products[0].category',
-    });
   });
 
   it('rejects an unknown dose state', () => {
