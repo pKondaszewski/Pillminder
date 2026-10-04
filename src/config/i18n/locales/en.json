@@ -40,6 +40,7 @@
     "editTitle": "Edit product",
     "history": "History",
     "historyEmpty": "No history yet",
+    "lastUsed": "Last used: {{when}}",
     "name": "Name",
     "namePlaceholder": "e.g. Vitamin D",
     "nameRequired": "Enter a name",
