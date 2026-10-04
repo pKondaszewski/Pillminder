@@ -58,6 +58,10 @@
     "strengthPlaceholder": "np. 5mg"
   },
   "history": {
+    "change": "Zmień",
+    "confirmSkipped": "Oznaczyć dawkę jako niewziętą? Zapas zostanie przywrócony.",
+    "confirmTaken": "Oznaczyć dawkę jako wziętą? Zapas zostanie zmniejszony.",
+    "errorCorrect": "Nie udało się zmienić dawki. Spróbuj ponownie.",
     "skipped": "Pominięto",
     "taken": "Wzięto"
   },
@@ -74,6 +78,8 @@
     "undo": "Cofnij",
     "undoConfirm": "Cofnąć wzięcie „{{name}}”?",
     "undoTitle": "Cofnąć wzięcie?",
+    "unskipConfirm": "Cofnąć pominięcie „{{name}}”?",
+    "unskipTitle": "Cofnąć pominięcie?",
     "unknownProduct": "Nieznany produkt"
   },
   "notes": {

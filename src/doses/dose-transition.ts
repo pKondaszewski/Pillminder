@@ -16,14 +16,14 @@ export function planDoseTransition(
   dose: TransitionInput,
   target: DoseState,
   scheduleQuantity: number,
-  now: Date,
+  takenAt: Date,
 ): DoseTransition | null {
   if (dose.state === target) return null;
 
   if (target === 'taken') {
     return {
       state: target,
-      takenAt: now,
+      takenAt,
       takenQuantity: scheduleQuantity,
       stockDelta: -scheduleQuantity,
     };

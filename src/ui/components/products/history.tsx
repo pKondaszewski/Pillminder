@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet } from 'react-native';
+import { Alert, Pressable, StyleSheet } from 'react-native';
 
-import type { HistoryEntry } from '@/doses/dose-service';
+import { correctDoseState, type HistoryEntry } from '@/doses/dose-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDateTime } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
@@ -52,17 +52,42 @@ export function ProductHistory({ productId }: { productId: string }) {
 function HistoryRow({ entry }: { entry: HistoryEntry }) {
   const { t } = useTranslation();
   const taken = entry.status === 'taken';
+  const target = taken ? 'skipped' : 'taken';
+
+  const correct = async () => {
+    try {
+      await correctDoseState(entry.id, target);
+    } catch {
+      Alert.alert(t('products.errorTitle'), t('history.errorCorrect'));
+    }
+  };
+
+  // Confirmation keeps an accidental tap from silently rewriting history.
+  const confirmCorrection = () =>
+    Alert.alert(
+      formatDateTime(entry.plannedAt),
+      t(taken ? 'history.confirmSkipped' : 'history.confirmTaken'),
+      [
+        { text: t('editor.cancel'), style: 'cancel' },
+        { text: t('history.change'), onPress: correct },
+      ],
+    );
 
   return (
-    <ThemedView type="backgroundElement" style={styles.row}>
-      <ThemedText type="small">{formatDateTime(entry.plannedAt)}</ThemedText>
-      <ThemedText
-        type="smallBold"
-        style={{ color: taken ? TAKEN_COLOR : SKIPPED_COLOR }}
-      >
-        {taken ? t('history.taken') : t('history.skipped')}
-      </ThemedText>
-    </ThemedView>
+    <Pressable
+      onPress={confirmCorrection}
+      style={({ pressed }) => pressed && styles.pressed}
+    >
+      <ThemedView type="backgroundElement" style={styles.row}>
+        <ThemedText type="small">{formatDateTime(entry.plannedAt)}</ThemedText>
+        <ThemedText
+          type="smallBold"
+          style={{ color: taken ? TAKEN_COLOR : SKIPPED_COLOR }}
+        >
+          {taken ? t('history.taken') : t('history.skipped')}
+        </ThemedText>
+      </ThemedView>
+    </Pressable>
   );
 }
 

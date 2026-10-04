@@ -58,6 +58,7 @@ export async function getDosesPlannedBetween(
 export async function setDoseState(
   id: string,
   state: DoseState,
+  { backdated = false }: { backdated?: boolean } = {},
 ): Promise<void> {
   db.transaction((tx) => {
     const dose = tx.select().from(doses).where(eq(doses.id, id)).get();
@@ -68,11 +69,13 @@ export async function setDoseState(
       .from(schedules)
       .where(eq(schedules.id, dose.scheduleId))
       .get();
+    const now = new Date();
+    const takenAt = backdated && dose.plannedAt < now ? dose.plannedAt : now;
     const transition = planDoseTransition(
       dose,
       state,
       schedule?.quantity ?? 1,
-      new Date(),
+      takenAt,
     );
     if (!transition) return;
 

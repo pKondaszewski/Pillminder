@@ -31,15 +31,23 @@ export default function HomeScreen() {
   const displayName = (dose: TodayDose) =>
     dose.productName ?? t('home.unknownProduct');
 
-  const confirmUndo = (item: TodayDose) => {
-    Alert.alert(
-      t('home.undoTitle'),
-      t('home.undoConfirm', { name: displayName(item) }),
-      [
-        { text: t('editor.cancel'), style: 'cancel' },
-        { text: t('home.undo'), onPress: () => untakeDose(item.id) },
-      ],
-    );
+  const confirmRevert = (item: TodayDose, kind: 'taken' | 'skipped') => {
+    const { title, message, revert } =
+      kind === 'taken'
+        ? {
+            title: 'home.undoTitle',
+            message: 'home.undoConfirm',
+            revert: untakeDose,
+          }
+        : {
+            title: 'home.unskipTitle',
+            message: 'home.unskipConfirm',
+            revert: unskipDose,
+          };
+    Alert.alert(t(title), t(message, { name: displayName(item) }), [
+      { text: t('editor.cancel'), style: 'cancel' },
+      { text: t('home.undo'), onPress: () => revert(item.id) },
+    ]);
   };
 
   const renderItem = ({ item }: { item: TodayDose }) => {
@@ -70,8 +78,8 @@ export default function HomeScreen() {
           takenAt={item.takenAt}
           onTake={() => applyWithUndo('taken', item.id)}
           onSkip={() => applyWithUndo('skipped', item.id)}
-          onUndo={() => confirmUndo(item)}
-          onUnskip={() => unskipDose(item.id)}
+          onUndo={() => confirmRevert(item, 'taken')}
+          onUnskip={() => confirmRevert(item, 'skipped')}
         />
       </ThemedView>
     );
