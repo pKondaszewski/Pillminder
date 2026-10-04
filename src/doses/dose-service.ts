@@ -171,6 +171,20 @@ export async function unskipDose(id: string): Promise<void> {
   await revertDoseToPending(id);
 }
 
+export async function correctDoseState(
+  id: string,
+  target: 'taken' | 'skipped',
+): Promise<void> {
+  log.info(`Correcting dose ${id} to ${target}`);
+  try {
+    await setDoseState(id, target, { backdated: true });
+    await Promise.all([cancelDoseReminder(id), dismissDoseReminder(id)]);
+  } catch (err) {
+    log.error(`Failed to correct dose ${id} to ${target}`, err);
+    throw err;
+  }
+}
+
 export async function snoozeDose(id: string): Promise<void> {
   const snoozeMinutes = getSnoozeMinutes();
   log.info(`Snoozing dose ${id} by ${snoozeMinutes} min`);

@@ -91,3 +91,38 @@ describe('planDoseTransition', () => {
     expect(transition?.stockDelta).toBe(1);
   });
 });
+
+describe('planDoseTransition for a past dose correction', () => {
+  const PLANNED_AT = new Date(2026, 0, 9, 8, 0);
+
+  it.each<DoseState>(['pending', 'skipped'])(
+    'records the planned time as takenAt when a %s dose is corrected to taken',
+    (from) => {
+      // given
+      const dose = { state: from, takenQuantity: null };
+
+      // when
+      const transition = planDoseTransition(dose, 'taken', 2, PLANNED_AT);
+
+      // then
+      expect(transition?.takenAt).toEqual(PLANNED_AT);
+      expect(transition?.stockDelta).toBe(-2);
+    },
+  );
+
+  it('restores the snapshot quantity and clears takenAt when a taken dose is corrected to skipped', () => {
+    // given
+    const dose = { state: 'taken' as const, takenQuantity: 3 };
+
+    // when
+    const transition = planDoseTransition(dose, 'skipped', 1, PLANNED_AT);
+
+    // then
+    expect(transition).toEqual({
+      state: 'skipped',
+      takenAt: null,
+      takenQuantity: null,
+      stockDelta: 3,
+    });
+  });
+});
