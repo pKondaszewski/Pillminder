@@ -20,7 +20,8 @@
       "invalidRow": "W rekordzie brakuje pola lub ma ono błędną wartość.",
       "newerVersion": "Plik pochodzi z nowszej wersji aplikacji.",
       "notBackup": "To nie jest kopia zapasowa Pillminder.",
-      "notJson": "Plik nie jest poprawnym JSON-em."
+      "notJson": "Plik nie jest poprawnym JSON-em.",
+      "productMismatch": "Dawka należy do innego produktu niż jej harmonogram."
     }
   },
   "category": {

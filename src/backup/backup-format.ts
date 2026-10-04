@@ -29,7 +29,7 @@ const TABLES: Record<BackupTable, SQLiteTable> = {
   notes,
 };
 
-const TIME_OF_DAY = /^\d{1,2}:\d{2}$/;
+const TIME_OF_DAY = /^([01]?\d|2[0-3]):[0-5]\d$/;
 
 export function serializeBackup(rows: BackupRows, exportedAt: Date): string {
   const file: BackupFile = {
@@ -52,7 +52,7 @@ export function parseBackup(text: string): BackupParseResult {
     return fail('notJson');
   }
 
-  if (!isRecord(json)) return fail('notBackup');
+  if (!isRecord(json) || json.app !== 'pillminder') return fail('notBackup');
   const { version } = json;
   if (!Number.isInteger(version) || (version as number) < 1) {
     return fail('notBackup');
@@ -147,6 +147,9 @@ function isValidValue(
       value.every((time) => typeof time === 'string' && TIME_OF_DAY.test(time))
     );
   }
+  if (table === 'products' && key === 'category') {
+    return typeof value === 'string' && value.trim() !== '';
+  }
   switch (column.dataType) {
     case 'date':
       return toDate(value) !== null;
@@ -187,6 +190,15 @@ function validateRelations(rows: BackupRows): BackupParseResult {
     const index = rows[table].findIndex((row) => !ids[target].has(row[key]));
     if (index >= 0) return fail('brokenReference', `${table}[${index}].${key}`);
   }
+
+  const scheduleProducts = new Map(
+    rows.schedules.map((schedule) => [schedule.id, schedule.productId]),
+  );
+  const mismatch = rows.doses.findIndex(
+    (dose) => scheduleProducts.get(dose.scheduleId) !== dose.productId,
+  );
+  if (mismatch >= 0)
+    return fail('productMismatch', `doses[${mismatch}].productId`);
 
   const slots = new Set(
     rows.doses.map(
