@@ -28,9 +28,6 @@ export default function HomeScreen() {
   const { undoable, applyWithUndo, undoLast, dismissUndo } =
     useUndoableDoseAction(actions);
 
-  const displayName = (dose: TodayDose) =>
-    dose.productName ?? t('home.unknownProduct');
-
   const confirmRevert = (item: TodayDose, kind: 'taken' | 'skipped') => {
     const { title, message, revert } =
       kind === 'taken'
@@ -44,7 +41,7 @@ export default function HomeScreen() {
             message: 'home.unskipConfirm',
             revert: unskipDose,
           };
-    Alert.alert(t(title), t(message, { name: displayName(item) }), [
+    Alert.alert(t(title), t(message, { name: item.productName }), [
       { text: t('editor.cancel'), style: 'cancel' },
       { text: t('home.undo'), onPress: () => revert(item.id) },
     ]);
@@ -60,7 +57,7 @@ export default function HomeScreen() {
             <ThemedText type="smallBold">
               {formatTime(item.plannedAt)}
             </ThemedText>
-            <ThemedText>{displayName(item)}</ThemedText>
+            <ThemedText>{item.productName}</ThemedText>
             {quantityText ? (
               <ThemedText type="small" themeColor="textSecondary">
                 {quantityText}

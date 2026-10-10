@@ -45,7 +45,7 @@ export type {
 } from './dto/adherence-report-output';
 export type { HistoryEntry } from './dto/history-entry-output';
 export { toHistoryEntries, toHistoryEntry } from './dto/history-entry-output';
-export type { TodayDose } from './dto/today-dose-output';
+export type { TodayDose, TodayDoseRow } from './dto/today-dose-output';
 export { toTodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');

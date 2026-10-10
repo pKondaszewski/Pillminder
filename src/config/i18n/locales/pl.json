@@ -83,8 +83,7 @@
     "undoConfirm": "Cofnąć wzięcie „{{name}}”?",
     "undoTitle": "Cofnąć wzięcie?",
     "unskipConfirm": "Cofnąć pominięcie „{{name}}”?",
-    "unskipTitle": "Cofnąć pominięcie?",
-    "unknownProduct": "Nieznany produkt"
+    "unskipTitle": "Cofnąć pominięcie?"
   },
   "notes": {
     "add": "Dodaj notatkę",

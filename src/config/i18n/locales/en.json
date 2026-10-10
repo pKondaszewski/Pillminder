@@ -83,8 +83,7 @@
     "undoConfirm": "Undo taking “{{name}}”?",
     "undoTitle": "Undo taken?",
     "unskipConfirm": "Undo skipping “{{name}}”?",
-    "unskipTitle": "Undo skipped?",
-    "unknownProduct": "Unknown product"
+    "unskipTitle": "Undo skipped?"
   },
   "notes": {
     "add": "Add note",

@@ -21,8 +21,20 @@ export function todaysDosesQuery(day: Date) {
   const end = addDays(start, 1);
 
   return db
-    .select()
+    .select({
+      id: doses.id,
+      plannedAt: doses.plannedAt,
+      state: doses.state,
+      takenAt: doses.takenAt,
+      snoozedUntil: doses.snoozedUntil,
+      productName: products.name,
+      productStrength: products.strength,
+      unit: products.unit,
+      quantity: schedules.quantity,
+    })
     .from(doses)
+    .innerJoin(products, eq(doses.productId, products.id))
+    .innerJoin(schedules, eq(doses.scheduleId, schedules.id))
     .where(and(gte(doses.plannedAt, start), lt(doses.plannedAt, end)))
     .orderBy(doses.plannedAt);
 }
