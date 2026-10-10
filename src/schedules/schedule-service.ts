@@ -9,6 +9,7 @@ import {
   getSchedulesByProductId,
   type Schedule,
   schedulesQuery,
+  setSchedulePause as setSchedulePauseRow,
   updateSchedule as updateScheduleRow,
 } from './schedule-repository';
 
@@ -17,9 +18,10 @@ export {
   occurrencesWithin,
   previewOccurrences,
 } from './schedule-helper';
+export { isPaused } from './schedule-pause';
 export type { Schedule } from './schedule-repository';
 export type { Translate } from './schedule-rhythm';
-export { describeRhythm } from './schedule-rhythm';
+export { describePause, describeRhythm } from './schedule-rhythm';
 
 const log = createLogger('schedule-service');
 
@@ -64,6 +66,30 @@ export async function updateSchedule(
     return updated;
   } catch (err) {
     log.error(`Failed to update schedule with id ${id}`, err);
+    throw err;
+  }
+}
+
+export async function suspendSchedule(
+  id: string,
+  resumeAt: Date | null,
+  now: Date = new Date(),
+): Promise<Schedule> {
+  log.info(`Pausing schedule ${id}`);
+  try {
+    return await setSchedulePauseRow(id, { pausedAt: now, resumeAt });
+  } catch (err) {
+    log.error(`Failed to pause schedule ${id}`, err);
+    throw err;
+  }
+}
+
+export async function reactivateSchedule(id: string): Promise<Schedule> {
+  log.info(`Resuming schedule ${id}`);
+  try {
+    return await setSchedulePauseRow(id, { pausedAt: null, resumeAt: null });
+  } catch (err) {
+    log.error(`Failed to resume schedule ${id}`, err);
     throw err;
   }
 }

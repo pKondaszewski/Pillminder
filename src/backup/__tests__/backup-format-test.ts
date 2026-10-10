@@ -120,6 +120,8 @@ describe('serializeBackup / parseBackup round trip', () => {
           quantity: 2,
           startDate: new Date('2026-01-01T00:00:00.000Z'),
           endDate: new Date('2026-03-01T00:00:00.000Z'),
+          pausedAt: new Date('2026-02-01T09:00:00.000Z'),
+          resumeAt: new Date('2026-02-10T00:00:00.000Z'),
         },
         {
           id: 's2',
@@ -129,6 +131,8 @@ describe('serializeBackup / parseBackup round trip', () => {
           quantity: 1,
           startDate: null,
           endDate: null,
+          pausedAt: null,
+          resumeAt: null,
         },
       ],
       doses: [
@@ -279,6 +283,38 @@ describe('parseBackup: older schema and unknown fields', () => {
       takenAt: null,
       takenQuantity: null,
       snoozedUntil: null,
+    });
+  });
+
+  it('imports a schedule from a backup made before pauses as not paused', () => {
+    // given
+    const text = backupText({ schedules: [schedule()] });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.schedules[0]).toMatchObject({ pausedAt: null, resumeAt: null });
+  });
+
+  it('keeps pause dates through a round trip', () => {
+    // given
+    const text = backupText({
+      schedules: [
+        schedule({
+          pausedAt: '2026-02-01T09:00:00.000Z',
+          resumeAt: '2026-02-10T00:00:00.000Z',
+        }),
+      ],
+    });
+
+    // when
+    const rows = rowsOf(serializeBackup(rowsOf(text), EXPORTED_AT));
+
+    // then
+    expect(rows.schedules[0]).toMatchObject({
+      pausedAt: new Date('2026-02-01T09:00:00.000Z'),
+      resumeAt: new Date('2026-02-10T00:00:00.000Z'),
     });
   });
 

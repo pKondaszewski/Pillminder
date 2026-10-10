@@ -69,6 +69,18 @@ export async function updateSchedule(
   return updated;
 }
 
+export async function setSchedulePause(
+  id: string,
+  pause: { pausedAt: Date | null; resumeAt: Date | null },
+): Promise<Schedule> {
+  const [updated] = await db
+    .update(schedules)
+    .set(pause)
+    .where(eq(schedules.id, id))
+    .returning();
+  return updated;
+}
+
 export async function deleteSchedule(id: string): Promise<void> {
   await db.delete(schedules).where(eq(schedules.id, id));
 }

@@ -1,5 +1,7 @@
 import { formatAmount, type ProductUnit } from '@/products/product-unit';
 
+import { isPaused } from './schedule-pause';
+
 export type Translate = (
   key: string,
   options?: Record<string, string | number>,
@@ -11,6 +13,8 @@ export interface RhythmText {
   quantity: number;
   startDate: Date | null;
   endDate: Date | null;
+  pausedAt?: Date | null;
+  resumeAt?: Date | null;
 }
 
 export function describeRhythm(
@@ -18,6 +22,7 @@ export function describeRhythm(
   t: Translate,
   formatDate: (date: Date) => string,
   unit: ProductUnit | null = null,
+  now: Date = new Date(),
 ): string {
   const { intervalDays, timesOfDay, quantity } = schedule;
   const base =
@@ -25,7 +30,20 @@ export function describeRhythm(
       ? t('schedule.daily')
       : t('schedule.everyXDays', { days: intervalDays });
   const quantityText = describeQuantity(quantity, unit, t);
-  return `${base} · ${timesOfDay.join(', ')}${quantityText}${describePeriod(schedule, t, formatDate)}`;
+  const rhythm = `${base} · ${timesOfDay.join(', ')}${quantityText}${describePeriod(schedule, t, formatDate)}`;
+  return isPaused(schedule, now)
+    ? `${describePause(schedule, t, formatDate)} · ${rhythm}`
+    : rhythm;
+}
+
+export function describePause(
+  { resumeAt }: RhythmText,
+  t: Translate,
+  formatDate: (date: Date) => string,
+): string {
+  return resumeAt
+    ? t('schedule.pausedUntil', { date: formatDate(resumeAt) })
+    : t('schedule.paused');
 }
 
 function describeQuantity(

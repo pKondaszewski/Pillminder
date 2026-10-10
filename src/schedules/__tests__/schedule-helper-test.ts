@@ -339,6 +339,78 @@ describe('occurrencesWithin', () => {
       expect(result).toEqual([at(10, 25, 0)]);
     });
   });
+
+  describe('while paused', () => {
+    it('has no slots when paused without a resume date', () => {
+      // given
+      const period = { pausedAt: at(1, 9, 8), resumeAt: null };
+
+      // when
+      const result = occurrencesWithin(1, ['08:00'], 3, period, NOW);
+
+      // then
+      expect(result).toEqual([]);
+    });
+
+    it('has no slots before the resume day and normal slots from it', () => {
+      // given
+      const period = { pausedAt: at(1, 9, 8), resumeAt: at(1, 12, 0) };
+
+      // when
+      const result = occurrencesWithin(1, ['08:00'], 3, period, NOW);
+
+      // then
+      expect(result).toEqual([at(1, 12, 8), at(1, 13, 8), at(1, 14, 8)]);
+    });
+
+    it('counts the horizon from the resume day when it is far away', () => {
+      // given
+      const period = { pausedAt: at(1, 9, 8), resumeAt: at(2, 1, 0) };
+
+      // when
+      const result = occurrencesWithin(1, ['08:00'], 2, period, NOW);
+
+      // then
+      expect(result).toEqual([at(2, 1, 8), at(2, 2, 8)]);
+    });
+
+    it('anchors an every-N-days rhythm without a start date to the resume day', () => {
+      // given
+      const period = { pausedAt: at(1, 9, 8), resumeAt: at(1, 15, 0) };
+
+      // when
+      const result = occurrencesWithin(3, ['08:00'], 7, period, NOW);
+
+      // then
+      expect(result).toEqual([at(1, 15, 8), at(1, 18, 8), at(1, 21, 8)]);
+    });
+
+    it('keeps the phase of an every-N-days rhythm that has a start date', () => {
+      // given
+      const period = {
+        startDate: at(1, 1, 0),
+        pausedAt: at(1, 9, 8),
+        resumeAt: at(1, 15, 0),
+      };
+
+      // when
+      const result = occurrencesWithin(3, ['08:00'], 7, period, NOW);
+
+      // then
+      expect(result).toEqual([at(1, 16, 8), at(1, 19, 8)]);
+    });
+
+    it('ignores a pause whose resume date has passed', () => {
+      // given
+      const period = { pausedAt: at(1, 1, 8), resumeAt: at(1, 5, 0) };
+
+      // when
+      const result = occurrencesWithin(1, ['08:00'], 3, period, NOW);
+
+      // then
+      expect(result).toEqual([at(1, 11, 8), at(1, 12, 8)]);
+    });
+  });
 });
 
 describe('nextOccurrences', () => {

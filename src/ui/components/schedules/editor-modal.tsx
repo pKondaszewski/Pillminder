@@ -13,10 +13,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { addDays, startOfDay } from '@/config/date-utils';
 import type { Product } from '@/products/product-service';
 import { formatAmount } from '@/products/product-unit';
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
 import {
+  describePause,
+  isPaused,
   previewOccurrences,
   type Schedule,
 } from '@/schedules/schedule-service';
@@ -33,6 +36,8 @@ interface Props {
   onClose: () => void;
   onSave: (input: NewScheduleInput) => void;
   onDelete: (id: string) => void;
+  onPause: (id: string, resumeAt: Date | null) => void;
+  onResume: (id: string) => void;
 }
 
 function formatOccurrence(date: Date): string {
@@ -48,6 +53,8 @@ export function ScheduleEditorModal({
   onClose,
   onSave,
   onDelete,
+  onPause,
+  onResume,
 }: Props) {
   return (
     <Modal
@@ -64,6 +71,8 @@ export function ScheduleEditorModal({
           onClose={onClose}
           onSave={onSave}
           onDelete={onDelete}
+          onPause={onPause}
+          onResume={onResume}
         />
       ) : null}
     </Modal>
@@ -76,6 +85,8 @@ function EditorForm({
   onClose,
   onSave,
   onDelete,
+  onPause,
+  onResume,
 }: Omit<Props, 'visible'>) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -93,9 +104,10 @@ function EditorForm({
   const [endDate, setEndDate] = useState<Date | null>(
     schedule?.endDate ?? null,
   );
-  const [datePickerFor, setDatePickerFor] = useState<'start' | 'end' | null>(
-    null,
-  );
+  const [resumeDate, setResumeDate] = useState<Date | null>(null);
+  const [datePickerFor, setDatePickerFor] = useState<
+    'start' | 'end' | 'resume' | null
+  >(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerValue, setPickerValue] = useState(new Date());
 
@@ -132,12 +144,19 @@ function EditorForm({
     day.setHours(0, 0, 0, 0);
     if (datePickerFor === 'start') setStartDate(day);
     if (datePickerFor === 'end') setEndDate(day);
+    if (datePickerFor === 'resume') setResumeDate(day);
     setDatePickerFor(null);
   };
 
+  const paused = schedule !== null && isPaused(schedule, new Date());
   const preview = periodInvalid
     ? []
-    : previewOccurrences(intervalDays, times, { startDate, endDate });
+    : previewOccurrences(intervalDays, times, {
+        startDate,
+        endDate,
+        pausedAt: schedule?.pausedAt,
+        resumeAt: schedule?.resumeAt,
+      });
 
   const handleSave = () => {
     if (productId === '' || times.length === 0 || periodInvalid) {
@@ -151,6 +170,14 @@ function EditorForm({
       startDate,
       endDate,
     });
+  };
+
+  const handlePause = () => {
+    if (schedule) onPause(schedule.id, resumeDate);
+  };
+
+  const handleResume = () => {
+    if (schedule) onResume(schedule.id);
   };
 
   const handleDelete = () => {
@@ -347,13 +374,49 @@ function EditorForm({
           ) : null}
           {datePickerFor ? (
             <DateTimePicker
-              value={
-                (datePickerFor === 'start' ? startDate : endDate) ?? new Date()
-              }
+              value={pickedDateValue(datePickerFor, {
+                start: startDate,
+                end: endDate,
+                resume: resumeDate,
+              })}
+              minimumDate={datePickerFor === 'resume' ? tomorrow() : undefined}
               mode="date"
               onValueChange={onDateChange}
               onDismiss={() => setDatePickerFor(null)}
             />
+          ) : null}
+
+          {schedule ? (
+            <>
+              <ThemedText type="small">{t('schedule.pause')}</ThemedText>
+              {paused ? (
+                <ThemedView style={styles.dateRow}>
+                  <ThemedText type="small" themeColor="textSecondary">
+                    {describePause(schedule, t, formatDate)}
+                  </ThemedText>
+                  <ActionButton
+                    label={t('schedule.resume')}
+                    onPress={handleResume}
+                    color={theme.accent}
+                  />
+                </ThemedView>
+              ) : (
+                <>
+                  <ThemedText type="small" themeColor="textSecondary">
+                    {t('schedule.resumeDate')}
+                  </ThemedText>
+                  <DateField
+                    value={resumeDate}
+                    onPick={() => setDatePickerFor('resume')}
+                    onClear={() => setResumeDate(null)}
+                  />
+                  <ActionButton
+                    label={t('schedule.pauseAction')}
+                    onPress={handlePause}
+                  />
+                </>
+              )}
+            </>
           ) : null}
 
           <ThemedText type="small">{t('schedule.preview')}</ThemedText>
@@ -401,6 +464,17 @@ function EditorForm({
       </SafeAreaView>
     </ThemedView>
   );
+}
+
+function pickedDateValue(
+  field: 'start' | 'end' | 'resume',
+  dates: { start: Date | null; end: Date | null; resume: Date | null },
+): Date {
+  return dates[field] ?? (field === 'resume' ? tomorrow() : new Date());
+}
+
+function tomorrow(): Date {
+  return addDays(startOfDay(new Date()), 1);
 }
 
 function DateField({

@@ -280,3 +280,60 @@ describe('reorderStatus', () => {
     expect(status.isLow).toBe(true);
   });
 });
+
+describe('reorderStatus with a paused schedule', () => {
+  it('gives no estimate while paused without a resume date', () => {
+    // given
+    const schedules: RhythmInput[] = [
+      { intervalDays: 1, timesOfDay: ['08:00'], pausedAt: daysFromNow(-1) },
+    ];
+
+    // when
+    const status = reorderStatus(5, schedules, THRESHOLD_DAYS, NOW);
+
+    // then
+    expect(status).toMatchObject({
+      dailyConsumption: 0,
+      daysLeft: null,
+      isLow: false,
+    });
+  });
+
+  it('counts consumption only from the resume day', () => {
+    // given
+    const schedules: RhythmInput[] = [
+      {
+        intervalDays: 1,
+        timesOfDay: ['08:00'],
+        pausedAt: daysFromNow(-1),
+        resumeAt: daysFromNow(10),
+      },
+    ];
+
+    // when
+    const status = reorderStatus(5, schedules, THRESHOLD_DAYS, NOW);
+
+    // then
+    expect(status.daysLeft).toBe(15);
+    expect(status.isLow).toBe(false);
+  });
+
+  it('treats a pause whose resume date has passed as not paused', () => {
+    // given
+    const schedules: RhythmInput[] = [
+      {
+        intervalDays: 1,
+        timesOfDay: ['08:00'],
+        pausedAt: daysFromNow(-10),
+        resumeAt: daysFromNow(-2),
+      },
+    ];
+
+    // when
+    const status = reorderStatus(5, schedules, THRESHOLD_DAYS, NOW);
+
+    // then
+    expect(status.daysLeft).toBe(5);
+    expect(status.isLow).toBe(true);
+  });
+});

@@ -4,4 +4,6 @@ export interface RhythmInput {
   quantity?: number;
   startDate?: Date | null;
   endDate?: Date | null;
+  pausedAt?: Date | null;
+  resumeAt?: Date | null;
 }
