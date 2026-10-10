@@ -1,24 +1,15 @@
 import { formatAmount, type ProductUnit } from '@/products/product-unit';
 
 import { isPaused } from './schedule-pause';
+import type { Schedule } from './schedule-repository';
 
 export type Translate = (
   key: string,
   options?: Record<string, string | number>,
 ) => string;
 
-export interface RhythmText {
-  intervalDays: number;
-  timesOfDay: string[];
-  quantity: number;
-  startDate: Date | null;
-  endDate: Date | null;
-  pausedAt?: Date | null;
-  resumeAt?: Date | null;
-}
-
 export function describeRhythm(
-  schedule: RhythmText,
+  schedule: Schedule,
   t: Translate,
   formatDate: (date: Date) => string,
   unit: ProductUnit | null = null,
@@ -37,7 +28,7 @@ export function describeRhythm(
 }
 
 export function describePause(
-  { resumeAt }: RhythmText,
+  { resumeAt }: Schedule,
   t: Translate,
   formatDate: (date: Date) => string,
 ): string {
@@ -60,7 +51,7 @@ function describeQuantity(
 }
 
 function describePeriod(
-  { startDate, endDate }: RhythmText,
+  { startDate, endDate }: Schedule,
   t: Translate,
   formatDate: (date: Date) => string,
 ): string {

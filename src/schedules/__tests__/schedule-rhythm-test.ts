@@ -1,8 +1,5 @@
-import {
-  describeRhythm,
-  type RhythmText,
-  type Translate,
-} from '../schedule-rhythm';
+import type { Schedule } from '../schedule-repository';
+import { describeRhythm, type Translate } from '../schedule-rhythm';
 
 const PL: Record<string, string> = {
   'schedule.daily': 'Codziennie',
@@ -22,13 +19,17 @@ const t: Translate = (key, options = {}) =>
   );
 const formatDate = (date: Date) => date.toISOString().slice(0, 10);
 
-function schedule(overrides: Partial<RhythmText>): RhythmText {
+function schedule(overrides: Partial<Schedule>): Schedule {
   return {
+    id: 'schedule-1',
+    productId: 'product-1',
     intervalDays: 1,
     timesOfDay: ['08:00'],
     quantity: 1,
     startDate: null,
     endDate: null,
+    pausedAt: null,
+    resumeAt: null,
     ...overrides,
   };
 }

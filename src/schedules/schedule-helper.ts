@@ -1,13 +1,6 @@
 import { addDays, startOfDay } from '@/config/date-utils';
 
-import { isPaused } from './schedule-pause';
-
-export interface SchedulePeriod {
-  startDate?: Date | null;
-  endDate?: Date | null;
-  pausedAt?: Date | null;
-  resumeAt?: Date | null;
-}
+import { isPaused, type SchedulePeriod } from './schedule-pause';
 
 const PREVIEW_COUNT = 3;
 const MAX_SCAN_DAYS = 3660;
@@ -106,12 +99,9 @@ function* occurrenceStream(
 }
 
 // Null: paused without a resume date, so no day is active.
-function earliestDay(
-  { pausedAt, resumeAt }: SchedulePeriod,
-  now: Date,
-): Date | null {
-  if (!isPaused({ pausedAt, resumeAt }, now)) return startOfDay(now);
-  return resumeAt ? startOfDay(resumeAt) : null;
+function earliestDay(period: SchedulePeriod, now: Date): Date | null {
+  if (!isPaused(period, now)) return startOfDay(now);
+  return period.resumeAt ? startOfDay(period.resumeAt) : null;
 }
 
 function firstDay(anchor: Date, earliest: Date, step: number): Date {
