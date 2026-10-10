@@ -18,7 +18,7 @@ export function useReorderStatuses(): Record<string, ReorderStatus> {
   const { schedules } = useSchedules();
 
   return useMemo(
-    () => buildReorderStatuses(products ?? [], schedules ?? []),
+    () => buildReorderStatuses(products, schedules),
     [products, schedules],
   );
 }

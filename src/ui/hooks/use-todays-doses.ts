@@ -21,9 +21,7 @@ export function useTodaysDoses() {
   const nameById = new Map(
     products.map((p) => [p.id, productLabel(p.name, p.strength)]),
   );
-  const quantityById = new Map(
-    (schedules ?? []).map((s) => [s.id, s.quantity]),
-  );
+  const quantityById = new Map(schedules.map((s) => [s.id, s.quantity]));
   const doses = data.map((dose) =>
     toTodayDose(
       dose,

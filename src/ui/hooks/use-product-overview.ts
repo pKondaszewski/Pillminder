@@ -15,7 +15,7 @@ export function useProductOverview(): ProductOverview {
 
   return useMemo(
     () =>
-      buildProductOverview(products ?? [], schedules ?? [], {
+      buildProductOverview(products, schedules, {
         t,
         formatDate,
         locale: i18n.language,
