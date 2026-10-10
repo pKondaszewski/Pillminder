@@ -61,8 +61,8 @@ function reminderStrings(product: Product, quantity: number) {
   };
 }
 
-export function getTodaysDosesQuery() {
-  return todaysDosesQuery();
+export function getTodaysDosesQuery(day: Date) {
+  return todaysDosesQuery(day);
 }
 
 export function getProductHistoryQuery(productId: string) {
