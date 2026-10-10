@@ -1,6 +1,7 @@
 import { and, desc, eq, gte, inArray, lt, max, ne, or } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
+import { addDays, startOfDay } from '@/config/date-utils';
 import { db } from '@/config/db/database';
 import { doses, products, schedules } from '@/config/db/schema';
 
@@ -15,11 +16,9 @@ export interface NewDoseSlot {
   plannedAt: Date;
 }
 
-export function todaysDosesQuery() {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setDate(end.getDate() + 1);
+export function todaysDosesQuery(day: Date) {
+  const start = startOfDay(day);
+  const end = addDays(start, 1);
 
   return db
     .select()

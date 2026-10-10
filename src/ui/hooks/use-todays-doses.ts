@@ -1,5 +1,8 @@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 
+import { msUntilNextDay, startOfDay } from '@/config/date-utils';
 import {
   getTodaysDosesQuery,
   skipDose,
@@ -13,7 +16,8 @@ import { useProducts } from '@/ui/hooks/use-products';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 
 export function useTodaysDoses() {
-  const { data } = useLiveQuery(getTodaysDosesQuery());
+  const day = useCurrentDay();
+  const { data } = useLiveQuery(getTodaysDosesQuery(new Date(day)), [day]);
   const { products } = useProducts();
 
   const { schedules } = useSchedules();
@@ -31,4 +35,32 @@ export function useTodaysDoses() {
   );
 
   return { doses, takeDose, untakeDose, skipDose, unskipDose };
+}
+
+function useCurrentDay(): number {
+  const [day, setDay] = useState(() => startOfDay(new Date()).getTime());
+
+  useEffect(() => {
+    const refresh = () => setDay(startOfDay(new Date()).getTime());
+
+    let timer: ReturnType<typeof setTimeout>;
+    const armTimer = () => {
+      timer = setTimeout(() => {
+        refresh();
+        armTimer();
+      }, msUntilNextDay(new Date()));
+    };
+    armTimer();
+
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') refresh();
+    });
+
+    return () => {
+      clearTimeout(timer);
+      subscription.remove();
+    };
+  }, []);
+
+  return day;
 }

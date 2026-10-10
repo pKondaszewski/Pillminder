@@ -9,3 +9,7 @@ export function addDays(date: Date, days: number): Date {
   next.setDate(next.getDate() + days);
   return next;
 }
+
+export function msUntilNextDay(now: Date): number {
+  return addDays(startOfDay(now), 1).getTime() - now.getTime();
+}
