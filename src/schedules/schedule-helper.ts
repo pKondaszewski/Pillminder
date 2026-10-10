@@ -1,8 +1,12 @@
 import { addDays, startOfDay } from '@/config/date-utils';
 
+import { isPaused } from './schedule-pause';
+
 export interface SchedulePeriod {
   startDate?: Date | null;
   endDate?: Date | null;
+  pausedAt?: Date | null;
+  resumeAt?: Date | null;
 }
 
 const PREVIEW_COUNT = 3;
@@ -48,7 +52,10 @@ export function occurrencesWithin(
 ): Date[] {
   if (timesOfDay.length === 0 || horizonDays <= 0) return [];
 
-  const until = addDays(startOfDay(now), horizonDays);
+  const first = earliestDay(period, now);
+  if (!first) return [];
+
+  const until = addDays(first, horizonDays);
   const result: Date[] = [];
   for (const occurrence of occurrenceStream(
     intervalDays,
@@ -66,20 +73,28 @@ export function daysBetween(from: Date, to: Date): number {
   return Math.round((to.getTime() - from.getTime()) / MS_PER_DAY);
 }
 
-// Without a start date the rhythm is anchored to today (rolling window); with
-// one, every N-th day counts from the start so the rhythm stays stable.
+// Without a start date the rhythm is anchored to today (rolling window), or to
+// the resume day of a pause; with one, every N-th day counts from the start so
+// the rhythm stays stable across a pause.
 function* occurrenceStream(
   intervalDays: number,
   timesOfDay: string[],
-  { startDate, endDate }: SchedulePeriod,
+  period: SchedulePeriod,
   now: Date,
 ): Generator<Date> {
+  const earliest = earliestDay(period, now);
+  if (!earliest) return;
+
+  const { startDate, endDate } = period;
   const step = Math.max(1, intervalDays);
   const times = [...timesOfDay].sort();
-  const today = startOfDay(now);
   const lastDay = endDate ? startOfDay(endDate) : null;
 
-  let day = firstDay(startDate ? startOfDay(startDate) : today, today, step);
+  let day = firstDay(
+    startDate ? startOfDay(startDate) : earliest,
+    earliest,
+    step,
+  );
   for (let scanned = 0; scanned < MAX_SCAN_DAYS; scanned += step) {
     if (lastDay && day > lastDay) return;
     for (const time of times) {
@@ -90,9 +105,18 @@ function* occurrenceStream(
   }
 }
 
-function firstDay(anchor: Date, today: Date, step: number): Date {
-  if (anchor >= today) return anchor;
-  const elapsed = daysBetween(anchor, today);
+// Null: paused without a resume date, so no day is active.
+function earliestDay(
+  { pausedAt, resumeAt }: SchedulePeriod,
+  now: Date,
+): Date | null {
+  if (!isPaused({ pausedAt, resumeAt }, now)) return startOfDay(now);
+  return resumeAt ? startOfDay(resumeAt) : null;
+}
+
+function firstDay(anchor: Date, earliest: Date, step: number): Date {
+  if (anchor >= earliest) return anchor;
+  const elapsed = daysBetween(anchor, earliest);
   return addDays(anchor, Math.ceil(elapsed / step) * step);
 }
 

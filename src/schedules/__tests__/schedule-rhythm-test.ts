@@ -11,6 +11,8 @@ const PL: Record<string, string> = {
   'schedule.periodRange': '{{from}} – {{to}}',
   'schedule.periodFrom': 'od {{date}}',
   'schedule.periodUntil': 'do {{date}}',
+  'schedule.paused': 'Wstrzymany',
+  'schedule.pausedUntil': 'Wstrzymany do {{date}}',
 };
 
 const t: Translate = (key, options = {}) =>
@@ -71,5 +73,48 @@ describe('describeRhythm', () => {
 
     // then
     expect(text).toBe(`Codziennie · 08:00 · ${period}`);
+  });
+
+  it('prefixes a schedule paused without a resume date', () => {
+    // given
+    const now = new Date(2026, 4, 10, 12);
+    const input = schedule({
+      pausedAt: new Date(2026, 4, 8, 9),
+      resumeAt: null,
+    });
+
+    // when
+    const text = describeRhythm(input, t, formatDate, null, now);
+
+    // then
+    expect(text).toBe('Wstrzymany · Codziennie · 08:00');
+  });
+
+  it('prefixes a paused schedule with its resume date', () => {
+    // given
+    const now = new Date(2026, 4, 10, 12);
+    const resumeAt = new Date('2026-05-20T00:00:00Z');
+    const input = schedule({ pausedAt: new Date(2026, 4, 8, 9), resumeAt });
+
+    // when
+    const text = describeRhythm(input, t, formatDate, null, now);
+
+    // then
+    expect(text).toBe('Wstrzymany do 2026-05-20 · Codziennie · 08:00');
+  });
+
+  it('shows no pause marker once the resume date has passed', () => {
+    // given
+    const now = new Date(2026, 4, 10, 12);
+    const input = schedule({
+      pausedAt: new Date(2026, 4, 1, 9),
+      resumeAt: new Date(2026, 4, 5),
+    });
+
+    // when
+    const text = describeRhythm(input, t, formatDate, null, now);
+
+    // then
+    expect(text).toBe('Codziennie · 08:00');
   });
 });

@@ -7,6 +7,7 @@ import m0002 from './0002_opposite_scream.sql';
 import m0003 from './0003_aspiring_clint_barton.sql';
 import m0004 from './0004_colossal_forgotten_one.sql';
 import m0005 from './0005_add_product_unit.sql';
+import m0006 from './0006_add_schedule_pause.sql';
 
 export default {
   journal,
@@ -17,5 +18,6 @@ export default {
     m0003,
     m0004,
     m0005,
+    m0006,
   },
 };

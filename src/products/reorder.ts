@@ -1,4 +1,5 @@
 import { addDays, startOfDay } from '@/config/date-utils';
+import { isPaused } from '@/schedules/schedule-pause';
 
 import type { ReorderStatus } from './dto/reorder-status';
 import type { RhythmInput } from './dto/rhythm-input';
@@ -47,14 +48,14 @@ function daysUntilEmpty(
   currentDailyConsumption: number,
   now: Date,
 ): number | null {
-  if (!schedules.some(hasPeriod)) {
+  if (!schedules.some(changesOverTime)) {
     return currentDailyConsumption > 0 ? stock / currentDailyConsumption : null;
   }
   return simulateDaysUntilEmpty(stock, schedules, now);
 }
 
-// Walks day by day so a schedule that has not started yet, or that ends
-// before the stock does, is counted only for the days it is active.
+// Walks day by day so a schedule that has not started yet, that ends before
+// the stock does, or that is paused, is counted only for the days it is active.
 function simulateDaysUntilEmpty(
   stock: number,
   schedules: RhythmInput[],
@@ -72,8 +73,12 @@ function simulateDaysUntilEmpty(
   return null;
 }
 
-function hasPeriod({ startDate, endDate }: RhythmInput): boolean {
-  return startDate != null || endDate != null;
+function changesOverTime({
+  startDate,
+  endDate,
+  pausedAt,
+}: RhythmInput): boolean {
+  return startDate != null || endDate != null || pausedAt != null;
 }
 
 function totalDailyConsumption(schedules: RhythmInput[], on: Date): number {
@@ -85,7 +90,9 @@ function totalDailyConsumption(schedules: RhythmInput[], on: Date): number {
     }, 0);
 }
 
-function isActiveOn({ startDate, endDate }: RhythmInput, on: Date): boolean {
+function isActiveOn(schedule: RhythmInput, on: Date): boolean {
+  const { startDate, endDate } = schedule;
+  if (isPaused(schedule, on)) return false;
   const day = startOfDay(on);
   if (startDate && day < startOfDay(startDate)) return false;
   if (endDate && day > startOfDay(endDate)) return false;

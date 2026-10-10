@@ -17,8 +17,14 @@ import { useSchedules } from '@/ui/hooks/use-schedules';
 export default function ScheduleListScreen() {
   const { t } = useTranslation();
   const { products } = useProducts();
-  const { schedules, addSchedule, editSchedule, removeSchedule } =
-    useSchedules();
+  const {
+    schedules,
+    addSchedule,
+    editSchedule,
+    removeSchedule,
+    pauseSchedule,
+    resumeSchedule,
+  } = useSchedules();
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<Schedule | null>(null);
@@ -77,6 +83,24 @@ export default function ScheduleListScreen() {
     }
   };
 
+  const handlePause = async (id: string, resumeAt: Date | null) => {
+    try {
+      await pauseSchedule(id, resumeAt);
+      closeEditor();
+    } catch {
+      // pause failed — keep modal open
+    }
+  };
+
+  const handleResume = async (id: string) => {
+    try {
+      await resumeSchedule(id);
+      closeEditor();
+    } catch {
+      // resume failed — keep modal open
+    }
+  };
+
   return (
     <TabSwipe>
       <ThemedView style={styles.container}>
@@ -108,6 +132,8 @@ export default function ScheduleListScreen() {
           onClose={closeEditor}
           onSave={handleSave}
           onDelete={handleDelete}
+          onPause={handlePause}
+          onResume={handleResume}
         />
       </ThemedView>
     </TabSwipe>

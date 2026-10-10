@@ -40,6 +40,8 @@ export const schedules = sqliteTable(
     quantity: integer('quantity').notNull().default(1),
     startDate: integer('start_date', { mode: 'timestamp' }),
     endDate: integer('end_date', { mode: 'timestamp' }),
+    pausedAt: integer('paused_at', { mode: 'timestamp' }),
+    resumeAt: integer('resume_at', { mode: 'timestamp' }),
   },
   (table) => [index('idx_schedules_product').on(table.productId)],
 );

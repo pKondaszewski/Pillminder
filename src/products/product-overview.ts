@@ -57,7 +57,7 @@ function toEntry(
         : [...schedules]
             .sort(byFirstTime)
             .map((schedule) =>
-              describeRhythm(schedule, t, formatDate, product.unit),
+              describeRhythm(schedule, t, formatDate, product.unit, now),
             ),
     stock: describeStock(product, schedules, t, now),
   };

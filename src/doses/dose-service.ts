@@ -251,6 +251,7 @@ async function syncDosesForScheduleWith(
           schedule.timesOfDay,
           HORIZON_DAYS,
           schedule,
+          from,
         );
 
   log.info(`Syncing ${slots.length} dose slot(s) for schedule ${schedule.id}`);

@@ -43,6 +43,13 @@
       "when": 1791652803882,
       "tag": "0005_add_product_unit",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1791655854100,
+      "tag": "0006_add_schedule_pause",
+      "breakpoints": true
     }
   ]
 }
