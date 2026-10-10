@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet } from 'react-native';
 
 import type { products as productsTable } from '@/config/db/schema';
-import { isBuiltInCategory } from '@/products/category';
+import { categoryLabel } from '@/products/category';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
 import { productLabel } from '@/products/product-label';
 import { Spacing } from '@/ui/commons/constants/theme';
@@ -35,9 +35,7 @@ export function ProductRow({ product, reorder, onPress }: Props) {
       >
         <ThemedText>{productLabel(product.name, product.strength)}</ThemedText>
         <ThemedText type="small">
-          {isBuiltInCategory(product.category)
-            ? t(`category.${product.category}`)
-            : product.category}
+          {categoryLabel(product.category, t)}
         </ThemedText>
         {isArchived && (
           <ThemedText type="small" themeColor="textSecondary">

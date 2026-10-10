@@ -13,6 +13,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { products } from '@/config/db/schema';
 import {
   BUILT_IN_CATEGORIES,
+  categoryLabel,
+  MAX_CUSTOM_CATEGORY_LENGTH,
+  normalizeCategory,
   storeSuggestionKeys,
   supportsStrength,
 } from '@/products/category';
@@ -24,6 +27,7 @@ import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductHistory } from '@/ui/components/products/history';
 import { ProductNotes } from '@/ui/components/products/notes';
+import { useCustomCategories } from '@/ui/hooks/use-custom-categories';
 import { useNoteDraft } from '@/ui/hooks/use-note-draft';
 import { useSettings } from '@/ui/hooks/use-settings';
 import { useTheme } from '@/ui/hooks/use-theme';
@@ -95,9 +99,11 @@ function EditorForm({
   const { currency } = useSettings();
 
   const [name, setName] = useState(product?.name ?? '');
-  const [category, setCategory] = useState<string | null>(
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
     product?.category ?? null,
   );
+  const [newCategoryName, setNewCategoryName] = useState<string | null>(null);
+  const customCategories = useCustomCategories();
   const [strength, setStrength] = useState(product?.strength ?? '');
   const [unit, setUnit] = useState<ProductUnit | null>(product?.unit ?? null);
   const [price, setPrice] = useState(toText(product?.price));
@@ -108,6 +114,10 @@ function EditorForm({
   const [completionNote, setCompletionNote] = useState('');
   const noteDraft = useNoteDraft(product?.id);
 
+  const addingCategory = newCategoryName !== null;
+  const category = addingCategory
+    ? normalizeCategory(newCategoryName, customCategories)
+    : selectedCategory;
   const hasStrength = category !== null && supportsStrength(category);
   const nameMissing = name.trim() === '';
   const categoryMissing = category === null;
@@ -134,6 +144,15 @@ function EditorForm({
       storeLink: storeLink.trim() || null,
       stock: toNumber(stock),
     });
+  };
+
+  const selectCategory = (selected: string) => {
+    setNewCategoryName(null);
+    setSelectedCategory(selected);
+  };
+
+  const startAddingCategory = () => {
+    if (!addingCategory) setNewCategoryName('');
   };
 
   const handleDelete = () => {
@@ -208,29 +227,33 @@ function EditorForm({
           {showNameError && <FieldError message={t('editor.nameRequired')} />}
 
           <ThemedText type="small">{t('editor.category')}</ThemedText>
-          <ThemedView style={styles.categoryRow}>
-            {BUILT_IN_CATEGORIES.map((c) => (
-              <Pressable
+          <ThemedView style={styles.chipRow}>
+            {[...BUILT_IN_CATEGORIES, ...customCategories].map((c) => (
+              <Chip
                 key={c}
-                onPress={() => setCategory(c)}
-                style={({ pressed }) => pressed && styles.pressed}
-              >
-                <ThemedView
-                  type={
-                    c === category ? 'backgroundSelected' : 'backgroundElement'
-                  }
-                  style={styles.categoryChip}
-                >
-                  <ThemedText
-                    type="small"
-                    themeColor={c === category ? 'text' : 'textSecondary'}
-                  >
-                    {t(`category.${c}`)}
-                  </ThemedText>
-                </ThemedView>
-              </Pressable>
+                label={categoryLabel(c, t)}
+                selected={c === category}
+                onPress={() => selectCategory(c)}
+              />
             ))}
+            <Chip
+              label={t('editor.addCategory')}
+              selected={addingCategory}
+              onPress={startAddingCategory}
+            />
           </ThemedView>
+          {addingCategory ? (
+            <TextInput
+              value={newCategoryName}
+              onChangeText={setNewCategoryName}
+              maxLength={MAX_CUSTOM_CATEGORY_LENGTH}
+              autoFocus
+              accessibilityLabel={t('editor.newCategory')}
+              placeholder={t('editor.newCategoryPlaceholder')}
+              placeholderTextColor={theme.textSecondary}
+              style={inputStyle}
+            />
+          ) : null}
           {showCategoryError && (
             <FieldError message={t('editor.categoryRequired')} />
           )}
@@ -249,25 +272,14 @@ function EditorForm({
           ) : null}
 
           <ThemedText type="small">{t('editor.unit')}</ThemedText>
-          <ThemedView style={styles.categoryRow}>
+          <ThemedView style={styles.chipRow}>
             {[null, ...PRODUCT_UNITS].map((u) => (
-              <Pressable
+              <Chip
                 key={u ?? 'none'}
+                label={u ? t(`unitName.${u}`) : t('editor.unitNone')}
+                selected={u === unit}
                 onPress={() => setUnit(u)}
-                style={({ pressed }) => pressed && styles.pressed}
-              >
-                <ThemedView
-                  type={u === unit ? 'backgroundSelected' : 'backgroundElement'}
-                  style={styles.categoryChip}
-                >
-                  <ThemedText
-                    type="small"
-                    themeColor={u === unit ? 'text' : 'textSecondary'}
-                  >
-                    {u ? t(`unitName.${u}`) : t('editor.unitNone')}
-                  </ThemedText>
-                </ThemedView>
-              </Pressable>
+              />
             ))}
           </ThemedView>
 
@@ -325,17 +337,14 @@ function EditorForm({
             style={inputStyle}
           />
           {category ? (
-            <ThemedView style={styles.categoryRow}>
+            <ThemedView style={styles.chipRow}>
               {storeSuggestionKeys(category).map((key) => (
                 <Pressable
                   key={key}
                   onPress={() => setStoreLink(t(`storeSuggestion.${key}`))}
                   style={({ pressed }) => pressed && styles.pressed}
                 >
-                  <ThemedView
-                    type="backgroundElement"
-                    style={styles.categoryChip}
-                  >
+                  <ThemedView type="backgroundElement" style={styles.chip}>
                     <ThemedText type="small" themeColor="textSecondary">
                       {t(`storeSuggestion.${key}`)}
                     </ThemedText>
@@ -420,6 +429,35 @@ function EditorForm({
   );
 }
 
+function Chip({
+  label,
+  selected,
+  onPress,
+}: {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => pressed && styles.pressed}
+    >
+      <ThemedView
+        type={selected ? 'backgroundSelected' : 'backgroundElement'}
+        style={styles.chip}
+      >
+        <ThemedText
+          type="small"
+          themeColor={selected ? 'text' : 'textSecondary'}
+        >
+          {label}
+        </ThemedText>
+      </ThemedView>
+    </Pressable>
+  );
+}
+
 function FieldError({ message }: { message: string }) {
   return (
     <ThemedText type="small" themeColor="danger">
@@ -472,12 +510,12 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.two,
     fontSize: 16,
   },
-  categoryRow: {
+  chipRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.two,
   },
-  categoryChip: {
+  chip: {
     paddingVertical: Spacing.two,
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.three,

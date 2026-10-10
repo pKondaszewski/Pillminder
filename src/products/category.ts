@@ -1,4 +1,8 @@
+import type { Translate } from '@/schedules/schedule-rhythm';
+
 import type { BuiltInCategory } from './dto/new-product-input';
+
+export const MAX_CUSTOM_CATEGORY_LENGTH = 30;
 
 export const BUILT_IN_CATEGORIES: BuiltInCategory[] = [
   'medication',
@@ -40,4 +44,8 @@ export function normalizeCategory(
   return (
     existingCustomCategories.find((c) => c.toLowerCase() === key) ?? cleaned
   );
+}
+
+export function categoryLabel(category: string, t: Translate): string {
+  return isBuiltInCategory(category) ? t(`category.${category}`) : category;
 }

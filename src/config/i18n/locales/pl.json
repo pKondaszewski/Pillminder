@@ -30,6 +30,7 @@
     "supplement": "Suplement"
   },
   "editor": {
+    "addCategory": "+ Nowa",
     "archive": "Archiwizuj",
     "cancel": "Anuluj",
     "category": "Kategoria",
@@ -45,6 +46,8 @@
     "name": "Nazwa",
     "namePlaceholder": "np. Witamina D",
     "nameRequired": "Podaj nazwę",
+    "newCategory": "Nazwa nowej kategorii",
+    "newCategoryPlaceholder": "np. Krople do oczu",
     "newTitle": "Nowy produkt",
     "price": "Cena ({{currency}})",
     "restore": "Przywróć",

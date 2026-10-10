@@ -1,4 +1,4 @@
-import { isBuiltInCategory } from '@/products/category';
+import { categoryLabel, isBuiltInCategory } from '@/products/category';
 import { productLabel } from '@/products/product-label';
 import type { Product } from '@/products/product-service';
 import { formatAmount, type ProductUnit } from '@/products/product-unit';
@@ -48,9 +48,7 @@ function toEntry(
   return {
     id: product.id,
     title: productLabel(product.name, product.strength),
-    category: isBuiltInCategory(product.category)
-      ? t(`category.${product.category}`)
-      : product.category,
+    category: categoryLabel(product.category, t),
     rhythm:
       schedules.length === 0
         ? [t('overview.noRhythm')]

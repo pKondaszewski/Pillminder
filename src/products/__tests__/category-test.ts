@@ -1,4 +1,7 @@
+import type { Translate } from '@/schedules/schedule-rhythm';
+
 import {
+  categoryLabel,
   isBuiltInCategory,
   normalizeCategory,
   storeSuggestionKeys,
@@ -83,5 +86,18 @@ describe('category-dependent behaviour', () => {
     // then
     expect(medication).toEqual(['pharmacy']);
     expect(custom).toEqual([]);
+  });
+});
+
+describe('categoryLabel', () => {
+  it('translates a built-in and shows a custom name as typed', () => {
+    // given
+    const t: Translate = (key) => `t:${key}`;
+
+    // when
+    const labels = ['care', 'Eye drops'].map((c) => categoryLabel(c, t));
+
+    // then
+    expect(labels).toEqual(['t:category.care', 'Eye drops']);
   });
 });
