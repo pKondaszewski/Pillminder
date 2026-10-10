@@ -1,6 +1,5 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
 
 import { createLogger } from '@/config/logger';
 
@@ -38,24 +37,23 @@ export {
   TAKE_ACTION,
 } from './identifiers';
 
+export const isNotificationsSupported =
+  Constants.executionEnvironment !== ExecutionEnvironment.StoreClient;
+
 const log = createLogger('notification-service');
 
 const REORDER_PREFIX = 'reorder:';
 
-const isExpoGo =
-  Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
-const isSupported = Platform.OS !== 'web' && !isExpoGo;
-
 let channelSetup: Promise<unknown> = Promise.resolve();
 
 export async function getNotificationPermission(): Promise<NotificationPermission> {
-  if (!isSupported) return { granted: true, canAskAgain: false };
+  if (!isNotificationsSupported) return { granted: true, canAskAgain: false };
   const { granted, canAskAgain } = await Notifications.getPermissionsAsync();
   return { granted, canAskAgain };
 }
 
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
-  if (!isSupported) return { granted: true, canAskAgain: false };
+  if (!isNotificationsSupported) return { granted: true, canAskAgain: false };
   // Android 13+ shows the system prompt only once a notification channel exists
   await channelSetup;
   const { granted, canAskAgain } =
@@ -75,7 +73,7 @@ export async function scheduleDoseReminder(
   reminder: DoseReminder,
   strings: NotificationText,
 ): Promise<void> {
-  if (!isSupported) return;
+  if (!isNotificationsSupported) return;
   if (reminder.plannedAt.getTime() <= Date.now()) return;
 
   try {
@@ -99,7 +97,7 @@ export async function scheduleDoseReminder(
 }
 
 export async function cancelDoseReminder(doseId: string): Promise<void> {
-  if (!isSupported) return;
+  if (!isNotificationsSupported) return;
   try {
     await Notifications.cancelScheduledNotificationAsync(doseId);
   } catch (err) {
@@ -115,7 +113,7 @@ export async function scheduleReorderAlert(
   alert: ReorderAlert,
   strings: NotificationText,
 ): Promise<void> {
-  if (!isSupported) return;
+  if (!isNotificationsSupported) return;
   if (alert.reorderAt.getTime() <= Date.now()) return;
 
   try {
@@ -139,7 +137,7 @@ export async function scheduleReorderAlert(
 }
 
 export async function cancelReorderAlert(productId: string): Promise<void> {
-  if (!isSupported) return;
+  if (!isNotificationsSupported) return;
   try {
     const id = `${REORDER_PREFIX}${productId}`;
     await Notifications.cancelScheduledNotificationAsync(id);
@@ -150,7 +148,7 @@ export async function cancelReorderAlert(productId: string): Promise<void> {
 }
 
 export async function dismissDoseReminder(doseId: string): Promise<void> {
-  if (!isSupported) return;
+  if (!isNotificationsSupported) return;
   try {
     await Notifications.dismissNotificationAsync(doseId);
   } catch (err) {
@@ -161,7 +159,7 @@ export async function dismissDoseReminder(doseId: string): Promise<void> {
 export function subscribeToReminderResponses(
   handlers: ReminderResponseHandlers,
 ): () => void {
-  if (!isSupported) return () => {};
+  if (!isNotificationsSupported) return () => {};
 
   try {
     const handle = (response: Notifications.NotificationResponse) => {
@@ -189,7 +187,7 @@ export function subscribeToReminderResponses(
 async function setUpNotifications(
   strings: NotificationStrings,
 ): Promise<boolean> {
-  if (!isSupported) {
+  if (!isNotificationsSupported) {
     log.info('Notifications unsupported in this environment, skipping init');
     return false;
   }
@@ -204,23 +202,21 @@ async function setUpNotifications(
       }),
     });
 
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-        name: strings.title,
-        importance: Notifications.AndroidImportance.HIGH,
-        sound: 'default',
-        enableVibrate: true,
-        vibrationPattern: [0, 250, 250, 250],
-      });
-      await Notifications.setNotificationChannelAsync(REORDER_CHANNEL_ID, {
-        name: strings.reorderChannel,
-        importance: Notifications.AndroidImportance.DEFAULT,
-      });
-      try {
-        await Notifications.registerTaskAsync(BACKGROUND_RESPONSE_TASK);
-      } catch (err) {
-        log.warn('Failed to register background response task', err);
-      }
+    await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
+      name: strings.title,
+      importance: Notifications.AndroidImportance.HIGH,
+      sound: 'default',
+      enableVibrate: true,
+      vibrationPattern: [0, 250, 250, 250],
+    });
+    await Notifications.setNotificationChannelAsync(REORDER_CHANNEL_ID, {
+      name: strings.reorderChannel,
+      importance: Notifications.AndroidImportance.DEFAULT,
+    });
+    try {
+      await Notifications.registerTaskAsync(BACKGROUND_RESPONSE_TASK);
+    } catch (err) {
+      log.warn('Failed to register background response task', err);
     }
 
     await Notifications.setNotificationCategoryAsync(CATEGORY_ID, [

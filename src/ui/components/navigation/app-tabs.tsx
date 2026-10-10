@@ -17,25 +17,25 @@ export default function AppTabs() {
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>{t('tabs.home')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
+        <NativeTabs.Trigger.Icon md="home" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="products">
         <NativeTabs.Trigger.Label>
           {t('tabs.products')}
         </NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="pills.fill" md="medication" />
+        <NativeTabs.Trigger.Icon md="medication" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="schedules">
         <NativeTabs.Trigger.Label>
           {t('tabs.schedules')}
         </NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="calendar.badge.clock" md="event" />
+        <NativeTabs.Trigger.Icon md="event" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
         <NativeTabs.Trigger.Label>
           {t('tabs.settings')}
         </NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="gearshape.fill" md="settings" />
+        <NativeTabs.Trigger.Icon md="settings" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

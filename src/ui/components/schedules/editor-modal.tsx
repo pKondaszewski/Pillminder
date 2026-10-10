@@ -3,14 +3,7 @@ import DateTimePicker, {
 } from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Alert,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { addDays, startOfDay } from '@/config/date-utils';
@@ -109,7 +102,6 @@ function EditorForm({
     'start' | 'end' | 'resume' | null
   >(null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [pickerValue, setPickerValue] = useState(new Date());
 
   const addTime = (date: Date) => {
     const formatted = formatTime(date);
@@ -123,17 +115,8 @@ function EditorForm({
   };
 
   const onValueChange = (_event: DateTimePickerChangeEvent, date: Date) => {
-    if (Platform.OS === 'android') {
-      setPickerOpen(false);
-      addTime(date);
-    } else {
-      setPickerValue(date);
-    }
-  };
-
-  const confirmIosTime = () => {
-    addTime(pickerValue);
     setPickerOpen(false);
+    addTime(date);
   };
 
   const periodInvalid =
@@ -330,29 +313,13 @@ function EditorForm({
           </ThemedView>
 
           {pickerOpen ? (
-            <>
-              <DateTimePicker
-                value={pickerValue}
-                mode="time"
-                is24Hour
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onValueChange={onValueChange}
-                onDismiss={() => setPickerOpen(false)}
-              />
-              {Platform.OS === 'ios' ? (
-                <ThemedView style={styles.actions}>
-                  <ActionButton
-                    label={t('editor.cancel')}
-                    onPress={() => setPickerOpen(false)}
-                  />
-                  <ActionButton
-                    label={t('schedule.addTime')}
-                    onPress={confirmIosTime}
-                    color={theme.accent}
-                  />
-                </ThemedView>
-              ) : null}
-            </>
+            <DateTimePicker
+              value={new Date()}
+              mode="time"
+              is24Hour
+              onValueChange={onValueChange}
+              onDismiss={() => setPickerOpen(false)}
+            />
           ) : null}
 
           <ThemedText type="small">{t('schedule.periodStart')}</ThemedText>

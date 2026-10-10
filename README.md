@@ -62,9 +62,8 @@ drizzle/          # generated SQL migrations + snapshots
 
 - **Node.js 22** (matches CI)
 - **npm**
-- A phone with the **Expo Go** app installed
-  ([iOS App Store](https://apps.apple.com/app/expo-go/id982107779) /
-  [Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)),
+- An Android phone with the **Expo Go** app installed
+  ([Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)),
   on the **same Wi-Fi network** as your computer.
 
 ### Run it
@@ -81,16 +80,14 @@ drizzle/          # generated SQL migrations + snapshots
    npm start
    ```
 
-3. A **QR code** appears in the terminal. Open it with your phone:
-   - **Android** — open **Expo Go** → _Scan QR code_.
-   - **iOS** — open the **Camera** app, point it at the QR code, tap the banner.
+3. A **QR code** appears in the terminal. Open **Expo Go** on your phone →
+   _Scan QR code_.
 
    The app loads on your phone and hot-reloads as you edit files. Shake the phone
    for the dev menu.
 
-> **Emulator / simulator instead of a phone?** With the dev server running, press
-> `a` for an Android emulator or `i` for an iOS simulator in the terminal
-> (or use `npm run android` / `npm run ios`).
+> **Emulator instead of a phone?** With the dev server running, press `a` for an
+> Android emulator in the terminal (or use `npm run android`).
 
 ### A note on notifications in Expo Go
 
@@ -131,8 +128,6 @@ cd android && ./gradlew assembleRelease
 | -------------------------- | --------------------------------------- |
 | `npm start`                | Start the Expo dev server (QR code)     |
 | `npm run android`          | Start and open on an Android emulator   |
-| `npm run ios`              | Start and open on an iOS simulator      |
-| `npm run web`              | Run in the browser (limited)            |
 | `npm run lint`             | ESLint                                  |
 | `npm run typecheck`        | `tsc --noEmit`                          |
 | `npx drizzle-kit generate` | Generate a DB migration from the schema |
