@@ -35,7 +35,7 @@ reminders, history, and low-stock alerts happen automatically. All data lives
 | Database      | [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/) + [Drizzle ORM](https://orm.drizzle.team/) (migrations via `drizzle-kit`) |
 | Notifications | [expo-notifications](https://docs.expo.dev/versions/latest/sdk/notifications/) + background task                                           |
 | i18n          | i18next / react-i18next + expo-localization                                                                                                |
-| Tooling       | ESLint + Prettier, Husky + lint-staged, GitHub Actions (CI + APK build)                                                                    |
+| Tooling       | ESLint + Prettier, native git hooks + lint-staged, GitHub Actions (CI + APK build)                                                         |
 
 ## Project structure
 
