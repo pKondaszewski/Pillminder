@@ -3,6 +3,7 @@ import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
 import { createLogger } from '@/config/logger';
+import { deleteStaleCacheFiles } from '@/config/stale-files';
 import { refreshAllReminders, syncAllSchedules } from '@/doses/dose-service';
 import {
   cancelDoseReminders,
@@ -33,7 +34,7 @@ export async function exportBackup(dialogTitle: string): Promise<void> {
   const now = new Date();
   const json = serializeBackup(await readAllRows(), now);
 
-  deleteStaleBackups();
+  deleteStaleCacheFiles(BACKUP_FILE_PATTERN);
   const file = new File(
     Paths.cache,
     `pillminder-backup-${now.toISOString().slice(0, 10)}.json`,
@@ -100,17 +101,4 @@ async function cancelOrphanedNotifications(
     ...doseIds.map(dismissDoseReminder),
     ...orphanIds('products').map(cancelReorderAlert),
   ]);
-}
-
-// shareAsync resolves when the chooser closes, not when the target app has read
-// the file, so the export cannot be deleted right after sharing. Leftovers from
-// earlier exports are removed on the next export instead.
-function deleteStaleBackups(): void {
-  Paths.cache
-    .list()
-    .filter(
-      (entry): entry is File =>
-        entry instanceof File && BACKUP_FILE_PATTERN.test(entry.name),
-    )
-    .forEach((file) => file.delete());
 }
