@@ -29,12 +29,7 @@ export function useNotificationSetup() {
 }
 
 export function useReminderResponses() {
-  useEffect(() => {
-    const unsubscribe = subscribeToReminderResponses(responseHandlers);
-    return () => {
-      void unsubscribe.then((unsubscribeFn) => unsubscribeFn());
-    };
-  }, []);
+  useEffect(() => subscribeToReminderResponses(responseHandlers), []);
 }
 
 function initNotificationStrings() {

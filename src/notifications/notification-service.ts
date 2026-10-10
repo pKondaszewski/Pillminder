@@ -158,9 +158,9 @@ export async function dismissDoseReminder(doseId: string): Promise<void> {
   }
 }
 
-export async function subscribeToReminderResponses(
+export function subscribeToReminderResponses(
   handlers: ReminderResponseHandlers,
-): Promise<() => void> {
+): () => void {
   if (!isSupported) return () => {};
 
   try {
