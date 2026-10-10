@@ -129,6 +129,18 @@
     "stockUnknown": "Stock not tracked",
     "title": "Overview"
   },
+  "period": {
+    "empty": "No doses planned in this period",
+    "emptyHint": "Products with a schedule that was active in the selected days will show up here, archived ones included.",
+    "from": "From",
+    "invalidRange": "The end date is before the start date.",
+    "noneDue": "No doses due yet",
+    "open": "Period summary",
+    "taken": "{{taken}} of {{due}} taken ({{percent}}%)",
+    "title": "Period summary",
+    "to": "To",
+    "upcoming": "Upcoming: {{count}}"
+  },
   "products": {
     "add": "Add new product",
     "archived": "Archived",

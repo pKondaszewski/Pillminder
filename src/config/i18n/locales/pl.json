@@ -129,6 +129,18 @@
     "stockUnknown": "Zapas nie jest śledzony",
     "title": "Przegląd"
   },
+  "period": {
+    "empty": "Brak zaplanowanych dawek w tym okresie",
+    "emptyHint": "Pojawią się tu produkty z harmonogramem aktywnym w wybranych dniach, także zarchiwizowane.",
+    "from": "Od",
+    "invalidRange": "Data końcowa jest wcześniejsza niż początkowa.",
+    "noneDue": "Brak dawek do rozliczenia",
+    "open": "Podsumowanie okresu",
+    "taken": "Przyjęto {{taken}} z {{due}} ({{percent}}%)",
+    "title": "Podsumowanie okresu",
+    "to": "Do",
+    "upcoming": "Nadchodzące: {{count}}"
+  },
   "products": {
     "add": "Dodaj nowy produkt",
     "archived": "Zarchiwizowany",
