@@ -1,10 +1,10 @@
 import { createLogger } from '@/config/logger';
 
 import {
-  createNote,
+  createNoteRow,
   deleteNoteRow,
   notesByProductQuery,
-  updateNoteBody,
+  updateNoteBodyRow,
 } from './note-repository';
 
 export type { Note } from './note-repository';
@@ -20,7 +20,7 @@ export async function addNote(productId: string, body: string): Promise<void> {
   if (trimmed === '') return;
   log.info(`Adding note to product ${productId}`);
   try {
-    await createNote(productId, trimmed);
+    await createNoteRow(productId, trimmed);
   } catch (err) {
     log.error(`Failed to add note to product ${productId}`, err);
     throw err;
@@ -32,7 +32,7 @@ export async function editNote(id: string, body: string): Promise<void> {
   if (trimmed === '') return;
   log.info(`Updating note ${id}`);
   try {
-    await updateNoteBody(id, trimmed);
+    await updateNoteBodyRow(id, trimmed);
   } catch (err) {
     log.error(`Failed to update note ${id}`, err);
     throw err;
