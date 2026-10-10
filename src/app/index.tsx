@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { TodayDose } from '@/doses/dose-service';
+import { doseQuantityText, type TodayDose } from '@/doses/dose-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatTime } from '@/ui/commons/format-date';
 import { Snackbar } from '@/ui/components/commons/snackbar';
@@ -51,6 +51,7 @@ export default function HomeScreen() {
   };
 
   const renderItem = ({ item }: { item: TodayDose }) => {
+    const quantityText = doseQuantityText(item.quantity, item.unit, t);
     return (
       <ThemedView type="backgroundElement" style={styles.row}>
         <ThemedView style={styles.rowLeading}>
@@ -60,9 +61,9 @@ export default function HomeScreen() {
               {formatTime(item.plannedAt)}
             </ThemedText>
             <ThemedText>{displayName(item)}</ThemedText>
-            {item.quantity !== 1 ? (
+            {quantityText ? (
               <ThemedText type="small" themeColor="textSecondary">
-                {t('home.quantity', { count: item.quantity })}
+                {quantityText}
               </ThemedText>
             ) : null}
             {item.state === 'pending' && item.snoozedUntil ? (

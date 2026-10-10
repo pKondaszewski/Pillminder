@@ -87,6 +87,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           name: 'Ibuprofen',
           category: 'medication',
           strength: '200 mg',
+          unit: 'tablet',
           price: 1299,
           storeLink: 'https://pharmacy.example/ibuprofen',
           status: 'archived',
@@ -100,6 +101,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           name: 'Magnesium',
           category: 'supplement',
           strength: null,
+          unit: null,
           price: null,
           storeLink: null,
           status: 'active',
@@ -258,6 +260,7 @@ describe('parseBackup: older schema and unknown fields', () => {
       name: 'Vitamin D',
       category: 'supplement',
       strength: null,
+      unit: null,
       price: null,
       storeLink: null,
       status: 'active',
@@ -907,5 +910,40 @@ describe('parseBackup: relations', () => {
       code: 'productMismatch',
       detail: 'doses[1].productId',
     });
+  });
+});
+
+describe('parseBackup product unit', () => {
+  it('imports a backup written before units as products without a unit', () => {
+    // given
+    const text = backupText();
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.products[0].unit).toBeNull();
+  });
+
+  it('keeps a known unit', () => {
+    // given
+    const text = backupText({ products: [product({ unit: 'drop' })] });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.products[0].unit).toBe('drop');
+  });
+
+  it('rejects an unknown unit', () => {
+    // given
+    const text = backupText({ products: [product({ unit: 'spoon' })] });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({ code: 'invalidRow', detail: 'products[0].unit' });
   });
 });

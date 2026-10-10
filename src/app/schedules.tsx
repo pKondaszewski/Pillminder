@@ -26,6 +26,9 @@ export default function ScheduleListScreen() {
   const productName = (id: string) =>
     products.find((p) => p.id === id)?.name ?? t('schedule.unknownProduct');
 
+  const unitOf = (id: string) =>
+    products.find((p) => p.id === id)?.unit ?? null;
+
   const openCreate = () => {
     setEditing(null);
     setEditorOpen(true);
@@ -46,7 +49,7 @@ export default function ScheduleListScreen() {
       <ThemedView type="backgroundElement" style={styles.row}>
         <ThemedText>{productName(item.productId)}</ThemedText>
         <ThemedText type="small">
-          {describeRhythm(item, t, formatDate)}
+          {describeRhythm(item, t, formatDate, unitOf(item.productId))}
         </ThemedText>
       </ThemedView>
     </Pressable>

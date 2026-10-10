@@ -57,7 +57,9 @@
     "storeLink": "Gdzie kupić",
     "storeLinkPlaceholder": "np. apteka albo link do sklepu",
     "strength": "Moc / dawka",
-    "strengthPlaceholder": "np. 5mg"
+    "strengthPlaceholder": "np. 5mg",
+    "unit": "Jednostka",
+    "unitNone": "Brak"
   },
   "history": {
     "change": "Zmień",
@@ -98,6 +100,7 @@
   },
   "notification": {
     "body": "Czas wziąć {{name}}",
+    "bodyAmount": "Czas wziąć {{name}}: {{amount}}",
     "bodyQuantity": "Czas wziąć {{quantity}} × {{name}}",
     "buy": "Kup",
     "reorderBody": "{{name}} się kończy — czas dokupić",
@@ -124,6 +127,7 @@
     "emptyHint": "Tutaj pojawią się aktywne produkty z rytmem przyjmowania i zapasem.",
     "noRhythm": "Brak harmonogramu",
     "open": "Przegląd",
+    "stockAmount": "Zapas: {{amount}}",
     "stockDaysLeft": "starczy na ~{{days}} d",
     "stockUnits": "Zapas: {{count}} szt.",
     "stockUnknown": "Zapas nie jest śledzony",
@@ -155,6 +159,7 @@
   "schedule": {
     "add": "+ Dodaj harmonogram",
     "addTime": "Dodaj godzinę",
+    "amountValue": "{{amount}} na dawkę",
     "daily": "Codziennie",
     "deleteConfirm": "Czy na pewno usunąć ten harmonogram?",
     "deleteTitle": "Usunąć harmonogram?",
@@ -217,5 +222,29 @@
     "products": "Produkty",
     "schedules": "Harmonogramy",
     "settings": "Ustawienia"
+  },
+  "unit": {
+    "capsule_few": "{{count}} kapsułki",
+    "capsule_many": "{{count}} kapsułek",
+    "capsule_one": "{{count}} kapsułka",
+    "capsule_other": "{{count}} kapsułki",
+    "drop_few": "{{count}} krople",
+    "drop_many": "{{count}} kropli",
+    "drop_one": "{{count}} kropla",
+    "drop_other": "{{count}} kropli",
+    "ml_few": "{{count}} ml",
+    "ml_many": "{{count}} ml",
+    "ml_one": "{{count}} ml",
+    "ml_other": "{{count}} ml",
+    "tablet_few": "{{count}} tabletki",
+    "tablet_many": "{{count}} tabletek",
+    "tablet_one": "{{count}} tabletka",
+    "tablet_other": "{{count}} tabletki"
+  },
+  "unitName": {
+    "capsule": "Kapsułka",
+    "drop": "Kropla",
+    "ml": "ml",
+    "tablet": "Tabletka"
   }
 }

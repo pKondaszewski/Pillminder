@@ -1,3 +1,5 @@
+import { formatAmount, type ProductUnit } from '@/products/product-unit';
+
 export type Translate = (
   key: string,
   options?: Record<string, string | number>,
@@ -15,17 +17,28 @@ export function describeRhythm(
   schedule: RhythmText,
   t: Translate,
   formatDate: (date: Date) => string,
+  unit: ProductUnit | null = null,
 ): string {
   const { intervalDays, timesOfDay, quantity } = schedule;
   const base =
     intervalDays === 1
       ? t('schedule.daily')
       : t('schedule.everyXDays', { days: intervalDays });
-  const quantityText =
-    quantity !== 1
-      ? ` · ${t('schedule.quantityValue', { count: quantity })}`
-      : '';
+  const quantityText = describeQuantity(quantity, unit, t);
   return `${base} · ${timesOfDay.join(', ')}${quantityText}${describePeriod(schedule, t, formatDate)}`;
+}
+
+function describeQuantity(
+  quantity: number,
+  unit: ProductUnit | null,
+  t: Translate,
+): string {
+  if (unit) {
+    return ` · ${t('schedule.amountValue', { amount: formatAmount(quantity, unit, t) })}`;
+  }
+  return quantity !== 1
+    ? ` · ${t('schedule.quantityValue', { count: quantity })}`
+    : '';
 }
 
 function describePeriod(
