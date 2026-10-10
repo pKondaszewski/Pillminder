@@ -65,9 +65,8 @@ Does not belong: products without a rhythm and without health consequences.
 ## Platform
 
 - **Expo** (React Native)
-- **Android only for now** — iOS is not supported or tested until decided
-  otherwise; keep the code cross-platform where it costs nothing, but do not
-  spend time on iOS-specific work
+- **Android only for now** — no iOS or web code (no platform branches, no
+  `.ios` / `.web` variants) until decided otherwise
 - data stored locally on the device (no backend, no API, no server)
 - push notifications built into Expo
 - priority: smartphone, laptop out of scope
@@ -99,7 +98,7 @@ These are settled and should not be re-litigated without a reason:
 ## Running locally (dev build)
 
 Notifications require a **dev build** on a physical device — Expo Go disables
-notifications entirely (`isSupported = false`), so all notification testing
+notifications entirely, so all notification testing
 uses `expo run:android`, never Expo Go.
 
 Test device: **Samsung Galaxy S26 Ultra** (SM-S948B, serial `R3GL604XT6K`),
