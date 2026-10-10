@@ -14,7 +14,7 @@ export function notesByProductQuery(productId: string) {
     .orderBy(desc(notes.createdAt));
 }
 
-export async function createNote(
+export async function createNoteRow(
   productId: string,
   body: string,
 ): Promise<Note> {
@@ -32,7 +32,10 @@ export async function createNote(
   return created;
 }
 
-export async function updateNoteBody(id: string, body: string): Promise<void> {
+export async function updateNoteBodyRow(
+  id: string,
+  body: string,
+): Promise<void> {
   await db
     .update(notes)
     .set({ body, updatedAt: new Date() })

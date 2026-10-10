@@ -2,15 +2,15 @@ import { createLogger } from '@/config/logger';
 
 import type { NewProductInput } from './dto/new-product-input';
 import {
-  createProduct,
-  deleteProduct as deleteProductRow,
+  createProductRow,
+  deleteProductRow,
+  getCustomCategories,
   getProductById,
   getProductsByIds,
-  listCustomCategories as listCustomCategoryRows,
   type Product,
   productsQuery,
-  setProductStatus as setProductStatusRow,
-  updateProduct as updateProductRow,
+  setProductStatusRow,
+  updateProductRow,
 } from './product-repository';
 
 export type {
@@ -40,13 +40,13 @@ export function getProducts(ids: string[]): Promise<Product[]> {
 }
 
 export function listCustomCategories(): Promise<string[]> {
-  return listCustomCategoryRows();
+  return getCustomCategories();
 }
 
 export async function addProduct(input: NewProductInput): Promise<void> {
   log.info(`Adding product "${input.name}"`);
   try {
-    const created = await createProduct(input);
+    const created = await createProductRow(input);
     log.info(`Created product ${JSON.stringify(created)}`);
   } catch (err) {
     log.error(`Failed to add product "${input.name}"`, err);

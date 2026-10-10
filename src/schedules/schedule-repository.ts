@@ -32,7 +32,7 @@ export async function getSchedulesByProductId(
   return db.select().from(schedules).where(eq(schedules.productId, productId));
 }
 
-export async function createSchedule(
+export async function createScheduleRow(
   input: NewScheduleInput,
 ): Promise<Schedule> {
   const [created] = await db
@@ -50,7 +50,7 @@ export async function createSchedule(
   return created;
 }
 
-export async function updateSchedule(
+export async function updateScheduleRow(
   id: string,
   input: NewScheduleInput,
 ): Promise<Schedule> {
@@ -69,7 +69,7 @@ export async function updateSchedule(
   return updated;
 }
 
-export async function setSchedulePause(
+export async function setSchedulePauseRow(
   id: string,
   pause: { pausedAt: Date | null; resumeAt: Date | null },
 ): Promise<Schedule> {
@@ -81,6 +81,6 @@ export async function setSchedulePause(
   return updated;
 }
 
-export async function deleteSchedule(id: string): Promise<void> {
+export async function deleteScheduleRow(id: string): Promise<void> {
   await db.delete(schedules).where(eq(schedules.id, id));
 }

@@ -2,15 +2,15 @@ import { createLogger } from '@/config/logger';
 
 import type { NewScheduleInput } from './dto/new-schedule-input';
 import {
-  createSchedule as createScheduleRow,
-  deleteSchedule as deleteScheduleRow,
+  createScheduleRow,
+  deleteScheduleRow,
   getAllSchedules,
   getScheduleById,
   getSchedulesByProductId,
   type Schedule,
   schedulesQuery,
-  setSchedulePause as setSchedulePauseRow,
-  updateSchedule as updateScheduleRow,
+  setSchedulePauseRow,
+  updateScheduleRow,
 } from './schedule-repository';
 
 export {

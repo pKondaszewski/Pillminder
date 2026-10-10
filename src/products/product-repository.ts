@@ -23,7 +23,7 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
   return db.select().from(products).where(inArray(products.id, ids));
 }
 
-export async function listCustomCategories(): Promise<string[]> {
+export async function getCustomCategories(): Promise<string[]> {
   const rows = await db
     .selectDistinct({ category: products.category })
     .from(products)
@@ -32,7 +32,9 @@ export async function listCustomCategories(): Promise<string[]> {
   return rows.map((row) => row.category);
 }
 
-export async function createProduct(input: NewProductInput): Promise<Product> {
+export async function createProductRow(
+  input: NewProductInput,
+): Promise<Product> {
   const category = await resolveCategory(input.category);
   const now = new Date();
   const [created] = await db
@@ -55,7 +57,7 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
   return created;
 }
 
-export async function updateProduct(
+export async function updateProductRow(
   id: string,
   input: NewProductInput,
 ): Promise<Product> {
@@ -77,7 +79,7 @@ export async function updateProduct(
   return updated;
 }
 
-export async function setProductStatus(
+export async function setProductStatusRow(
   id: string,
   status: 'active' | 'archived',
 ): Promise<void> {
@@ -87,12 +89,12 @@ export async function setProductStatus(
     .where(eq(products.id, id));
 }
 
-export async function deleteProduct(id: string): Promise<void> {
+export async function deleteProductRow(id: string): Promise<void> {
   await db.delete(products).where(eq(products.id, id));
 }
 
 async function resolveCategory(raw: string): Promise<string> {
-  const category = normalizeCategory(raw, await listCustomCategories());
+  const category = normalizeCategory(raw, await getCustomCategories());
   if (category === null) throw new Error('Product category must not be blank');
   return category;
 }
