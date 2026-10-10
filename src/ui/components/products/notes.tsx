@@ -27,7 +27,7 @@ export function ProductNotes({
     try {
       await submit();
     } catch {
-      // save failed — keep the draft so the text is not lost
+      Alert.alert(t('products.errorTitle'), t('notes.errorSave'));
     }
   };
 
@@ -42,7 +42,7 @@ export function ProductNotes({
             await removeNote(note.id);
             if (note.id === editingId) reset();
           } catch {
-            // delete failed — note stays in the list
+            Alert.alert(t('products.errorTitle'), t('notes.errorDelete'));
           }
         },
       },

@@ -132,7 +132,7 @@ function EditorForm({
     try {
       await noteDraft.submit();
     } catch {
-      // note save failed — keep the editor open so the draft is not lost
+      Alert.alert(t('products.errorTitle'), t('notes.errorSave'));
       return;
     }
     onSave({

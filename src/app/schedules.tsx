@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, StyleSheet } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
@@ -61,6 +61,9 @@ export default function ScheduleListScreen() {
     </Pressable>
   );
 
+  const showFailure = (messageKey: string) =>
+    Alert.alert(t('products.errorTitle'), t(messageKey));
+
   const handleSave = async (input: NewScheduleInput) => {
     try {
       if (editing) {
@@ -70,7 +73,7 @@ export default function ScheduleListScreen() {
       }
       closeEditor();
     } catch {
-      // save failed — keep modal open so the user's input is not lost
+      showFailure('schedule.errorSave');
     }
   };
 
@@ -79,7 +82,7 @@ export default function ScheduleListScreen() {
       await removeSchedule(id);
       closeEditor();
     } catch {
-      // delete failed — keep modal open
+      showFailure('schedule.errorDelete');
     }
   };
 
@@ -88,7 +91,7 @@ export default function ScheduleListScreen() {
       await pauseSchedule(id, resumeAt);
       closeEditor();
     } catch {
-      // pause failed — keep modal open
+      showFailure('schedule.errorPause');
     }
   };
 
@@ -97,7 +100,7 @@ export default function ScheduleListScreen() {
       await resumeSchedule(id);
       closeEditor();
     } catch {
-      // resume failed — keep modal open
+      showFailure('schedule.errorResume');
     }
   };
 

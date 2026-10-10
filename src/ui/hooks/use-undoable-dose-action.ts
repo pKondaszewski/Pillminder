@@ -45,17 +45,24 @@ export function useUndoableDoseAction(
     [actions, reportFailure],
   );
 
+  const revert = useCallback(
+    async (kind: UndoableKind, id: string) => {
+      try {
+        await actions[kind].revert(id);
+      } catch (err) {
+        reportFailure(`revert dose ${id} from ${kind}`, err);
+      }
+    },
+    [actions, reportFailure],
+  );
+
   const undoLast = useCallback(async () => {
     if (!undoable) return;
     setUndoable(null);
-    try {
-      await actions[undoable.kind].revert(undoable.id);
-    } catch (err) {
-      reportFailure(`revert dose ${undoable.id} from ${undoable.kind}`, err);
-    }
-  }, [actions, undoable, reportFailure]);
+    await revert(undoable.kind, undoable.id);
+  }, [undoable, revert]);
 
   const dismissUndo = useCallback(() => setUndoable(null), []);
 
-  return { undoable, applyWithUndo, undoLast, dismissUndo };
+  return { undoable, applyWithUndo, revert, undoLast, dismissUndo };
 }

@@ -25,25 +25,17 @@ export default function HomeScreen() {
     }),
     [takeDose, untakeDose, skipDose, unskipDose],
   );
-  const { undoable, applyWithUndo, undoLast, dismissUndo } =
+  const { undoable, applyWithUndo, revert, undoLast, dismissUndo } =
     useUndoableDoseAction(actions);
 
   const confirmRevert = (item: TodayDose, kind: 'taken' | 'skipped') => {
-    const { title, message, revert } =
+    const { title, message } =
       kind === 'taken'
-        ? {
-            title: 'home.undoTitle',
-            message: 'home.undoConfirm',
-            revert: untakeDose,
-          }
-        : {
-            title: 'home.unskipTitle',
-            message: 'home.unskipConfirm',
-            revert: unskipDose,
-          };
+        ? { title: 'home.undoTitle', message: 'home.undoConfirm' }
+        : { title: 'home.unskipTitle', message: 'home.unskipConfirm' };
     Alert.alert(t(title), t(message, { name: item.productName }), [
       { text: t('editor.cancel'), style: 'cancel' },
-      { text: t('home.undo'), onPress: () => revert(item.id) },
+      { text: t('home.undo'), onPress: () => revert(kind, item.id) },
     ]);
   };
 
