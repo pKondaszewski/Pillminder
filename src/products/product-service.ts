@@ -14,6 +14,10 @@ import {
 } from './product-repository';
 
 export type {
+  PeriodAdherence,
+  PeriodReportEntry,
+} from './dto/period-report-output';
+export type {
   ProductOverview,
   ProductOverviewEntry,
   ProductOverviewStock,

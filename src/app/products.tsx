@@ -11,6 +11,7 @@ import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { ProductEditorModal } from '@/ui/components/products/editor-modal';
 import { ProductOverviewModal } from '@/ui/components/products/overview-modal';
+import { ProductPeriodModal } from '@/ui/components/products/period-modal';
 import { ProductRow } from '@/ui/components/products/row';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
@@ -40,6 +41,7 @@ export default function ProductListScreen() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [overviewOpen, setOverviewOpen] = useState(false);
+  const [periodOpen, setPeriodOpen] = useState(false);
   const editedProduct = products.find((p) => p.id === editing?.id) ?? editing;
 
   const openCreate = () => {
@@ -137,6 +139,17 @@ export default function ProductListScreen() {
                     </ThemedText>
                   </ThemedView>
                 </Pressable>
+                <Pressable
+                  onPress={() => setPeriodOpen(true)}
+                  accessibilityRole="button"
+                  style={({ pressed }) => pressed && styles.pressed}
+                >
+                  <ThemedView type="backgroundElement" style={styles.addRow}>
+                    <ThemedText themeColor="accent" style={styles.addText}>
+                      {t('period.open')}
+                    </ThemedText>
+                  </ThemedView>
+                </Pressable>
               </ThemedView>
             }
           />
@@ -155,6 +168,11 @@ export default function ProductListScreen() {
         <ProductOverviewModal
           visible={overviewOpen}
           onClose={() => setOverviewOpen(false)}
+        />
+
+        <ProductPeriodModal
+          visible={periodOpen}
+          onClose={() => setPeriodOpen(false)}
         />
       </ThemedView>
     </TabSwipe>
