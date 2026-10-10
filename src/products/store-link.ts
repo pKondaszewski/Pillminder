@@ -1,6 +1,4 @@
-const MAPS_SEARCH_URL =
-  process.env.EXPO_PUBLIC_MAPS_SEARCH_URL ??
-  'https://www.google.com/maps/search/?api=1&query=';
+const MAPS_SEARCH_URL = 'https://www.google.com/maps/search/?api=1&query=';
 
 export function resolveStoreUrl(
   value: string | null | undefined,
