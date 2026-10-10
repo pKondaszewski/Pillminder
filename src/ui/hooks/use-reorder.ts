@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import type {
   products as productsTable,
   schedules as schedulesTable,
@@ -17,10 +15,7 @@ export function useReorderStatuses(): Record<string, ReorderStatus> {
   const { products } = useProducts();
   const { schedules } = useSchedules();
 
-  return useMemo(
-    () => buildReorderStatuses(products, schedules),
-    [products, schedules],
-  );
+  return buildReorderStatuses(products, schedules);
 }
 
 function buildReorderStatuses(

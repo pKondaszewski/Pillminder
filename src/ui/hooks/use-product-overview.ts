@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { buildProductOverview } from '@/products/product-overview';
@@ -13,14 +12,10 @@ export function useProductOverview(): ProductOverview {
   const { products } = useProducts();
   const { schedules } = useSchedules();
 
-  return useMemo(
-    () =>
-      buildProductOverview(products, schedules, {
-        t,
-        formatDate,
-        locale: i18n.language,
-        now: new Date(),
-      }),
-    [products, schedules, t, i18n.language],
-  );
+  return buildProductOverview(products, schedules, {
+    t,
+    formatDate,
+    locale: i18n.language,
+    now: new Date(),
+  });
 }

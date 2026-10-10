@@ -1,5 +1,5 @@
 import { router, useFocusEffect, usePathname } from 'expo-router';
-import { type ReactNode, useCallback, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import {
   Directions,
@@ -18,13 +18,11 @@ export function TabSwipe({ children }: { children: ReactNode }) {
 
   const [anim, setAnim] = useState({ tick: 0, direction: 1 });
 
-  useFocusEffect(
-    useCallback(() => {
-      const direction = index >= prevIndex ? 1 : -1;
-      prevIndex = index < 0 ? prevIndex : index;
-      setAnim((prev) => ({ tick: prev.tick + 1, direction }));
-    }, [index]),
-  );
+  useFocusEffect(() => {
+    const direction = index >= prevIndex ? 1 : -1;
+    prevIndex = index < 0 ? prevIndex : index;
+    setAnim((prev) => ({ tick: prev.tick + 1, direction }));
+  });
 
   const goTo = (target: number) => {
     if (index < 0 || target < 0 || target >= TAB_ORDER.length) return;
