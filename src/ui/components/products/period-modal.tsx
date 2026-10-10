@@ -7,15 +7,15 @@ import { Modal, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { addDays, startOfDay } from '@/config/date-utils';
-import type {
-  PeriodAdherence,
-  PeriodReportEntry,
-} from '@/products/product-service';
+import { describeAdherence } from '@/products/period-report';
+import type { PeriodReportEntry } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDate } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { useDoctorSummaryExport } from '@/ui/hooks/use-doctor-summary-export';
 import { usePeriodReport } from '@/ui/hooks/use-period-report';
+import { useProductOverview } from '@/ui/hooks/use-product-overview';
 
 const DEFAULT_RANGE_DAYS = 30;
 
@@ -47,7 +47,15 @@ function PeriodContent({ onClose }: Pick<Props, 'onClose'>) {
   );
   const [pickerFor, setPickerFor] = useState<Edge | null>(null);
   const report = usePeriodReport(firstDay, lastDay);
+  const { products } = useProductOverview();
+  const { busy, share } = useDoctorSummaryExport(
+    products,
+    report,
+    firstDay,
+    lastDay,
+  );
   const rangeInvalid = lastDay < firstDay;
+  const canShare = !rangeInvalid && report !== null && !busy;
 
   const onDateChange = (_event: DateTimePickerChangeEvent, date: Date) => {
     const day = startOfDay(date);
@@ -88,6 +96,22 @@ function PeriodContent({ onClose }: Pick<Props, 'onClose'>) {
           ) : (
             <PeriodResults entries={report} />
           )}
+          <Pressable
+            onPress={() => void share()}
+            disabled={!canShare}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !canShare, busy }}
+            style={({ pressed }) => [
+              pressed && styles.pressed,
+              !canShare && styles.disabled,
+            ]}
+          >
+            <ThemedView type="backgroundElement" style={styles.closeButton}>
+              <ThemedText themeColor="accent" style={styles.closeText}>
+                {t('summary.sharePdf')}
+              </ThemedText>
+            </ThemedView>
+          </Pressable>
           <Pressable
             onPress={onClose}
             accessibilityRole="button"
@@ -137,28 +161,9 @@ function ProductBlock({ product }: { product: PeriodReportEntry }) {
           {t('products.archived')}
         </ThemedText>
       ) : null}
-      <ThemedText type="small">
-        <AdherenceText counts={product} />
-      </ThemedText>
+      <ThemedText type="small">{describeAdherence(product, t)}</ThemedText>
     </ThemedView>
   );
-}
-
-function AdherenceText({ counts }: { counts: PeriodAdherence }) {
-  const { t } = useTranslation();
-  const parts = [
-    counts.rate === null
-      ? t('period.noneDue')
-      : t('period.taken', {
-          taken: counts.taken,
-          due: counts.due,
-          percent: Math.round(counts.rate * 100),
-        }),
-    ...(counts.upcoming > 0
-      ? [t('period.upcoming', { count: counts.upcoming })]
-      : []),
-  ];
-  return <>{parts.join(' · ')}</>;
 }
 
 function DateButton({
@@ -210,4 +215,5 @@ const styles = StyleSheet.create({
   },
   closeText: { fontWeight: '600' },
   pressed: { opacity: 0.7 },
+  disabled: { opacity: 0.4 },
 });

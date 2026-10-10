@@ -222,6 +222,21 @@
     "pharmacy": "apteka",
     "rossmann": "Rossmann"
   },
+  "summary": {
+    "adherenceColumn": "Regularność",
+    "adherenceTitle": "Regularność w wybranym okresie",
+    "categoryColumn": "Kategoria",
+    "currentTitle": "Aktualnie przyjmowane",
+    "exportFailed": "Nie udało się utworzyć PDF",
+    "generated": "Wygenerowano: {{date}}",
+    "noActive": "Brak aktywnych produktów",
+    "period": "Okres: {{from}} – {{to}}",
+    "productColumn": "Produkt",
+    "rhythmColumn": "Rytm",
+    "sharePdf": "Udostępnij PDF",
+    "shareTitle": "Udostępnij podsumowanie",
+    "title": "Podsumowanie przyjmowanych produktów"
+  },
   "tabs": {
     "home": "Dziś",
     "products": "Produkty",

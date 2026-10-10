@@ -222,6 +222,21 @@
     "pharmacy": "pharmacy",
     "rossmann": "Rossmann"
   },
+  "summary": {
+    "adherenceColumn": "Adherence",
+    "adherenceTitle": "Adherence in the selected period",
+    "categoryColumn": "Category",
+    "currentTitle": "Currently taken",
+    "exportFailed": "Could not create the PDF",
+    "generated": "Generated: {{date}}",
+    "noActive": "No active products",
+    "period": "Period: {{from}} – {{to}}",
+    "productColumn": "Product",
+    "rhythmColumn": "Rhythm",
+    "sharePdf": "Share PDF",
+    "shareTitle": "Share summary",
+    "title": "Medication summary"
+  },
   "tabs": {
     "home": "Today",
     "products": "Products",

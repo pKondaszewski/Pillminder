@@ -1,7 +1,8 @@
 import type { AdherenceReport } from '@/doses/dose-service';
 import type { Product } from '@/products/product-service';
+import type { Translate } from '@/schedules/schedule-rhythm';
 
-import { buildPeriodReport } from '../period-report';
+import { buildPeriodReport, describeAdherence } from '../period-report';
 
 function product(overrides: Partial<Product> & { id: string }): Product {
   return {
@@ -113,5 +114,32 @@ describe('buildPeriodReport', () => {
 
     // then
     expect(result[0]).toMatchObject({ rate: null, upcoming: 2 });
+  });
+});
+
+describe('describeAdherence', () => {
+  const t: Translate = (key, options = {}) =>
+    `${key}${JSON.stringify(options)}`;
+
+  it('describes taken of due with a rounded percentage', () => {
+    // given
+    const adherence = { taken: 2, due: 3, upcoming: 0, rate: 2 / 3 };
+
+    // when
+    const text = describeAdherence(adherence, t);
+
+    // then
+    expect(text).toBe('period.taken{"taken":2,"due":3,"percent":67}');
+  });
+
+  it('says nothing is due yet and lists upcoming doses', () => {
+    // given
+    const adherence = { taken: 0, due: 0, upcoming: 2, rate: null };
+
+    // when
+    const text = describeAdherence(adherence, t);
+
+    // then
+    expect(text).toBe('period.noneDue{} · period.upcoming{"count":2}');
   });
 });

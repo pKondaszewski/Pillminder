@@ -1,8 +1,12 @@
 import type { AdherenceCounts, AdherenceReport } from '@/doses/dose-service';
 import { productLabel } from '@/products/product-label';
 import type { Product } from '@/products/product-service';
+import type { Translate } from '@/schedules/schedule-rhythm';
 
-import type { PeriodReportEntry } from './dto/period-report-output';
+import type {
+  PeriodAdherence,
+  PeriodReportEntry,
+} from './dto/period-report-output';
 
 export function buildPeriodReport(
   products: Product[],
@@ -13,6 +17,25 @@ export function buildPeriodReport(
     .filter((product) => product.id in report.byProduct)
     .map((product) => toEntry(product, report.byProduct[product.id]))
     .sort(activeFirstThenTitle(locale));
+}
+
+export function describeAdherence(
+  counts: PeriodAdherence,
+  t: Translate,
+): string {
+  const parts = [
+    counts.rate === null
+      ? t('period.noneDue')
+      : t('period.taken', {
+          taken: counts.taken,
+          due: counts.due,
+          percent: Math.round(counts.rate * 100),
+        }),
+    ...(counts.upcoming > 0
+      ? [t('period.upcoming', { count: counts.upcoming })]
+      : []),
+  ];
+  return parts.join(' · ');
 }
 
 function toEntry(product: Product, counts: AdherenceCounts): PeriodReportEntry {

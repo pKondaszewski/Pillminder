@@ -1,4 +1,9 @@
-import { inclusiveDayRange, msUntilNextDay, startOfDay } from '../date-utils';
+import {
+  inclusiveDayRange,
+  isoDay,
+  msUntilNextDay,
+  startOfDay,
+} from '../date-utils';
 
 describe('startOfDay', () => {
   it('maps every moment of a day to the same instant', () => {
@@ -75,5 +80,18 @@ describe('inclusiveDayRange', () => {
     // then
     expect(range.from).toEqual(new Date(2026, 5, 10));
     expect(range.to).toEqual(new Date(2026, 5, 11));
+  });
+});
+
+describe('isoDay', () => {
+  it('formats the local calendar day as YYYY-MM-DD', () => {
+    // given
+    const date = new Date(2026, 8, 1, 23, 30);
+
+    // when
+    const result = isoDay(date);
+
+    // then
+    expect(result).toBe('2026-09-01');
   });
 });
