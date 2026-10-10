@@ -1,9 +1,25 @@
-import type { RhythmInput } from '../dto/rhythm-input';
+import type { Schedule } from '@/schedules/schedule-service';
+
 import { reorderStatus } from '../reorder';
 
 const NOW = new Date(2026, 0, 10, 12, 0);
 const THRESHOLD_DAYS = 7;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function rhythm(overrides: Partial<Schedule>): Schedule {
+  return {
+    id: 'schedule-1',
+    productId: 'product-1',
+    intervalDays: 1,
+    timesOfDay: ['08:00'],
+    quantity: 1,
+    startDate: null,
+    endDate: null,
+    pausedAt: null,
+    resumeAt: null,
+    ...overrides,
+  };
+}
 
 function daysFromNow(days: number): Date {
   return new Date(NOW.getTime() + days * MS_PER_DAY);
@@ -13,8 +29,8 @@ describe('reorderStatus', () => {
   it('returns no estimate when stock is null', () => {
     // given
     const stock = null;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00'] },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 1, timesOfDay: ['08:00'] }),
     ];
 
     // when
@@ -33,8 +49,8 @@ describe('reorderStatus', () => {
   it('returns no estimate when stock is undefined', () => {
     // given
     const stock = undefined;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00'] },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 1, timesOfDay: ['08:00'] }),
     ];
 
     // when
@@ -48,7 +64,7 @@ describe('reorderStatus', () => {
   it('returns no estimate when there are no schedules', () => {
     // given
     const stock = 10;
-    const schedules: RhythmInput[] = [];
+    const schedules: Schedule[] = [];
 
     // when
     const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
@@ -66,8 +82,8 @@ describe('reorderStatus', () => {
   it('computes days left for a single daily schedule without a period', () => {
     // given
     const stock = 20;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00'] },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 1, timesOfDay: ['08:00'] }),
     ];
 
     // when
@@ -84,8 +100,8 @@ describe('reorderStatus', () => {
   it('counts every time of day as a separate intake', () => {
     // given
     const stock = 20;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00', '20:00'] },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 1, timesOfDay: ['08:00', '20:00'] }),
     ];
 
     // when
@@ -99,8 +115,8 @@ describe('reorderStatus', () => {
   it('multiplies consumption by quantity per intake', () => {
     // given
     const stock = 20;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00'], quantity: 2 },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 1, timesOfDay: ['08:00'], quantity: 2 }),
     ];
 
     // when
@@ -114,8 +130,8 @@ describe('reorderStatus', () => {
   it('spreads consumption over an interval longer than one day', () => {
     // given
     const stock = 10;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 2, timesOfDay: ['08:00'] },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 2, timesOfDay: ['08:00'] }),
     ];
 
     // when
@@ -129,9 +145,9 @@ describe('reorderStatus', () => {
   it('sums consumption of several schedules without a period', () => {
     // given
     const stock = 20;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00'] },
-      { intervalDays: 2, timesOfDay: ['20:00'], quantity: 2 },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 1, timesOfDay: ['08:00'] }),
+      rhythm({ intervalDays: 2, timesOfDay: ['20:00'], quantity: 2 }),
     ];
 
     // when
@@ -145,12 +161,12 @@ describe('reorderStatus', () => {
   it('counts a schedule that has not started yet only from its start date', () => {
     // given
     const stock = 10;
-    const schedules: RhythmInput[] = [
-      {
+    const schedules: Schedule[] = [
+      rhythm({
         intervalDays: 1,
         timesOfDay: ['08:00'],
         startDate: new Date(2026, 0, 15),
-      },
+      }),
     ];
 
     // when
@@ -164,12 +180,12 @@ describe('reorderStatus', () => {
   it('returns no estimate when the only schedule ends before the stock runs out', () => {
     // given
     const stock = 100;
-    const schedules: RhythmInput[] = [
-      {
+    const schedules: Schedule[] = [
+      rhythm({
         intervalDays: 1,
         timesOfDay: ['08:00'],
         endDate: new Date(2026, 0, 14),
-      },
+      }),
     ];
 
     // when
@@ -185,12 +201,12 @@ describe('reorderStatus', () => {
   it('runs out when a schedule with a period covers the whole stock', () => {
     // given
     const stock = 5;
-    const schedules: RhythmInput[] = [
-      {
+    const schedules: Schedule[] = [
+      rhythm({
         intervalDays: 1,
         timesOfDay: ['08:00'],
         endDate: new Date(2026, 0, 30),
-      },
+      }),
     ];
 
     // when
@@ -203,13 +219,13 @@ describe('reorderStatus', () => {
   it('switches consumption when one of two schedules ends', () => {
     // given
     const stock = 7;
-    const schedules: RhythmInput[] = [
-      {
+    const schedules: Schedule[] = [
+      rhythm({
         intervalDays: 1,
         timesOfDay: ['08:00'],
         endDate: new Date(2026, 0, 12),
-      },
-      { intervalDays: 1, timesOfDay: ['20:00'] },
+      }),
+      rhythm({ intervalDays: 1, timesOfDay: ['20:00'] }),
     ];
 
     // when
@@ -223,8 +239,8 @@ describe('reorderStatus', () => {
   it('marks stock as low when days left is below the threshold', () => {
     // given
     const stock = 6;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00'] },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 1, timesOfDay: ['08:00'] }),
     ];
 
     // when
@@ -237,8 +253,8 @@ describe('reorderStatus', () => {
   it('does not mark stock as low when days left equals the threshold', () => {
     // given
     const stock = 7;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00'] },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 1, timesOfDay: ['08:00'] }),
     ];
 
     // when
@@ -252,8 +268,8 @@ describe('reorderStatus', () => {
   it('uses the given threshold instead of the default', () => {
     // given
     const stock = 10;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00'] },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 1, timesOfDay: ['08:00'] }),
     ];
     const thresholdDays = 14;
 
@@ -268,8 +284,8 @@ describe('reorderStatus', () => {
   it('reports zero days left and low stock for an empty stock', () => {
     // given
     const stock = 0;
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00'] },
+    const schedules: Schedule[] = [
+      rhythm({ intervalDays: 1, timesOfDay: ['08:00'] }),
     ];
 
     // when
@@ -284,8 +300,12 @@ describe('reorderStatus', () => {
 describe('reorderStatus with a paused schedule', () => {
   it('gives no estimate while paused without a resume date', () => {
     // given
-    const schedules: RhythmInput[] = [
-      { intervalDays: 1, timesOfDay: ['08:00'], pausedAt: daysFromNow(-1) },
+    const schedules: Schedule[] = [
+      rhythm({
+        intervalDays: 1,
+        timesOfDay: ['08:00'],
+        pausedAt: daysFromNow(-1),
+      }),
     ];
 
     // when
@@ -301,13 +321,13 @@ describe('reorderStatus with a paused schedule', () => {
 
   it('counts consumption only from the resume day', () => {
     // given
-    const schedules: RhythmInput[] = [
-      {
+    const schedules: Schedule[] = [
+      rhythm({
         intervalDays: 1,
         timesOfDay: ['08:00'],
         pausedAt: daysFromNow(-1),
         resumeAt: daysFromNow(10),
-      },
+      }),
     ];
 
     // when
@@ -320,13 +340,13 @@ describe('reorderStatus with a paused schedule', () => {
 
   it('treats a pause whose resume date has passed as not paused', () => {
     // given
-    const schedules: RhythmInput[] = [
-      {
+    const schedules: Schedule[] = [
+      rhythm({
         intervalDays: 1,
         timesOfDay: ['08:00'],
         pausedAt: daysFromNow(-10),
         resumeAt: daysFromNow(-2),
-      },
+      }),
     ];
 
     // when

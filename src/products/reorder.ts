@@ -1,8 +1,8 @@
 import { addDays, startOfDay } from '@/config/date-utils';
 import { isPaused } from '@/schedules/schedule-pause';
+import type { Schedule } from '@/schedules/schedule-service';
 
 import type { ReorderStatus } from './dto/reorder-status';
-import type { RhythmInput } from './dto/rhythm-input';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const DEFAULT_REORDER_THRESHOLD_DAYS = 7;
@@ -10,7 +10,7 @@ const MAX_SIMULATED_DAYS = 3660;
 
 export function reorderStatus(
   stock: number | null | undefined,
-  schedules: RhythmInput[],
+  schedules: Schedule[],
   thresholdDays: number = DEFAULT_REORDER_THRESHOLD_DAYS,
   now: Date = new Date(),
 ): ReorderStatus {
@@ -44,7 +44,7 @@ export function reorderStatus(
 
 function daysUntilEmpty(
   stock: number,
-  schedules: RhythmInput[],
+  schedules: Schedule[],
   currentDailyConsumption: number,
   now: Date,
 ): number | null {
@@ -58,7 +58,7 @@ function daysUntilEmpty(
 // the stock does, or that is paused, is counted only for the days it is active.
 function simulateDaysUntilEmpty(
   stock: number,
-  schedules: RhythmInput[],
+  schedules: Schedule[],
   now: Date,
 ): number | null {
   const today = startOfDay(now);
@@ -73,24 +73,20 @@ function simulateDaysUntilEmpty(
   return null;
 }
 
-function changesOverTime({
-  startDate,
-  endDate,
-  pausedAt,
-}: RhythmInput): boolean {
+function changesOverTime({ startDate, endDate, pausedAt }: Schedule): boolean {
   return startDate != null || endDate != null || pausedAt != null;
 }
 
-function totalDailyConsumption(schedules: RhythmInput[], on: Date): number {
+function totalDailyConsumption(schedules: Schedule[], on: Date): number {
   return schedules
     .filter((schedule) => isActiveOn(schedule, on))
-    .reduce((units, { intervalDays, timesOfDay, quantity = 1 }) => {
+    .reduce((units, { intervalDays, timesOfDay, quantity }) => {
       const daysBetweenDoses = Math.max(1, intervalDays);
       return units + (timesOfDay.length * quantity) / daysBetweenDoses;
     }, 0);
 }
 
-function isActiveOn(schedule: RhythmInput, on: Date): boolean {
+function isActiveOn(schedule: Schedule, on: Date): boolean {
   const { startDate, endDate } = schedule;
   if (isPaused(schedule, on)) return false;
   const day = startOfDay(on);
