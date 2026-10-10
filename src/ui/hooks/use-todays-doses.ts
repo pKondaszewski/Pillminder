@@ -11,30 +11,21 @@ import {
   unskipDose,
   untakeDose,
 } from '@/doses/dose-service';
-import { productLabel } from '@/products/product-label';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 
 export function useTodaysDoses() {
   const day = useCurrentDay();
-  const { data } = useLiveQuery(getTodaysDosesQuery(new Date(day)), [day]);
   const { products } = useProducts();
-
   const { schedules } = useSchedules();
-
-  const nameById = new Map(
-    products.map((p) => [p.id, productLabel(p.name, p.strength)]),
-  );
-  const unitById = new Map(products.map((p) => [p.id, p.unit]));
-  const quantityById = new Map(schedules.map((s) => [s.id, s.quantity]));
-  const doses = data.map((dose) =>
-    toTodayDose(
-      dose,
-      nameById.get(dose.productId) ?? null,
-      quantityById.get(dose.scheduleId) ?? 1,
-      unitById.get(dose.productId) ?? null,
-    ),
-  );
+  // useLiveQuery re-runs only on changes of the FROM table (doses), so product
+  // and schedule edits are signalled through these live lists as deps.
+  const { data } = useLiveQuery(getTodaysDosesQuery(new Date(day)), [
+    day,
+    products,
+    schedules,
+  ]);
+  const doses = data.map(toTodayDose);
 
   return { doses, takeDose, untakeDose, skipDose, unskipDose };
 }

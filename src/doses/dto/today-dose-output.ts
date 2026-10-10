@@ -1,11 +1,11 @@
+import { productLabel } from '@/products/product-label';
 import type { ProductUnit } from '@/products/product-unit';
 
-import type { Dose } from '../dose-repository';
 import type { DoseState } from '../dose-transition';
 
 export interface TodayDose {
   id: string;
-  productName: string | null;
+  productName: string;
   quantity: number;
   unit: ProductUnit | null;
   plannedAt: Date;
@@ -14,20 +14,27 @@ export interface TodayDose {
   snoozedUntil: Date | null;
 }
 
-export function toTodayDose(
-  dose: Dose,
-  productName: string | null,
-  quantity: number,
-  unit: ProductUnit | null,
-): TodayDose {
+export interface TodayDoseRow {
+  id: string;
+  plannedAt: Date;
+  state: DoseState;
+  takenAt: Date | null;
+  snoozedUntil: Date | null;
+  productName: string;
+  productStrength: string | null;
+  unit: ProductUnit | null;
+  quantity: number;
+}
+
+export function toTodayDose(row: TodayDoseRow): TodayDose {
   return {
-    id: dose.id,
-    productName,
-    quantity,
-    unit,
-    plannedAt: dose.plannedAt,
-    state: dose.state,
-    takenAt: dose.takenAt,
-    snoozedUntil: dose.snoozedUntil,
+    id: row.id,
+    productName: productLabel(row.productName, row.productStrength),
+    quantity: row.quantity,
+    unit: row.unit,
+    plannedAt: row.plannedAt,
+    state: row.state,
+    takenAt: row.takenAt,
+    snoozedUntil: row.snoozedUntil,
   };
 }
