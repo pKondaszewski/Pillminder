@@ -30,6 +30,7 @@
     "supplement": "Supplement"
   },
   "editor": {
+    "addCategory": "+ New",
     "archive": "Archive",
     "cancel": "Cancel",
     "category": "Category",
@@ -45,6 +46,8 @@
     "name": "Name",
     "namePlaceholder": "e.g. Vitamin D",
     "nameRequired": "Enter a name",
+    "newCategory": "New category name",
+    "newCategoryPlaceholder": "e.g. Eye drops",
     "newTitle": "New product",
     "price": "Price ({{currency}})",
     "restore": "Restore",
