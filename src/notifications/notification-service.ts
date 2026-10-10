@@ -5,8 +5,9 @@ import { Platform } from 'react-native';
 import { createLogger } from '@/config/logger';
 
 import type { DoseReminder } from './dto/dose-reminder';
-import type { DoseReminderStrings } from './dto/dose-reminder-strings';
 import type { NotificationPermission } from './dto/notification-permission';
+import type { NotificationStrings } from './dto/notification-strings';
+import type { NotificationText } from './dto/notification-text';
 import type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
 import type { ReorderAlert } from './dto/reorder-alert';
 import {
@@ -22,8 +23,9 @@ import {
 import { processReminderResponse } from './reminder-response-router';
 
 export type { DoseReminder } from './dto/dose-reminder';
-export type { DoseReminderStrings } from './dto/dose-reminder-strings';
 export type { NotificationPermission } from './dto/notification-permission';
+export type { NotificationStrings } from './dto/notification-strings';
+export type { NotificationText } from './dto/notification-text';
 export type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
 export type { ReorderAlert } from './dto/reorder-alert';
 export {
@@ -45,11 +47,6 @@ const isExpoGo =
 const isSupported = Platform.OS !== 'web' && !isExpoGo;
 
 let channelSetup: Promise<unknown> = Promise.resolve();
-
-export type NotificationStrings = Omit<DoseReminderStrings, 'body'> & {
-  buy: string;
-  reorderChannel: string;
-};
 
 export async function getNotificationPermission(): Promise<NotificationPermission> {
   if (!isSupported) return { granted: true, canAskAgain: false };
@@ -76,7 +73,7 @@ export function initNotifications(
 
 export async function scheduleDoseReminder(
   reminder: DoseReminder,
-  strings: Pick<DoseReminderStrings, 'title' | 'body'>,
+  strings: NotificationText,
 ): Promise<void> {
   if (!isSupported) return;
   if (reminder.plannedAt.getTime() <= Date.now()) return;
@@ -116,7 +113,7 @@ export async function cancelDoseReminders(doseIds: string[]): Promise<void> {
 
 export async function scheduleReorderAlert(
   alert: ReorderAlert,
-  strings: { title: string; body: string },
+  strings: NotificationText,
 ): Promise<void> {
   if (!isSupported) return;
   if (alert.reorderAt.getTime() <= Date.now()) return;
