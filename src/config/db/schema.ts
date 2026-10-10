@@ -6,11 +6,15 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/sqlite-core';
 
+// Relative on purpose: drizzle-kit loads this file without the @ alias.
+import { PRODUCT_UNITS } from '../../products/product-unit';
+
 export const products = sqliteTable('products', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   category: text('category').notNull(),
   strength: text('strength'),
+  unit: text('unit', { enum: PRODUCT_UNITS }),
   price: integer('price'),
   storeLink: text('store_link'),
   status: text('status', { enum: ['active', 'archived'] })

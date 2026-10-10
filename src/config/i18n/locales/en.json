@@ -57,7 +57,9 @@
     "storeLink": "Where to buy",
     "storeLinkPlaceholder": "e.g. pharmacy or a store link",
     "strength": "Strength",
-    "strengthPlaceholder": "e.g. 5mg"
+    "strengthPlaceholder": "e.g. 5mg",
+    "unit": "Unit",
+    "unitNone": "None"
   },
   "history": {
     "change": "Change",
@@ -98,6 +100,7 @@
   },
   "notification": {
     "body": "Time to take {{name}}",
+    "bodyAmount": "Time to take {{name}}: {{amount}}",
     "bodyQuantity": "Time to take {{quantity}} × {{name}}",
     "buy": "Buy",
     "reorderBody": "{{name}} is running low — time to reorder",
@@ -124,6 +127,7 @@
     "emptyHint": "Active products with their rhythm and stock will show up here.",
     "noRhythm": "No schedule set",
     "open": "Overview",
+    "stockAmount": "Stock: {{amount}}",
     "stockDaysLeft": "~{{days}}d left",
     "stockUnits": "Stock: {{count}} pcs",
     "stockUnknown": "Stock not tracked",
@@ -155,6 +159,7 @@
   "schedule": {
     "add": "+ Add schedule",
     "addTime": "Add time",
+    "amountValue": "{{amount}} per dose",
     "daily": "Daily",
     "deleteConfirm": "Delete this schedule?",
     "deleteTitle": "Delete schedule?",
@@ -217,5 +222,21 @@
     "products": "Products",
     "schedules": "Schedules",
     "settings": "Settings"
+  },
+  "unit": {
+    "capsule_one": "{{count}} capsule",
+    "capsule_other": "{{count}} capsules",
+    "drop_one": "{{count}} drop",
+    "drop_other": "{{count}} drops",
+    "ml_one": "{{count}} ml",
+    "ml_other": "{{count}} ml",
+    "tablet_one": "{{count}} tablet",
+    "tablet_other": "{{count}} tablets"
+  },
+  "unitName": {
+    "capsule": "Capsule",
+    "drop": "Drop",
+    "ml": "ml",
+    "tablet": "Tablet"
   }
 }

@@ -1,6 +1,7 @@
 import { isBuiltInCategory } from '@/products/category';
 import { productLabel } from '@/products/product-label';
 import type { Product } from '@/products/product-service';
+import { formatAmount, type ProductUnit } from '@/products/product-unit';
 import { reorderStatus } from '@/products/reorder';
 import { describeRhythm, type Translate } from '@/schedules/schedule-rhythm';
 import type { Schedule } from '@/schedules/schedule-service';
@@ -55,7 +56,9 @@ function toEntry(
         ? [t('overview.noRhythm')]
         : [...schedules]
             .sort(byFirstTime)
-            .map((schedule) => describeRhythm(schedule, t, formatDate)),
+            .map((schedule) =>
+              describeRhythm(schedule, t, formatDate, product.unit),
+            ),
     stock: describeStock(product, schedules, t, now),
   };
 }
@@ -77,13 +80,23 @@ function describeStock(
   );
   const isLow = belowThreshold && daysLeft !== null;
   const parts = [
-    t('overview.stockUnits', { count: product.stock }),
+    describeStockAmount(product.stock, product.unit, t),
     ...(daysLeft === null
       ? []
       : [t('overview.stockDaysLeft', { days: Math.ceil(daysLeft) })]),
     ...(isLow ? [t('products.lowStock')] : []),
   ];
   return { text: parts.join(' · '), isLow };
+}
+
+function describeStockAmount(
+  stock: number,
+  unit: ProductUnit | null,
+  t: Translate,
+): string {
+  return unit
+    ? t('overview.stockAmount', { amount: formatAmount(stock, unit, t) })
+    : t('overview.stockUnits', { count: stock });
 }
 
 function byFirstTime(a: Schedule, b: Schedule): number {

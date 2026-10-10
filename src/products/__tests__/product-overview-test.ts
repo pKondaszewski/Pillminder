@@ -20,6 +20,9 @@ const MESSAGES: Record<string, string> = {
   'overview.stockUnknown': 'Zapas nie jest śledzony',
   'overview.stockUnits': 'Zapas: {{count}} szt.',
   'overview.stockDaysLeft': 'starczy na ~{{days}} d',
+  'overview.stockAmount': 'Zapas: {{amount}}',
+  'schedule.amountValue': '{{amount}} na dawkę',
+  'unit.tablet': '{{count}} tabl.',
 };
 
 const context: ProductOverviewContext = {
@@ -38,6 +41,7 @@ function product(overrides: Partial<Product> & { id: string }): Product {
     name: 'Product',
     category: 'medication',
     strength: null,
+    unit: null,
     status: 'active',
     stock: null,
     ...overrides,
@@ -90,6 +94,19 @@ describe('buildProductOverview', () => {
       rhythm: ['Codziennie · 08:00, 20:00'],
       stock: { text: 'Zapas: 60 szt. · starczy na ~30 d', isLow: false },
     });
+  });
+
+  it('shows stock and quantity per dose in the product unit', () => {
+    // given
+    const products = [product({ id: 'a', stock: 60, unit: 'tablet' })];
+    const schedules = [schedule('a', { quantity: 2 })];
+
+    // when
+    const [entry] = buildProductOverview(products, schedules, context).products;
+
+    // then
+    expect(entry.rhythm).toEqual(['Codziennie · 08:00 · 2 tabl. na dawkę']);
+    expect(entry.stock.text).toBe('Zapas: 60 tabl. · starczy na ~30 d');
   });
 
   it('flags low stock', () => {

@@ -17,6 +17,7 @@ import {
   supportsStrength,
 } from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
+import { PRODUCT_UNITS, type ProductUnit } from '@/products/product-unit';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDateTime } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
@@ -98,6 +99,7 @@ function EditorForm({
     product?.category ?? null,
   );
   const [strength, setStrength] = useState(product?.strength ?? '');
+  const [unit, setUnit] = useState<ProductUnit | null>(product?.unit ?? null);
   const [price, setPrice] = useState(toText(product?.price));
   const [storeLink, setStoreLink] = useState(product?.storeLink ?? '');
   const [stock, setStock] = useState(toText(product?.stock));
@@ -127,6 +129,7 @@ function EditorForm({
       name: name.trim(),
       category,
       strength: hasStrength ? strength.trim() || null : null,
+      unit,
       price: toNumber(price),
       storeLink: storeLink.trim() || null,
       stock: toNumber(stock),
@@ -244,6 +247,29 @@ function EditorForm({
               />
             </>
           ) : null}
+
+          <ThemedText type="small">{t('editor.unit')}</ThemedText>
+          <ThemedView style={styles.categoryRow}>
+            {[null, ...PRODUCT_UNITS].map((u) => (
+              <Pressable
+                key={u ?? 'none'}
+                onPress={() => setUnit(u)}
+                style={({ pressed }) => pressed && styles.pressed}
+              >
+                <ThemedView
+                  type={u === unit ? 'backgroundSelected' : 'backgroundElement'}
+                  style={styles.categoryChip}
+                >
+                  <ThemedText
+                    type="small"
+                    themeColor={u === unit ? 'text' : 'textSecondary'}
+                  >
+                    {u ? t(`unitName.${u}`) : t('editor.unitNone')}
+                  </ThemedText>
+                </ThemedView>
+              </Pressable>
+            ))}
+          </ThemedView>
 
           <ThemedText type="small">
             {t('editor.price', { currency })}

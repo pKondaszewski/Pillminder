@@ -23,6 +23,7 @@ import {
 import { getSnoozeMinutes } from '@/settings/settings-service';
 
 import { calculateAdherence } from './dose-adherence';
+import { reminderBody } from './dose-label';
 import {
   deleteFuturePendingDosesForSchedules,
   getDoseById,
@@ -37,6 +38,7 @@ import {
 import { isDueInFuture, isPending, isPresent } from './dose-validator';
 import type { AdherenceReport } from './dto/adherence-report-output';
 
+export { doseQuantityText } from './dose-label';
 export type {
   AdherenceCounts,
   AdherenceReport,
@@ -54,10 +56,9 @@ function reminderStrings(product: Product, quantity: number) {
   const name = productLabel(product.name, product.strength);
   return {
     title: i18n.t('notification.title'),
-    body:
-      quantity > 1
-        ? i18n.t('notification.bodyQuantity', { name, quantity })
-        : i18n.t('notification.body', { name }),
+    body: reminderBody(name, quantity, product.unit, (key, options) =>
+      i18n.t(key, options),
+    ),
   };
 }
 

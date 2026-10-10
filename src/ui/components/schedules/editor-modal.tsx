@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { Product } from '@/products/product-service';
+import { formatAmount } from '@/products/product-unit';
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
 import {
   previewOccurrences,
@@ -82,6 +83,7 @@ function EditorForm({
   const [productId, setProductId] = useState(
     schedule?.productId ?? products[0]?.id ?? '',
   );
+  const unit = products.find((p) => p.id === productId)?.unit ?? null;
   const [intervalDays, setIntervalDays] = useState(schedule?.intervalDays ?? 1);
   const [times, setTimes] = useState<string[]>(schedule?.timesOfDay ?? []);
   const [quantity, setQuantity] = useState(schedule?.quantity ?? 1);
@@ -248,7 +250,9 @@ function EditorForm({
                 <ThemedText type="subtitle">−</ThemedText>
               </ThemedView>
             </Pressable>
-            <ThemedText style={styles.stepperValue}>{quantity}</ThemedText>
+            <ThemedText style={styles.stepperValue}>
+              {unit ? formatAmount(quantity, unit, t) : quantity}
+            </ThemedText>
             <Pressable
               onPress={() => setQuantity(quantity + 1)}
               hitSlop={Spacing.two}
