@@ -66,7 +66,7 @@ export async function getDosesPlannedBetween(
     .orderBy(doses.plannedAt);
 }
 
-export async function setDoseState(
+export async function setDoseStateRow(
   id: string,
   state: DoseState,
   { backdated = false }: { backdated?: boolean } = {},
@@ -136,7 +136,7 @@ export async function setDoseState(
   });
 }
 
-export async function setDoseSnoozedUntil(
+export async function setDoseSnoozedUntilRow(
   id: string,
   when: Date,
 ): Promise<void> {
@@ -163,7 +163,7 @@ export async function getFuturePendingDosesByProduct(
     );
 }
 
-export async function deleteFuturePendingDosesForSchedules(
+export async function deleteFuturePendingDoseRowsForSchedules(
   scheduleIds: string[],
   from: Date,
 ): Promise<string[]> {
@@ -190,7 +190,7 @@ export async function deleteFuturePendingDosesForSchedules(
   });
 }
 
-export async function replaceFuturePendingDoses(
+export async function replaceFuturePendingDoseRows(
   scheduleId: string,
   from: Date,
   slots: NewDoseSlot[],
