@@ -6,10 +6,8 @@ import { syncAllSchedules } from '@/doses/dose-service';
 
 const log = createLogger('use-dose-sync');
 
-export function useDoseSync(enabled: boolean) {
+export function useDoseSync() {
   useEffect(() => {
-    if (!enabled) return;
-
     const sync = () =>
       syncAllSchedules().catch((err) => log.error('Dose sync failed', err));
 
@@ -19,5 +17,5 @@ export function useDoseSync(enabled: boolean) {
     });
 
     return () => subscription.remove();
-  }, [enabled]);
+  }, []);
 }

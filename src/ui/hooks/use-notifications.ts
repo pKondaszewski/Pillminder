@@ -10,22 +10,29 @@ import {
 } from '@/doses/dose-service';
 import {
   initNotifications,
+  type ReminderResponseHandlers,
   subscribeToReminderResponses,
 } from '@/notifications/notification-service';
 import { resolveStoreUrl } from '@/products/store-link';
 
 const log = createLogger('use-notifications');
 
-export function useNotifications() {
+export function useNotificationSetup() {
   useEffect(() => {
-    const ready = startNotifications();
+    void initNotificationStrings();
     const refreshOnLanguageChange = () => {
       void refreshNotificationLanguage();
     };
     i18n.on('languageChanged', refreshOnLanguageChange);
+    return () => i18n.off('languageChanged', refreshOnLanguageChange);
+  }, []);
+}
+
+export function useReminderResponses() {
+  useEffect(() => {
+    const unsubscribe = subscribeToReminderResponses(responseHandlers);
     return () => {
-      i18n.off('languageChanged', refreshOnLanguageChange);
-      void ready.then((unsubscribe) => unsubscribe());
+      void unsubscribe.then((unsubscribeFn) => unsubscribeFn());
     };
   }, []);
 }
@@ -49,24 +56,20 @@ async function refreshNotificationLanguage(): Promise<void> {
   }
 }
 
-async function startNotifications(): Promise<() => void> {
-  await initNotificationStrings();
-
-  return subscribeToReminderResponses({
-    onTake: (doseId) =>
-      takeDose(doseId).catch((err) =>
-        log.error('Take from notification failed', err),
-      ),
-    onSnooze: (doseId) =>
-      snoozeDose(doseId).catch((err) =>
-        log.error('Snooze from notification failed', err),
-      ),
-    onReorder: (storeLink) => {
-      const url = resolveStoreUrl(storeLink);
-      if (!url) return;
-      Linking.openURL(url).catch((err) =>
-        log.error('Open store link from notification failed', err),
-      );
-    },
-  });
-}
+const responseHandlers: ReminderResponseHandlers = {
+  onTake: (doseId) =>
+    takeDose(doseId).catch((err) =>
+      log.error('Take from notification failed', err),
+    ),
+  onSnooze: (doseId) =>
+    snoozeDose(doseId).catch((err) =>
+      log.error('Snooze from notification failed', err),
+    ),
+  onReorder: (storeLink) => {
+    const url = resolveStoreUrl(storeLink);
+    if (!url) return;
+    Linking.openURL(url).catch((err) =>
+      log.error('Open store link from notification failed', err),
+    );
+  },
+};

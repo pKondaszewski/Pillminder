@@ -11,7 +11,10 @@ import { AnimatedSplashOverlay } from '@/ui/components/commons/animated-icon';
 import AppTabs from '@/ui/components/navigation/app-tabs';
 import { OnboardingScreen } from '@/ui/components/onboarding/onboarding-screen';
 import { useDoseSync } from '@/ui/hooks/use-dose-sync';
-import { useNotifications } from '@/ui/hooks/use-notifications';
+import {
+  useNotificationSetup,
+  useReminderResponses,
+} from '@/ui/hooks/use-notifications';
 import { useOnboarding } from '@/ui/hooks/use-onboarding';
 import { useReorderNotifications } from '@/ui/hooks/use-reorder-notifications';
 
@@ -25,9 +28,7 @@ export default function TabLayout() {
     db,
     migrations,
   );
-  useNotifications();
-  useReorderNotifications();
-  useDoseSync(migrationsReady);
+  useNotificationSetup();
   const onboarding = useOnboarding(migrationsReady);
 
   if (migrationError) {
@@ -41,6 +42,7 @@ export default function TabLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <DatabaseBoundEffects />
         <AnimatedSplashOverlay />
         {onboarding.visible ? (
           <OnboardingScreen
@@ -61,4 +63,11 @@ function MigrationErrorScreen({ error }: { error: Error }) {
       <Text>Migration error: {error.message}</Text>
     </View>
   );
+}
+
+function DatabaseBoundEffects() {
+  useReminderResponses();
+  useReorderNotifications();
+  useDoseSync();
+  return null;
 }
