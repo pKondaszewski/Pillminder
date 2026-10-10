@@ -1,13 +1,14 @@
+import type { TFunction } from 'i18next';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { products as productsTable } from '@/config/db/schema';
-import i18n from '@/config/i18n';
 import {
   cancelReorderAlert,
   scheduleReorderAlert,
 } from '@/notifications/notification-service';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
+import type { Currency } from '@/settings/settings-store';
 
 import { useProducts } from './use-products';
 import { useReorderStatuses } from './use-reorder';
@@ -19,18 +20,18 @@ export function useReorderNotifications() {
   const { products } = useProducts();
   const reorderStatuses = useReorderStatuses();
   const { currency } = useSettings();
-  const { i18n: i18nInstance } = useTranslation();
-  const language = i18nInstance.language;
+  const { t } = useTranslation();
 
   useEffect(() => {
-    void syncReorderAlerts(products ?? [], reorderStatuses, currency);
-  }, [products, reorderStatuses, currency, language]);
+    void syncReorderAlerts(products, reorderStatuses, currency, t);
+  }, [products, reorderStatuses, currency, t]);
 }
 
 function syncReorderAlerts(
   products: Product[],
   statuses: Record<string, ReorderStatus>,
-  currency: string,
+  currency: Currency,
+  t: TFunction,
 ): Promise<unknown> {
   return Promise.all(
     products.map((product) => {
@@ -46,11 +47,11 @@ function syncReorderAlerts(
           reorderAt,
         },
         {
-          title: i18n.t('notification.reorderTitle'),
+          title: t('notification.reorderTitle'),
           body:
             product.price === null
-              ? i18n.t('notification.reorderBody', { name: product.name })
-              : i18n.t('notification.reorderBodyWithPrice', {
+              ? t('notification.reorderBody', { name: product.name })
+              : t('notification.reorderBodyWithPrice', {
                   name: product.name,
                   price: product.price,
                   currency,
