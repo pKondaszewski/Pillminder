@@ -1,5 +1,5 @@
 import {
-  cancelFutureDosesForSchedule,
+  cancelFutureDosesForSchedules,
   syncDosesForSchedule,
 } from '@/doses/dose-service';
 
@@ -39,6 +39,6 @@ export async function resumeSchedule(id: string): Promise<void> {
 }
 
 export async function removeSchedule(id: string): Promise<void> {
-  await cancelFutureDosesForSchedule(id);
+  await cancelFutureDosesForSchedules([id]);
   await deleteSchedule(id);
 }
