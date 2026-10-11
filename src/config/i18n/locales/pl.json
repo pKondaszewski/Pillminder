@@ -233,6 +233,13 @@
   },
   "settings": {
     "about": "O aplikacji",
+    "accent": "Kolor akcentu",
+    "accentBlue": "Niebieski",
+    "accentGreen": "Zielony",
+    "accentOrange": "Pomarańczowy",
+    "accentPink": "Różowy",
+    "accentPurple": "Fioletowy",
+    "accentTeal": "Morski",
     "appearance": "Wygląd",
     "author": "Autor",
     "batteryOptimization": "Optymalizacja baterii",

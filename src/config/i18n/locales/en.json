@@ -233,6 +233,13 @@
   },
   "settings": {
     "about": "About",
+    "accent": "Accent color",
+    "accentBlue": "Blue",
+    "accentGreen": "Green",
+    "accentOrange": "Orange",
+    "accentPink": "Pink",
+    "accentPurple": "Purple",
+    "accentTeal": "Teal",
     "appearance": "Appearance",
     "author": "Author",
     "batteryOptimization": "Battery optimization",

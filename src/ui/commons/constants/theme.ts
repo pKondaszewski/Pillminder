@@ -1,3 +1,14 @@
+import type { AccentPreference } from '@/settings/settings-store';
+
+export const ACCENT_COLORS: Record<AccentPreference, string> = {
+  blue: '#3c87f7',
+  green: '#279c58',
+  purple: '#a76cea',
+  orange: '#e0640c',
+  pink: '#eb4d8f',
+  teal: '#1b9894',
+};
+
 export const Colors = {
   light: {
     text: '#000000',
@@ -8,7 +19,7 @@ export const Colors = {
     danger: '#D9534F',
     success: '#3aa76d',
     warning: '#d97706',
-    accent: '#3c87f7',
+    accent: ACCENT_COLORS.blue,
   },
   dark: {
     text: '#ffffff',
@@ -19,7 +30,7 @@ export const Colors = {
     danger: '#FF6B66',
     success: '#3aa76d',
     warning: '#d97706',
-    accent: '#3c87f7',
+    accent: ACCENT_COLORS.blue,
   },
 } as const;
 

@@ -16,12 +16,15 @@ import {
   permissionStep,
 } from '@/onboarding/onboarding-service';
 import {
+  setAccent,
   setCurrency,
   setLanguage,
   setSnoozeMinutes,
   setTheme,
 } from '@/settings/settings-service';
 import {
+  ACCENT_OPTIONS,
+  type AccentPreference,
   CURRENCY_OPTIONS,
   isValidSnoozeMinutes,
   LANGUAGE_OPTIONS,
@@ -66,6 +69,13 @@ export default function SettingsScreen() {
                 selected={settings.theme}
                 optionLabel={(o) => t(THEME_LABEL_KEYS[o])}
                 onSelect={setTheme}
+              />
+              <OptionRow
+                label={t('settings.accent')}
+                options={ACCENT_OPTIONS}
+                selected={settings.accent}
+                optionLabel={(o) => t(ACCENT_LABEL_KEYS[o])}
+                onSelect={setAccent}
               />
             </Section>
 
@@ -122,6 +132,15 @@ const PERMISSION_STATUS_KEYS: Record<PermissionStep, string> = {
   granted: 'settings.notificationsGranted',
   askable: 'settings.notificationsAskable',
   blocked: 'settings.notificationsBlocked',
+};
+
+const ACCENT_LABEL_KEYS: Record<AccentPreference, string> = {
+  blue: 'settings.accentBlue',
+  green: 'settings.accentGreen',
+  purple: 'settings.accentPurple',
+  orange: 'settings.accentOrange',
+  pink: 'settings.accentPink',
+  teal: 'settings.accentTeal',
 };
 
 function Section({
