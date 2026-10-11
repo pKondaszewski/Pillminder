@@ -19,9 +19,9 @@ import {
   supportsStrength,
 } from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
-import { parsePackSize } from '@/products/pack-size';
 import type { Product } from '@/products/product-service';
 import { PRODUCT_UNITS, type ProductUnit } from '@/products/product-unit';
+import { parseWholeNumber } from '@/products/whole-number-input';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDateTime } from '@/ui/commons/format-date';
 import { ActionButton } from '@/ui/components/commons/action-button';
@@ -101,9 +101,9 @@ function EditorForm({
   const customCategories = useCustomCategories();
   const [strength, setStrength] = useState(product?.strength ?? '');
   const [unit, setUnit] = useState<ProductUnit | null>(product?.unit ?? null);
-  const [price, setPrice] = useState(toText(product?.price));
+  const [priceText, setPriceText] = useState(toText(product?.price));
   const [storeLink, setStoreLink] = useState(product?.storeLink ?? '');
-  const [stock, setStock] = useState(toText(product?.stock));
+  const [stockText, setStockText] = useState(toText(product?.stock));
   const [packSizeText, setPackSizeText] = useState(toText(product?.packSize));
   const [showErrors, setShowErrors] = useState(false);
   const [archiving, setArchiving] = useState(false);
@@ -119,12 +119,22 @@ function EditorForm({
   const categoryMissing = category === null;
   const showNameError = showErrors && nameMissing;
   const showCategoryError = showErrors && categoryMissing;
-  const parsedPackSize = parsePackSize(packSizeText);
-  const packSize = parsedPackSize.valid ? parsedPackSize.packSize : null;
+  const parsedPrice = parseWholeNumber(priceText, 0);
+  const parsedStock = parseWholeNumber(stockText, 0);
+  const parsedPackSize = parseWholeNumber(packSizeText, 1);
+  const packSize = parsedPackSize.valid ? parsedPackSize.value : null;
+  const showPriceError = showErrors && !parsedPrice.valid;
+  const showStockError = showErrors && !parsedStock.valid;
   const showPackSizeError = showErrors && !parsedPackSize.valid;
 
   const handleSave = async () => {
-    if (nameMissing || categoryMissing || !parsedPackSize.valid) {
+    if (
+      nameMissing ||
+      categoryMissing ||
+      !parsedPrice.valid ||
+      !parsedStock.valid ||
+      !parsedPackSize.valid
+    ) {
       setShowErrors(true);
       return;
     }
@@ -139,9 +149,9 @@ function EditorForm({
       category,
       strength: hasStrength ? strength.trim() || null : null,
       unit,
-      price: toNumber(price),
+      price: parsedPrice.value,
       storeLink: storeLink.trim() || null,
-      stock: toNumber(stock),
+      stock: parsedStock.value,
       packSize,
     });
   };
@@ -186,28 +196,27 @@ function EditorForm({
   };
 
   const increaseStock = () => {
-    const current = toNumber(stock) ?? 0;
-    setStock(String(current + 1));
+    if (!parsedStock.valid) return;
+    setStockText(String((parsedStock.value ?? 0) + 1));
   };
 
   const addPack = (size: number) => {
-    const current = toNumber(stock) ?? 0;
-    setStock(String(current + size));
+    if (!parsedStock.valid) return;
+    setStockText(String((parsedStock.value ?? 0) + size));
   };
 
   const decreaseStock = () => {
-    const current = toNumber(stock);
-    if (current === null) return;
-    setStock(String(Math.max(0, current - 1)));
+    if (!parsedStock.valid || parsedStock.value === null) return;
+    setStockText(String(Math.max(0, parsedStock.value - 1)));
   };
 
   const inputStyle = [
     styles.input,
     { color: theme.text, borderColor: theme.backgroundSelected },
   ];
-  const packSizeInputStyle = [
+  const numberInputStyle = (showError: boolean) => [
     inputStyle,
-    showPackSizeError ? { borderColor: theme.danger } : null,
+    showError ? { borderColor: theme.danger } : null,
   ];
   const nameInputStyle = [
     inputStyle,
@@ -297,13 +306,16 @@ function EditorForm({
           </ThemedText>
 
           <TextInput
-            value={price}
-            onChangeText={setPrice}
+            value={priceText}
+            onChangeText={setPriceText}
             keyboardType="numeric"
             placeholder="0"
             placeholderTextColor={theme.textSecondary}
-            style={inputStyle}
+            style={numberInputStyle(showPriceError)}
           />
+          {showPriceError && (
+            <FieldError message={t('editor.wholeNumberInvalid')} />
+          )}
 
           <ThemedText type="small">{t('editor.stock')}</ThemedText>
           <ThemedView style={styles.stepperRow}>
@@ -313,12 +325,12 @@ function EditorForm({
               onPress={decreaseStock}
             />
             <TextInput
-              value={stock}
-              onChangeText={setStock}
+              value={stockText}
+              onChangeText={setStockText}
               keyboardType="numeric"
               placeholder="0"
               placeholderTextColor={theme.textSecondary}
-              style={[inputStyle, styles.stepperInput]}
+              style={[numberInputStyle(showStockError), styles.stepperInput]}
             />
             <StepperButton
               sign="+"
@@ -326,6 +338,9 @@ function EditorForm({
               onPress={increaseStock}
             />
           </ThemedView>
+          {showStockError && (
+            <FieldError message={t('editor.wholeNumberInvalid')} />
+          )}
           {packSize !== null && (
             <ThemedView style={styles.actions}>
               <ActionButton
@@ -343,7 +358,7 @@ function EditorForm({
             accessibilityLabel={t('editor.packSize')}
             placeholder={t('editor.packSizePlaceholder')}
             placeholderTextColor={theme.textSecondary}
-            style={packSizeInputStyle}
+            style={numberInputStyle(showPackSizeError)}
           />
           {showPackSizeError && (
             <FieldError message={t('editor.packSizeInvalid')} />
@@ -455,13 +470,6 @@ function EditorForm({
 
 function toText(value: number | null | undefined) {
   return value == null ? '' : String(value);
-}
-
-function toNumber(value: string): number | null {
-  const trimmed = value.trim();
-  if (trimmed === '') return null;
-  const parsed = Number(trimmed);
-  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function FieldError({ message }: { message: string }) {

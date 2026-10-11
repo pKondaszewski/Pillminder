@@ -66,7 +66,8 @@
     "strength": "Strength",
     "strengthPlaceholder": "e.g. 5mg",
     "unit": "Unit",
-    "unitNone": "None"
+    "unitNone": "None",
+    "wholeNumberInvalid": "Enter a whole number, 0 or more"
   },
   "history": {
     "change": "Change",
