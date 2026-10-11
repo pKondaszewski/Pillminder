@@ -179,6 +179,7 @@
     "reorderBody": "{{name}} się kończy — czas dokupić",
     "reorderBodyWithPrice": "{{name}} się kończy — czas dokupić ({{price}} {{currency}})",
     "reorderTitle": "Kończy się zapas",
+    "retryTitle": "Dawka nadal czeka — przypominamy ponownie",
     "snooze": "Drzemka",
     "take": "Wziąłem",
     "title": "Przypomnienie o dawce"
