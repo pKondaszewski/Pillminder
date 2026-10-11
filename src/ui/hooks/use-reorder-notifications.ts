@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import {
   cancelReorderAlert,
+  getReorderAlertedAt,
   scheduleReorderAlert,
+  showReorderAlert,
 } from '@/notifications/notification-service';
 import { reorderAlertAction } from '@/notifications/reorder-alert-action';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
@@ -36,31 +38,33 @@ function syncReorderAlerts(
   return Promise.all(
     products.map(async (product) => {
       const reorderAt = statuses[product.id]?.reorderAt ?? null;
-      const action = reorderAlertAction(reorderAt, now);
+      const alertedAt = getReorderAlertedAt(product.id);
+      const action = reorderAlertAction(reorderAt, alertedAt, now);
       if (action.kind === 'keep') return;
       if (action.kind === 'cancel') return cancelReorderAlert(product.id);
 
+      const alert = {
+        productId: product.id,
+        productName: product.name,
+        storeLink: product.storeLink,
+        canAddPack: product.packSize !== null,
+      };
+      const text = {
+        title: t('notification.reorderTitle'),
+        body:
+          product.price === null
+            ? t('notification.reorderBody', { name: product.name })
+            : t('notification.reorderBodyWithPrice', {
+                name: product.name,
+                price: product.price,
+                currency,
+              }),
+      };
+
       await cancelReorderAlert(product.id);
-      return scheduleReorderAlert(
-        {
-          productId: product.id,
-          productName: product.name,
-          storeLink: product.storeLink,
-          canAddPack: product.packSize !== null,
-          reorderAt: action.at,
-        },
-        {
-          title: t('notification.reorderTitle'),
-          body:
-            product.price === null
-              ? t('notification.reorderBody', { name: product.name })
-              : t('notification.reorderBodyWithPrice', {
-                  name: product.name,
-                  price: product.price,
-                  currency,
-                }),
-        },
-      );
+      return action.kind === 'reschedule'
+        ? scheduleReorderAlert(alert, action.at, text)
+        : showReorderAlert(alert, text);
     }),
   );
 }

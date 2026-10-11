@@ -1,5 +1,6 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import * as Notifications from 'expo-notifications';
+import Storage from 'expo-sqlite/kv-store';
 
 import { createLogger } from '@/config/logger';
 
@@ -32,6 +33,9 @@ export const isNotificationsSupported =
 const log = createLogger('notification-service');
 
 const REORDER_PREFIX = 'reorder:';
+// A dismissed notification can't be told apart from one never shown, so the
+// delivery time is kept here.
+const REORDER_ALERTED_AT_PREFIX = 'reorder-alerted-at:';
 
 let channelSetup: Promise<unknown> = Promise.resolve();
 
@@ -101,35 +105,23 @@ export async function cancelDoseReminders(doseIds: string[]): Promise<void> {
 
 export async function scheduleReorderAlert(
   alert: ReorderAlert,
+  reorderAt: Date,
   strings: NotificationText,
 ): Promise<void> {
-  if (!isNotificationsSupported) return;
-  if (alert.reorderAt.getTime() <= Date.now()) return;
+  if (reorderAt.getTime() <= Date.now()) return;
+  await postReorderAlert(alert, strings, reorderAt);
+}
 
-  try {
-    await Notifications.scheduleNotificationAsync({
-      identifier: `${REORDER_PREFIX}${alert.productId}`,
-      content: {
-        title: strings.title,
-        body: strings.body,
-        categoryIdentifier: alert.canAddPack
-          ? REORDER_PACK_CATEGORY_ID
-          : REORDER_CATEGORY_ID,
-        data: {
-          type: 'reorder',
-          productId: alert.productId,
-          storeLink: alert.storeLink,
-        },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: alert.reorderAt,
-        channelId: REORDER_CHANNEL_ID,
-      },
-    });
-  } catch (err) {
-    log.error(`Failed to schedule reorder alert for ${alert.productId}`, err);
-  }
+export async function showReorderAlert(
+  alert: ReorderAlert,
+  strings: NotificationText,
+): Promise<void> {
+  await postReorderAlert(alert, strings, null);
+}
+
+export function getReorderAlertedAt(productId: string): Date | null {
+  const stored = Storage.getItemSync(reorderAlertedAtKey(productId));
+  return stored === null ? null : new Date(Number(stored));
 }
 
 export async function cancelReorderAlert(productId: string): Promise<void> {
@@ -141,6 +133,7 @@ export async function cancelReorderAlert(productId: string): Promise<void> {
   } catch (err) {
     log.warn(`Failed to cancel reorder alert for ${productId}`, err);
   }
+  Storage.removeItemSync(reorderAlertedAtKey(productId));
 }
 
 export async function cancelAllNotifications(): Promise<void> {
@@ -264,5 +257,49 @@ async function setUpNotifications(
   } catch (err) {
     log.error('Failed to initialize notifications', err);
     return false;
+  }
+}
+
+function reorderAlertedAtKey(productId: string): string {
+  return REORDER_ALERTED_AT_PREFIX + productId;
+}
+
+async function postReorderAlert(
+  alert: ReorderAlert,
+  strings: NotificationText,
+  deliverAt: Date | null,
+): Promise<void> {
+  if (!isNotificationsSupported) return;
+
+  try {
+    await Notifications.scheduleNotificationAsync({
+      identifier: `${REORDER_PREFIX}${alert.productId}`,
+      content: {
+        title: strings.title,
+        body: strings.body,
+        categoryIdentifier: alert.canAddPack
+          ? REORDER_PACK_CATEGORY_ID
+          : REORDER_CATEGORY_ID,
+        data: {
+          type: 'reorder',
+          productId: alert.productId,
+          storeLink: alert.storeLink,
+        },
+      },
+      trigger:
+        deliverAt === null
+          ? { channelId: REORDER_CHANNEL_ID }
+          : {
+              type: Notifications.SchedulableTriggerInputTypes.DATE,
+              date: deliverAt,
+              channelId: REORDER_CHANNEL_ID,
+            },
+    });
+    Storage.setItemSync(
+      reorderAlertedAtKey(alert.productId),
+      String((deliverAt ?? new Date()).getTime()),
+    );
+  } catch (err) {
+    log.error(`Failed to post reorder alert for ${alert.productId}`, err);
   }
 }

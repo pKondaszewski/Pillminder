@@ -8,7 +8,7 @@ describe('reorderAlertAction', () => {
     const reorderAt = null;
 
     // when
-    const action = reorderAlertAction(reorderAt, NOW);
+    const action = reorderAlertAction(reorderAt, null, NOW);
 
     // then
     expect(action).toEqual({ kind: 'cancel' });
@@ -19,31 +19,67 @@ describe('reorderAlertAction', () => {
     const reorderAt = new Date(NOW.getTime() + 60_000);
 
     // when
-    const action = reorderAlertAction(reorderAt, NOW);
+    const action = reorderAlertAction(reorderAt, null, NOW);
 
     // then
     expect(action).toEqual({ kind: 'reschedule', at: reorderAt });
   });
 
-  it('keeps the delivered alert when reorderAt has passed', () => {
+  it('reschedules a future reorderAt even if an alert was delivered before', () => {
+    // given
+    const reorderAt = new Date(NOW.getTime() + 60_000);
+    const alertedAt = new Date(NOW.getTime() - 60_000);
+
+    // when
+    const action = reorderAlertAction(reorderAt, alertedAt, NOW);
+
+    // then
+    expect(action).toEqual({ kind: 'reschedule', at: reorderAt });
+  });
+
+  it('notifies now when reorderAt has passed and no alert was posted', () => {
     // given
     const reorderAt = new Date(NOW.getTime() - 60_000);
 
     // when
-    const action = reorderAlertAction(reorderAt, NOW);
+    const action = reorderAlertAction(reorderAt, null, NOW);
+
+    // then
+    expect(action).toEqual({ kind: 'notifyNow' });
+  });
+
+  it('notifies now when the scheduled alert is still ahead of now', () => {
+    // given
+    const reorderAt = new Date(NOW.getTime() - 60_000);
+    const alertedAt = new Date(NOW.getTime() + 24 * 60 * 60_000);
+
+    // when
+    const action = reorderAlertAction(reorderAt, alertedAt, NOW);
+
+    // then
+    expect(action).toEqual({ kind: 'notifyNow' });
+  });
+
+  it('keeps the alert already delivered in this episode', () => {
+    // given
+    const reorderAt = new Date(NOW.getTime() - 60_000);
+    const alertedAt = new Date(NOW.getTime() - 2 * 60_000);
+
+    // when
+    const action = reorderAlertAction(reorderAt, alertedAt, NOW);
 
     // then
     expect(action).toEqual({ kind: 'keep' });
   });
 
-  it('keeps the alert at the exact moment reorderAt is reached', () => {
+  it('notifies when reorderAt is reached exactly and nothing was posted', () => {
     // given
     const reorderAt = new Date(NOW.getTime());
 
     // when
-    const action = reorderAlertAction(reorderAt, NOW);
+    const action = reorderAlertAction(reorderAt, null, NOW);
 
     // then
-    expect(action).toEqual({ kind: 'keep' });
+    expect(action).toEqual({ kind: 'notifyNow' });
   });
 });

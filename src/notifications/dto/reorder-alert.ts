@@ -3,5 +3,4 @@ export interface ReorderAlert {
   productName: string;
   storeLink: string | null;
   canAddPack: boolean;
-  reorderAt: Date;
 }
