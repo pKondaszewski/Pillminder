@@ -73,6 +73,11 @@
     "taken": "Taken"
   },
   "home": {
+    "bulkTake": "Take overdue ({{count}})",
+    "bulkTakeConfirm_one": "Mark {{count}} overdue dose as taken?",
+    "bulkTakeConfirm_other": "Mark {{count}} overdue doses as taken?",
+    "bulkTakeError": "Some doses could not be saved. The rest were marked.",
+    "bulkTakeTitle": "Mark overdue as taken?",
     "empty": "Nothing today, you're free 🎉",
     "quantity": "× {{count}}",
     "skip": "Skip",

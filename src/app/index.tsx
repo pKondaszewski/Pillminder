@@ -3,8 +3,10 @@ import { Alert, Pressable, SectionList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
+  BULK_TAKE_MIN_OVERDUE,
   doseQuantityText,
   groupDosesByTimeSlot,
+  overdueDoses,
   type TodayDose,
 } from '@/doses/dose-service';
 import { Spacing } from '@/ui/commons/constants/theme';
@@ -24,7 +26,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const { doses, takeDose, untakeDose, skipDose, unskipDose } =
     useTodaysDoses();
-  const { undoable, applyWithUndo, revert, undoLast, dismissUndo } =
+  const { undoable, applyWithUndo, takeAll, revert, undoLast, dismissUndo } =
     useUndoableDoseAction({
       taken: { apply: takeDose, revert: untakeDose },
       skipped: { apply: skipDose, revert: unskipDose },
@@ -35,6 +37,20 @@ export default function HomeScreen() {
     Alert.alert(t(title), t(message, { name: item.productName }), [
       { text: t('editor.cancel'), style: 'cancel' },
       { text: t('home.undo'), onPress: () => revert(kind, item.id) },
+    ]);
+  };
+
+  const overdue = overdueDoses(doses, new Date());
+  const showBulkTake = overdue.length >= BULK_TAKE_MIN_OVERDUE;
+
+  const confirmTakeOverdue = () => {
+    const count = overdue.length;
+    Alert.alert(t('home.bulkTakeTitle'), t('home.bulkTakeConfirm', { count }), [
+      { text: t('editor.cancel'), style: 'cancel' },
+      {
+        text: t('home.take'),
+        onPress: () => takeAll(overdue.map(({ id }) => id)),
+      },
     ]);
   };
 
@@ -89,6 +105,24 @@ export default function HomeScreen() {
               </ThemedText>
             )}
             stickySectionHeadersEnabled={false}
+            ListHeaderComponent={
+              showBulkTake ? (
+                <Pressable
+                  onPress={confirmTakeOverdue}
+                  accessibilityRole="button"
+                  style={({ pressed }) => pressed && styles.pressed}
+                >
+                  <ThemedView
+                    type="backgroundSelected"
+                    style={[styles.takeButton, styles.bulkTake]}
+                  >
+                    <ThemedText type="smallBold" themeColor="accent">
+                      {t('home.bulkTake', { count: overdue.length })}
+                    </ThemedText>
+                  </ThemedView>
+                </Pressable>
+              ) : null
+            }
             ListEmptyComponent={
               <ThemedText type="small">{t('home.empty')}</ThemedText>
             }
@@ -232,6 +266,9 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.two,
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.three,
+  },
+  bulkTake: {
+    alignItems: 'center',
   },
   pressed: {
     opacity: 0.7,

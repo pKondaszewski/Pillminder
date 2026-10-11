@@ -40,6 +40,7 @@ import type { AdherenceReport } from './dto/adherence-report-output';
 
 export { toHistoryEntries } from './dose-history';
 export { doseQuantityText } from './dose-label';
+export { BULK_TAKE_MIN_OVERDUE, overdueDoses } from './dose-overdue';
 export { groupDosesByTimeSlot } from './dose-time-slot';
 export { toTodayDose } from './dose-today';
 export type {

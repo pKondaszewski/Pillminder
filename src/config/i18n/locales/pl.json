@@ -73,6 +73,13 @@
     "taken": "Wzięto"
   },
   "home": {
+    "bulkTake": "Wziąłem zaległe ({{count}})",
+    "bulkTakeConfirm_few": "Oznaczyć {{count}} zaległe dawki jako wzięte?",
+    "bulkTakeConfirm_many": "Oznaczyć {{count}} zaległych dawek jako wzięte?",
+    "bulkTakeConfirm_one": "Oznaczyć {{count}} zaległą dawkę jako wziętą?",
+    "bulkTakeConfirm_other": "Oznaczyć {{count}} zaległej dawki jako wzięte?",
+    "bulkTakeError": "Nie wszystkie dawki udało się zapisać. Pozostałe zostały oznaczone.",
+    "bulkTakeTitle": "Oznaczyć zaległe jako wzięte?",
     "empty": "Nic na dziś, wolne 🎉",
     "quantity": "× {{count}}",
     "skip": "Pomiń",
