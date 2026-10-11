@@ -1,10 +1,7 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert } from 'react-native';
 
-import { createLogger } from '@/config/logger';
-import { openBatteryOptimizationSettings } from '@/onboarding/onboarding-service';
 import { ThemedText } from '@/ui/components/commons/themed-text';
+import { useBatteryOptimization } from '@/ui/hooks/use-battery-optimization';
 
 import {
   OnboardingStepLayout,
@@ -12,26 +9,12 @@ import {
   SkipButton,
 } from './onboarding-step-layout';
 
-const log = createLogger('battery-step');
-
 export function BatteryStep({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation();
-  const [busy, setBusy] = useState(false);
+  const { busy, openSettings } = useBatteryOptimization();
 
-  const openSettings = async () => {
-    setBusy(true);
-    try {
-      await openBatteryOptimizationSettings();
-      onDone();
-    } catch (err) {
-      log.error('Opening battery optimization settings failed', err);
-      Alert.alert(
-        t('onboarding.batteryFailed'),
-        err instanceof Error ? err.message : '',
-      );
-    } finally {
-      setBusy(false);
-    }
+  const openSettingsThenDone = async () => {
+    if (await openSettings()) onDone();
   };
 
   return (
@@ -51,7 +34,7 @@ export function BatteryStep({ onDone }: { onDone: () => void }) {
         <>
           <PrimaryButton
             label={t('onboarding.batteryOpen')}
-            onPress={() => void openSettings()}
+            onPress={() => void openSettingsThenDone()}
             disabled={busy}
           />
           <SkipButton label={t('onboarding.notNow')} onPress={onDone} />

@@ -3,6 +3,7 @@ import { Appearance } from 'react-native';
 import i18n, { resolveLanguage } from '@/config/i18n';
 
 import {
+  type AccentPreference,
   type Currency,
   getSettings,
   type LanguagePreference,
@@ -17,6 +18,10 @@ export function applyStoredTheme(): void {
 export function setTheme(theme: ThemePreference): void {
   updateSettings({ theme });
   applyTheme(theme);
+}
+
+export function setAccent(accent: AccentPreference): void {
+  updateSettings({ accent });
 }
 
 export function setLanguage(language: LanguagePreference): void {

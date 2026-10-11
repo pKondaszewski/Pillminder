@@ -1,17 +1,30 @@
 import Constants from 'expo-constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
+import {
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AUTHOR_NAME } from '@/config/app-info';
 import {
+  type PermissionStep,
+  permissionStep,
+} from '@/onboarding/onboarding-service';
+import {
+  setAccent,
   setCurrency,
   setLanguage,
   setSnoozeMinutes,
   setTheme,
 } from '@/settings/settings-service';
 import {
+  ACCENT_OPTIONS,
+  type AccentPreference,
   CURRENCY_OPTIONS,
   isValidSnoozeMinutes,
   LANGUAGE_OPTIONS,
@@ -28,6 +41,8 @@ import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { useBackup } from '@/ui/hooks/use-backup';
+import { useBatteryOptimization } from '@/ui/hooks/use-battery-optimization';
+import { useNotificationPermission } from '@/ui/hooks/use-notification-permission';
 import { useSettings } from '@/ui/hooks/use-settings';
 import { useTheme } from '@/ui/hooks/use-theme';
 
@@ -55,6 +70,13 @@ export default function SettingsScreen() {
                 optionLabel={(o) => t(THEME_LABEL_KEYS[o])}
                 onSelect={setTheme}
               />
+              <OptionRow
+                label={t('settings.accent')}
+                options={ACCENT_OPTIONS}
+                selected={settings.accent}
+                optionLabel={(o) => t(ACCENT_LABEL_KEYS[o])}
+                onSelect={setAccent}
+              />
             </Section>
 
             <Section title={t('settings.notifications')}>
@@ -63,6 +85,8 @@ export default function SettingsScreen() {
                 value={settings.snoozeMinutes}
                 onChange={setSnoozeMinutes}
               />
+              <NotificationPermissionRow />
+              <BatteryOptimizationRow />
             </Section>
 
             <Section title={t('settings.price')}>
@@ -104,6 +128,21 @@ const THEME_LABEL_KEYS: Record<ThemePreference, string> = {
   dark: 'settings.themeDark',
 };
 
+const PERMISSION_STATUS_KEYS: Record<PermissionStep, string> = {
+  granted: 'settings.notificationsGranted',
+  askable: 'settings.notificationsAskable',
+  blocked: 'settings.notificationsBlocked',
+};
+
+const ACCENT_LABEL_KEYS: Record<AccentPreference, string> = {
+  blue: 'settings.accentBlue',
+  green: 'settings.accentGreen',
+  purple: 'settings.accentPurple',
+  orange: 'settings.accentOrange',
+  pink: 'settings.accentPink',
+  teal: 'settings.accentTeal',
+};
+
 function Section({
   title,
   children,
@@ -121,6 +160,100 @@ function Section({
   );
 }
 
+function NotificationPermissionRow() {
+  const { t } = useTranslation();
+  const { permission, request } = useNotificationPermission();
+  if (!permission) return null;
+
+  const step = permissionStep(permission);
+  const action = {
+    granted: undefined,
+    askable: { label: t('onboarding.allow'), onPress: request },
+    blocked: {
+      label: t('onboarding.openSettings'),
+      onPress: () => void Linking.openSettings(),
+    },
+  }[step];
+
+  return (
+    <StatusRow
+      label={t('settings.notificationsPermission')}
+      status={t(PERMISSION_STATUS_KEYS[step])}
+      action={action}
+    />
+  );
+}
+
+function BatteryOptimizationRow() {
+  const { t } = useTranslation();
+  const { enabled, openSettings } = useBatteryOptimization();
+  if (enabled === null) return null;
+
+  return (
+    <StatusRow
+      label={t('settings.batteryOptimization')}
+      status={t(
+        enabled ? 'settings.batteryRestricted' : 'settings.batteryUnrestricted',
+      )}
+      action={
+        enabled
+          ? {
+              label: t('onboarding.batteryOpen'),
+              onPress: () => void openSettings(),
+            }
+          : undefined
+      }
+    />
+  );
+}
+
+function StatusRow({
+  label,
+  status,
+  action,
+}: {
+  label: string;
+  status: string;
+  action?: { label: string; onPress: () => void };
+}) {
+  return (
+    <ThemedView style={styles.optionRow}>
+      <ThemedText type="small">{label}</ThemedText>
+      <ThemedText type="small" themeColor="textSecondary">
+        {status}
+      </ThemedText>
+      {action && (
+        <ThemedView style={styles.chips}>
+          <SettingsActionButton label={action.label} onPress={action.onPress} />
+        </ThemedView>
+      )}
+    </ThemedView>
+  );
+}
+
+function SettingsActionButton({
+  label,
+  onPress,
+  disabled = false,
+}: {
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      style={({ pressed }) => (pressed || disabled) && styles.pressed}
+    >
+      <ThemedView type="backgroundElement" style={styles.chip}>
+        <ThemedText type="small">{label}</ThemedText>
+      </ThemedView>
+    </Pressable>
+  );
+}
+
 function BackupSection() {
   const { t } = useTranslation();
   const { busy, exportData, importData } = useBackup();
@@ -135,17 +268,12 @@ function BackupSection() {
           { label: t('backup.export'), onPress: exportData },
           { label: t('backup.import'), onPress: importData },
         ].map(({ label, onPress }) => (
-          <Pressable
+          <SettingsActionButton
             key={label}
+            label={label}
             onPress={onPress}
             disabled={busy}
-            accessibilityRole="button"
-            style={({ pressed }) => (pressed || busy) && styles.pressed}
-          >
-            <ThemedView type="backgroundElement" style={styles.chip}>
-              <ThemedText type="small">{label}</ThemedText>
-            </ThemedView>
-          </Pressable>
+          />
         ))}
       </ThemedView>
     </Section>
