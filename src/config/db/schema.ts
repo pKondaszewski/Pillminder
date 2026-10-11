@@ -8,6 +8,7 @@ import {
 
 // Relative on purpose: drizzle-kit loads this file without the @ alias.
 import { DOSE_STATES } from '../../doses/dose-transition';
+import { IMAGE_ROLES } from '../../images/image-role';
 import { PRODUCT_UNITS } from '../../products/product-unit';
 
 export const products = sqliteTable('products', {
@@ -83,4 +84,18 @@ export const notes = sqliteTable(
     updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
   },
   (table) => [index('idx_notes_product').on(table.productId)],
+);
+
+export const productImages = sqliteTable(
+  'product_images',
+  {
+    id: text('id').primaryKey(),
+    productId: text('product_id')
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    fileName: text('file_name').notNull(),
+    role: text('role', { enum: IMAGE_ROLES }).notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  },
+  (table) => [index('idx_product_images_product').on(table.productId)],
 );

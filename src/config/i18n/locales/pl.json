@@ -2,9 +2,9 @@
   "backup": {
     "cancel": "Anuluj",
     "confirmAction": "Zastąp wszystko",
-    "confirmMessage": "Wszystkie obecne dane zostaną usunięte i zastąpione zawartością pliku: produkty: {{products}}, harmonogramy: {{schedules}}, dawki: {{doses}}, notatki: {{notes}}.\n\nUstawienia nie są zmieniane. Tej operacji nie można cofnąć.",
+    "confirmMessage": "Wszystkie obecne dane zostaną usunięte i zastąpione zawartością pliku: produkty: {{products}}, harmonogramy: {{schedules}}, dawki: {{doses}}, notatki: {{notes}}. Zdjęcia produktów też zostaną usunięte.\n\nUstawienia nie są zmieniane. Tej operacji nie można cofnąć.",
     "confirmTitle": "Zastąpić wszystkie dane?",
-    "description": "Eksport zapisuje produkty, harmonogramy, historię dawek i notatki do pliku JSON. Import zastępuje wszystkie obecne dane zawartością takiego pliku. Ustawienia nie są uwzględniane.",
+    "description": "Eksport zapisuje produkty, harmonogramy, historię dawek i notatki do pliku JSON. Import zastępuje wszystkie obecne dane zawartością takiego pliku. Zdjęcia i ustawienia nie są uwzględniane.",
     "export": "Eksportuj dane",
     "exportFailed": "Eksport nie powiódł się",
     "import": "Importuj dane",
@@ -142,13 +142,30 @@
     "unskipConfirm": "Cofnąć pominięcie „{{name}}”?",
     "unskipTitle": "Cofnąć pominięcie?"
   },
+  "images": {
+    "camera": "Zrób zdjęcie",
+    "cameraDenied": "Brak dostępu do aparatu. Zezwól na niego w ustawieniach systemu albo dodaj zdjęcie z galerii.",
+    "deleteConfirm": "Usunąć to zdjęcie?",
+    "deleteTitle": "Usunąć zdjęcie?",
+    "empty": "Brak zdjęć",
+    "errorDelete": "Nie udało się usunąć zdjęcia. Spróbuj ponownie.",
+    "errorSave": "Nie udało się dodać zdjęcia. Spróbuj ponownie.",
+    "gallery": "Z galerii",
+    "preview": "Pokaż zdjęcie",
+    "role": {
+      "box": "Pudełko",
+      "document": "Paragon / recepta",
+      "pill": "Tabletka"
+    },
+    "title": "Zdjęcia"
+  },
   "migrationError": {
     "details": "Szczegóły techniczne",
     "hideDetails": "Ukryj szczegóły techniczne",
     "message": "Nie udało się przygotować bazy danych aplikacji. Zwykle pomaga ponowna próba. Jeśli to nie działa, możesz przywrócić dane z kopii zapasowej albo zacząć od zera.",
     "reset": "Wyczyść dane",
     "resetConfirmAction": "Usuń wszystko",
-    "resetConfirmMessage": "Wszystkie produkty, harmonogramy, historia dawek i notatki zostaną usunięte. Ustawienia zostają.\n\nTej operacji nie można cofnąć.",
+    "resetConfirmMessage": "Wszystkie produkty, harmonogramy, historia dawek, notatki i zdjęcia zostaną usunięte. Ustawienia zostają.\n\nTej operacji nie można cofnąć.",
     "resetConfirmTitle": "Wyczyścić wszystkie dane?",
     "resetFailed": "Nie udało się wyczyścić danych",
     "restore": "Przywróć z kopii",

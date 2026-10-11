@@ -2,9 +2,9 @@
   "backup": {
     "cancel": "Cancel",
     "confirmAction": "Replace everything",
-    "confirmMessage": "This will delete ALL current data and replace it with the file contents: {{products}} products, {{schedules}} schedules, {{doses}} doses, {{notes}} notes.\n\nSettings are not affected. This cannot be undone.",
+    "confirmMessage": "This will delete ALL current data and replace it with the file contents: {{products}} products, {{schedules}} schedules, {{doses}} doses, {{notes}} notes. Photos of products will be deleted too.\n\nSettings are not affected. This cannot be undone.",
     "confirmTitle": "Replace all data?",
-    "description": "Export saves products, schedules, dose history and notes to a JSON file. Import replaces all current data with the contents of such a file. Settings are not included.",
+    "description": "Export saves products, schedules, dose history and notes to a JSON file. Import replaces all current data with the contents of such a file. Photos and settings are not included.",
     "export": "Export data",
     "exportFailed": "Export failed",
     "import": "Import data",
@@ -138,13 +138,30 @@
     "unskipConfirm": "Undo skipping “{{name}}”?",
     "unskipTitle": "Undo skipped?"
   },
+  "images": {
+    "camera": "Take photo",
+    "cameraDenied": "Camera access is denied. Allow it in the system settings or add the photo from the gallery.",
+    "deleteConfirm": "Delete this photo?",
+    "deleteTitle": "Delete photo?",
+    "empty": "No photos yet",
+    "errorDelete": "Could not delete the photo. Try again.",
+    "errorSave": "Could not add the photo. Try again.",
+    "gallery": "From gallery",
+    "preview": "Show photo",
+    "role": {
+      "box": "Box",
+      "document": "Receipt / prescription",
+      "pill": "Pill"
+    },
+    "title": "Photos"
+  },
   "migrationError": {
     "details": "Technical details",
     "hideDetails": "Hide technical details",
     "message": "The app could not prepare its database. Trying again usually helps. If it doesn't, you can restore your data from a backup or start from scratch.",
     "reset": "Erase data",
     "resetConfirmAction": "Erase everything",
-    "resetConfirmMessage": "All products, schedules, dose history and notes will be deleted. Settings are kept.\n\nThis cannot be undone.",
+    "resetConfirmMessage": "All products, schedules, dose history, notes and photos will be deleted. Settings are kept.\n\nThis cannot be undone.",
     "resetConfirmTitle": "Erase all data?",
     "resetFailed": "Could not erase the data",
     "restore": "Restore from backup",

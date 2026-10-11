@@ -30,6 +30,7 @@ import { StepperButton } from '@/ui/components/commons/stepper-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductHistory } from '@/ui/components/products/history';
+import { ProductImages } from '@/ui/components/products/images';
 import { ProductNotes } from '@/ui/components/products/notes';
 import { useCustomCategories } from '@/ui/hooks/use-custom-categories';
 import { useNoteDraft } from '@/ui/hooks/use-note-draft';
@@ -417,6 +418,8 @@ function EditorForm({
               </ThemedView>
             </Pressable>
           ) : null}
+
+          {product ? <ProductImages productId={product.id} /> : null}
 
           {product ? (
             <ProductNotes productId={product.id} noteDraft={noteDraft} />

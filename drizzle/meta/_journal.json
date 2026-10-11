@@ -64,6 +64,13 @@
       "when": 1791753033994,
       "tag": "0008_add_product_pack_size",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1791756010349,
+      "tag": "0009_add_product_images",
+      "breakpoints": true
     }
   ]
 }
