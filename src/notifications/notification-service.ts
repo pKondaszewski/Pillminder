@@ -90,6 +90,7 @@ export async function cancelDoseReminder(doseId: string): Promise<void> {
   } catch (err) {
     log.warn(`Failed to cancel reminder for dose ${doseId}`, err);
   }
+  await dismissDoseReminder(doseId);
 }
 
 export async function cancelDoseReminders(doseIds: string[]): Promise<void> {

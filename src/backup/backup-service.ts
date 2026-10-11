@@ -8,7 +8,6 @@ import { refreshAllReminders, syncAllSchedules } from '@/doses/dose-service';
 import {
   cancelDoseReminders,
   cancelReorderAlert,
-  dismissDoseReminder,
 } from '@/notifications/notification-service';
 
 import {
@@ -98,7 +97,6 @@ async function cancelOrphanedNotifications(
   const doseIds = orphanIds('doses');
   await Promise.all([
     cancelDoseReminders(doseIds),
-    ...doseIds.map(dismissDoseReminder),
     ...orphanIds('products').map(cancelReorderAlert),
   ]);
 }
