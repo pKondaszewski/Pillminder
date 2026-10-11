@@ -85,9 +85,13 @@ function* occurrenceStream(
   );
   for (let scanned = 0; scanned < MAX_SCAN_DAYS; scanned += intervalDays) {
     if (lastDay && day > lastDay) return;
+    let previous: Date | null = null;
     for (const time of times) {
       const occurrence = atTime(day, time);
-      if (occurrence >= now) yield occurrence;
+      // Times inside a spring-forward gap both land on the first valid instant.
+      const isCollapsed = previous?.getTime() === occurrence.getTime();
+      previous = occurrence;
+      if (occurrence >= now && !isCollapsed) yield occurrence;
     }
     day = addDays(day, intervalDays);
   }
