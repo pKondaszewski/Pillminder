@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert } from 'react-native';
 
@@ -24,45 +24,36 @@ export function useUndoableDoseAction(
   const { t } = useTranslation();
   const [undoable, setUndoable] = useState<Undoable | null>(null);
 
-  const reportFailure = useCallback(
-    (what: string, err: unknown) => {
-      log.error(`Failed to ${what}`, err);
-      Alert.alert(t('products.errorTitle'), t('history.errorCorrect'));
-    },
-    [t],
-  );
+  const reportFailure = (what: string, err: unknown) => {
+    log.error(`Failed to ${what}`, err);
+    Alert.alert(t('products.errorTitle'), t('history.errorCorrect'));
+  };
 
-  const applyWithUndo = useCallback(
-    async (kind: UndoableKind, id: string) => {
-      try {
-        await actions[kind].apply(id);
-      } catch (err) {
-        reportFailure(`mark dose ${id} as ${kind}`, err);
-        return;
-      }
-      setUndoable({ id, kind });
-    },
-    [actions, reportFailure],
-  );
+  const applyWithUndo = async (kind: UndoableKind, id: string) => {
+    try {
+      await actions[kind].apply(id);
+    } catch (err) {
+      reportFailure(`mark dose ${id} as ${kind}`, err);
+      return;
+    }
+    setUndoable({ id, kind });
+  };
 
-  const revert = useCallback(
-    async (kind: UndoableKind, id: string) => {
-      try {
-        await actions[kind].revert(id);
-      } catch (err) {
-        reportFailure(`revert dose ${id} from ${kind}`, err);
-      }
-    },
-    [actions, reportFailure],
-  );
+  const revert = async (kind: UndoableKind, id: string) => {
+    try {
+      await actions[kind].revert(id);
+    } catch (err) {
+      reportFailure(`revert dose ${id} from ${kind}`, err);
+    }
+  };
 
-  const undoLast = useCallback(async () => {
+  const undoLast = async () => {
     if (!undoable) return;
     setUndoable(null);
     await revert(undoable.kind, undoable.id);
-  }, [undoable, revert]);
+  };
 
-  const dismissUndo = useCallback(() => setUndoable(null), []);
+  const dismissUndo = () => setUndoable(null);
 
   return { undoable, applyWithUndo, revert, undoLast, dismissUndo };
 }

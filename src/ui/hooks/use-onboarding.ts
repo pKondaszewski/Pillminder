@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { createLogger } from '@/config/logger';
 import {
@@ -22,12 +22,12 @@ export function useOnboarding(enabled: boolean) {
       });
   }, [enabled]);
 
-  const finish = useCallback(() => setVisible(false), []);
+  const finish = () => setVisible(false);
 
-  const dismiss = useCallback(() => {
+  const dismiss = () => {
     dismissNotificationsPrompt();
     setVisible(false);
-  }, []);
+  };
 
   return {
     ready: visible !== null,

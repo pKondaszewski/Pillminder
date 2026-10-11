@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,15 +17,11 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const { doses, takeDose, untakeDose, skipDose, unskipDose } =
     useTodaysDoses();
-  const actions = useMemo(
-    () => ({
+  const { undoable, applyWithUndo, revert, undoLast, dismissUndo } =
+    useUndoableDoseAction({
       taken: { apply: takeDose, revert: untakeDose },
       skipped: { apply: skipDose, revert: unskipDose },
-    }),
-    [takeDose, untakeDose, skipDose, unskipDose],
-  );
-  const { undoable, applyWithUndo, revert, undoLast, dismissUndo } =
-    useUndoableDoseAction(actions);
+    });
 
   const confirmRevert = (item: TodayDose, kind: 'taken' | 'skipped') => {
     const { title, message } =

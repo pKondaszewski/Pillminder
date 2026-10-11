@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { inclusiveDayRange } from '@/config/date-utils';
@@ -41,11 +41,7 @@ export function usePeriodReport(
     };
   }, [firstKey, lastKey, rangeKey]);
 
-  return useMemo(
-    () =>
-      loaded?.rangeKey === rangeKey
-        ? buildPeriodReport(products, loaded.report, i18n.language)
-        : null,
-    [products, loaded, rangeKey, i18n.language],
-  );
+  return loaded?.rangeKey === rangeKey
+    ? buildPeriodReport(products, loaded.report, i18n.language)
+    : null;
 }
