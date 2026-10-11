@@ -487,20 +487,12 @@ describe('nextOccurrences', () => {
 });
 
 describe('previewOccurrences', () => {
-  beforeEach(() => {
-    jest.useFakeTimers().setSystemTime(NOW);
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   it('returns the next three doses from the current time', () => {
     // given
     const timesOfDay = ['08:00'];
 
     // when
-    const result = previewOccurrences(1, timesOfDay);
+    const result = previewOccurrences(1, timesOfDay, {}, NOW);
 
     // then
     expect(result).toEqual([at(1, 11, 8), at(1, 12, 8), at(1, 13, 8)]);
@@ -512,7 +504,7 @@ describe('previewOccurrences', () => {
     const period = { startDate: at(1, 20, 0), endDate: at(1, 21, 0) };
 
     // when
-    const result = previewOccurrences(1, timesOfDay, period);
+    const result = previewOccurrences(1, timesOfDay, period, NOW);
 
     // then
     expect(result).toEqual([at(1, 20, 8), at(1, 21, 8)]);

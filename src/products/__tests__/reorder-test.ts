@@ -3,7 +3,6 @@ import type { Schedule } from '@/schedules/schedule-service';
 import { reorderStatus } from '../reorder';
 
 const NOW = new Date(2026, 0, 10, 12, 0);
-const THRESHOLD_DAYS = 7;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function rhythm(overrides: Partial<Schedule>): Schedule {
@@ -34,7 +33,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status).toEqual({
@@ -54,7 +53,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.daysLeft).toBeNull();
@@ -67,7 +66,7 @@ describe('reorderStatus', () => {
     const schedules: Schedule[] = [];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status).toEqual({
@@ -87,7 +86,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.dailyConsumption).toBe(1);
@@ -105,7 +104,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.dailyConsumption).toBe(2);
@@ -120,7 +119,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.dailyConsumption).toBe(2);
@@ -135,7 +134,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.dailyConsumption).toBe(0.5);
@@ -151,7 +150,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.dailyConsumption).toBe(2);
@@ -170,7 +169,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.dailyConsumption).toBe(0);
@@ -189,7 +188,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.daysLeft).toBeNull();
@@ -210,7 +209,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.daysLeft).toBe(5);
@@ -229,7 +228,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     // days 0-2 consume 2/day (6 units), then 1 unit left at 1/day
@@ -244,7 +243,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.isLow).toBe(true);
@@ -258,27 +257,11 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.isLow).toBe(false);
     expect(status.reorderAt).toEqual(NOW);
-  });
-
-  it('uses the given threshold instead of the default', () => {
-    // given
-    const stock = 10;
-    const schedules: Schedule[] = [
-      rhythm({ intervalDays: 1, timesOfDay: ['08:00'] }),
-    ];
-    const thresholdDays = 14;
-
-    // when
-    const status = reorderStatus(stock, schedules, thresholdDays, NOW);
-
-    // then
-    expect(status.isLow).toBe(true);
-    expect(status.reorderAt).toEqual(daysFromNow(-4));
   });
 
   it('reports zero days left and low stock for an empty stock', () => {
@@ -289,7 +272,7 @@ describe('reorderStatus', () => {
     ];
 
     // when
-    const status = reorderStatus(stock, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(stock, schedules, NOW);
 
     // then
     expect(status.daysLeft).toBe(0);
@@ -309,7 +292,7 @@ describe('reorderStatus with a paused schedule', () => {
     ];
 
     // when
-    const status = reorderStatus(5, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(5, schedules, NOW);
 
     // then
     expect(status).toMatchObject({
@@ -331,7 +314,7 @@ describe('reorderStatus with a paused schedule', () => {
     ];
 
     // when
-    const status = reorderStatus(5, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(5, schedules, NOW);
 
     // then
     expect(status.daysLeft).toBe(15);
@@ -350,7 +333,7 @@ describe('reorderStatus with a paused schedule', () => {
     ];
 
     // when
-    const status = reorderStatus(5, schedules, THRESHOLD_DAYS, NOW);
+    const status = reorderStatus(5, schedules, NOW);
 
     // then
     expect(status.daysLeft).toBe(5);

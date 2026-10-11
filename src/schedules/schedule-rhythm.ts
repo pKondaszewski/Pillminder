@@ -12,8 +12,8 @@ export function describeRhythm(
   schedule: Schedule,
   t: Translate,
   formatDate: (date: Date) => string,
-  unit: ProductUnit | null = null,
-  now: Date = new Date(),
+  unit: ProductUnit | null,
+  now: Date,
 ): string {
   const { intervalDays, timesOfDay, quantity } = schedule;
   const base =

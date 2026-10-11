@@ -47,6 +47,8 @@ export default function ScheduleListScreen() {
 
   const closeEditor = () => setEditorOpen(false);
 
+  const now = new Date();
+
   const renderItem = ({ item }: { item: Schedule }) => (
     <Pressable
       onPress={() => openEdit(item)}
@@ -55,7 +57,7 @@ export default function ScheduleListScreen() {
       <ThemedView type="backgroundElement" style={styles.row}>
         <ThemedText>{productName(item.productId)}</ThemedText>
         <ThemedText type="small">
-          {describeRhythm(item, t, formatDate, unitOf(item.productId))}
+          {describeRhythm(item, t, formatDate, unitOf(item.productId), now)}
         </ThemedText>
       </ThemedView>
     </Pressable>

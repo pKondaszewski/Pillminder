@@ -73,7 +73,7 @@ export function getProductHistoryQuery(productId: string) {
 export async function getAdherence(
   from: Date,
   to: Date,
-  now: Date = new Date(),
+  now: Date,
 ): Promise<AdherenceReport> {
   const doses = await getDosesPlannedBetween(from, to);
   return calculateAdherence(doses, from, to, now);

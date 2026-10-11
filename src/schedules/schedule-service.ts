@@ -73,11 +73,10 @@ export async function updateSchedule(
 export async function suspendSchedule(
   id: string,
   resumeAt: Date | null,
-  now: Date = new Date(),
 ): Promise<Schedule> {
   log.info(`Pausing schedule ${id}`);
   try {
-    return await setSchedulePauseRow(id, { pausedAt: now, resumeAt });
+    return await setSchedulePauseRow(id, { pausedAt: new Date(), resumeAt });
   } catch (err) {
     log.error(`Failed to pause schedule ${id}`, err);
     throw err;

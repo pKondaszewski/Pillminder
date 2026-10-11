@@ -131,15 +131,21 @@ function EditorForm({
     setDatePickerFor(null);
   };
 
-  const paused = schedule !== null && isPaused(schedule, new Date());
+  const now = new Date();
+  const paused = schedule !== null && isPaused(schedule, now);
   const preview = periodInvalid
     ? []
-    : previewOccurrences(intervalDays, times, {
-        startDate,
-        endDate,
-        pausedAt: schedule?.pausedAt,
-        resumeAt: schedule?.resumeAt,
-      });
+    : previewOccurrences(
+        intervalDays,
+        times,
+        {
+          startDate,
+          endDate,
+          pausedAt: schedule?.pausedAt,
+          resumeAt: schedule?.resumeAt,
+        },
+        now,
+      );
 
   const handleSave = () => {
     if (productId === '' || times.length === 0 || periodInvalid) {
@@ -314,7 +320,7 @@ function EditorForm({
 
           {pickerOpen ? (
             <DateTimePicker
-              value={new Date()}
+              value={now}
               mode="time"
               is24Hour
               onValueChange={onValueChange}

@@ -15,17 +15,18 @@ export function useReorderStatuses(): Record<string, ReorderStatus> {
   const { products } = useProducts();
   const { schedules } = useSchedules();
 
-  return buildReorderStatuses(products, schedules);
+  return buildReorderStatuses(products, schedules, new Date());
 }
 
 function buildReorderStatuses(
   products: Product[],
   schedules: Schedule[],
+  now: Date,
 ): Record<string, ReorderStatus> {
   const byProduct: Record<string, ReorderStatus> = {};
   for (const product of products.filter(isActive)) {
     const productSchedules = schedulesFor(product.id, schedules);
-    byProduct[product.id] = reorderStatus(product.stock, productSchedules);
+    byProduct[product.id] = reorderStatus(product.stock, productSchedules, now);
   }
   return byProduct;
 }

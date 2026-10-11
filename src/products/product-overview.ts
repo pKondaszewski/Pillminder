@@ -73,7 +73,6 @@ function describeStock(
   const { daysLeft, isLow: belowThreshold } = reorderStatus(
     product.stock,
     schedules,
-    undefined,
     now,
   );
   const isLow = belowThreshold && daysLeft !== null;
