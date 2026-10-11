@@ -21,21 +21,8 @@ import {
 } from './identifiers';
 import { processReminderResponse } from './reminder-response-router';
 
-export type { DoseReminder } from './dto/dose-reminder';
 export type { NotificationPermission } from './dto/notification-permission';
-export type { NotificationStrings } from './dto/notification-strings';
-export type { NotificationText } from './dto/notification-text';
 export type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
-export type { ReorderAlert } from './dto/reorder-alert';
-export {
-  BUY_ACTION,
-  CATEGORY_ID,
-  CHANNEL_ID,
-  REORDER_CATEGORY_ID,
-  REORDER_CHANNEL_ID,
-  SNOOZE_ACTION,
-  TAKE_ACTION,
-} from './identifiers';
 
 export const isNotificationsSupported =
   Constants.executionEnvironment !== ExecutionEnvironment.StoreClient;

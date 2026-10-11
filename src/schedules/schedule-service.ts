@@ -13,14 +13,9 @@ import {
   updateScheduleRow,
 } from './schedule-repository';
 
-export {
-  nextOccurrences,
-  occurrencesWithin,
-  previewOccurrences,
-} from './schedule-helper';
+export { occurrencesWithin, previewOccurrences } from './schedule-helper';
 export { isPaused } from './schedule-pause';
 export type { Schedule } from './schedule-repository';
-export type { Translate } from './schedule-rhythm';
 export { describePause, describeRhythm } from './schedule-rhythm';
 
 const log = createLogger('schedule-service');

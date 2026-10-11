@@ -5,7 +5,6 @@ export type DoseHistoryStatus = 'taken' | 'skipped';
 export interface HistoryEntry {
   id: string;
   plannedAt: Date;
-  takenAt: Date | null;
   occurredAt: Date;
   status: DoseHistoryStatus;
 }
@@ -19,7 +18,6 @@ export function toHistoryEntry(dose: Dose): HistoryEntry {
   return {
     id: dose.id,
     plannedAt: dose.plannedAt,
-    takenAt: dose.takenAt,
     occurredAt: taken && dose.takenAt ? dose.takenAt : dose.plannedAt,
     status: taken ? 'taken' : 'skipped',
   };

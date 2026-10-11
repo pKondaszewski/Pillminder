@@ -10,6 +10,8 @@ import type { ReplaceDosesQueryResult } from './dto/replace-doses-query-result';
 
 export type Dose = typeof doses.$inferSelect;
 
+const HISTORY_LIMIT = 30;
+
 export interface NewDoseSlot {
   productId: string;
   scheduleId: string;
@@ -39,7 +41,7 @@ export function todaysDosesQuery(day: Date) {
     .orderBy(doses.plannedAt);
 }
 
-export function productHistoryQuery(productId: string, limit = 30) {
+export function productHistoryQuery(productId: string) {
   const now = new Date();
 
   return db
@@ -52,7 +54,7 @@ export function productHistoryQuery(productId: string, limit = 30) {
       ),
     )
     .orderBy(desc(doses.plannedAt))
-    .limit(limit);
+    .limit(HISTORY_LIMIT);
 }
 
 export async function getDosesPlannedBetween(

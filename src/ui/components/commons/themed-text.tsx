@@ -3,7 +3,7 @@ import { StyleSheet, Text, type TextProps } from 'react-native';
 import { ThemeColor } from '@/ui/commons/constants/theme';
 import { useTheme } from '@/ui/hooks/use-theme';
 
-export type ThemedTextProps = TextProps & {
+type ThemedTextProps = TextProps & {
   type?: 'default' | 'title' | 'small' | 'smallBold' | 'subtitle';
   themeColor?: ThemeColor;
 };

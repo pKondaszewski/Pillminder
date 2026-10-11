@@ -16,7 +16,6 @@ import type {
 } from './dto/backup-parse-result';
 
 export type { BackupRows } from './dto/backup-data';
-export { BACKUP_TABLES } from './dto/backup-data';
 export type { BackupError } from './dto/backup-parse-result';
 export type { BackupParseResult } from './dto/backup-parse-result';
 
