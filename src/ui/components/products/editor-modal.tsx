@@ -44,6 +44,7 @@ type Props = {
   onDelete: (id: string) => void;
   onArchive: (id: string, completionNote?: string) => void;
   onRestore: (id: string) => void;
+  onAddSchedule: () => void;
 };
 
 export function ProductEditorModal({
@@ -54,6 +55,7 @@ export function ProductEditorModal({
   onDelete,
   onArchive,
   onRestore,
+  onAddSchedule,
 }: Props) {
   return (
     <Modal
@@ -71,6 +73,7 @@ export function ProductEditorModal({
           onDelete={onDelete}
           onArchive={onArchive}
           onRestore={onRestore}
+          onAddSchedule={onAddSchedule}
         />
       ) : null}
     </Modal>
@@ -84,6 +87,7 @@ function EditorForm({
   onDelete,
   onArchive,
   onRestore,
+  onAddSchedule,
 }: Omit<Props, 'visible'>) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -390,6 +394,12 @@ function EditorForm({
                   themeColor="accent"
                 />
               </ThemedView>
+            </ThemedView>
+          ) : null}
+
+          {product && product.status !== 'archived' && !archiving ? (
+            <ThemedView style={styles.actions}>
+              <ActionButton label={t('schedule.add')} onPress={onAddSchedule} />
             </ThemedView>
           ) : null}
 
