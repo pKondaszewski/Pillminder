@@ -15,9 +15,11 @@ import {
   CURRENCY_OPTIONS,
   isValidSnoozeMinutes,
   LANGUAGE_OPTIONS,
+  type LanguagePreference,
   SNOOZE_MINUTES_MAX,
   SNOOZE_MINUTES_MIN,
   THEME_OPTIONS,
+  type ThemePreference,
 } from '@/settings/settings-store';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { Chip } from '@/ui/components/commons/chip';
@@ -43,18 +45,14 @@ export default function SettingsScreen() {
                 label={t('settings.language')}
                 options={LANGUAGE_OPTIONS}
                 selected={settings.language}
-                optionLabel={(o) =>
-                  t(`settings.language${o[0].toUpperCase()}${o.slice(1)}`)
-                }
+                optionLabel={(o) => t(LANGUAGE_LABEL_KEYS[o])}
                 onSelect={setLanguage}
               />
               <OptionRow
                 label={t('settings.theme')}
                 options={THEME_OPTIONS}
                 selected={settings.theme}
-                optionLabel={(o) =>
-                  t(`settings.theme${o[0].toUpperCase()}${o.slice(1)}`)
-                }
+                optionLabel={(o) => t(THEME_LABEL_KEYS[o])}
                 onSelect={setTheme}
               />
             </Section>
@@ -93,6 +91,18 @@ export default function SettingsScreen() {
     </TabSwipe>
   );
 }
+
+const LANGUAGE_LABEL_KEYS: Record<LanguagePreference, string> = {
+  system: 'settings.languageSystem',
+  pl: 'settings.languagePl',
+  en: 'settings.languageEn',
+};
+
+const THEME_LABEL_KEYS: Record<ThemePreference, string> = {
+  system: 'settings.themeSystem',
+  light: 'settings.themeLight',
+  dark: 'settings.themeDark',
+};
 
 function Section({
   title,

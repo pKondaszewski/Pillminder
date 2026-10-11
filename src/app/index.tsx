@@ -11,7 +11,10 @@ import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DoseStatusDot } from '@/ui/components/doses/status-dot';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { useTodaysDoses } from '@/ui/hooks/use-todays-doses';
-import { useUndoableDoseAction } from '@/ui/hooks/use-undoable-dose-action';
+import {
+  type UndoableKind,
+  useUndoableDoseAction,
+} from '@/ui/hooks/use-undoable-dose-action';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -23,11 +26,8 @@ export default function HomeScreen() {
       skipped: { apply: skipDose, revert: unskipDose },
     });
 
-  const confirmRevert = (item: TodayDose, kind: 'taken' | 'skipped') => {
-    const { title, message } =
-      kind === 'taken'
-        ? { title: 'home.undoTitle', message: 'home.undoConfirm' }
-        : { title: 'home.unskipTitle', message: 'home.unskipConfirm' };
+  const confirmRevert = (item: TodayDose, kind: UndoableKind) => {
+    const { title, message } = DOSE_ACTION_TEXT_KEYS[kind];
     Alert.alert(t(title), t(message, { name: item.productName }), [
       { text: t('editor.cancel'), style: 'cancel' },
       { text: t('home.undo'), onPress: () => revert(kind, item.id) },
@@ -87,11 +87,7 @@ export default function HomeScreen() {
         {undoable ? (
           <Snackbar
             key={undoable.id}
-            message={
-              undoable.kind === 'taken'
-                ? t('home.takenToast')
-                : t('home.skippedToast')
-            }
+            message={t(DOSE_ACTION_TEXT_KEYS[undoable.kind].toast)}
             actionLabel={t('home.undo')}
             onAction={undoLast}
             onDismiss={dismissUndo}
@@ -169,6 +165,22 @@ function DoseActionButton({
     </ThemedView>
   );
 }
+
+const DOSE_ACTION_TEXT_KEYS: Record<
+  UndoableKind,
+  { title: string; message: string; toast: string }
+> = {
+  taken: {
+    title: 'home.undoTitle',
+    message: 'home.undoConfirm',
+    toast: 'home.takenToast',
+  },
+  skipped: {
+    title: 'home.unskipTitle',
+    message: 'home.unskipConfirm',
+    toast: 'home.skippedToast',
+  },
+};
 
 const styles = StyleSheet.create({
   container: {
