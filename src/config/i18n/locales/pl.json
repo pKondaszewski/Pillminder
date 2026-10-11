@@ -369,6 +369,20 @@
     "schedules": "Harmonogramy",
     "settings": "Ustawienia"
   },
+  "travel": {
+    "departure": "Wyjazd",
+    "empty": "Nic do spakowania na ten wyjazd",
+    "emptyHint": "Pojawią się tu aktywne produkty z harmonogramem obowiązującym w czasie wyjazdu.",
+    "enough": "Zapas wystarczy na wyjazd",
+    "invalidRange": "Data powrotu jest przed datą wyjazdu.",
+    "open": "Planer wyjazdu",
+    "pack": "Spakuj: {{amount}}",
+    "pieces": "{{count}} szt.",
+    "return": "Powrót",
+    "runsOutAfterReturn": "Kup przed wyjazdem: zapas skończy się w ciągu tygodnia po powrocie",
+    "runsOutDuringTrip": "Kup przed wyjazdem: zapas skończy się w trakcie wyjazdu",
+    "title": "Planer wyjazdu"
+  },
   "unit": {
     "capsule_few": "{{count}} kapsułki",
     "capsule_many": "{{count}} kapsułek",

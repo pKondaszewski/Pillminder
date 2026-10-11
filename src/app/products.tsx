@@ -23,6 +23,7 @@ import { ProductListFilterBar } from '@/ui/components/products/list-filters';
 import { ProductOverviewModal } from '@/ui/components/products/overview-modal';
 import { ProductPeriodModal } from '@/ui/components/products/period-modal';
 import { ProductRow } from '@/ui/components/products/row';
+import { TravelPlanModal } from '@/ui/components/products/travel-plan-modal';
 import { ScheduleEditorModal } from '@/ui/components/schedules/editor-modal';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
@@ -62,6 +63,7 @@ export default function ProductListScreen() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [overviewOpen, setOverviewOpen] = useState(false);
   const [periodOpen, setPeriodOpen] = useState(false);
+  const [travelOpen, setTravelOpen] = useState(false);
   const [schedulingOpen, setSchedulingOpen] = useState(false);
   const editedProduct = products.find((p) => p.id === editing?.id) ?? editing;
 
@@ -150,6 +152,10 @@ export default function ProductListScreen() {
                     label: t('period.open'),
                     onPress: () => setPeriodOpen(true),
                   },
+                  {
+                    label: t('travel.open'),
+                    onPress: () => setTravelOpen(true),
+                  },
                 ].map(({ label, onPress }) => (
                   <Pressable
                     key={label}
@@ -199,6 +205,11 @@ export default function ProductListScreen() {
         <ProductPeriodModal
           visible={periodOpen}
           onClose={() => setPeriodOpen(false)}
+        />
+
+        <TravelPlanModal
+          visible={travelOpen}
+          onClose={() => setTravelOpen(false)}
         />
       </ThemedView>
     </TabSwipe>
