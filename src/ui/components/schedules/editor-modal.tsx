@@ -38,17 +38,19 @@ type Props = {
   visible: boolean;
   schedule: Schedule | null;
   products: Product[];
+  productLocked?: boolean;
   onClose: () => void;
   onSave: (input: NewScheduleInput) => void;
-  onDelete: (id: string) => void;
-  onPause: (id: string, resumeAt: Date | null) => void;
-  onResume: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onPause?: (id: string, resumeAt: Date | null) => void;
+  onResume?: (id: string) => void;
 };
 
 export function ScheduleEditorModal({
   visible,
   schedule,
   products,
+  productLocked,
   onClose,
   onSave,
   onDelete,
@@ -67,6 +69,7 @@ export function ScheduleEditorModal({
           key={schedule?.id ?? 'new'}
           schedule={schedule}
           products={products}
+          productLocked={productLocked}
           onClose={onClose}
           onSave={onSave}
           onDelete={onDelete}
@@ -81,6 +84,7 @@ export function ScheduleEditorModal({
 function EditorForm({
   schedule,
   products,
+  productLocked,
   onClose,
   onSave,
   onDelete,
@@ -90,11 +94,11 @@ function EditorForm({
   const { t, i18n } = useTranslation();
 
   const sortedProducts = sortProductsByName(products, i18n.language);
-  const [productQuery, setProductQuery] = useState('');
   const [productId, setProductId] = useState(
     schedule?.productId ?? sortedProducts[0]?.id ?? '',
   );
-  const unit = products.find((p) => p.id === productId)?.unit ?? null;
+  const selectedProduct = products.find((p) => p.id === productId);
+  const unit = selectedProduct?.unit ?? null;
   const [intervalDays, setIntervalDays] = useState(schedule?.intervalDays ?? 1);
   const [times, setTimes] = useState<string[]>(schedule?.timesOfDay ?? []);
   const [quantity, setQuantity] = useState(schedule?.quantity ?? 1);
@@ -109,9 +113,6 @@ function EditorForm({
     'start' | 'end' | 'resume' | null
   >(null);
   const [pickerOpen, setPickerOpen] = useState(false);
-
-  const searchable = products.length > PRODUCT_SEARCH_THRESHOLD;
-  const visibleProducts = filterProductsByName(sortedProducts, productQuery);
 
   const addTime = (date: Date) => {
     const formatted = formatTime(date);
@@ -171,11 +172,11 @@ function EditorForm({
   };
 
   const handlePause = () => {
-    if (schedule) onPause(schedule.id, resumeDate);
+    if (schedule) onPause?.(schedule.id, resumeDate);
   };
 
   const handleResume = () => {
-    if (schedule) onResume(schedule.id);
+    if (schedule) onResume?.(schedule.id);
   };
 
   const handleDelete = () => {
@@ -185,7 +186,7 @@ function EditorForm({
       {
         text: t('editor.delete'),
         style: 'destructive',
-        onPress: () => onDelete(schedule.id),
+        onPress: () => onDelete?.(schedule.id),
       },
     ]);
   };
@@ -205,37 +206,12 @@ function EditorForm({
           </ThemedText>
 
           <ThemedText type="small">{t('schedule.product')}</ThemedText>
-          {products.length === 0 ? (
-            <ThemedText type="small" themeColor="textSecondary">
-              {t('schedule.noProducts')}
-            </ThemedText>
-          ) : (
-            <>
-              {searchable ? (
-                <SearchField
-                  value={productQuery}
-                  onChangeText={setProductQuery}
-                  label={t('schedule.searchProduct')}
-                />
-              ) : null}
-              {visibleProducts.length === 0 ? (
-                <ThemedText type="small" themeColor="textSecondary">
-                  {t('schedule.noMatchingProducts')}
-                </ThemedText>
-              ) : (
-                <ThemedView style={styles.chipsRow}>
-                  {visibleProducts.map((p) => (
-                    <Chip
-                      key={p.id}
-                      label={p.name}
-                      selected={p.id === productId}
-                      onPress={() => setProductId(p.id)}
-                    />
-                  ))}
-                </ThemedView>
-              )}
-            </>
-          )}
+          <ProductPicker
+            products={sortedProducts}
+            selectedProduct={selectedProduct}
+            locked={productLocked}
+            onSelect={setProductId}
+          />
 
           <ThemedText type="small">{t('schedule.intervalDays')}</ThemedText>
           <ThemedView style={styles.stepper}>
@@ -401,6 +377,61 @@ function EditorForm({
         </ThemedView>
       </SafeAreaView>
     </ThemedView>
+  );
+}
+
+function ProductPicker({
+  products,
+  selectedProduct,
+  locked,
+  onSelect,
+}: {
+  products: Product[];
+  selectedProduct: Product | undefined;
+  locked: boolean | undefined;
+  onSelect: (productId: string) => void;
+}) {
+  const { t } = useTranslation();
+  const [query, setQuery] = useState('');
+
+  if (locked) return <ThemedText>{selectedProduct?.name}</ThemedText>;
+
+  if (products.length === 0) {
+    return (
+      <ThemedText type="small" themeColor="textSecondary">
+        {t('schedule.noProducts')}
+      </ThemedText>
+    );
+  }
+
+  const visibleProducts = filterProductsByName(products, query);
+
+  return (
+    <>
+      {products.length > PRODUCT_SEARCH_THRESHOLD ? (
+        <SearchField
+          value={query}
+          onChangeText={setQuery}
+          label={t('schedule.searchProduct')}
+        />
+      ) : null}
+      {visibleProducts.length === 0 ? (
+        <ThemedText type="small" themeColor="textSecondary">
+          {t('schedule.noMatchingProducts')}
+        </ThemedText>
+      ) : (
+        <ThemedView style={styles.chipsRow}>
+          {visibleProducts.map((p) => (
+            <Chip
+              key={p.id}
+              label={p.name}
+              selected={p.id === selectedProduct?.id}
+              onPress={() => onSelect(p.id)}
+            />
+          ))}
+        </ThemedView>
+      )}
+    </>
   );
 }
 
