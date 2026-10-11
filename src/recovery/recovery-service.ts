@@ -3,6 +3,7 @@ import { migrate } from 'drizzle-orm/expo-sqlite/migrator';
 import { type BackupRows, replaceAllWithBackup } from '@/backup/backup-service';
 import { db } from '@/config/db/database';
 import { dropAllTables } from '@/config/db/database-reset';
+import { deleteAllImageFiles } from '@/images/image-service';
 import { cancelAllNotifications } from '@/notifications/notification-service';
 
 import migrations from '../../drizzle/migrations';
@@ -22,6 +23,7 @@ export async function resetData(): Promise<void> {
 
 async function wipe(): Promise<void> {
   dropAllTables();
+  deleteAllImageFiles();
   // The previous rows may be unreadable, so orphans cannot be picked by id
   await cancelAllNotifications();
 }

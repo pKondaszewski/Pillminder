@@ -2,7 +2,13 @@ import { getTableColumns } from 'drizzle-orm';
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
 
 import { db } from '@/config/db/database';
-import { doses, notes, products, schedules } from '@/config/db/schema';
+import {
+  doses,
+  notes,
+  productImages,
+  products,
+  schedules,
+} from '@/config/db/schema';
 
 import type { BackupRow, BackupRows } from './dto/backup-data';
 
@@ -29,6 +35,7 @@ export function replaceAllRows(rows: BackupRows): void {
   db.transaction((tx) => {
     tx.delete(doses).run();
     tx.delete(notes).run();
+    tx.delete(productImages).run();
     tx.delete(schedules).run();
     tx.delete(products).run();
 

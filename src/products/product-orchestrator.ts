@@ -3,6 +3,10 @@ import {
   refreshRemindersForProduct,
   syncDosesForSchedules,
 } from '@/doses/dose-service';
+import {
+  deleteImageFiles,
+  getImageFileNamesByProduct,
+} from '@/images/image-service';
 import { addNote } from '@/notes/note-service';
 import { cancelReorderAlert } from '@/notifications/notification-service';
 import { getSchedulesByProduct } from '@/schedules/schedule-service';
@@ -32,7 +36,9 @@ export async function removeProduct(id: string): Promise<void> {
   const schedules = await getSchedulesByProduct(id);
   await cancelFutureDosesForSchedules(schedules.map((s) => s.id));
   await cancelReorderAlert(id);
+  const imageFileNames = await getImageFileNamesByProduct(id);
   await deleteProduct(id);
+  deleteImageFiles(imageFileNames);
 }
 
 export async function archiveProduct(

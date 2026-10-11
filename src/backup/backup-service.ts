@@ -5,6 +5,7 @@ import * as Sharing from 'expo-sharing';
 import { createLogger } from '@/config/logger';
 import { deleteStaleCacheFiles } from '@/config/stale-files';
 import { refreshAllReminders, syncAllSchedules } from '@/doses/dose-service';
+import { deleteAllImageFiles } from '@/images/image-service';
 import {
   cancelDoseReminders,
   cancelReorderAlert,
@@ -77,6 +78,13 @@ export async function replaceAllWithBackup(rows: BackupRows): Promise<void> {
     await refreshAllReminders();
   } catch (err) {
     log.error('Rebuilding reminders after import failed', err);
+  }
+
+  // Backups carry no photos, so every stored file is orphaned by the import.
+  try {
+    deleteAllImageFiles();
+  } catch (err) {
+    log.error('Deleting product images after import failed', err);
   }
 }
 
