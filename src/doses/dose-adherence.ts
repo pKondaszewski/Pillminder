@@ -1,3 +1,5 @@
+import { addDays, startOfDay } from '@/config/date-utils';
+
 import type { DoseState } from './dose-transition';
 import type {
   AdherenceCounts,
@@ -58,4 +60,20 @@ function countDoses(doses: AdherenceDose[], now: Date): AdherenceCounts {
     due,
     rate: due === 0 ? null : taken / due,
   };
+}
+
+export function calculateStreak(doses: AdherenceDose[], now: Date): number {
+  const dayStarts = [
+    ...new Set(doses.map(({ plannedAt }) => startOfDay(plannedAt).getTime())),
+  ].sort((a, b) => b - a);
+
+  let streak = 0;
+  for (const dayStart of dayStarts) {
+    const from = new Date(dayStart);
+    const { total } = calculateAdherence(doses, from, addDays(from, 1), now);
+    if (total.due === 0) continue;
+    if (total.taken < total.due) break;
+    streak++;
+  }
+  return streak;
 }

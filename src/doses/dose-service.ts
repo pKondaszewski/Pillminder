@@ -1,3 +1,4 @@
+import { addDays, startOfDay } from '@/config/date-utils';
 import i18n from '@/config/i18n';
 import { createLogger } from '@/config/logger';
 import {
@@ -22,7 +23,7 @@ import {
 } from '@/schedules/schedule-service';
 import { getSnoozeMinutes } from '@/settings/settings-service';
 
-import { calculateAdherence } from './dose-adherence';
+import { calculateAdherence, calculateStreak } from './dose-adherence';
 import { reminderBody } from './dose-label';
 import {
   deleteFuturePendingDoseRowsForSchedules,
@@ -36,7 +37,10 @@ import {
   todaysDosesQuery,
 } from './dose-repository';
 import { isDueInFuture, isPending } from './dose-validator';
-import type { AdherenceReport } from './dto/adherence-report-output';
+import type {
+  AdherenceReport,
+  AdherenceStats,
+} from './dto/adherence-report-output';
 
 export { toHistoryEntries } from './dose-history';
 export { doseQuantityText } from './dose-label';
@@ -46,6 +50,7 @@ export { toTodayDose } from './dose-today';
 export type {
   AdherenceCounts,
   AdherenceReport,
+  AdherenceStats,
 } from './dto/adherence-report-output';
 export type { HistoryEntry } from './dto/history-entry-output';
 export type { TodayDose } from './dto/today-dose-output';
@@ -79,6 +84,22 @@ export async function getAdherence(
 ): Promise<AdherenceReport> {
   const doses = await getDosesPlannedBetween(from, to);
   return calculateAdherence(doses, from, to, now);
+}
+
+export async function getAdherenceStats(now: Date): Promise<AdherenceStats> {
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const loaded = await getDosesPlannedBetween(new Date(0), monthEnd);
+  const untilToday = loaded.filter(
+    ({ plannedAt }) => plannedAt < addDays(startOfDay(now), 1),
+  );
+  const { taken, due } = calculateAdherence(
+    loaded,
+    monthStart,
+    monthEnd,
+    now,
+  ).total;
+  return { taken, due, streak: calculateStreak(untilToday, now) };
 }
 
 export async function cancelFutureDosesForSchedules(

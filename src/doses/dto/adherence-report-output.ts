@@ -11,3 +11,9 @@ export interface AdherenceReport {
   total: AdherenceCounts;
   byProduct: Record<string, AdherenceCounts>;
 }
+
+export interface AdherenceStats {
+  taken: number;
+  due: number;
+  streak: number;
+}
