@@ -202,6 +202,7 @@
     "intervalLess": "Rzadziej",
     "intervalMore": "Częściej",
     "newTitle": "Nowy harmonogram",
+    "noMatchingProducts": "Brak pasujących produktów",
     "noProducts": "Najpierw dodaj produkt",
     "pause": "Pauza",
     "pauseAction": "Wstrzymaj harmonogram",
@@ -226,6 +227,7 @@
     "removeTime": "Usuń godzinę {{time}}",
     "resume": "Wznów",
     "resumeDate": "Data wznowienia (opcjonalnie)",
+    "searchProduct": "Szukaj produktów",
     "timesOfDay": "Godziny",
     "unknownProduct": "Nieznany produkt"
   },

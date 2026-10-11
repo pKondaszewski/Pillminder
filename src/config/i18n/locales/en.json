@@ -202,6 +202,7 @@
     "intervalLess": "Less often",
     "intervalMore": "More often",
     "newTitle": "New schedule",
+    "noMatchingProducts": "No products match",
     "noProducts": "Add a product first",
     "pause": "Pause",
     "pauseAction": "Pause schedule",
@@ -226,6 +227,7 @@
     "removeTime": "Remove time {{time}}",
     "resume": "Resume",
     "resumeDate": "Resume date (optional)",
+    "searchProduct": "Search products",
     "timesOfDay": "Times",
     "unknownProduct": "Unknown product"
   },
