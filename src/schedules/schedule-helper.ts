@@ -1,10 +1,9 @@
-import { addDays, startOfDay } from '@/config/date-utils';
+import { addDays, daysBetween, startOfDay } from '@/config/date-utils';
 
 import { isPaused, type SchedulePeriod } from './schedule-pause';
 
 const PREVIEW_COUNT = 3;
 const MAX_SCAN_DAYS = 3660;
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 export function nextOccurrences(
   intervalDays: number,
@@ -61,10 +60,6 @@ export function occurrencesWithin(
     result.push(occurrence);
   }
   return result;
-}
-
-export function daysBetween(from: Date, to: Date): number {
-  return Math.round((to.getTime() - from.getTime()) / MS_PER_DAY);
 }
 
 // Without a start date the rhythm is anchored to today (rolling window), or to

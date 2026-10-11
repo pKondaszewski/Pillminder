@@ -1,10 +1,9 @@
-import { addDays, startOfDay } from '@/config/date-utils';
+import { addDays, MS_PER_DAY, startOfDay } from '@/config/date-utils';
 import { isPaused } from '@/schedules/schedule-pause';
 import type { Schedule } from '@/schedules/schedule-service';
 
 import type { ReorderStatus } from './dto/reorder-status';
 
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const REORDER_THRESHOLD_DAYS = 7;
 const MAX_SIMULATED_DAYS = 3660;
 

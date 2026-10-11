@@ -1,3 +1,5 @@
+export const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
 export function startOfDay(date: Date): Date {
   const start = new Date(date);
   start.setHours(0, 0, 0, 0);
@@ -8,6 +10,10 @@ export function addDays(date: Date, days: number): Date {
   const next = new Date(date);
   next.setDate(next.getDate() + days);
   return next;
+}
+
+export function daysBetween(from: Date, to: Date): number {
+  return Math.round((to.getTime() - from.getTime()) / MS_PER_DAY);
 }
 
 export function msUntilNextDay(now: Date): number {

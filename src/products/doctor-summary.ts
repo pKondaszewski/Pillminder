@@ -4,6 +4,7 @@ import type { Translate } from '@/schedules/schedule-rhythm';
 import type { PeriodReportEntry } from './dto/period-report-output';
 import type { ProductOverviewEntry } from './dto/product-overview-output';
 import { describeAdherence } from './period-report';
+import type { ProductOverviewContext } from './product-overview';
 
 const SUMMARY_FILE_PREFIX = 'pillminder-summary-';
 export const SUMMARY_FILE_PATTERN = new RegExp(
@@ -32,16 +33,9 @@ export interface DoctorSummaryInput {
   lastDay: Date;
 }
 
-export interface DoctorSummaryContext {
-  t: Translate;
-  formatDate: (date: Date) => string;
-  locale: string;
-  now: Date;
-}
-
 export function buildDoctorSummaryHtml(
   input: DoctorSummaryInput,
-  context: DoctorSummaryContext,
+  context: ProductOverviewContext,
 ): string {
   const { t, formatDate, locale, now } = context;
   const period = t('summary.period', {
@@ -99,13 +93,10 @@ function reportSection(entries: PeriodReportEntry[], t: Translate): string {
   if (entries.length === 0) {
     return `<p>${escapeHtml(t('period.empty'))}</p>`;
   }
+  const archivedBadge = `<br><span class="archived">${escapeHtml(t('products.archived'))}</span>`;
   const rows = entries.map(
     (entry) => `<tr>
-<td>${escapeHtml(entry.title)}${
-      entry.isArchived
-        ? `<br><span class="archived">${escapeHtml(t('products.archived'))}</span>`
-        : ''
-    }</td>
+<td>${escapeHtml(entry.title)}${entry.isArchived ? archivedBadge : ''}</td>
 <td>${escapeHtml(describeAdherence(entry, t))}</td>
 </tr>`,
   );

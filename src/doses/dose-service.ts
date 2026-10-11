@@ -38,15 +38,15 @@ import {
 import { isDueInFuture, isPending } from './dose-validator';
 import type { AdherenceReport } from './dto/adherence-report-output';
 
+export { toHistoryEntries } from './dose-history';
 export { doseQuantityText } from './dose-label';
+export { toTodayDose } from './dose-today';
 export type {
   AdherenceCounts,
   AdherenceReport,
 } from './dto/adherence-report-output';
 export type { HistoryEntry } from './dto/history-entry-output';
-export { toHistoryEntries } from './dto/history-entry-output';
 export type { TodayDose } from './dto/today-dose-output';
-export { toTodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');
 

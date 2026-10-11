@@ -1,5 +1,5 @@
-import type { Dose } from '../../dose-repository';
-import { toHistoryEntries, toHistoryEntry } from '../history-entry-output';
+import { toHistoryEntries, toHistoryEntry } from '../dose-history';
+import type { Dose } from '../dose-repository';
 
 const PLANNED = new Date(2026, 9, 4, 9, 0);
 

@@ -42,14 +42,8 @@ export async function createProductRow(
     .insert(products)
     .values({
       id: Crypto.randomUUID(),
-      name: input.name,
-      category,
-      strength: input.strength ?? null,
-      unit: input.unit ?? null,
-      price: input.price ?? null,
-      storeLink: input.storeLink ?? null,
+      ...productFields(input, category),
       status: 'active',
-      stock: input.stock ?? null,
       lastUsedAt: null,
       createdAt: now,
       updatedAt: now,
@@ -66,13 +60,7 @@ export async function updateProductRow(
   const [updated] = await db
     .update(products)
     .set({
-      name: input.name,
-      category,
-      strength: input.strength ?? null,
-      unit: input.unit ?? null,
-      price: input.price ?? null,
-      storeLink: input.storeLink ?? null,
-      stock: input.stock ?? null,
+      ...productFields(input, category),
       updatedAt: new Date(),
     })
     .where(eq(products.id, id))
@@ -98,4 +86,16 @@ async function resolveCategory(raw: string): Promise<string> {
   const category = normalizeCategory(raw, await getCustomCategories());
   if (category === null) throw new Error('Product category must not be blank');
   return category;
+}
+
+function productFields(input: NewProductInput, category: string) {
+  return {
+    name: input.name,
+    category,
+    strength: input.strength ?? null,
+    unit: input.unit ?? null,
+    price: input.price ?? null,
+    storeLink: input.storeLink ?? null,
+    stock: input.stock ?? null,
+  };
 }
