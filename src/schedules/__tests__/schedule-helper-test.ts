@@ -326,6 +326,42 @@ describe('occurrencesWithin', () => {
       // then
       expect(result).toEqual([at(10, 25, 0)]);
     });
+
+    it('moves a time inside the spring forward gap to the first valid instant', () => {
+      // given
+      const timesOfDay = ['02:30'];
+      const now = at(3, 28, 12);
+
+      // when
+      const result = occurrencesWithin(1, timesOfDay, 3, {}, now);
+
+      // then
+      expect(result).toEqual([at(3, 29, 3, 30), at(3, 30, 2, 30)]);
+    });
+
+    it('does not duplicate two times that collapse into the same instant', () => {
+      // given
+      const timesOfDay = ['02:30', '03:30'];
+      const now = at(3, 29, 0);
+
+      // when
+      const result = occurrencesWithin(1, timesOfDay, 1, {}, now);
+
+      // then
+      expect(result).toEqual([at(3, 29, 3, 30)]);
+    });
+
+    it('generates a single dose for the repeated hour on fall back day', () => {
+      // given
+      const timesOfDay = ['02:30'];
+      const now = at(10, 24, 12);
+
+      // when
+      const result = occurrencesWithin(1, timesOfDay, 3, {}, now);
+
+      // then
+      expect(result).toEqual([at(10, 25, 2, 30), at(10, 26, 2, 30)]);
+    });
   });
 
   describe('while paused', () => {
