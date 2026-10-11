@@ -193,6 +193,7 @@
     "reorderBody": "{{name}} is running low — time to reorder",
     "reorderBodyWithPrice": "{{name}} is running low — time to reorder ({{price}} {{currency}})",
     "reorderTitle": "Running low",
+    "retryTitle": "Dose still waiting — reminder again",
     "snooze": "Snooze",
     "take": "Taken",
     "title": "Dose reminder"

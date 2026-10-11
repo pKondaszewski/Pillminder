@@ -5,6 +5,7 @@ import Storage from 'expo-sqlite/kv-store';
 import { createLogger } from '@/config/logger';
 
 import type { DoseReminder } from './dto/dose-reminder';
+import type { DoseReminderTexts } from './dto/dose-reminder-texts';
 import type { NotificationPermission } from './dto/notification-permission';
 import type { NotificationStrings } from './dto/notification-strings';
 import type { NotificationText } from './dto/notification-text';
@@ -22,6 +23,10 @@ import {
   SNOOZE_ACTION,
   TAKE_ACTION,
 } from './identifiers';
+import {
+  doseNotificationIdentifiers,
+  planDoseNotifications,
+} from './reminder-plan';
 import { processReminderResponse } from './reminder-response-router';
 
 export type { NotificationPermission } from './dto/notification-permission';
@@ -64,38 +69,49 @@ export function initNotifications(
 
 export async function scheduleDoseReminder(
   reminder: DoseReminder,
-  strings: NotificationText,
+  texts: DoseReminderTexts,
 ): Promise<void> {
   if (!isNotificationsSupported) return;
-  if (reminder.plannedAt.getTime() <= Date.now()) return;
 
-  try {
-    await Notifications.scheduleNotificationAsync({
-      identifier: reminder.id,
-      content: {
-        title: strings.title,
-        body: strings.body,
-        categoryIdentifier: CATEGORY_ID,
-        data: { doseId: reminder.id },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: reminder.plannedAt,
-        channelId: CHANNEL_ID,
-      },
-    });
-  } catch (err) {
-    log.error(`Failed to schedule reminder for dose ${reminder.id}`, err);
-  }
+  const planned = planDoseNotifications(
+    reminder.id,
+    reminder.plannedAt,
+    new Date(),
+  );
+  await Promise.all(
+    planned.map(async ({ identifier, kind, at }) => {
+      try {
+        await Notifications.scheduleNotificationAsync({
+          identifier,
+          content: {
+            title: texts[kind].title,
+            body: texts[kind].body,
+            categoryIdentifier: CATEGORY_ID,
+            data: { doseId: reminder.id },
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date: at,
+            channelId: CHANNEL_ID,
+          },
+        });
+      } catch (err) {
+        log.error(
+          `Failed to schedule ${identifier} for dose ${reminder.id}`,
+          err,
+        );
+      }
+    }),
+  );
 }
 
 export async function cancelDoseReminder(doseId: string): Promise<void> {
   if (!isNotificationsSupported) return;
-  try {
-    await Notifications.cancelScheduledNotificationAsync(doseId);
-  } catch (err) {
-    log.warn(`Failed to cancel reminder for dose ${doseId}`, err);
-  }
+  await forEachDoseNotification(
+    doseId,
+    'cancel',
+    Notifications.cancelScheduledNotificationAsync,
+  );
   await dismissDoseReminder(doseId);
 }
 
@@ -148,11 +164,11 @@ export async function cancelAllNotifications(): Promise<void> {
 
 export async function dismissDoseReminder(doseId: string): Promise<void> {
   if (!isNotificationsSupported) return;
-  try {
-    await Notifications.dismissNotificationAsync(doseId);
-  } catch (err) {
-    log.warn(`Failed to dismiss delivered reminder for dose ${doseId}`, err);
-  }
+  await forEachDoseNotification(
+    doseId,
+    'dismiss',
+    Notifications.dismissNotificationAsync,
+  );
 }
 
 export function subscribeToReminderResponses(
@@ -181,6 +197,25 @@ export function subscribeToReminderResponses(
     log.error('Failed to subscribe to reminder responses', err);
     return () => {};
   }
+}
+
+async function forEachDoseNotification(
+  doseId: string,
+  actionName: string,
+  action: (identifier: string) => Promise<unknown>,
+): Promise<void> {
+  await Promise.all(
+    doseNotificationIdentifiers(doseId).map(async (identifier) => {
+      try {
+        await action(identifier);
+      } catch (err) {
+        log.warn(
+          `Failed to ${actionName} ${identifier} for dose ${doseId}`,
+          err,
+        );
+      }
+    }),
+  );
 }
 
 async function setUpNotifications(

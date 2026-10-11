@@ -61,13 +61,14 @@ const log = createLogger('dose-service');
 
 const HORIZON_DAYS = 30;
 
-function reminderStrings(product: Product, quantity: number) {
+function reminderTexts(product: Product, quantity: number) {
   const name = productLabel(product.name, product.strength);
+  const body = reminderBody(name, quantity, product.unit, (key, options) =>
+    i18n.t(key, options),
+  );
   return {
-    title: i18n.t('notification.title'),
-    body: reminderBody(name, quantity, product.unit, (key, options) =>
-      i18n.t(key, options),
-    ),
+    first: { title: i18n.t('notification.title'), body },
+    retry: { title: i18n.t('notification.retryTitle'), body },
   };
 }
 
@@ -140,10 +141,7 @@ export async function refreshRemindersForProduct(
     pending.map((dose) =>
       scheduleDoseReminder(
         { id: dose.id, productName: product.name, plannedAt: dose.plannedAt },
-        reminderStrings(
-          product,
-          quantityByScheduleId.get(dose.scheduleId) ?? 1,
-        ),
+        reminderTexts(product, quantityByScheduleId.get(dose.scheduleId) ?? 1),
       ),
     ),
   );
@@ -189,7 +187,7 @@ export async function snoozeDose(id: string): Promise<void> {
     const when = new Date(Date.now() + snoozeMinutes * 60 * 1000);
     await scheduleDoseReminder(
       { id: dose.id, productName: product.name, plannedAt: when },
-      reminderStrings(product, await quantityForDose(dose.scheduleId)),
+      reminderTexts(product, await quantityForDose(dose.scheduleId)),
     );
     await setDoseSnoozedUntilRow(dose.id, when);
     await dismissDoseReminder(dose.id);
@@ -254,7 +252,7 @@ export async function syncDosesForSchedules(
               productName: product.name,
               plannedAt: dose.plannedAt,
             },
-            reminderStrings(product, schedule.quantity),
+            reminderTexts(product, schedule.quantity),
           ),
         ),
       );
@@ -302,7 +300,7 @@ async function revertDoseToPending(id: string): Promise<void> {
 
     await scheduleDoseReminder(
       { id: dose.id, productName: product.name, plannedAt: dose.plannedAt },
-      reminderStrings(product, await quantityForDose(dose.scheduleId)),
+      reminderTexts(product, await quantityForDose(dose.scheduleId)),
     );
   } catch (err) {
     log.error(`Failed to revert dose ${id}`, err);
