@@ -35,6 +35,22 @@ export function useUndoableDoseAction(
     setUndoable({ id, kind });
   };
 
+  const takeAll = async (ids: string[]) => {
+    setUndoable(null);
+    let failed = 0;
+    for (const id of ids) {
+      try {
+        await actions.taken.apply(id);
+      } catch (err) {
+        failed += 1;
+        log.error(`Failed to mark dose ${id} as taken`, err);
+      }
+    }
+    if (failed > 0) {
+      Alert.alert(t('products.errorTitle'), t('home.bulkTakeError'));
+    }
+  };
+
   const revert = async (kind: UndoableKind, id: string) => {
     try {
       await actions[kind].revert(id);
@@ -51,5 +67,5 @@ export function useUndoableDoseAction(
 
   const dismissUndo = () => setUndoable(null);
 
-  return { undoable, applyWithUndo, revert, undoLast, dismissUndo };
+  return { undoable, applyWithUndo, takeAll, revert, undoLast, dismissUndo };
 }
