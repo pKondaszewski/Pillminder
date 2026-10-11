@@ -40,6 +40,7 @@ import type { AdherenceReport } from './dto/adherence-report-output';
 
 export { toHistoryEntries } from './dose-history';
 export { doseQuantityText } from './dose-label';
+export { groupDosesByTimeSlot } from './dose-time-slot';
 export { toTodayDose } from './dose-today';
 export type {
   AdherenceCounts,

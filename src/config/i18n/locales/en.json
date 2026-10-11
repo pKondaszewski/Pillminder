@@ -78,6 +78,12 @@
     "skip": "Skip",
     "skipped": "Skipped",
     "skippedToast": "Marked as skipped",
+    "slot": {
+      "afternoon": "Afternoon",
+      "evening": "Evening",
+      "morning": "Morning",
+      "night": "Night"
+    },
     "snoozed": "snoozed → {{time}}",
     "take": "Take",
     "taken": "✓ {{time}}",

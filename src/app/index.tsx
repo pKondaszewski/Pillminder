@@ -1,8 +1,12 @@
 import { useTranslation } from 'react-i18next';
-import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
+import { Alert, Pressable, SectionList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { doseQuantityText, type TodayDose } from '@/doses/dose-service';
+import {
+  doseQuantityText,
+  groupDosesByTimeSlot,
+  type TodayDose,
+} from '@/doses/dose-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatTime } from '@/ui/commons/format-date';
 import { Snackbar } from '@/ui/components/commons/snackbar';
@@ -74,11 +78,17 @@ export default function HomeScreen() {
     <TabSwipe>
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <FlatList
-            data={doses}
+          <SectionList
+            sections={groupDosesByTimeSlot(doses)}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
             renderItem={renderItem}
+            renderSectionHeader={({ section }) => (
+              <ThemedText type="smallBold" themeColor="textSecondary">
+                {t(`home.slot.${section.slot}`)}
+              </ThemedText>
+            )}
+            stickySectionHeadersEnabled={false}
             ListEmptyComponent={
               <ThemedText type="small">{t('home.empty')}</ThemedText>
             }
