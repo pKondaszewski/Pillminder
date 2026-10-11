@@ -1,4 +1,5 @@
-import { type TodayDoseRow, toTodayDose } from '../today-dose-output';
+import { toTodayDose } from '../dose-today';
+import type { TodayDoseRow } from '../dto/today-dose-output';
 
 const row: TodayDoseRow = {
   id: 'dose-1',

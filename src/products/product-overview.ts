@@ -1,7 +1,11 @@
 import { describeRhythm, type Translate } from '@/schedules/schedule-rhythm';
 import type { Schedule } from '@/schedules/schedule-service';
 
-import { categoryLabel, isBuiltInCategory } from './category';
+import {
+  BUILT_IN_CATEGORIES,
+  categoryLabel,
+  isBuiltInCategory,
+} from './category';
 import type {
   ProductOverview,
   ProductOverviewEntry,
@@ -11,8 +15,6 @@ import { productLabel } from './product-label';
 import type { Product } from './product-service';
 import { formatAmount, type ProductUnit } from './product-unit';
 import { reorderStatus } from './reorder';
-
-const BUILT_IN_ORDER = ['medication', 'supplement', 'care'];
 
 export interface ProductOverviewContext {
   t: Translate;
@@ -45,18 +47,19 @@ function toEntry(
   schedules: Schedule[],
   { t, formatDate, now }: ProductOverviewContext,
 ): ProductOverviewEntry {
+  const rhythm =
+    schedules.length === 0
+      ? [t('overview.noRhythm')]
+      : [...schedules]
+          .sort(byFirstTime)
+          .map((schedule) =>
+            describeRhythm(schedule, t, formatDate, product.unit, now),
+          );
   return {
     id: product.id,
     title: productLabel(product.name, product.strength),
     category: categoryLabel(product.category, t),
-    rhythm:
-      schedules.length === 0
-        ? [t('overview.noRhythm')]
-        : [...schedules]
-            .sort(byFirstTime)
-            .map((schedule) =>
-              describeRhythm(schedule, t, formatDate, product.unit, now),
-            ),
+    rhythm,
     stock: describeStock(product, schedules, t, now),
   };
 }
@@ -70,12 +73,7 @@ function describeStock(
   if (product.stock == null) {
     return { text: t('overview.stockUnknown'), isLow: false };
   }
-  const { daysLeft, isLow: belowThreshold } = reorderStatus(
-    product.stock,
-    schedules,
-    now,
-  );
-  const isLow = belowThreshold && daysLeft !== null;
+  const { daysLeft, isLow } = reorderStatus(product.stock, schedules, now);
   const parts = [
     describeStockAmount(product.stock, product.unit, t),
     ...(daysLeft === null
@@ -108,8 +106,8 @@ function byFirstTime(a: Schedule, b: Schedule): number {
 function byCategoryThenName(locale: string) {
   const rank = (category: string) =>
     isBuiltInCategory(category)
-      ? BUILT_IN_ORDER.indexOf(category)
-      : BUILT_IN_ORDER.length;
+      ? BUILT_IN_CATEGORIES.indexOf(category)
+      : BUILT_IN_CATEGORIES.length;
 
   return (a: Product, b: Product): number =>
     rank(a.category) - rank(b.category) ||

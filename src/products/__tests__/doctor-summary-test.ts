@@ -1,11 +1,11 @@
 import {
   buildDoctorSummaryHtml,
-  type DoctorSummaryContext,
   doctorSummaryFileName,
   SUMMARY_FILE_PATTERN,
 } from '../doctor-summary';
 import type { PeriodReportEntry } from '../dto/period-report-output';
 import type { ProductOverviewEntry } from '../dto/product-overview-output';
+import type { ProductOverviewContext } from '../product-overview';
 
 const MESSAGES: Record<string, string> = {
   'summary.title': 'Summary',
@@ -19,7 +19,7 @@ const MESSAGES: Record<string, string> = {
   'products.archived': 'Archived',
 };
 
-const context: DoctorSummaryContext = {
+const context: ProductOverviewContext = {
   t: (key, options = {}) =>
     Object.entries(options).reduce(
       (text, [name, value]) => text.replace(`{{${name}}}`, String(value)),

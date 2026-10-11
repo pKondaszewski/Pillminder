@@ -1,9 +1,14 @@
 import {
+  daysBetween,
   inclusiveDayRange,
   isoDay,
   msUntilNextDay,
   startOfDay,
 } from '../date-utils';
+
+function at(month: number, day: number, hours: number): Date {
+  return new Date(2026, month - 1, day, hours);
+}
 
 describe('startOfDay', () => {
   it('maps every moment of a day to the same instant', () => {
@@ -93,5 +98,55 @@ describe('isoDay', () => {
 
     // then
     expect(result).toBe('2026-09-01');
+  });
+});
+
+describe('daysBetween', () => {
+  it('returns whole days between two dates', () => {
+    // given
+    const from = at(1, 1, 0);
+    const to = at(1, 8, 0);
+
+    // when
+    const days = daysBetween(from, to);
+
+    // then
+    expect(days).toBe(7);
+  });
+
+  it('counts calendar days across spring forward', () => {
+    // given
+    const from = at(3, 28, 0);
+    const to = at(3, 30, 0);
+
+    // when
+    const days = daysBetween(from, to);
+
+    // then
+    expect(days).toBe(2);
+  });
+
+  it('counts calendar days across fall back', () => {
+    // given
+    const from = at(10, 24, 0);
+    const to = at(10, 26, 0);
+
+    // when
+    const days = daysBetween(from, to);
+
+    // then
+    expect(days).toBe(2);
+  });
+
+  it('is negative when to is before from', () => {
+    // given
+    const from = at(1, 8, 0);
+    const to = at(1, 5, 0);
+
+    // when
+    const days = daysBetween(from, to);
+
+    // then
+    expect(days).toBe(-3);
   });
 });

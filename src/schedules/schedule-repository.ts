@@ -39,12 +39,7 @@ export async function createScheduleRow(
     .insert(schedules)
     .values({
       id: Crypto.randomUUID(),
-      productId: input.productId,
-      intervalDays: input.intervalDays,
-      timesOfDay: input.timesOfDay,
-      quantity: input.quantity ?? 1,
-      startDate: input.startDate ?? null,
-      endDate: input.endDate ?? null,
+      ...scheduleFields(input),
     })
     .returning();
   return created;
@@ -56,14 +51,7 @@ export async function updateScheduleRow(
 ): Promise<Schedule> {
   const [updated] = await db
     .update(schedules)
-    .set({
-      productId: input.productId,
-      intervalDays: input.intervalDays,
-      timesOfDay: input.timesOfDay,
-      quantity: input.quantity ?? 1,
-      startDate: input.startDate ?? null,
-      endDate: input.endDate ?? null,
-    })
+    .set(scheduleFields(input))
     .where(eq(schedules.id, id))
     .returning();
   return updated;
@@ -83,4 +71,15 @@ export async function setSchedulePauseRow(
 
 export async function deleteScheduleRow(id: string): Promise<void> {
   await db.delete(schedules).where(eq(schedules.id, id));
+}
+
+function scheduleFields(input: NewScheduleInput) {
+  return {
+    productId: input.productId,
+    intervalDays: input.intervalDays,
+    timesOfDay: input.timesOfDay,
+    quantity: input.quantity ?? 1,
+    startDate: input.startDate ?? null,
+    endDate: input.endDate ?? null,
+  };
 }

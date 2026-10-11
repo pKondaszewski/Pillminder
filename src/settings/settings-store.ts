@@ -58,6 +58,14 @@ export function subscribeToSettings(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
+export function isValidSnoozeMinutes(value: unknown): value is number {
+  return (
+    Number.isInteger(value) &&
+    (value as number) >= SNOOZE_MINUTES_MIN &&
+    (value as number) <= SNOOZE_MINUTES_MAX
+  );
+}
+
 function readStoredSettings(): Settings {
   try {
     const raw = Storage.getItemSync(STORAGE_KEY);
@@ -81,14 +89,6 @@ function resolveDeviceCurrency(): Currency {
   const code = getLocales()[0]?.currencyCode;
   return (
     CURRENCY_OPTIONS.find((option) => option === code) ?? FALLBACK_CURRENCY
-  );
-}
-
-export function isValidSnoozeMinutes(value: unknown): value is number {
-  return (
-    Number.isInteger(value) &&
-    (value as number) >= SNOOZE_MINUTES_MIN &&
-    (value as number) <= SNOOZE_MINUTES_MAX
   );
 }
 
