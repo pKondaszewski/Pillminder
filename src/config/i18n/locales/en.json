@@ -116,6 +116,11 @@
   },
   "onboarding": {
     "allow": "Allow notifications",
+    "batteryFailed": "Could not open battery settings",
+    "batteryHint": "On the next screen choose \"Allow\" (on some phones: \"Unrestricted\" or \"Don't optimize\").",
+    "batteryIntro": "To remind you on time, Android must not put Pillminder to sleep. Without that, reminders can arrive late or not at all.",
+    "batteryOpen": "Open battery settings",
+    "batteryTitle": "Reminders on time",
     "blocked": "Notifications are blocked and Android will not ask again. Turn them on in the app's system settings.",
     "continue": "Continue without notifications",
     "featureDose": "A reminder when a dose is due, with \"Taken\" and \"Snooze\" buttons right on the notification",
