@@ -81,10 +81,11 @@ function changesOverTime({ startDate, endDate, pausedAt }: Schedule): boolean {
 function totalDailyConsumption(schedules: Schedule[], on: Date): number {
   return schedules
     .filter((schedule) => isActiveOn(schedule, on))
-    .reduce((units, { intervalDays, timesOfDay, quantity }) => {
-      const daysBetweenDoses = Math.max(1, intervalDays);
-      return units + (timesOfDay.length * quantity) / daysBetweenDoses;
-    }, 0);
+    .reduce(
+      (units, { intervalDays, timesOfDay, quantity }) =>
+        units + (timesOfDay.length * quantity) / intervalDays,
+      0,
+    );
 }
 
 function isActiveOn(schedule: Schedule, on: Date): boolean {

@@ -80,22 +80,21 @@ function* occurrenceStream(
   if (!earliest) return;
 
   const { startDate, endDate } = period;
-  const step = Math.max(1, intervalDays);
   const times = [...timesOfDay].sort();
   const lastDay = endDate ? startOfDay(endDate) : null;
 
   let day = firstDay(
     startDate ? startOfDay(startDate) : earliest,
     earliest,
-    step,
+    intervalDays,
   );
-  for (let scanned = 0; scanned < MAX_SCAN_DAYS; scanned += step) {
+  for (let scanned = 0; scanned < MAX_SCAN_DAYS; scanned += intervalDays) {
     if (lastDay && day > lastDay) return;
     for (const time of times) {
       const occurrence = atTime(day, time);
       if (occurrence >= now) yield occurrence;
     }
-    day = addDays(day, step);
+    day = addDays(day, intervalDays);
   }
 }
 

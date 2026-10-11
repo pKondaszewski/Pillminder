@@ -2,6 +2,7 @@ import { getTableColumns } from 'drizzle-orm';
 import type { SQLiteColumn, SQLiteTable } from 'drizzle-orm/sqlite-core';
 
 import { doses, notes, products, schedules } from '@/config/db/schema';
+import { isPositiveInteger } from '@/schedules/schedule-validator';
 
 import {
   BACKUP_TABLES,
@@ -145,6 +146,9 @@ function isValidValue(
       Array.isArray(value) &&
       value.every((time) => typeof time === 'string' && TIME_OF_DAY.test(time))
     );
+  }
+  if (table === 'schedules' && (key === 'intervalDays' || key === 'quantity')) {
+    return isPositiveInteger(value);
   }
   if (table === 'products' && key === 'category') {
     return typeof value === 'string' && value.trim() !== '';

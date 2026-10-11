@@ -12,6 +12,7 @@ import {
   setSchedulePauseRow,
   updateScheduleRow,
 } from './schedule-repository';
+import { assertValidScheduleInput } from './schedule-validator';
 
 export { occurrencesWithin, previewOccurrences } from './schedule-helper';
 export { isPaused } from './schedule-pause';
@@ -41,6 +42,7 @@ export async function createSchedule(
 ): Promise<Schedule> {
   log.info(`Adding schedule for product ${input.productId}`);
   try {
+    assertValidScheduleInput(input);
     const created = await createScheduleRow(input);
     log.info(`Created schedule ${JSON.stringify(created)}`);
     return created;
@@ -56,6 +58,7 @@ export async function updateSchedule(
 ): Promise<Schedule> {
   log.info(`Updating schedule with id ${id}`);
   try {
+    assertValidScheduleInput(input);
     const updated = await updateScheduleRow(id, input);
     log.info(`Updated schedule ${JSON.stringify(updated)}`);
     return updated;

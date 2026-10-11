@@ -227,17 +227,6 @@ describe('occurrencesWithin', () => {
     expect(result).toEqual([]);
   });
 
-  it.each([0, -2])('treats intervalDays = %i as daily', (intervalDays) => {
-    // given
-    const timesOfDay = ['18:00'];
-
-    // when
-    const result = occurrencesWithin(intervalDays, timesOfDay, 2, {}, NOW);
-
-    // then
-    expect(result).toEqual([at(1, 10, 18), at(1, 11, 18)]);
-  });
-
   describe('daylight saving time (Europe/Warsaw)', () => {
     it('runs tests in the Europe/Warsaw time zone', () => {
       // given
