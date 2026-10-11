@@ -44,9 +44,10 @@ export default function TabLayout() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <DatabaseBoundEffects />
         <AnimatedSplashOverlay />
-        {onboarding.visible ? (
+        {onboarding.step ? (
           <OnboardingScreen
-            onFinish={onboarding.finish}
+            step={onboarding.step}
+            onAdvance={onboarding.advance}
             onDismiss={onboarding.dismiss}
           />
         ) : (

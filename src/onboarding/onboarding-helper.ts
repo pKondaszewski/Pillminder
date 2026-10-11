@@ -1,15 +1,28 @@
 import type { NotificationPermission } from '@/notifications/notification-service';
 
-export type OnboardingDecision = 'show' | 'skip';
+export type OnboardingStep = 'notifications' | 'battery';
 
 export type PermissionStep = 'askable' | 'blocked' | 'granted';
 
-export function decideOnboarding(
-  promptDismissed: boolean,
-  permission: NotificationPermission,
-): OnboardingDecision {
-  if (permission.granted || promptDismissed) return 'skip';
-  return 'show';
+export function decideOnboardingSteps({
+  permission,
+  notificationsPromptDismissed,
+  batteryOptimizationEnabled,
+  batteryPromptDismissed,
+}: {
+  permission: NotificationPermission;
+  notificationsPromptDismissed: boolean;
+  batteryOptimizationEnabled: boolean;
+  batteryPromptDismissed: boolean;
+}): OnboardingStep[] {
+  const steps: OnboardingStep[] = [];
+  if (!permission.granted && !notificationsPromptDismissed) {
+    steps.push('notifications');
+  }
+  if (batteryOptimizationEnabled && !batteryPromptDismissed) {
+    steps.push('battery');
+  }
+  return steps;
 }
 
 export function permissionStep(

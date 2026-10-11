@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "android": {
       "package": "com.pkondaszewski.pillminder",
-      "permissions": ["android.permission.USE_EXACT_ALARM"],
+      "permissions": [
+        "android.permission.USE_EXACT_ALARM",
+        "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

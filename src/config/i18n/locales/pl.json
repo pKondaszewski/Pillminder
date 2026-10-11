@@ -122,6 +122,11 @@
   },
   "onboarding": {
     "allow": "Zezwól na powiadomienia",
+    "batteryFailed": "Nie udało się otworzyć ustawień baterii",
+    "batteryHint": "Na kolejnym ekranie wybierz „Zezwól” (na niektórych telefonach: „Bez ograniczeń” lub „Nie optymalizuj”).",
+    "batteryIntro": "Aby przypomnienia przychodziły na czas, Android nie może usypiać Pillminder. Bez tego przypomnienia mogą się spóźniać albo nie przyjść wcale.",
+    "batteryOpen": "Otwórz ustawienia baterii",
+    "batteryTitle": "Przypomnienia na czas",
     "blocked": "Powiadomienia są zablokowane, a Android nie zapyta ponownie. Włącz je w ustawieniach systemowych aplikacji.",
     "continue": "Kontynuuj bez powiadomień",
     "featureDose": "Przypomnienie, gdy czas na dawkę, z przyciskami „Wziąłem” i „Drzemka” bezpośrednio w powiadomieniu",

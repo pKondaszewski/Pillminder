@@ -40,6 +40,14 @@ export function isNotificationsPromptDismissed(): boolean {
   return getSettings().notificationsPromptDismissed;
 }
 
+export function dismissBatteryPrompt(): void {
+  updateSettings({ batteryPromptDismissed: true });
+}
+
+export function isBatteryPromptDismissed(): boolean {
+  return getSettings().batteryPromptDismissed;
+}
+
 export function getSnoozeMinutes(): number {
   return getSettings().snoozeMinutes;
 }

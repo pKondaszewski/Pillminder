@@ -18,6 +18,7 @@ export interface Settings {
   snoozeMinutes: number;
   currency: Currency;
   notificationsPromptDismissed: boolean;
+  batteryPromptDismissed: boolean;
 }
 
 const STORAGE_KEY = 'settings';
@@ -30,6 +31,7 @@ const DEFAULT_SETTINGS: Settings = {
   snoozeMinutes: SNOOZE_MINUTES_DEFAULT,
   currency: resolveDeviceCurrency(),
   notificationsPromptDismissed: false,
+  batteryPromptDismissed: false,
 };
 
 const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
@@ -38,6 +40,7 @@ const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
   snoozeMinutes: isValidSnoozeMinutes,
   currency: (value) => CURRENCY_OPTIONS.some((option) => option === value),
   notificationsPromptDismissed: (value) => typeof value === 'boolean',
+  batteryPromptDismissed: (value) => typeof value === 'boolean',
 };
 
 const listeners = new Set<() => void>();
@@ -79,6 +82,7 @@ function readStoredSettings(): Settings {
         'notificationsPromptDismissed',
         stored,
       ),
+      batteryPromptDismissed: pick('batteryPromptDismissed', stored),
     };
   } catch {
     return DEFAULT_SETTINGS;

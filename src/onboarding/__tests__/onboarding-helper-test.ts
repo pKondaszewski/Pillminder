@@ -1,54 +1,79 @@
-import { decideOnboarding, permissionStep } from '../onboarding-helper';
+import { decideOnboardingSteps, permissionStep } from '../onboarding-helper';
 
-describe('decideOnboarding', () => {
-  it.each([
-    [true, true],
-    [true, false],
-  ])(
-    'skips when permission is granted (dismissed: %s, canAskAgain: %s)',
-    (promptDismissed, canAskAgain) => {
+const NOTHING_DONE = {
+  permission: { granted: false, canAskAgain: true },
+  notificationsPromptDismissed: false,
+  batteryOptimizationEnabled: true,
+  batteryPromptDismissed: false,
+};
+
+describe('decideOnboardingSteps', () => {
+  it('shows notifications and then battery for a fresh user', () => {
+    // when
+    const result = decideOnboardingSteps(NOTHING_DONE);
+
+    // then
+    expect(result).toEqual(['notifications', 'battery']);
+  });
+
+  it.each([true, false])(
+    'shows only battery when permission is granted (canAskAgain: %s)',
+    (canAskAgain) => {
       // when
-      const result = decideOnboarding(promptDismissed, {
-        granted: true,
-        canAskAgain,
+      const result = decideOnboardingSteps({
+        ...NOTHING_DONE,
+        permission: { granted: true, canAskAgain },
       });
 
       // then
-      expect(result).toBe('skip');
+      expect(result).toEqual(['battery']);
     },
   );
 
-  it.each([true, false])(
-    'shows when permission is missing and the prompt was not dismissed (canAskAgain: %s)',
-    (canAskAgain) => {
-      // when
-      const result = decideOnboarding(false, { granted: false, canAskAgain });
-
-      // then
-      expect(result).toBe('show');
-    },
-  );
-
-  it.each([true, false])(
-    'skips when permission is missing but the user dismissed the prompt (canAskAgain: %s)',
-    (canAskAgain) => {
-      // when
-      const result = decideOnboarding(true, { granted: false, canAskAgain });
-
-      // then
-      expect(result).toBe('skip');
-    },
-  );
-
-  it('skips when permission is granted and the prompt was not dismissed', () => {
+  it('shows only battery when the notifications prompt was dismissed', () => {
     // when
-    const result = decideOnboarding(false, {
-      granted: true,
-      canAskAgain: true,
+    const result = decideOnboardingSteps({
+      ...NOTHING_DONE,
+      notificationsPromptDismissed: true,
     });
 
     // then
-    expect(result).toBe('skip');
+    expect(result).toEqual(['battery']);
+  });
+
+  it('shows only notifications when battery optimization is already off', () => {
+    // when
+    const result = decideOnboardingSteps({
+      ...NOTHING_DONE,
+      batteryOptimizationEnabled: false,
+    });
+
+    // then
+    expect(result).toEqual(['notifications']);
+  });
+
+  it('shows only notifications when the battery prompt was dismissed', () => {
+    // when
+    const result = decideOnboardingSteps({
+      ...NOTHING_DONE,
+      batteryPromptDismissed: true,
+    });
+
+    // then
+    expect(result).toEqual(['notifications']);
+  });
+
+  it('shows nothing when everything is done or dismissed', () => {
+    // when
+    const result = decideOnboardingSteps({
+      permission: { granted: true, canAskAgain: true },
+      notificationsPromptDismissed: false,
+      batteryOptimizationEnabled: false,
+      batteryPromptDismissed: true,
+    });
+
+    // then
+    expect(result).toEqual([]);
   });
 });
 
