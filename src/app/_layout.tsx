@@ -7,7 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { db } from '@/config/db/database';
 import { applyStoredTheme } from '@/settings/settings-service';
-import { AnimatedSplashOverlay } from '@/ui/components/commons/animated-icon';
+import { AnimatedSplashOverlay } from '@/ui/components/commons/animated-splash-overlay';
 import AppTabs from '@/ui/components/navigation/app-tabs';
 import { OnboardingScreen } from '@/ui/components/onboarding/onboarding-screen';
 import { useDoseSync } from '@/ui/hooks/use-dose-sync';

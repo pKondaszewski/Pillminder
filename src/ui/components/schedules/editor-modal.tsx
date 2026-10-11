@@ -17,7 +17,11 @@ import {
   type Schedule,
 } from '@/schedules/schedule-service';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { formatDate, formatTime } from '@/ui/commons/format-date';
+import {
+  formatDate,
+  formatDateTime,
+  formatTime,
+} from '@/ui/commons/format-date';
 import { ActionButton } from '@/ui/components/commons/action-button';
 import { Chip } from '@/ui/components/commons/chip';
 import { StepperButton } from '@/ui/components/commons/stepper-button';
@@ -34,12 +38,6 @@ type Props = {
   onPause: (id: string, resumeAt: Date | null) => void;
   onResume: (id: string) => void;
 };
-
-function formatOccurrence(date: Date): string {
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  return `${day}.${month} · ${formatTime(date)}`;
-}
 
 export function ScheduleEditorModal({
   visible,
@@ -124,8 +122,7 @@ function EditorForm({
     startDate !== null && endDate !== null && endDate < startDate;
 
   const onDateChange = (_event: DateTimePickerChangeEvent, date: Date) => {
-    const day = new Date(date);
-    day.setHours(0, 0, 0, 0);
+    const day = startOfDay(date);
     if (datePickerFor === 'start') setStartDate(day);
     if (datePickerFor === 'end') setEndDate(day);
     if (datePickerFor === 'resume') setResumeDate(day);
@@ -181,6 +178,9 @@ function EditorForm({
       },
     ]);
   };
+
+  const pickedDates = { start: startDate, end: endDate, resume: resumeDate };
+  const minimumPickerDate = datePickerFor === 'resume' ? tomorrow() : undefined;
 
   return (
     <ThemedView style={styles.container}>
@@ -313,12 +313,8 @@ function EditorForm({
           ) : null}
           {datePickerFor ? (
             <DateTimePicker
-              value={pickedDateValue(datePickerFor, {
-                start: startDate,
-                end: endDate,
-                resume: resumeDate,
-              })}
-              minimumDate={datePickerFor === 'resume' ? tomorrow() : undefined}
+              value={pickedDateValue(datePickerFor, pickedDates)}
+              minimumDate={minimumPickerDate}
               mode="date"
               onValueChange={onDateChange}
               onDismiss={() => setDatePickerFor(null)}
@@ -359,30 +355,7 @@ function EditorForm({
           ) : null}
 
           <ThemedText type="small">{t('schedule.preview')}</ThemedText>
-          {times.length === 0 ? (
-            <ThemedText type="small" themeColor="textSecondary">
-              {t('schedule.previewEmpty')}
-            </ThemedText>
-          ) : preview.length === 0 ? (
-            <ThemedText type="small" themeColor="textSecondary">
-              {t('schedule.previewNone')}
-            </ThemedText>
-          ) : (
-            <ThemedView type="backgroundElement" style={styles.previewBox}>
-              {preview.map((occurrence) => (
-                <ThemedText
-                  key={occurrence.toISOString()}
-                  type="small"
-                  themeColor="textSecondary"
-                >
-                  {formatOccurrence(occurrence)}
-                </ThemedText>
-              ))}
-              <ThemedText type="small" themeColor="textSecondary">
-                …
-              </ThemedText>
-            </ThemedView>
-          )}
+          <PreviewBox times={times} preview={preview} />
         </ScrollView>
 
         <ThemedView style={styles.actions}>
@@ -401,6 +374,40 @@ function EditorForm({
           />
         </ThemedView>
       </SafeAreaView>
+    </ThemedView>
+  );
+}
+
+function PreviewBox({ times, preview }: { times: string[]; preview: Date[] }) {
+  const { t } = useTranslation();
+  if (times.length === 0) {
+    return (
+      <ThemedText type="small" themeColor="textSecondary">
+        {t('schedule.previewEmpty')}
+      </ThemedText>
+    );
+  }
+  if (preview.length === 0) {
+    return (
+      <ThemedText type="small" themeColor="textSecondary">
+        {t('schedule.previewNone')}
+      </ThemedText>
+    );
+  }
+  return (
+    <ThemedView type="backgroundElement" style={styles.previewBox}>
+      {preview.map((occurrence) => (
+        <ThemedText
+          key={occurrence.toISOString()}
+          type="small"
+          themeColor="textSecondary"
+        >
+          {formatDateTime(occurrence)}
+        </ThemedText>
+      ))}
+      <ThemedText type="small" themeColor="textSecondary">
+        …
+      </ThemedText>
     </ThemedView>
   );
 }

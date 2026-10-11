@@ -22,12 +22,12 @@ export function ProductOverviewModal({ visible, onClose }: Props) {
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      {visible ? <SummaryContent onClose={onClose} /> : null}
+      {visible ? <OverviewContent onClose={onClose} /> : null}
     </Modal>
   );
 }
 
-function SummaryContent({ onClose }: Pick<Props, 'onClose'>) {
+function OverviewContent({ onClose }: Pick<Props, 'onClose'>) {
   const { t } = useTranslation();
   const { products } = useProductOverview();
 

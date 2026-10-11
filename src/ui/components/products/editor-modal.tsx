@@ -45,17 +45,6 @@ type Props = {
   onRestore: (id: string) => void;
 };
 
-function toText(value: number | null | undefined) {
-  return value == null ? '' : String(value);
-}
-
-function toNumber(value: string): number | null {
-  const trimmed = value.trim();
-  if (trimmed === '') return null;
-  const parsed = Number(trimmed);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
 export function ProductEditorModal({
   visible,
   product,
@@ -340,7 +329,7 @@ function EditorForm({
             </ThemedView>
           ) : null}
 
-          {product && archiving ? (
+          {archiving ? (
             <ThemedView style={styles.archivePrompt}>
               <ThemedText type="small">
                 {t('notes.completionPrompt')}
@@ -365,7 +354,9 @@ function EditorForm({
                 />
               </ThemedView>
             </ThemedView>
-          ) : product ? (
+          ) : null}
+
+          {product && !archiving ? (
             <Pressable
               onPress={handleToggleStatus}
               style={({ pressed }) => pressed && styles.pressed}
@@ -413,6 +404,17 @@ function EditorForm({
       </SafeAreaView>
     </ThemedView>
   );
+}
+
+function toText(value: number | null | undefined) {
+  return value == null ? '' : String(value);
+}
+
+function toNumber(value: string): number | null {
+  const trimmed = value.trim();
+  if (trimmed === '') return null;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function FieldError({ message }: { message: string }) {

@@ -7,7 +7,6 @@ import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { useNotificationPermission } from '@/ui/hooks/use-notification-permission';
-import { useTheme } from '@/ui/hooks/use-theme';
 
 export function NotificationsStep({
   onGranted,
@@ -82,8 +81,6 @@ function PrimaryButton({
   onPress: () => void;
   disabled?: boolean;
 }) {
-  const theme = useTheme();
-
   return (
     <Pressable
       onPress={onPress}
@@ -91,7 +88,7 @@ function PrimaryButton({
       accessibilityRole="button"
       style={({ pressed }) => (pressed || disabled) && styles.pressed}
     >
-      <ThemedView style={[styles.primary, { backgroundColor: theme.accent }]}>
+      <ThemedView type="accent" style={styles.primary}>
         <ThemedText type="smallBold" style={styles.primaryLabel}>
           {label}
         </ThemedText>
