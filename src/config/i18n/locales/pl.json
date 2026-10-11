@@ -94,6 +94,20 @@
     "unskipConfirm": "Cofnąć pominięcie „{{name}}”?",
     "unskipTitle": "Cofnąć pominięcie?"
   },
+  "migrationError": {
+    "details": "Szczegóły techniczne",
+    "hideDetails": "Ukryj szczegóły techniczne",
+    "message": "Nie udało się przygotować bazy danych aplikacji. Zwykle pomaga ponowna próba. Jeśli to nie działa, możesz przywrócić dane z kopii zapasowej albo zacząć od zera.",
+    "reset": "Wyczyść dane",
+    "resetConfirmAction": "Usuń wszystko",
+    "resetConfirmMessage": "Wszystkie produkty, harmonogramy, historia dawek i notatki zostaną usunięte. Ustawienia zostają.\n\nTej operacji nie można cofnąć.",
+    "resetConfirmTitle": "Wyczyścić wszystkie dane?",
+    "resetFailed": "Nie udało się wyczyścić danych",
+    "restore": "Przywróć z kopii",
+    "restoreFailed": "Nie udało się przywrócić danych",
+    "retry": "Spróbuj ponownie",
+    "title": "Aplikacja nie może otworzyć danych"
+  },
   "notes": {
     "add": "Dodaj notatkę",
     "completionPlaceholder": "np. przerwa w stosowaniu, zamiennik",
