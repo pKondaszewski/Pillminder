@@ -57,6 +57,13 @@
       "when": 1791677557543,
       "tag": "0007_repair_schedule_interval_and_quantity",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1791753033994,
+      "tag": "0008_add_product_pack_size",
+      "breakpoints": true
     }
   ]
 }

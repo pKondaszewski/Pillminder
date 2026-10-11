@@ -2,6 +2,7 @@ import { createLogger } from '@/config/logger';
 
 import type { NewProductInput } from './dto/new-product-input';
 import {
+  addPackToStockRow,
   createProductRow,
   deleteProductRow,
   getCustomCategories,
@@ -60,6 +61,16 @@ export async function updateProduct(
     log.info(`Updated product ${JSON.stringify(updated)}`);
   } catch (err) {
     log.error(`Failed to update product with id ${id}`, err);
+    throw err;
+  }
+}
+
+export async function addPackToStock(id: string): Promise<void> {
+  log.info(`Adding a pack to the stock of product ${id}`);
+  try {
+    await addPackToStockRow(id);
+  } catch (err) {
+    log.error(`Failed to add a pack to the stock of product ${id}`, err);
     throw err;
   }
 }

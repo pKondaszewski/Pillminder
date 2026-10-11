@@ -31,6 +31,7 @@
   },
   "editor": {
     "addCategory": "+ New",
+    "addPack": "+ pack ({{count}})",
     "archive": "Archive",
     "cancel": "Cancel",
     "category": "Category",
@@ -49,6 +50,9 @@
     "newCategory": "New category name",
     "newCategoryPlaceholder": "e.g. Eye drops",
     "newTitle": "New product",
+    "packSize": "Pack size",
+    "packSizeInvalid": "Enter a whole number greater than 0",
+    "packSizePlaceholder": "e.g. 30",
     "price": "Price ({{currency}})",
     "restore": "Restore",
     "save": "Save",
@@ -128,6 +132,7 @@
     "title": "Notes"
   },
   "notification": {
+    "addPack": "Add pack",
     "body": "Time to take {{name}}",
     "bodyAmount": "Time to take {{name}}: {{amount}}",
     "bodyQuantity": "Time to take {{quantity}} × {{name}}",

@@ -13,6 +13,7 @@ import {
   type ReminderResponseHandlers,
   subscribeToReminderResponses,
 } from '@/notifications/notification-service';
+import { restockPack } from '@/products/product-orchestrator';
 import { resolveStoreUrl } from '@/products/store-link';
 
 const log = createLogger('use-notifications');
@@ -38,6 +39,7 @@ function initNotificationStrings() {
     take: i18n.t('notification.take'),
     snooze: i18n.t('notification.snooze'),
     buy: i18n.t('notification.buy'),
+    addPack: i18n.t('notification.addPack'),
     reorderChannel: i18n.t('notification.reorderTitle'),
   });
 }
@@ -67,4 +69,8 @@ const responseHandlers: ReminderResponseHandlers = {
       log.error('Open store link from notification failed', err),
     );
   },
+  onAddPack: (productId) =>
+    restockPack(productId).catch((err) =>
+      log.error('Add pack from notification failed', err),
+    ),
 };

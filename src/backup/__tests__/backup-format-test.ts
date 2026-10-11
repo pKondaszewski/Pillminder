@@ -92,6 +92,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           storeLink: 'https://pharmacy.example/ibuprofen',
           status: 'archived',
           stock: 30,
+          packSize: 10,
           lastUsedAt: new Date('2026-02-10T07:30:00.000Z'),
           createdAt: new Date('2026-01-01T00:00:00.000Z'),
           updatedAt: new Date('2026-02-10T07:30:00.000Z'),
@@ -106,6 +107,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           storeLink: null,
           status: 'active',
           stock: null,
+          packSize: null,
           lastUsedAt: null,
           createdAt: new Date('2026-01-05T00:00:00.000Z'),
           updatedAt: new Date('2026-01-05T00:00:00.000Z'),
@@ -269,6 +271,7 @@ describe('parseBackup: older schema and unknown fields', () => {
       storeLink: null,
       status: 'active',
       stock: null,
+      packSize: null,
       lastUsedAt: null,
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-02T00:00:00.000Z'),
@@ -1013,5 +1016,43 @@ describe('parseBackup product unit', () => {
 
     // then
     expect(rows.schedules[0]).toMatchObject({ intervalDays: 1, quantity: 1 });
+  });
+});
+
+describe('parseBackup: product pack size', () => {
+  it('imports a backup made before pack sizes with no pack size', () => {
+    // given
+    const text = backupText();
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.products[0].packSize).toBeNull();
+  });
+
+  it('keeps the pack size through a round trip', () => {
+    // given
+    const text = backupText({ products: [product({ packSize: 30 })] });
+
+    // when
+    const rows = rowsOf(serializeBackup(rowsOf(text), EXPORTED_AT));
+
+    // then
+    expect(rows.products[0].packSize).toBe(30);
+  });
+
+  it.each([0, -1, 2.5])('rejects pack size %s', (packSize) => {
+    // given
+    const text = backupText({ products: [product({ packSize })] });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({
+      code: 'invalidRow',
+      detail: 'products[0].packSize',
+    });
   });
 });

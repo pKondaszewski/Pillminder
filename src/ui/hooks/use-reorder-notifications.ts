@@ -46,6 +46,7 @@ function syncReorderAlerts(
           productId: product.id,
           productName: product.name,
           storeLink: product.storeLink,
+          canAddPack: product.packSize !== null,
           reorderAt: action.at,
         },
         {

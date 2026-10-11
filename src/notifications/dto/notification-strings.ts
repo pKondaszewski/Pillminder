@@ -3,5 +3,6 @@ export interface NotificationStrings {
   take: string;
   snooze: string;
   buy: string;
+  addPack: string;
   reorderChannel: string;
 }

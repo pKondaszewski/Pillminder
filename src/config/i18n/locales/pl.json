@@ -31,6 +31,7 @@
   },
   "editor": {
     "addCategory": "+ Nowa",
+    "addPack": "+ opakowanie ({{count}})",
     "archive": "Archiwizuj",
     "cancel": "Anuluj",
     "category": "Kategoria",
@@ -49,6 +50,9 @@
     "newCategory": "Nazwa nowej kategorii",
     "newCategoryPlaceholder": "np. Krople do oczu",
     "newTitle": "Nowy produkt",
+    "packSize": "Rozmiar opakowania",
+    "packSizeInvalid": "Podaj liczbę całkowitą większą od 0",
+    "packSizePlaceholder": "np. 30",
     "price": "Cena ({{currency}})",
     "restore": "Przywróć",
     "save": "Zapisz",
@@ -130,6 +134,7 @@
     "title": "Notatki"
   },
   "notification": {
+    "addPack": "Dodaj opakowanie",
     "body": "Czas wziąć {{name}}",
     "bodyAmount": "Czas wziąć {{name}}: {{amount}}",
     "bodyQuantity": "Czas wziąć {{quantity}} × {{name}}",

@@ -10,12 +10,14 @@ import type { NotificationText } from './dto/notification-text';
 import type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
 import type { ReorderAlert } from './dto/reorder-alert';
 import {
+  ADD_PACK_ACTION,
   BACKGROUND_RESPONSE_TASK,
   BUY_ACTION,
   CATEGORY_ID,
   CHANNEL_ID,
   REORDER_CATEGORY_ID,
   REORDER_CHANNEL_ID,
+  REORDER_PACK_CATEGORY_ID,
   SNOOZE_ACTION,
   TAKE_ACTION,
 } from './identifiers';
@@ -110,8 +112,14 @@ export async function scheduleReorderAlert(
       content: {
         title: strings.title,
         body: strings.body,
-        categoryIdentifier: REORDER_CATEGORY_ID,
-        data: { type: 'reorder', storeLink: alert.storeLink },
+        categoryIdentifier: alert.canAddPack
+          ? REORDER_PACK_CATEGORY_ID
+          : REORDER_CATEGORY_ID,
+        data: {
+          type: 'reorder',
+          productId: alert.productId,
+          storeLink: alert.storeLink,
+        },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
@@ -235,6 +243,19 @@ async function setUpNotifications(
         identifier: BUY_ACTION,
         buttonTitle: strings.buy,
         options: { opensAppToForeground: true },
+      },
+    ]);
+
+    await Notifications.setNotificationCategoryAsync(REORDER_PACK_CATEGORY_ID, [
+      {
+        identifier: BUY_ACTION,
+        buttonTitle: strings.buy,
+        options: { opensAppToForeground: true },
+      },
+      {
+        identifier: ADD_PACK_ACTION,
+        buttonTitle: strings.addPack,
+        options: { opensAppToForeground: false },
       },
     ]);
 

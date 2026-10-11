@@ -1,9 +1,23 @@
 import type { NotificationResponse } from 'expo-notifications';
 
 import type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
-import { BUY_ACTION, SNOOZE_ACTION, TAKE_ACTION } from './identifiers';
+import {
+  ADD_PACK_ACTION,
+  BUY_ACTION,
+  SNOOZE_ACTION,
+  TAKE_ACTION,
+} from './identifiers';
 
 const handledResponses = new Set<string>();
+
+// The app listener and the background task can both see one response when the
+// app is alive in the background; adding a pack is not idempotent.
+export function claimResponse(response: NotificationResponse): boolean {
+  const key = responseKey(response);
+  if (handledResponses.has(key)) return false;
+  handledResponses.add(key);
+  return true;
+}
 
 export function processReminderResponse(
   response: NotificationResponse,
@@ -20,11 +34,14 @@ function processReorderResponse(
   data: Record<string, unknown>,
   handlers: ReminderResponseHandlers,
 ): boolean {
+  const { productId } = data;
+  if (response.actionIdentifier === ADD_PACK_ACTION) {
+    if (typeof productId !== 'string') return false;
+    return runHandlerOnce(response, () => handlers.onAddPack(productId));
+  }
   if (response.actionIdentifier !== BUY_ACTION) return false;
   const storeLink = typeof data.storeLink === 'string' ? data.storeLink : null;
-  return runHandlerOnce(responseKey(response), () =>
-    handlers.onReorder(storeLink),
-  );
+  return runHandlerOnce(response, () => handlers.onReorder(storeLink));
 }
 
 function processDoseResponse(
@@ -36,12 +53,10 @@ function processDoseResponse(
   if (typeof doseId !== 'string') return false;
 
   if (response.actionIdentifier === TAKE_ACTION) {
-    return runHandlerOnce(responseKey(response), () => handlers.onTake(doseId));
+    return runHandlerOnce(response, () => handlers.onTake(doseId));
   }
   if (response.actionIdentifier === SNOOZE_ACTION) {
-    return runHandlerOnce(responseKey(response), () =>
-      handlers.onSnooze(doseId),
-    );
+    return runHandlerOnce(response, () => handlers.onSnooze(doseId));
   }
   return false;
 }
@@ -50,9 +65,11 @@ function responseKey(response: NotificationResponse): string {
   return `${response.notification.request.identifier}:${response.actionIdentifier}`;
 }
 
-function runHandlerOnce(key: string, action: () => void): boolean {
-  if (handledResponses.has(key)) return false;
-  handledResponses.add(key);
+function runHandlerOnce(
+  response: NotificationResponse,
+  action: () => void,
+): boolean {
+  if (!claimResponse(response)) return false;
   action();
   return true;
 }

@@ -150,6 +150,9 @@ function isValidValue(
   if (table === 'schedules' && (key === 'intervalDays' || key === 'quantity')) {
     return isPositiveInteger(value);
   }
+  if (table === 'products' && key === 'packSize') {
+    return isPositiveInteger(value);
+  }
   if (table === 'products' && key === 'category') {
     return typeof value === 'string' && value.trim() !== '';
   }
