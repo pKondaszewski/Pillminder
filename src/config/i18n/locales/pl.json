@@ -72,9 +72,41 @@
     "change": "Zmień",
     "confirmSkipped": "Oznaczyć dawkę jako niewziętą? Zapas zostanie przywrócony.",
     "confirmTaken": "Oznaczyć dawkę jako wziętą? Zapas zostanie zmniejszony.",
+    "emptyDay": "Nic nie zaplanowano na ten dzień",
     "errorCorrect": "Nie udało się zmienić dawki. Spróbuj ponownie.",
+    "month": {
+      "april": "Kwiecień",
+      "august": "Sierpień",
+      "december": "Grudzień",
+      "february": "Luty",
+      "january": "Styczeń",
+      "july": "Lipiec",
+      "june": "Czerwiec",
+      "march": "Marzec",
+      "may": "Maj",
+      "november": "Listopad",
+      "october": "Październik",
+      "september": "Wrzesień"
+    },
+    "nextMonth": "Następny miesiąc",
+    "previousMonth": "Poprzedni miesiąc",
     "skipped": "Pominięto",
-    "taken": "Wzięto"
+    "status": {
+      "allTaken": "Wszystko wzięte",
+      "missed": "Przeoczono",
+      "skipped": "Pominięto",
+      "upcoming": "Zaplanowano"
+    },
+    "taken": "Wzięto",
+    "weekday": {
+      "fri": "Pt",
+      "mon": "Pn",
+      "sat": "So",
+      "sun": "Nd",
+      "thu": "Cz",
+      "tue": "Wt",
+      "wed": "Śr"
+    }
   },
   "home": {
     "bulkTake": "Wziąłem zaległe ({{count}})",
@@ -312,6 +344,7 @@
     "title": "Podsumowanie przyjmowanych produktów"
   },
   "tabs": {
+    "history": "Historia",
     "home": "Dziś",
     "products": "Produkty",
     "schedules": "Harmonogramy",

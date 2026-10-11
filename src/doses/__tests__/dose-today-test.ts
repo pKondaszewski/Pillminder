@@ -3,6 +3,7 @@ import type { TodayDoseRow } from '../dto/today-dose-output';
 
 const row: TodayDoseRow = {
   id: 'dose-1',
+  productId: 'product-1',
   plannedAt: new Date('2026-10-10T08:00:00Z'),
   state: 'pending',
   takenAt: null,
@@ -21,6 +22,7 @@ describe('toTodayDose', () => {
     // then
     expect(dose).toEqual({
       id: 'dose-1',
+      productId: 'product-1',
       productName: 'Ibuprofen',
       quantity: 2,
       unit: 'tablet',

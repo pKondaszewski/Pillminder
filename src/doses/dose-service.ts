@@ -27,6 +27,7 @@ import { calculateAdherence, calculateStreak } from './dose-adherence';
 import { reminderBody } from './dose-label';
 import {
   deleteFuturePendingDoseRowsForSchedules,
+  dosesBetweenQuery,
   getDoseById,
   getDosesPlannedBetween,
   getFuturePendingDosesByProduct,
@@ -34,7 +35,6 @@ import {
   replaceFuturePendingDoseRows,
   setDoseSnoozedUntilRow,
   setDoseStateRow,
-  todaysDosesQuery,
 } from './dose-repository';
 import { isDueInFuture, isPending } from './dose-validator';
 import type {
@@ -42,6 +42,8 @@ import type {
   AdherenceStats,
 } from './dto/adherence-report-output';
 
+export type { DayStatus, ProductDoses } from './dose-day';
+export { dayStatus, groupDosesByProduct } from './dose-day';
 export { toHistoryEntries } from './dose-history';
 export { doseQuantityText } from './dose-label';
 export { BULK_TAKE_MIN_OVERDUE, overdueDoses } from './dose-overdue';
@@ -69,8 +71,8 @@ function reminderStrings(product: Product, quantity: number) {
   };
 }
 
-export function getTodaysDosesQuery(day: Date) {
-  return todaysDosesQuery(day);
+export function getDosesBetweenQuery(from: Date, to: Date) {
+  return dosesBetweenQuery(from, to);
 }
 
 export function getProductHistoryQuery(productId: string) {

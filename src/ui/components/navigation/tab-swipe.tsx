@@ -8,7 +8,13 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, { Keyframe } from 'react-native-reanimated';
 
-const TAB_ORDER = ['/', '/products', '/schedules', '/settings'] as const;
+const TAB_ORDER = [
+  '/',
+  '/products',
+  '/schedules',
+  '/history',
+  '/settings',
+] as const;
 
 let prevIndex = 0;
 

@@ -8,6 +8,7 @@ function at(hours: number, minutes = 0): Date {
 function doseAt(id: string, plannedAt: Date): TodayDose {
   return {
     id,
+    productId: 'ibuprofen',
     productName: 'Ibuprofen',
     quantity: 1,
     unit: 'tablet',

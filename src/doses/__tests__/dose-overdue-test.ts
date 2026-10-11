@@ -10,6 +10,7 @@ function dose(
 ): TodayDose {
   return {
     id,
+    productId: 'ibuprofen',
     productName: 'Ibuprofen',
     quantity: 1,
     unit: 'tablet',
