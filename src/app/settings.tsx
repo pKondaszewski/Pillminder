@@ -20,6 +20,8 @@ import {
   THEME_OPTIONS,
 } from '@/settings/settings-store';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { Chip } from '@/ui/components/commons/chip';
+import { StepperButton } from '@/ui/components/commons/stepper-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
@@ -173,16 +175,11 @@ function MinutesStepper({
     <ThemedView style={styles.optionRow}>
       <ThemedText type="small">{label}</ThemedText>
       <ThemedView style={styles.stepperRow}>
-        <Pressable
-          onPress={() => commit(value - 1)}
-          hitSlop={Spacing.two}
+        <StepperButton
+          sign="−"
           accessibilityLabel={t('settings.snoozeLess')}
-          style={({ pressed }) => pressed && styles.pressed}
-        >
-          <ThemedView type="backgroundElement" style={styles.stepperButton}>
-            <ThemedText type="subtitle">−</ThemedText>
-          </ThemedView>
-        </Pressable>
+          onPress={() => commit(value - 1)}
+        />
         <TextInput
           value={draft}
           onChangeText={handleChangeText}
@@ -197,16 +194,11 @@ function MinutesStepper({
         <ThemedText type="small" themeColor="textSecondary">
           {t('settings.minutesUnit')}
         </ThemedText>
-        <Pressable
-          onPress={() => commit(value + 1)}
-          hitSlop={Spacing.two}
+        <StepperButton
+          sign="+"
           accessibilityLabel={t('settings.snoozeMore')}
-          style={({ pressed }) => pressed && styles.pressed}
-        >
-          <ThemedView type="backgroundElement" style={styles.stepperButton}>
-            <ThemedText type="subtitle">+</ThemedText>
-          </ThemedView>
-        </Pressable>
+          onPress={() => commit(value + 1)}
+        />
       </ThemedView>
     </ThemedView>
   );
@@ -230,27 +222,12 @@ function OptionRow<T extends string | number>({
       <ThemedText type="small">{label}</ThemedText>
       <ThemedView style={styles.chips}>
         {options.map((option) => (
-          <Pressable
+          <Chip
             key={option}
+            label={optionLabel(option)}
+            selected={option === selected}
             onPress={() => onSelect(option)}
-            accessibilityRole="button"
-            accessibilityState={{ selected: option === selected }}
-            style={({ pressed }) => pressed && styles.pressed}
-          >
-            <ThemedView
-              type={
-                option === selected ? 'backgroundSelected' : 'backgroundElement'
-              }
-              style={styles.chip}
-            >
-              <ThemedText
-                type="small"
-                themeColor={option === selected ? 'text' : 'textSecondary'}
-              >
-                {optionLabel(option)}
-              </ThemedText>
-            </ThemedView>
-          </Pressable>
+          />
         ))}
       </ThemedView>
     </ThemedView>
@@ -289,13 +266,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.two,
-  },
-  stepperButton: {
-    width: 48,
-    height: 48,
-    borderRadius: Spacing.three,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   stepperInput: {
     minWidth: 72,

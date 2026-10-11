@@ -1,14 +1,13 @@
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Modal, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { ProductOverviewEntry } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { ActionButton } from '@/ui/components/commons/action-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { useProductOverview } from '@/ui/hooks/use-product-overview';
-
-const LOW_STOCK_COLOR = '#d97706';
 
 type Props = {
   visible: boolean;
@@ -49,17 +48,13 @@ function SummaryContent({ onClose }: Pick<Props, 'onClose'>) {
               <ProductBlock key={product.id} product={product} />
             ))
           )}
-          <Pressable
-            onPress={onClose}
-            accessibilityRole="button"
-            style={({ pressed }) => pressed && styles.pressed}
-          >
-            <ThemedView type="backgroundElement" style={styles.closeButton}>
-              <ThemedText themeColor="accent" style={styles.closeText}>
-                {t('editor.close')}
-              </ThemedText>
-            </ThemedView>
-          </Pressable>
+          <ThemedView style={styles.actions}>
+            <ActionButton
+              label={t('editor.close')}
+              onPress={onClose}
+              themeColor="accent"
+            />
+          </ThemedView>
         </ScrollView>
       </SafeAreaView>
     </ThemedView>
@@ -78,7 +73,10 @@ function ProductBlock({ product }: { product: ProductOverviewEntry }) {
           {line}
         </ThemedText>
       ))}
-      <ThemedText type="small" style={product.stock.isLow && styles.lowStock}>
+      <ThemedText
+        type={product.stock.isLow ? 'smallBold' : 'small'}
+        themeColor={product.stock.isLow ? 'warning' : undefined}
+      >
         {product.stock.text}
       </ThemedText>
     </ThemedView>
@@ -106,19 +104,7 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.three,
     gap: Spacing.one,
   },
-  lowStock: {
-    color: LOW_STOCK_COLOR,
-    fontWeight: '600',
-  },
-  closeButton: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    alignItems: 'center',
-  },
-  closeText: {
-    fontWeight: '600',
-  },
-  pressed: {
-    opacity: 0.7,
+  actions: {
+    flexDirection: 'row',
   },
 });

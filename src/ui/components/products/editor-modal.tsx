@@ -23,6 +23,9 @@ import type { NewProductInput } from '@/products/dto/new-product-input';
 import { PRODUCT_UNITS, type ProductUnit } from '@/products/product-unit';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDateTime } from '@/ui/commons/format-date';
+import { ActionButton } from '@/ui/components/commons/action-button';
+import { Chip } from '@/ui/components/commons/chip';
+import { StepperButton } from '@/ui/components/commons/stepper-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductHistory } from '@/ui/components/products/history';
@@ -298,16 +301,11 @@ function EditorForm({
 
           <ThemedText type="small">{t('editor.stock')}</ThemedText>
           <ThemedView style={styles.stepperRow}>
-            <Pressable
-              onPress={decreaseStock}
-              hitSlop={Spacing.two}
+            <StepperButton
+              sign="−"
               accessibilityLabel={t('editor.stockLess')}
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <ThemedView type="backgroundElement" style={styles.stepperButton}>
-                <ThemedText type="subtitle">−</ThemedText>
-              </ThemedView>
-            </Pressable>
+              onPress={decreaseStock}
+            />
             <TextInput
               value={stock}
               onChangeText={setStock}
@@ -316,16 +314,11 @@ function EditorForm({
               placeholderTextColor={theme.textSecondary}
               style={[inputStyle, styles.stepperInput]}
             />
-            <Pressable
-              onPress={increaseStock}
-              hitSlop={Spacing.two}
+            <StepperButton
+              sign="+"
               accessibilityLabel={t('editor.stockMore')}
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <ThemedView type="backgroundElement" style={styles.stepperButton}>
-                <ThemedText type="subtitle">+</ThemedText>
-              </ThemedView>
-            </Pressable>
+              onPress={increaseStock}
+            />
           </ThemedView>
 
           <ThemedText type="small">{t('editor.storeLink')}</ThemedText>
@@ -339,17 +332,12 @@ function EditorForm({
           {category ? (
             <ThemedView style={styles.chipRow}>
               {storeSuggestionKeys(category).map((key) => (
-                <Pressable
+                <Chip
                   key={key}
+                  label={t(`storeSuggestion.${key}`)}
+                  selected={false}
                   onPress={() => setStoreLink(t(`storeSuggestion.${key}`))}
-                  style={({ pressed }) => pressed && styles.pressed}
-                >
-                  <ThemedView type="backgroundElement" style={styles.chip}>
-                    <ThemedText type="small" themeColor="textSecondary">
-                      {t(`storeSuggestion.${key}`)}
-                    </ThemedText>
-                  </ThemedView>
-                </Pressable>
+                />
               ))}
             </ThemedView>
           ) : null}
@@ -375,7 +363,7 @@ function EditorForm({
                 <ActionButton
                   label={t('editor.archive')}
                   onPress={handleConfirmArchive}
-                  color={theme.accent}
+                  themeColor="accent"
                 />
               </ThemedView>
             </ThemedView>
@@ -415,46 +403,17 @@ function EditorForm({
             <ActionButton
               label={t('editor.delete')}
               onPress={handleDelete}
-              color={theme.danger}
+              themeColor="danger"
             />
           ) : null}
           <ActionButton
             label={t('editor.save')}
             onPress={handleSave}
-            color={theme.accent}
+            themeColor="accent"
           />
         </ThemedView>
       </SafeAreaView>
     </ThemedView>
-  );
-}
-
-function Chip({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => pressed && styles.pressed}
-    >
-      <ThemedView
-        type={selected ? 'backgroundSelected' : 'backgroundElement'}
-        style={styles.chip}
-      >
-        <ThemedText
-          type="small"
-          themeColor={selected ? 'text' : 'textSecondary'}
-        >
-          {label}
-        </ThemedText>
-      </ThemedView>
-    </Pressable>
   );
 }
 
@@ -463,29 +422,6 @@ function FieldError({ message }: { message: string }) {
     <ThemedText type="small" themeColor="danger">
       {message}
     </ThemedText>
-  );
-}
-
-function ActionButton({
-  label,
-  onPress,
-  color,
-}: {
-  label: string;
-  onPress: () => void;
-  color?: string;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}
-    >
-      <ThemedView type="backgroundElement" style={styles.actionButtonInner}>
-        <ThemedText type="smallBold" style={color ? { color } : undefined}>
-          {label}
-        </ThemedText>
-      </ThemedView>
-    </Pressable>
   );
 }
 
@@ -515,22 +451,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: Spacing.two,
   },
-  chip: {
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.three,
-  },
   stepperRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.two,
-  },
-  stepperButton: {
-    width: 48,
-    height: 48,
-    borderRadius: Spacing.three,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   stepperInput: {
     flex: 1,
@@ -557,13 +481,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.two,
     marginTop: Spacing.three,
-  },
-  actionButton: {
-    flex: 1,
-  },
-  actionButtonInner: {
-    paddingVertical: Spacing.three,
-    borderRadius: Spacing.three,
-    alignItems: 'center',
   },
 });

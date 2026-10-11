@@ -18,9 +18,11 @@ import {
 } from '@/schedules/schedule-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDate, formatTime } from '@/ui/commons/format-date';
+import { ActionButton } from '@/ui/components/commons/action-button';
+import { Chip } from '@/ui/components/commons/chip';
+import { StepperButton } from '@/ui/components/commons/stepper-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { useTheme } from '@/ui/hooks/use-theme';
 
 interface Props {
   visible: boolean;
@@ -82,7 +84,6 @@ function EditorForm({
   onResume,
 }: Omit<Props, 'visible'>) {
   const { t } = useTranslation();
-  const theme = useTheme();
 
   const [productId, setProductId] = useState(
     schedule?.productId ?? products[0]?.id ?? '',
@@ -194,85 +195,50 @@ function EditorForm({
           ) : (
             <ThemedView style={styles.chipsRow}>
               {products.map((p) => (
-                <Pressable
+                <Chip
                   key={p.id}
+                  label={p.name}
+                  selected={p.id === productId}
                   onPress={() => setProductId(p.id)}
-                  style={({ pressed }) => pressed && styles.pressed}
-                >
-                  <ThemedView
-                    type={
-                      p.id === productId
-                        ? 'backgroundSelected'
-                        : 'backgroundElement'
-                    }
-                    style={styles.chip}
-                  >
-                    <ThemedText
-                      type="small"
-                      themeColor={p.id === productId ? 'text' : 'textSecondary'}
-                    >
-                      {p.name}
-                    </ThemedText>
-                  </ThemedView>
-                </Pressable>
+                />
               ))}
             </ThemedView>
           )}
 
           <ThemedText type="small">{t('schedule.intervalDays')}</ThemedText>
           <ThemedView style={styles.stepper}>
-            <Pressable
-              onPress={() => setIntervalDays(Math.max(1, intervalDays - 1))}
-              hitSlop={Spacing.two}
+            <StepperButton
+              sign="−"
               accessibilityLabel={t('schedule.intervalLess')}
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <ThemedView type="backgroundElement" style={styles.stepperButton}>
-                <ThemedText type="subtitle">−</ThemedText>
-              </ThemedView>
-            </Pressable>
+              onPress={() => setIntervalDays(Math.max(1, intervalDays - 1))}
+            />
             <ThemedText style={styles.stepperValue}>
               {intervalDays === 1
                 ? t('schedule.daily')
                 : t('schedule.everyXDays', { days: intervalDays })}
             </ThemedText>
-            <Pressable
-              onPress={() => setIntervalDays(intervalDays + 1)}
-              hitSlop={Spacing.two}
+            <StepperButton
+              sign="+"
               accessibilityLabel={t('schedule.intervalMore')}
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <ThemedView type="backgroundElement" style={styles.stepperButton}>
-                <ThemedText type="subtitle">+</ThemedText>
-              </ThemedView>
-            </Pressable>
+              onPress={() => setIntervalDays(intervalDays + 1)}
+            />
           </ThemedView>
 
           <ThemedText type="small">{t('schedule.quantity')}</ThemedText>
           <ThemedView style={styles.stepper}>
-            <Pressable
-              onPress={() => setQuantity(Math.max(1, quantity - 1))}
-              hitSlop={Spacing.two}
+            <StepperButton
+              sign="−"
               accessibilityLabel={t('schedule.quantityLess')}
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <ThemedView type="backgroundElement" style={styles.stepperButton}>
-                <ThemedText type="subtitle">−</ThemedText>
-              </ThemedView>
-            </Pressable>
+              onPress={() => setQuantity(Math.max(1, quantity - 1))}
+            />
             <ThemedText style={styles.stepperValue}>
               {unit ? formatAmount(quantity, unit, t) : quantity}
             </ThemedText>
-            <Pressable
-              onPress={() => setQuantity(quantity + 1)}
-              hitSlop={Spacing.two}
+            <StepperButton
+              sign="+"
               accessibilityLabel={t('schedule.quantityMore')}
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <ThemedView type="backgroundElement" style={styles.stepperButton}>
-                <ThemedText type="subtitle">+</ThemedText>
-              </ThemedView>
-            </Pressable>
+              onPress={() => setQuantity(quantity + 1)}
+            />
           </ThemedView>
 
           <ThemedText type="small">{t('schedule.timesOfDay')}</ThemedText>
@@ -335,7 +301,7 @@ function EditorForm({
             onClear={() => setEndDate(null)}
           />
           {periodInvalid ? (
-            <ThemedText type="small" style={styles.error}>
+            <ThemedText type="small" themeColor="danger">
               {t('schedule.periodInvalid')}
             </ThemedText>
           ) : null}
@@ -364,7 +330,7 @@ function EditorForm({
                   <ActionButton
                     label={t('schedule.resume')}
                     onPress={handleResume}
-                    color={theme.accent}
+                    themeColor="accent"
                   />
                 </ThemedView>
               ) : (
@@ -419,13 +385,13 @@ function EditorForm({
             <ActionButton
               label={t('editor.delete')}
               onPress={handleDelete}
-              color="#d9534f"
+              themeColor="danger"
             />
           ) : null}
           <ActionButton
             label={t('editor.save')}
             onPress={handleSave}
-            color={theme.accent}
+            themeColor="accent"
           />
         </ThemedView>
       </SafeAreaView>
@@ -486,29 +452,6 @@ function DateField({
   );
 }
 
-function ActionButton({
-  label,
-  onPress,
-  color,
-}: {
-  label: string;
-  onPress: () => void;
-  color?: string;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}
-    >
-      <ThemedView type="backgroundElement" style={styles.actionButtonInner}>
-        <ThemedText type="smallBold" style={color ? { color } : undefined}>
-          {label}
-        </ThemedText>
-      </ThemedView>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -528,13 +471,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.three,
   },
-  stepperButton: {
-    width: 48,
-    height: 48,
-    borderRadius: Spacing.three,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   stepperValue: {
     minWidth: 110,
     textAlign: 'center',
@@ -544,11 +480,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'center',
     gap: Spacing.two,
-  },
-  chip: {
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.three,
   },
   timeChip: {
     flexDirection: 'row',
@@ -562,9 +493,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.three,
-  },
-  error: {
-    color: '#d9534f',
   },
   addText: {
     fontWeight: '600',
@@ -581,13 +509,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.two,
     marginTop: Spacing.three,
-  },
-  actionButton: {
-    flex: 1,
-  },
-  actionButtonInner: {
-    paddingVertical: Spacing.three,
-    borderRadius: Spacing.three,
-    alignItems: 'center',
   },
 });

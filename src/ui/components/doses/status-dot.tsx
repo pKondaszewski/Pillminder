@@ -12,15 +12,13 @@ import Animated, {
 import type { DoseState } from '@/doses/dose-transition';
 import { useTheme } from '@/ui/hooks/use-theme';
 
-const TAKEN_COLOR = '#34c759';
-
 export function DoseStatusDot({ state }: { state: DoseState }) {
   const theme = useTheme();
   const pulse = useSharedValue(1);
   const pending = state === 'pending';
   const dotColors = {
     pending: theme.accent,
-    taken: TAKEN_COLOR,
+    taken: theme.success,
     skipped: theme.textSecondary,
   };
 
