@@ -8,7 +8,7 @@ import type { BackupRow, BackupRows } from './dto/backup-data';
 
 const MAX_BOUND_VARIABLES = 500;
 
-export async function readAllRows(): Promise<BackupRows> {
+export async function getAllRows(): Promise<BackupRows> {
   const [productRows, scheduleRows, doseRows, noteRows] = await Promise.all([
     db.select().from(products),
     db.select().from(schedules),

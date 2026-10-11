@@ -25,14 +25,14 @@ import { getSnoozeMinutes } from '@/settings/settings-service';
 import { calculateAdherence } from './dose-adherence';
 import { reminderBody } from './dose-label';
 import {
-  deleteFuturePendingDosesForSchedules,
+  deleteFuturePendingDoseRowsForSchedules,
   getDoseById,
   getDosesPlannedBetween,
   getFuturePendingDosesByProduct,
   productHistoryQuery,
-  replaceFuturePendingDoses,
-  setDoseSnoozedUntil,
-  setDoseState,
+  replaceFuturePendingDoseRows,
+  setDoseSnoozedUntilRow,
+  setDoseStateRow,
   todaysDosesQuery,
 } from './dose-repository';
 import { isDueInFuture, isPending, isPresent } from './dose-validator';
@@ -84,7 +84,7 @@ export async function cancelFutureDosesForSchedule(
 ): Promise<void> {
   log.info(`Cancelling future doses for schedule ${scheduleId}`);
   try {
-    const { removedIds } = await replaceFuturePendingDoses(
+    const { removedIds } = await replaceFuturePendingDoseRows(
       scheduleId,
       new Date(),
       [],
@@ -102,7 +102,7 @@ export async function cancelFutureDosesForSchedules(
   if (scheduleIds.length === 0) return;
   log.info(`Cancelling future doses for ${scheduleIds.length} schedule(s)`);
   try {
-    const removedIds = await deleteFuturePendingDosesForSchedules(
+    const removedIds = await deleteFuturePendingDoseRowsForSchedules(
       scheduleIds,
       new Date(),
     );
@@ -145,7 +145,7 @@ export async function refreshAllReminders(): Promise<void> {
 export async function takeDose(id: string): Promise<void> {
   log.info(`Marking dose ${id} as taken`);
   try {
-    await setDoseState(id, 'taken');
+    await setDoseStateRow(id, 'taken');
     await Promise.all([cancelDoseReminder(id), dismissDoseReminder(id)]);
   } catch (err) {
     log.error(`Failed to mark dose ${id} as taken`, err);
@@ -160,7 +160,7 @@ export async function untakeDose(id: string): Promise<void> {
 export async function skipDose(id: string): Promise<void> {
   log.info(`Marking dose ${id} as skipped`);
   try {
-    await setDoseState(id, 'skipped');
+    await setDoseStateRow(id, 'skipped');
     await Promise.all([cancelDoseReminder(id), dismissDoseReminder(id)]);
   } catch (err) {
     log.error(`Failed to mark dose ${id} as skipped`, err);
@@ -178,7 +178,7 @@ export async function correctDoseState(
 ): Promise<void> {
   log.info(`Correcting dose ${id} to ${target}`);
   try {
-    await setDoseState(id, target, { backdated: true });
+    await setDoseStateRow(id, target, { backdated: true });
     await Promise.all([cancelDoseReminder(id), dismissDoseReminder(id)]);
   } catch (err) {
     log.error(`Failed to correct dose ${id} to ${target}`, err);
@@ -200,7 +200,7 @@ export async function snoozeDose(id: string): Promise<void> {
       { id: dose.id, productName: product.name, plannedAt: when },
       reminderStrings(product, await quantityForDose(dose.scheduleId)),
     );
-    await setDoseSnoozedUntil(dose.id, when);
+    await setDoseSnoozedUntilRow(dose.id, when);
     await dismissDoseReminder(dose.id);
   } catch (err) {
     log.error(`Failed to snooze dose ${id}`, err);
@@ -256,7 +256,7 @@ async function syncDosesForScheduleWith(
 
   log.info(`Syncing ${slots.length} dose slot(s) for schedule ${schedule.id}`);
   try {
-    const { removedIds, inserted } = await replaceFuturePendingDoses(
+    const { removedIds, inserted } = await replaceFuturePendingDoseRows(
       schedule.id,
       from,
       slots.map((plannedAt) => ({
@@ -294,7 +294,7 @@ async function quantityForDose(scheduleId: string): Promise<number> {
 async function revertDoseToPending(id: string): Promise<void> {
   log.info(`Reverting dose ${id} to pending`);
   try {
-    await setDoseState(id, 'pending');
+    await setDoseStateRow(id, 'pending');
 
     const dose = await getDoseById(id);
     if (!isPresent(dose) || !isDueInFuture(dose)) return;

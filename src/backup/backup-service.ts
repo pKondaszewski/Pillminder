@@ -17,7 +17,7 @@ import {
   parseBackup,
   serializeBackup,
 } from './backup-format';
-import { readAllRows, replaceAllRows } from './backup-repository';
+import { getAllRows, replaceAllRows } from './backup-repository';
 
 export type { BackupError, BackupRows } from './backup-format';
 
@@ -32,7 +32,7 @@ export async function exportBackup(dialogTitle: string): Promise<void> {
   }
 
   const now = new Date();
-  const json = serializeBackup(await readAllRows(), now);
+  const json = serializeBackup(await getAllRows(), now);
 
   deleteStaleCacheFiles(BACKUP_FILE_PATTERN);
   const file = new File(
@@ -67,7 +67,7 @@ export async function pickBackup(): Promise<BackupParseResult | null> {
 
 export async function replaceAllWithBackup(rows: BackupRows): Promise<void> {
   log.info('Replacing all data with imported backup');
-  const previous = await readAllRows();
+  const previous = await getAllRows();
   replaceAllRows(rows);
 
   // The data is committed at this point; a failure below only leaves
