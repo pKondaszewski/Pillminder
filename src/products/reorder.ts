@@ -42,6 +42,22 @@ export function reorderStatus(
   };
 }
 
+export function consumptionBetween(
+  schedules: Schedule[],
+  firstDay: Date,
+  lastDay: Date,
+): number {
+  let units = 0;
+  for (
+    let day = startOfDay(firstDay);
+    day <= startOfDay(lastDay);
+    day = addDays(day, 1)
+  ) {
+    units += totalDailyConsumption(schedules, day);
+  }
+  return units;
+}
+
 function daysUntilEmpty(
   stock: number,
   schedules: Schedule[],

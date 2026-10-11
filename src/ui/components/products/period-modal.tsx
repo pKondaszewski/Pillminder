@@ -3,15 +3,15 @@ import DateTimePicker, {
 } from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Modal, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { addDays, startOfDay } from '@/config/date-utils';
 import { describeAdherence } from '@/products/period-report';
 import type { PeriodReportEntry } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { formatDate } from '@/ui/commons/format-date';
 import { ActionButton } from '@/ui/components/commons/action-button';
+import { DateButton } from '@/ui/components/commons/date-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { useDoctorSummaryExport } from '@/ui/hooks/use-doctor-summary-export';
@@ -156,42 +156,11 @@ function ProductBlock({ product }: { product: PeriodReportEntry }) {
   );
 }
 
-function DateButton({
-  label,
-  value,
-  onPress,
-}: {
-  label: string;
-  value: Date;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      style={({ pressed }) => [styles.dateButton, pressed && styles.pressed]}
-    >
-      <ThemedView type="backgroundElement" style={styles.dateBox}>
-        <ThemedText type="small" themeColor="textSecondary">
-          {label}
-        </ThemedText>
-        <ThemedText themeColor="accent">{formatDate(value)}</ThemedText>
-      </ThemedView>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   container: { flex: 1 },
   safeArea: { flex: 1, paddingHorizontal: Spacing.four },
   content: { gap: Spacing.two, paddingVertical: Spacing.three },
   range: { flexDirection: 'row', gap: Spacing.two },
-  dateButton: { flex: 1 },
-  dateBox: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    gap: Spacing.one,
-  },
   empty: { gap: Spacing.one, paddingVertical: Spacing.three },
   block: {
     padding: Spacing.three,
@@ -199,5 +168,4 @@ const styles = StyleSheet.create({
     gap: Spacing.one,
   },
   actions: { flexDirection: 'row' },
-  pressed: { opacity: 0.7 },
 });

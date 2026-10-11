@@ -20,6 +20,7 @@ export type {
   ProductOverview,
   ProductOverviewEntry,
 } from './dto/product-overview-output';
+export type { TravelPlanEntry } from './dto/travel-plan-output';
 export type { Product, ProductStatus } from './product-repository';
 
 const log = createLogger('product-service');
