@@ -10,9 +10,8 @@ import {
   type OnboardingStep,
 } from './onboarding-helper';
 
-export type { OnboardingStep } from './onboarding-helper';
+export type { OnboardingStep, PermissionStep } from './onboarding-helper';
 export { permissionStep } from './onboarding-helper';
-export { openBatteryOptimizationSettings } from '@/battery/battery-service';
 export type { NotificationPermission } from '@/notifications/notification-service';
 export {
   getNotificationPermission,
