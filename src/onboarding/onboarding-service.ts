@@ -3,7 +3,6 @@ import { isNotificationsPromptDismissed } from '@/settings/settings-service';
 
 import { decideOnboarding } from './onboarding-helper';
 
-export type { PermissionStep } from './onboarding-helper';
 export { permissionStep } from './onboarding-helper';
 export type { NotificationPermission } from '@/notifications/notification-service';
 export {

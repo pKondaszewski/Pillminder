@@ -9,30 +9,24 @@ import { ThemedView } from '@/ui/components/commons/themed-view';
 
 const AUTO_DISMISS_MS = 5000;
 
-/**
- * Transient bottom bar with a single action, e.g. "taken → Undo", plus a close
- * button. Auto-hides after `duration`. Remount it (change its `key`) to restart
- * the timer for a fresh message.
- */
+// Remount it (change its key) to restart the auto-dismiss timer.
 export function Snackbar({
   message,
   actionLabel,
   onAction,
   onDismiss,
-  duration = AUTO_DISMISS_MS,
 }: {
   message: string;
   actionLabel: string;
   onAction: () => void;
   onDismiss: () => void;
-  duration?: number;
 }) {
   const { t } = useTranslation();
 
   useEffect(() => {
-    const timer = setTimeout(onDismiss, duration);
+    const timer = setTimeout(onDismiss, AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
-  }, [duration, onDismiss]);
+  }, [onDismiss]);
 
   return (
     <Animated.View

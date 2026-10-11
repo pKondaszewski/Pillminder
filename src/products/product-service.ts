@@ -13,16 +13,11 @@ import {
   updateProductRow,
 } from './product-repository';
 
-export type {
-  PeriodAdherence,
-  PeriodReportEntry,
-} from './dto/period-report-output';
+export type { PeriodReportEntry } from './dto/period-report-output';
 export type {
   ProductOverview,
   ProductOverviewEntry,
-  ProductOverviewStock,
 } from './dto/product-overview-output';
-export type { ProductOverviewContext } from './product-overview';
 export type { Product } from './product-repository';
 
 const log = createLogger('product-service');
