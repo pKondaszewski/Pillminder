@@ -4,12 +4,21 @@ import { FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { NewProductInput } from '@/products/dto/new-product-input';
-import type { Product, ProductStatus } from '@/products/product-service';
+import {
+  categoryFilterIfListed,
+  filterProducts,
+  listedCategories,
+  PRODUCT_SEARCH_THRESHOLD,
+  type ProductListFilters,
+  sortProductsByStatusThenName,
+} from '@/products/product-list';
+import type { Product } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { ProductEditorModal } from '@/ui/components/products/editor-modal';
+import { ProductListFilterBar } from '@/ui/components/products/list-filters';
 import { ProductOverviewModal } from '@/ui/components/products/overview-modal';
 import { ProductPeriodModal } from '@/ui/components/products/period-modal';
 import { ProductRow } from '@/ui/components/products/row';
@@ -18,7 +27,7 @@ import { useReorderStatuses } from '@/ui/hooks/use-reorder';
 import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
 
 export default function ProductListScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     products,
     addProduct,
@@ -29,8 +38,20 @@ export default function ProductListScreen() {
   } = useProducts();
   const reorderStatuses = useReorderStatuses();
 
-  const sortedProducts = [...products].sort(
-    (a, b) => statusRank(a.status) - statusRank(b.status),
+  const [filters, setFilters] = useState<ProductListFilters>({
+    query: '',
+    category: null,
+    status: null,
+  });
+  const categories = listedCategories(products);
+  const effectiveFilters = {
+    ...filters,
+    category: categoryFilterIfListed(filters.category, categories),
+  };
+  const searchable = products.length > PRODUCT_SEARCH_THRESHOLD;
+  const visibleProducts = sortProductsByStatusThenName(
+    searchable ? filterProducts(products, effectiveFilters) : products,
+    i18n.language,
   );
 
   const [editorOpen, setEditorOpen] = useState(false);
@@ -84,10 +105,27 @@ export default function ProductListScreen() {
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
           <FlatList
-            data={sortedProducts}
+            data={visibleProducts}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
             renderItem={renderItem}
+            keyboardShouldPersistTaps="handled"
+            ListHeaderComponent={
+              searchable ? (
+                <ProductListFilterBar
+                  filters={effectiveFilters}
+                  categories={categories}
+                  onChange={setFilters}
+                />
+              ) : null
+            }
+            ListEmptyComponent={
+              searchable ? (
+                <ThemedText type="small" themeColor="textSecondary">
+                  {t('products.noMatching')}
+                </ThemedText>
+              ) : null
+            }
             ListFooterComponent={
               <ThemedView style={styles.footer}>
                 {[
@@ -141,10 +179,6 @@ export default function ProductListScreen() {
       </ThemedView>
     </TabSwipe>
   );
-}
-
-function statusRank(status: ProductStatus): number {
-  return status === 'archived' ? 1 : 0;
 }
 
 const styles = StyleSheet.create({

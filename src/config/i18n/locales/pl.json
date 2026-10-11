@@ -183,14 +183,21 @@
   },
   "products": {
     "add": "Dodaj nowy produkt",
+    "all": "Wszystkie",
     "archived": "Zarchiwizowany",
     "errorArchive": "Nie udało się zarchiwizować produktu. Spróbuj ponownie.",
     "errorDelete": "Nie udało się usunąć produktu. Spróbuj ponownie.",
     "errorRestore": "Nie udało się przywrócić produktu. Spróbuj ponownie.",
     "errorSave": "Nie udało się zapisać produktu. Wpisane dane nadal są w formularzu.",
     "errorTitle": "Coś poszło nie tak",
+    "filterActive": "Aktywne",
+    "filterArchived": "Zarchiwizowane",
+    "filterCategory": "Filtr kategorii",
+    "filterStatus": "Filtr statusu",
     "lowStock": "Niski zapas",
-    "lowStockDays": "~{{days}} dni"
+    "lowStockDays": "~{{days}} dni",
+    "noMatching": "Brak pasujących produktów",
+    "search": "Szukaj produktów"
   },
   "schedule": {
     "add": "+ Dodaj harmonogram",

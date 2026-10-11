@@ -181,14 +181,21 @@
   },
   "products": {
     "add": "Add new product",
+    "all": "All",
     "archived": "Archived",
     "errorArchive": "Could not archive the product. Try again.",
     "errorDelete": "Could not delete the product. Try again.",
     "errorRestore": "Could not restore the product. Try again.",
     "errorSave": "Could not save the product. Your changes are still in the form.",
     "errorTitle": "Something went wrong",
+    "filterActive": "Active",
+    "filterArchived": "Archived",
+    "filterCategory": "Filter by category",
+    "filterStatus": "Filter by status",
     "lowStock": "Low stock",
-    "lowStockDays": "~{{days}}d left"
+    "lowStockDays": "~{{days}}d left",
+    "noMatching": "No matching products",
+    "search": "Search products"
   },
   "schedule": {
     "add": "+ Add schedule",

@@ -3,14 +3,7 @@ import DateTimePicker, {
 } from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Alert,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-} from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { addDays, startOfDay } from '@/config/date-utils';
@@ -18,7 +11,7 @@ import {
   filterProductsByName,
   PRODUCT_SEARCH_THRESHOLD,
   sortProductsByName,
-} from '@/products/product-picker';
+} from '@/products/product-list';
 import type { Product } from '@/products/product-service';
 import { formatAmount } from '@/products/product-unit';
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
@@ -36,10 +29,10 @@ import {
 } from '@/ui/commons/format-date';
 import { ActionButton } from '@/ui/components/commons/action-button';
 import { Chip } from '@/ui/components/commons/chip';
+import { SearchField } from '@/ui/components/commons/search-field';
 import { StepperButton } from '@/ui/components/commons/stepper-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
   visible: boolean;
@@ -95,7 +88,6 @@ function EditorForm({
   onResume,
 }: Omit<Props, 'visible'>) {
   const { t, i18n } = useTranslation();
-  const theme = useTheme();
 
   const sortedProducts = sortProductsByName(products, i18n.language);
   const [productQuery, setProductQuery] = useState('');
@@ -200,10 +192,6 @@ function EditorForm({
 
   const pickedDates = { start: startDate, end: endDate, resume: resumeDate };
   const minimumPickerDate = datePickerFor === 'resume' ? tomorrow() : undefined;
-  const searchStyle = [
-    styles.search,
-    { color: theme.text, borderColor: theme.backgroundSelected },
-  ];
 
   return (
     <ThemedView style={styles.container}>
@@ -224,13 +212,10 @@ function EditorForm({
           ) : (
             <>
               {searchable ? (
-                <TextInput
+                <SearchField
                   value={productQuery}
                   onChangeText={setProductQuery}
-                  accessibilityLabel={t('schedule.searchProduct')}
-                  placeholder={t('schedule.searchProduct')}
-                  placeholderTextColor={theme.textSecondary}
-                  style={searchStyle}
+                  label={t('schedule.searchProduct')}
                 />
               ) : null}
               {visibleProducts.length === 0 ? (
@@ -528,13 +513,6 @@ const styles = StyleSheet.create({
   stepperValue: {
     minWidth: 110,
     textAlign: 'center',
-  },
-  search: {
-    borderWidth: 1,
-    borderRadius: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    fontSize: 16,
   },
   chipsRow: {
     flexDirection: 'row',
