@@ -4,6 +4,7 @@ import type { DoseState } from '../dose-transition';
 
 export interface TodayDose {
   id: string;
+  productId: string;
   productName: string;
   quantity: number;
   unit: ProductUnit | null;
@@ -15,6 +16,7 @@ export interface TodayDose {
 
 export interface TodayDoseRow {
   id: string;
+  productId: string;
   plannedAt: Date;
   state: DoseState;
   takenAt: Date | null;

@@ -29,6 +29,10 @@ export default function AppTabs() {
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon md="event" />
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="history">
+        <NativeTabs.Trigger.Label>{t('tabs.history')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon md="history" />
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
         <NativeTabs.Trigger.Label>
           {t('tabs.settings')}

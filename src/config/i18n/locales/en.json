@@ -72,9 +72,41 @@
     "change": "Change",
     "confirmSkipped": "Mark this dose as not taken? Stock will be restored.",
     "confirmTaken": "Mark this dose as taken? Stock will be reduced.",
+    "emptyDay": "Nothing planned this day",
     "errorCorrect": "Could not change the dose. Try again.",
+    "month": {
+      "april": "April",
+      "august": "August",
+      "december": "December",
+      "february": "February",
+      "january": "January",
+      "july": "July",
+      "june": "June",
+      "march": "March",
+      "may": "May",
+      "november": "November",
+      "october": "October",
+      "september": "September"
+    },
+    "nextMonth": "Next month",
+    "previousMonth": "Previous month",
     "skipped": "Missed",
-    "taken": "Taken"
+    "status": {
+      "allTaken": "All taken",
+      "missed": "Missed",
+      "skipped": "Skipped",
+      "upcoming": "Planned"
+    },
+    "taken": "Taken",
+    "weekday": {
+      "fri": "Fri",
+      "mon": "Mon",
+      "sat": "Sat",
+      "sun": "Sun",
+      "thu": "Thu",
+      "tue": "Tue",
+      "wed": "Wed"
+    }
   },
   "home": {
     "bulkTake": "Take overdue ({{count}})",
@@ -305,6 +337,7 @@
     "title": "Medication summary"
   },
   "tabs": {
+    "history": "History",
     "home": "Today",
     "products": "Products",
     "schedules": "Schedules",

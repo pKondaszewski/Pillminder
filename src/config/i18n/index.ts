@@ -11,6 +11,7 @@ import en from './locales/en.json';
 import pl from './locales/pl.json';
 
 export const SUPPORTED_LANGUAGES = ['en', 'pl'] as const;
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 export const FALLBACK_LANGUAGE = 'en';
 
 const resources = {

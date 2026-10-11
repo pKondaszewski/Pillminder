@@ -1,7 +1,6 @@
 import { and, desc, eq, gte, inArray, lt, max, ne, or } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
-import { addDays, startOfDay } from '@/config/date-utils';
 import { db } from '@/config/db/database';
 import { doses, products, schedules } from '@/config/db/schema';
 
@@ -18,13 +17,11 @@ export interface NewDoseSlot {
   plannedAt: Date;
 }
 
-export function todaysDosesQuery(day: Date) {
-  const start = startOfDay(day);
-  const end = addDays(start, 1);
-
+export function dosesBetweenQuery(from: Date, to: Date) {
   return db
     .select({
       id: doses.id,
+      productId: doses.productId,
       plannedAt: doses.plannedAt,
       state: doses.state,
       takenAt: doses.takenAt,
@@ -37,7 +34,7 @@ export function todaysDosesQuery(day: Date) {
     .from(doses)
     .innerJoin(products, eq(doses.productId, products.id))
     .innerJoin(schedules, eq(doses.scheduleId, schedules.id))
-    .where(and(gte(doses.plannedAt, start), lt(doses.plannedAt, end)))
+    .where(and(gte(doses.plannedAt, from), lt(doses.plannedAt, to)))
     .orderBy(doses.plannedAt);
 }
 
