@@ -1,4 +1,8 @@
-import { type AdherenceDose, calculateAdherence } from '../dose-adherence';
+import {
+  type AdherenceDose,
+  calculateAdherence,
+  calculateStreak,
+} from '../dose-adherence';
 
 const NOW = new Date(2026, 0, 10, 12, 0);
 const FROM = new Date(2026, 0, 1);
@@ -134,5 +138,98 @@ describe('calculateAdherence', () => {
 
     // then
     expect(total).toMatchObject({ upcoming: 1, due: 0, rate: null });
+  });
+});
+
+describe('calculateStreak', () => {
+  const now = new Date(2026, 0, 10, 12, 0);
+
+  it('counts consecutive days with all due doses taken, today included', () => {
+    // given
+    const doses = [
+      dose('taken', new Date(2026, 0, 8, 8)),
+      dose('taken', new Date(2026, 0, 9, 8)),
+      dose('taken', new Date(2026, 0, 10, 8)),
+      dose('pending', new Date(2026, 0, 10, 20)),
+    ];
+
+    // when
+    const streak = calculateStreak(doses, now);
+
+    // then
+    expect(streak).toBe(3);
+  });
+
+  it('stops at the most recent day with a skipped or missed dose', () => {
+    // given
+    const doses = [
+      dose('taken', new Date(2026, 0, 7, 8)),
+      dose('taken', new Date(2026, 0, 8, 8)),
+      dose('skipped', new Date(2026, 0, 8, 20)),
+      dose('taken', new Date(2026, 0, 9, 8)),
+      dose('pending', new Date(2026, 0, 10, 20)),
+    ];
+
+    // when
+    const streak = calculateStreak(doses, now);
+
+    // then
+    expect(streak).toBe(1);
+  });
+
+  it('is not extended or broken by a day without doses', () => {
+    // given
+    const doses = [
+      dose('taken', new Date(2026, 0, 6, 8)),
+      dose('taken', new Date(2026, 0, 9, 8)),
+    ];
+
+    // when
+    const streak = calculateStreak(doses, now);
+
+    // then
+    expect(streak).toBe(2);
+  });
+
+  it('does not count today until a dose is due, and does not break on upcoming ones', () => {
+    // given
+    const doses = [
+      dose('taken', new Date(2026, 0, 9, 8)),
+      dose('pending', new Date(2026, 0, 10, 20)),
+    ];
+
+    // when
+    const streak = calculateStreak(doses, now);
+
+    // then
+    expect(streak).toBe(1);
+  });
+
+  it('is broken by an overdue dose today', () => {
+    // given
+    const doses = [
+      dose('taken', new Date(2026, 0, 9, 8)),
+      dose('pending', new Date(2026, 0, 10, 8)),
+    ];
+
+    // when
+    const streak = calculateStreak(doses, now);
+
+    // then
+    expect(streak).toBe(0);
+  });
+
+  it('continues across the month boundary', () => {
+    // given
+    const doses = [
+      dose('taken', new Date(2025, 11, 31, 8)),
+      dose('taken', new Date(2026, 0, 1, 8)),
+    ];
+
+    // when
+    const streak = calculateStreak(doses, now);
+
+    // then
+    expect(streak).toBe(2);
   });
 });

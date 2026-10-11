@@ -96,6 +96,11 @@
       "night": "W nocy"
     },
     "snoozed": "drzemka → {{time}}",
+    "statsMonth": "{{taken}}/{{due}} w tym miesiącu",
+    "statsStreak_few": "{{count}} dni z rzędu",
+    "statsStreak_many": "{{count}} dni z rzędu",
+    "statsStreak_one": "{{count}} dzień z rzędu",
+    "statsStreak_other": "{{count}} dnia z rzędu",
     "take": "Wziąłem",
     "taken": "✓ {{time}}",
     "takenToast": "✓ Oznaczono jako wzięte",

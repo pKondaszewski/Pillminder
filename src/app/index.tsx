@@ -1,8 +1,10 @@
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, SectionList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
+  type AdherenceStats,
   BULK_TAKE_MIN_OVERDUE,
   doseQuantityText,
   groupDosesByTimeSlot,
@@ -16,6 +18,7 @@ import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DoseStatusDot } from '@/ui/components/doses/status-dot';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
+import { useAdherenceStats } from '@/ui/hooks/use-adherence-stats';
 import { useTodaysDoses } from '@/ui/hooks/use-todays-doses';
 import {
   type UndoableKind,
@@ -39,6 +42,9 @@ export default function HomeScreen() {
       { text: t('home.undo'), onPress: () => revert(kind, item.id) },
     ]);
   };
+
+  const stats = useAdherenceStats(doses);
+  const statsText = adherenceStatsText(stats, t);
 
   const overdue = overdueDoses(doses, new Date());
   const showBulkTake = overdue.length >= BULK_TAKE_MIN_OVERDUE;
@@ -106,22 +112,29 @@ export default function HomeScreen() {
             )}
             stickySectionHeadersEnabled={false}
             ListHeaderComponent={
-              showBulkTake ? (
-                <Pressable
-                  onPress={confirmTakeOverdue}
-                  accessibilityRole="button"
-                  style={({ pressed }) => pressed && styles.pressed}
-                >
-                  <ThemedView
-                    type="backgroundSelected"
-                    style={[styles.takeButton, styles.bulkTake]}
+              <>
+                {statsText ? (
+                  <ThemedText type="small" themeColor="textSecondary">
+                    {statsText}
+                  </ThemedText>
+                ) : null}
+                {showBulkTake ? (
+                  <Pressable
+                    onPress={confirmTakeOverdue}
+                    accessibilityRole="button"
+                    style={({ pressed }) => pressed && styles.pressed}
                   >
-                    <ThemedText type="smallBold" themeColor="accent">
-                      {t('home.bulkTake', { count: overdue.length })}
-                    </ThemedText>
-                  </ThemedView>
-                </Pressable>
-              ) : null
+                    <ThemedView
+                      type="backgroundSelected"
+                      style={[styles.takeButton, styles.bulkTake]}
+                    >
+                      <ThemedText type="smallBold" themeColor="accent">
+                        {t('home.bulkTake', { count: overdue.length })}
+                      </ThemedText>
+                    </ThemedView>
+                  </Pressable>
+                ) : null}
+              </>
             }
             ListEmptyComponent={
               <ThemedText type="small">{t('home.empty')}</ThemedText>
@@ -140,6 +153,19 @@ export default function HomeScreen() {
       </ThemedView>
     </TabSwipe>
   );
+}
+
+function adherenceStatsText(
+  stats: AdherenceStats | null,
+  t: TFunction,
+): string | null {
+  if (stats === null || stats.due === 0) return null;
+  const monthText = t('home.statsMonth', {
+    taken: stats.taken,
+    due: stats.due,
+  });
+  if (stats.streak === 0) return monthText;
+  return `${monthText} · ${t('home.statsStreak', { count: stats.streak })}`;
 }
 
 function DoseActionButton({

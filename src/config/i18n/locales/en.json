@@ -94,6 +94,9 @@
       "night": "Night"
     },
     "snoozed": "snoozed → {{time}}",
+    "statsMonth": "{{taken}}/{{due}} this month",
+    "statsStreak_one": "{{count}} day in a row",
+    "statsStreak_other": "{{count}} days in a row",
     "take": "Take",
     "taken": "✓ {{time}}",
     "takenToast": "✓ Marked as taken",
