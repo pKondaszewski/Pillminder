@@ -135,6 +135,16 @@ export async function cancelReorderAlert(productId: string): Promise<void> {
   }
 }
 
+export async function cancelAllNotifications(): Promise<void> {
+  if (!isNotificationsSupported) return;
+  try {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+    await Notifications.dismissAllNotificationsAsync();
+  } catch (err) {
+    log.warn('Failed to cancel all notifications', err);
+  }
+}
+
 export async function dismissDoseReminder(doseId: string): Promise<void> {
   if (!isNotificationsSupported) return;
   try {

@@ -2,12 +2,14 @@ import '@/config/i18n';
 
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import { Text, useColorScheme, View } from 'react-native';
+import { useState } from 'react';
+import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { db } from '@/config/db/database';
 import { applyStoredTheme } from '@/settings/settings-service';
 import { AnimatedSplashOverlay } from '@/ui/components/commons/animated-splash-overlay';
+import { MigrationErrorScreen } from '@/ui/components/commons/migration-error-screen';
 import AppTabs from '@/ui/components/navigation/app-tabs';
 import { OnboardingScreen } from '@/ui/components/onboarding/onboarding-screen';
 import { useDoseSync } from '@/ui/hooks/use-dose-sync';
@@ -22,7 +24,19 @@ import migrations from '../../drizzle/migrations';
 
 applyStoredTheme();
 
-export default function TabLayout() {
+export default function RootLayout() {
+  const [attempt, setAttempt] = useState(0);
+
+  // useMigrations runs once per mount, so a new key is what re-runs them
+  return (
+    <TabLayout
+      key={attempt}
+      onRerunMigrations={() => setAttempt((n) => n + 1)}
+    />
+  );
+}
+
+function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
   const colorScheme = useColorScheme();
   const { success: migrationsReady, error: migrationError } = useMigrations(
     db,
@@ -32,7 +46,12 @@ export default function TabLayout() {
   const onboarding = useOnboarding(migrationsReady);
 
   if (migrationError) {
-    return <MigrationErrorScreen error={migrationError} />;
+    return (
+      <MigrationErrorScreen
+        error={migrationError}
+        onRerunMigrations={onRerunMigrations}
+      />
+    );
   }
 
   if (!migrationsReady || !onboarding.ready) {
@@ -54,14 +73,6 @@ export default function TabLayout() {
         )}
       </ThemeProvider>
     </GestureHandlerRootView>
-  );
-}
-
-function MigrationErrorScreen({ error }: { error: Error }) {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Migration error: {error.message}</Text>
-    </View>
   );
 }
 

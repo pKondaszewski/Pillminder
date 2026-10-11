@@ -88,6 +88,20 @@
     "unskipConfirm": "Undo skipping “{{name}}”?",
     "unskipTitle": "Undo skipped?"
   },
+  "migrationError": {
+    "details": "Technical details",
+    "hideDetails": "Hide technical details",
+    "message": "The app could not prepare its database. Trying again usually helps. If it doesn't, you can restore your data from a backup or start from scratch.",
+    "reset": "Erase data",
+    "resetConfirmAction": "Erase everything",
+    "resetConfirmMessage": "All products, schedules, dose history and notes will be deleted. Settings are kept.\n\nThis cannot be undone.",
+    "resetConfirmTitle": "Erase all data?",
+    "resetFailed": "Could not erase the data",
+    "restore": "Restore from backup",
+    "restoreFailed": "Could not restore the data",
+    "retry": "Try again",
+    "title": "The app cannot open your data"
+  },
   "notes": {
     "add": "Add note",
     "completionPlaceholder": "e.g. taking a break, switched to another product",
