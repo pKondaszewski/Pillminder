@@ -6,6 +6,7 @@ import {
   cancelReorderAlert,
   scheduleReorderAlert,
 } from '@/notifications/notification-service';
+import { reorderAlertAction } from '@/notifications/reorder-alert-action';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
 import type { Product } from '@/products/product-service';
 import type { Currency } from '@/settings/settings-store';
@@ -31,18 +32,21 @@ function syncReorderAlerts(
   currency: Currency,
   t: TFunction,
 ): Promise<unknown> {
+  const now = new Date();
   return Promise.all(
-    products.map((product) => {
+    products.map(async (product) => {
       const reorderAt = statuses[product.id]?.reorderAt ?? null;
-      if (!reorderAt || reorderAt.getTime() <= Date.now()) {
-        return cancelReorderAlert(product.id);
-      }
+      const action = reorderAlertAction(reorderAt, now);
+      if (action.kind === 'keep') return;
+      if (action.kind === 'cancel') return cancelReorderAlert(product.id);
+
+      await cancelReorderAlert(product.id);
       return scheduleReorderAlert(
         {
           productId: product.id,
           productName: product.name,
           storeLink: product.storeLink,
-          reorderAt,
+          reorderAt: action.at,
         },
         {
           title: t('notification.reorderTitle'),
