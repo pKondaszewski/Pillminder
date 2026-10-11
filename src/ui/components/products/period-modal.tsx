@@ -11,6 +11,7 @@ import { describeAdherence } from '@/products/period-report';
 import type { PeriodReportEntry } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDate } from '@/ui/commons/format-date';
+import { ActionButton } from '@/ui/components/commons/action-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { useDoctorSummaryExport } from '@/ui/hooks/use-doctor-summary-export';
@@ -96,33 +97,22 @@ function PeriodContent({ onClose }: Pick<Props, 'onClose'>) {
           ) : (
             <PeriodResults entries={report} />
           )}
-          <Pressable
-            onPress={() => void share()}
-            disabled={!canShare}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !canShare, busy }}
-            style={({ pressed }) => [
-              pressed && styles.pressed,
-              !canShare && styles.disabled,
-            ]}
-          >
-            <ThemedView type="backgroundElement" style={styles.closeButton}>
-              <ThemedText themeColor="accent" style={styles.closeText}>
-                {t('summary.sharePdf')}
-              </ThemedText>
-            </ThemedView>
-          </Pressable>
-          <Pressable
-            onPress={onClose}
-            accessibilityRole="button"
-            style={({ pressed }) => pressed && styles.pressed}
-          >
-            <ThemedView type="backgroundElement" style={styles.closeButton}>
-              <ThemedText themeColor="accent" style={styles.closeText}>
-                {t('editor.close')}
-              </ThemedText>
-            </ThemedView>
-          </Pressable>
+          <ThemedView style={styles.actions}>
+            <ActionButton
+              label={t('summary.sharePdf')}
+              onPress={() => void share()}
+              themeColor="accent"
+              disabled={!canShare}
+              busy={busy}
+            />
+          </ThemedView>
+          <ThemedView style={styles.actions}>
+            <ActionButton
+              label={t('editor.close')}
+              onPress={onClose}
+              themeColor="accent"
+            />
+          </ThemedView>
         </ScrollView>
       </SafeAreaView>
     </ThemedView>
@@ -208,12 +198,6 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.three,
     gap: Spacing.one,
   },
-  closeButton: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    alignItems: 'center',
-  },
-  closeText: { fontWeight: '600' },
+  actions: { flexDirection: 'row' },
   pressed: { opacity: 0.7 },
-  disabled: { opacity: 0.4 },
 });

@@ -9,8 +9,6 @@ import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 
-const LOW_STOCK_COLOR = '#d97706';
-
 type Product = typeof productsTable.$inferSelect;
 
 type Props = {
@@ -43,7 +41,7 @@ export function ProductRow({ product, reorder, onPress }: Props) {
           </ThemedText>
         )}
         {isLow && (
-          <ThemedText type="small" style={styles.lowStock}>
+          <ThemedText type="smallBold" themeColor="warning">
             {t('products.lowStock')} ·{' '}
             {t('products.lowStockDays', {
               days: Math.ceil(reorder.daysLeft as number),
@@ -63,10 +61,6 @@ const styles = StyleSheet.create({
   },
   archived: {
     opacity: 0.5,
-  },
-  lowStock: {
-    color: LOW_STOCK_COLOR,
-    fontWeight: '600',
   },
   pressed: {
     opacity: 0.7,

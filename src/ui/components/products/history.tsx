@@ -9,8 +9,6 @@ import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { useProductHistory } from '@/ui/hooks/use-product-history';
 
-const TAKEN_COLOR = '#3aa76d';
-const SKIPPED_COLOR = '#d9534f';
 const COLLAPSED_COUNT = 5;
 
 export function ProductHistory({ productId }: { productId: string }) {
@@ -80,10 +78,7 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
     >
       <ThemedView type="backgroundElement" style={styles.row}>
         <ThemedText type="small">{formatDateTime(entry.occurredAt)}</ThemedText>
-        <ThemedText
-          type="smallBold"
-          style={{ color: taken ? TAKEN_COLOR : SKIPPED_COLOR }}
-        >
+        <ThemedText type="smallBold" themeColor={taken ? 'success' : 'danger'}>
           {taken ? t('history.taken') : t('history.skipped')}
         </ThemedText>
       </ThemedView>
