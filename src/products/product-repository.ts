@@ -1,4 +1,4 @@
-import { eq, inArray, notInArray } from 'drizzle-orm';
+import { and, eq, inArray, isNotNull, notInArray, sql } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
@@ -68,6 +68,22 @@ export async function updateProductRow(
   return updated;
 }
 
+export async function addPackToStockRow(id: string): Promise<void> {
+  await db
+    .update(products)
+    .set({
+      stock: sql`${products.stock} + ${products.packSize}`,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(products.id, id),
+        isNotNull(products.stock),
+        isNotNull(products.packSize),
+      ),
+    );
+}
+
 export async function setProductStatusRow(
   id: string,
   status: ProductStatus,
@@ -97,5 +113,6 @@ function productFields(input: NewProductInput, category: string) {
     price: input.price ?? null,
     storeLink: input.storeLink ?? null,
     stock: input.stock ?? null,
+    packSize: input.packSize ?? null,
   };
 }

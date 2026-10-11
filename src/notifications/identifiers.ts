@@ -8,6 +8,8 @@ export const SNOOZE_ACTION = 'SNOOZE_ACTION';
 
 export const REORDER_CHANNEL_ID = 'reorder-alerts-v1';
 export const REORDER_CATEGORY_ID = 'reorder-alert';
+export const REORDER_PACK_CATEGORY_ID = 'reorder-alert-pack';
 export const BUY_ACTION = 'BUY_ACTION';
+export const ADD_PACK_ACTION = 'ADD_PACK_ACTION';
 
 export const BACKGROUND_RESPONSE_TASK = 'dose-reminder-response';

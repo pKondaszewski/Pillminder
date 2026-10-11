@@ -7,6 +7,7 @@ import m0004 from './0004_colossal_forgotten_one.sql';
 import m0005 from './0005_add_product_unit.sql';
 import m0006 from './0006_add_schedule_pause.sql';
 import m0007 from './0007_repair_schedule_interval_and_quantity.sql';
+import m0008 from './0008_add_product_pack_size.sql';
 
   export default {
     journal,
@@ -18,7 +19,8 @@ m0003,
 m0004,
 m0005,
 m0006,
-m0007
+m0007,
+m0008
     }
   }
   

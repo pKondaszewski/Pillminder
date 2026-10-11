@@ -10,4 +10,5 @@ export interface NewProductInput {
   price?: number | null;
   storeLink?: string | null;
   stock?: number | null;
+  packSize?: number | null;
 }

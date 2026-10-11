@@ -19,6 +19,7 @@ import {
   supportsStrength,
 } from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
+import { parsePackSize } from '@/products/pack-size';
 import type { Product } from '@/products/product-service';
 import { PRODUCT_UNITS, type ProductUnit } from '@/products/product-unit';
 import { Spacing } from '@/ui/commons/constants/theme';
@@ -99,6 +100,7 @@ function EditorForm({
   const [price, setPrice] = useState(toText(product?.price));
   const [storeLink, setStoreLink] = useState(product?.storeLink ?? '');
   const [stock, setStock] = useState(toText(product?.stock));
+  const [packSizeText, setPackSizeText] = useState(toText(product?.packSize));
   const [showErrors, setShowErrors] = useState(false);
   const [archiving, setArchiving] = useState(false);
   const [completionNote, setCompletionNote] = useState('');
@@ -113,9 +115,12 @@ function EditorForm({
   const categoryMissing = category === null;
   const showNameError = showErrors && nameMissing;
   const showCategoryError = showErrors && categoryMissing;
+  const parsedPackSize = parsePackSize(packSizeText);
+  const packSize = parsedPackSize.valid ? parsedPackSize.packSize : null;
+  const showPackSizeError = showErrors && !parsedPackSize.valid;
 
   const handleSave = async () => {
-    if (nameMissing || categoryMissing) {
+    if (nameMissing || categoryMissing || !parsedPackSize.valid) {
       setShowErrors(true);
       return;
     }
@@ -133,6 +138,7 @@ function EditorForm({
       price: toNumber(price),
       storeLink: storeLink.trim() || null,
       stock: toNumber(stock),
+      packSize,
     });
   };
 
@@ -180,6 +186,11 @@ function EditorForm({
     setStock(String(current + 1));
   };
 
+  const addPack = (size: number) => {
+    const current = toNumber(stock) ?? 0;
+    setStock(String(current + size));
+  };
+
   const decreaseStock = () => {
     const current = toNumber(stock);
     if (current === null) return;
@@ -189,6 +200,10 @@ function EditorForm({
   const inputStyle = [
     styles.input,
     { color: theme.text, borderColor: theme.backgroundSelected },
+  ];
+  const packSizeInputStyle = [
+    inputStyle,
+    showPackSizeError ? { borderColor: theme.danger } : null,
   ];
   const nameInputStyle = [
     inputStyle,
@@ -307,6 +322,28 @@ function EditorForm({
               onPress={increaseStock}
             />
           </ThemedView>
+          {packSize !== null && (
+            <ThemedView style={styles.actions}>
+              <ActionButton
+                label={t('editor.addPack', { count: packSize })}
+                onPress={() => addPack(packSize)}
+              />
+            </ThemedView>
+          )}
+
+          <ThemedText type="small">{t('editor.packSize')}</ThemedText>
+          <TextInput
+            value={packSizeText}
+            onChangeText={setPackSizeText}
+            keyboardType="numeric"
+            accessibilityLabel={t('editor.packSize')}
+            placeholder={t('editor.packSizePlaceholder')}
+            placeholderTextColor={theme.textSecondary}
+            style={packSizeInputStyle}
+          />
+          {showPackSizeError && (
+            <FieldError message={t('editor.packSizeInvalid')} />
+          )}
 
           <ThemedText type="small">{t('editor.storeLink')}</ThemedText>
           <TextInput

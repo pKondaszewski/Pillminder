@@ -22,6 +22,7 @@ export const products = sqliteTable('products', {
     .notNull()
     .default('active'),
   stock: integer('stock'),
+  packSize: integer('pack_size'),
   lastUsedAt: integer('last_used_at', { mode: 'timestamp' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),

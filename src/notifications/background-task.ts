@@ -7,13 +7,16 @@ import { AppState } from 'react-native';
 
 import { createLogger } from '@/config/logger';
 import { snoozeDose, takeDose } from '@/doses/dose-service';
+import { restockPack } from '@/products/product-orchestrator';
 
 import {
+  ADD_PACK_ACTION,
   BACKGROUND_RESPONSE_TASK,
   SNOOZE_ACTION,
   TAKE_ACTION,
 } from './identifiers';
 import { isNotificationsSupported } from './notification-service';
+import { claimResponse } from './reminder-response-router';
 
 const log = createLogger('background-task');
 
@@ -37,10 +40,19 @@ if (
 async function handleResponse(response: NotificationResponse): Promise<void> {
   if (AppState.currentState === 'active') return;
 
-  const doseId = doseIdOf(response);
-  if (!doseId) return;
-
   const { actionIdentifier } = response;
+  const payload = payloadOf(response);
+  if (actionIdentifier === ADD_PACK_ACTION) {
+    const { productId } = payload;
+    if (typeof productId === 'string') {
+      await addPackFromReorderAlert(response, productId);
+    }
+    return;
+  }
+
+  const doseId = payload.doseId;
+  if (typeof doseId !== 'string') return;
+
   try {
     if (actionIdentifier === TAKE_ACTION) {
       await takeDose(doseId);
@@ -52,17 +64,28 @@ async function handleResponse(response: NotificationResponse): Promise<void> {
   }
 }
 
-function doseIdOf(response: NotificationResponse): string | undefined {
+async function addPackFromReorderAlert(
+  response: NotificationResponse,
+  productId: string,
+): Promise<void> {
+  if (!claimResponse(response)) return;
+  try {
+    await restockPack(productId);
+  } catch (err) {
+    log.error(`Background add pack failed for product ${productId}`, err);
+  }
+}
+
+function payloadOf(response: NotificationResponse): Record<string, unknown> {
   const { dataString } = response.notification.request.content as {
     dataString?: string;
   };
-  if (!dataString) return undefined;
+  if (!dataString) return {};
 
   try {
-    const { doseId } = JSON.parse(dataString);
-    return typeof doseId === 'string' ? doseId : undefined;
+    return JSON.parse(dataString) ?? {};
   } catch (err) {
     log.warn('Failed to parse notification dataString', err);
-    return undefined;
+    return {};
   }
 }

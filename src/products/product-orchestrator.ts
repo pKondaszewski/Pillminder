@@ -9,6 +9,7 @@ import { getSchedulesByProduct } from '@/schedules/schedule-service';
 
 import type { NewProductInput } from './dto/new-product-input';
 import {
+  addPackToStock,
   deleteProduct,
   setProductStatus,
   updateProduct,
@@ -20,6 +21,11 @@ export async function editProduct(
 ): Promise<void> {
   await updateProduct(id, input);
   await refreshRemindersForProduct(id);
+}
+
+export async function restockPack(id: string): Promise<void> {
+  await addPackToStock(id);
+  await cancelReorderAlert(id);
 }
 
 export async function removeProduct(id: string): Promise<void> {
