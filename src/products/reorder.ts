@@ -5,14 +5,13 @@ import type { Schedule } from '@/schedules/schedule-service';
 import type { ReorderStatus } from './dto/reorder-status';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
-const DEFAULT_REORDER_THRESHOLD_DAYS = 7;
+const REORDER_THRESHOLD_DAYS = 7;
 const MAX_SIMULATED_DAYS = 3660;
 
 export function reorderStatus(
   stock: number | null | undefined,
   schedules: Schedule[],
-  thresholdDays: number = DEFAULT_REORDER_THRESHOLD_DAYS,
-  now: Date = new Date(),
+  now: Date,
 ): ReorderStatus {
   const dailyConsumption = totalDailyConsumption(schedules, now);
   const daysLeft =
@@ -31,14 +30,16 @@ export function reorderStatus(
   }
 
   const runOutAt = new Date(now.getTime() + daysLeft * MS_PER_DAY);
-  const reorderAt = new Date(runOutAt.getTime() - thresholdDays * MS_PER_DAY);
+  const reorderAt = new Date(
+    runOutAt.getTime() - REORDER_THRESHOLD_DAYS * MS_PER_DAY,
+  );
 
   return {
     dailyConsumption,
     daysLeft,
     runOutAt,
     reorderAt,
-    isLow: daysLeft < thresholdDays,
+    isLow: daysLeft < REORDER_THRESHOLD_DAYS,
   };
 }
 

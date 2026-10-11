@@ -10,8 +10,8 @@ export function nextOccurrences(
   intervalDays: number,
   timesOfDay: string[],
   count: number,
-  period: SchedulePeriod = {},
-  now: Date = new Date(),
+  period: SchedulePeriod,
+  now: Date,
 ): Date[] {
   if (timesOfDay.length === 0 || count <= 0) return [];
 
@@ -31,17 +31,18 @@ export function nextOccurrences(
 export function previewOccurrences(
   intervalDays: number,
   timesOfDay: string[],
-  period: SchedulePeriod = {},
+  period: SchedulePeriod,
+  now: Date,
 ): Date[] {
-  return nextOccurrences(intervalDays, timesOfDay, PREVIEW_COUNT, period);
+  return nextOccurrences(intervalDays, timesOfDay, PREVIEW_COUNT, period, now);
 }
 
 export function occurrencesWithin(
   intervalDays: number,
   timesOfDay: string[],
   horizonDays: number,
-  period: SchedulePeriod = {},
-  now: Date = new Date(),
+  period: SchedulePeriod,
+  now: Date,
 ): Date[] {
   if (timesOfDay.length === 0 || horizonDays <= 0) return [];
 

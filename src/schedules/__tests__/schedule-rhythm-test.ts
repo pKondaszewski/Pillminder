@@ -17,6 +17,7 @@ const t: Translate = (key, options = {}) =>
     (text, [name, value]) => text.replace(`{{${name}}}`, String(value)),
     PL[key] ?? key,
   );
+const NOW = new Date(2026, 0, 10, 12, 0);
 const formatDate = (date: Date) => date.toISOString().slice(0, 10);
 
 function schedule(overrides: Partial<Schedule>): Schedule {
@@ -40,7 +41,7 @@ describe('describeRhythm', () => {
     const input = schedule({ timesOfDay: ['08:00', '20:00'] });
 
     // when
-    const text = describeRhythm(input, t, formatDate);
+    const text = describeRhythm(input, t, formatDate, null, NOW);
 
     // then
     expect(text).toBe('Codziennie · 08:00, 20:00');
@@ -55,7 +56,7 @@ describe('describeRhythm', () => {
     });
 
     // when
-    const text = describeRhythm(input, t, formatDate);
+    const text = describeRhythm(input, t, formatDate, null, NOW);
 
     // then
     expect(text).toBe('Co 3 dni · 09:00 · 2 na dawkę');
@@ -70,7 +71,7 @@ describe('describeRhythm', () => {
     const input = schedule({ startDate, endDate });
 
     // when
-    const text = describeRhythm(input, t, formatDate);
+    const text = describeRhythm(input, t, formatDate, null, NOW);
 
     // then
     expect(text).toBe(`Codziennie · 08:00 · ${period}`);
