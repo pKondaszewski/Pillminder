@@ -982,4 +982,36 @@ describe('parseBackup product unit', () => {
     // then
     expect(error).toEqual({ code: 'invalidRow', detail: 'products[0].unit' });
   });
+
+  it.each([
+    ['intervalDays', 0],
+    ['intervalDays', -2],
+    ['quantity', 0],
+    ['quantity', -1],
+  ])('rejects a schedule with %s = %s', (field, value) => {
+    // given
+    const text = backupText({ schedules: [schedule({ [field]: value })] });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({
+      code: 'invalidRow',
+      detail: `schedules[0].${field}`,
+    });
+  });
+
+  it('accepts a schedule with intervalDays and quantity of 1', () => {
+    // given
+    const text = backupText({
+      schedules: [schedule({ intervalDays: 1, quantity: 1 })],
+    });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.schedules[0]).toMatchObject({ intervalDays: 1, quantity: 1 });
+  });
 });

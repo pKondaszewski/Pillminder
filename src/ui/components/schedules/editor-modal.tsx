@@ -153,9 +153,9 @@ function EditorForm({
     }
     onSave({
       productId,
-      intervalDays: Math.max(1, intervalDays),
+      intervalDays,
       timesOfDay: times,
-      quantity: Math.max(1, quantity),
+      quantity,
       startDate,
       endDate,
     });
