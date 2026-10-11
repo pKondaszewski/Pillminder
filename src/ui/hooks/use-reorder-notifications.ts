@@ -2,19 +2,17 @@ import type { TFunction } from 'i18next';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { products as productsTable } from '@/config/db/schema';
 import {
   cancelReorderAlert,
   scheduleReorderAlert,
 } from '@/notifications/notification-service';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
+import type { Product } from '@/products/product-service';
 import type { Currency } from '@/settings/settings-store';
 
 import { useProducts } from './use-products';
 import { useReorderStatuses } from './use-reorder';
 import { useSettings } from './use-settings';
-
-type Product = typeof productsTable.$inferSelect;
 
 export function useReorderNotifications() {
   const { products } = useProducts();

@@ -1,15 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet } from 'react-native';
 
-import type { products as productsTable } from '@/config/db/schema';
 import { categoryLabel } from '@/products/category';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
 import { productLabel } from '@/products/product-label';
+import type { Product } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-
-type Product = typeof productsTable.$inferSelect;
 
 type Props = {
   product: Product;

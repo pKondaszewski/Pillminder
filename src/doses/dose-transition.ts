@@ -1,4 +1,6 @@
-export type DoseState = 'pending' | 'taken' | 'skipped';
+export const DOSE_STATES = ['pending', 'taken', 'skipped'] as const;
+
+export type DoseState = (typeof DOSE_STATES)[number];
 
 export interface TransitionInput {
   state: DoseState;

@@ -1,12 +1,12 @@
 import type { AdherenceCounts, AdherenceReport } from '@/doses/dose-service';
-import { productLabel } from '@/products/product-label';
-import type { Product } from '@/products/product-service';
 import type { Translate } from '@/schedules/schedule-rhythm';
 
 import type {
   PeriodAdherence,
   PeriodReportEntry,
 } from './dto/period-report-output';
+import { productLabel } from './product-label';
+import type { Product } from './product-service';
 
 export function buildPeriodReport(
   products: Product[],

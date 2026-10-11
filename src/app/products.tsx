@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { products as productsTable } from '@/config/db/schema';
 import type { NewProductInput } from '@/products/dto/new-product-input';
+import type { Product, ProductStatus } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
@@ -16,9 +16,7 @@ import { ProductRow } from '@/ui/components/products/row';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
 
-type Product = typeof productsTable.$inferSelect;
-
-function statusRank(status: Product['status']): number {
+function statusRank(status: ProductStatus): number {
   return status === 'archived' ? 1 : 0;
 }
 

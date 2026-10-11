@@ -24,7 +24,7 @@ import { StepperButton } from '@/ui/components/commons/stepper-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 
-interface Props {
+type Props = {
   visible: boolean;
   schedule: Schedule | null;
   products: Product[];
@@ -33,7 +33,7 @@ interface Props {
   onDelete: (id: string) => void;
   onPause: (id: string, resumeAt: Date | null) => void;
   onResume: (id: string) => void;
-}
+};
 
 function formatOccurrence(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0');

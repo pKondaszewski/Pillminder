@@ -11,8 +11,9 @@ import {
   unskipDose,
   untakeDose,
 } from '@/doses/dose-service';
-import { useProducts } from '@/ui/hooks/use-products';
-import { useSchedules } from '@/ui/hooks/use-schedules';
+
+import { useProducts } from './use-products';
+import { useSchedules } from './use-schedules';
 
 export function useTodaysDoses() {
   const day = useCurrentDay();

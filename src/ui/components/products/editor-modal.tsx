@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { products } from '@/config/db/schema';
 import {
   BUILT_IN_CATEGORIES,
   categoryLabel,
@@ -20,6 +19,7 @@ import {
   supportsStrength,
 } from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
+import type { Product } from '@/products/product-service';
 import { PRODUCT_UNITS, type ProductUnit } from '@/products/product-unit';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDateTime } from '@/ui/commons/format-date';
@@ -35,9 +35,7 @@ import { useNoteDraft } from '@/ui/hooks/use-note-draft';
 import { useSettings } from '@/ui/hooks/use-settings';
 import { useTheme } from '@/ui/hooks/use-theme';
 
-type Product = typeof products.$inferSelect;
-
-interface Props {
+type Props = {
   visible: boolean;
   product: Product | null;
   onClose: () => void;
@@ -45,7 +43,7 @@ interface Props {
   onDelete: (id: string) => void;
   onArchive: (id: string, completionNote?: string) => void;
   onRestore: (id: string) => void;
-}
+};
 
 function toText(value: number | null | undefined) {
   return value == null ? '' : String(value);

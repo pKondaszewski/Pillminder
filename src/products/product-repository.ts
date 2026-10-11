@@ -8,6 +8,7 @@ import { BUILT_IN_CATEGORIES, normalizeCategory } from './category';
 import type { NewProductInput } from './dto/new-product-input';
 
 export type Product = typeof products.$inferSelect;
+export type ProductStatus = Product['status'];
 
 export function productsQuery() {
   return db.select().from(products);
@@ -81,7 +82,7 @@ export async function updateProductRow(
 
 export async function setProductStatusRow(
   id: string,
-  status: 'active' | 'archived',
+  status: ProductStatus,
 ): Promise<void> {
   await db
     .update(products)
