@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
+import { FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { NewProductInput } from '@/products/dto/new-product-input';
@@ -15,10 +15,7 @@ import { ProductPeriodModal } from '@/ui/components/products/period-modal';
 import { ProductRow } from '@/ui/components/products/row';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
-
-function statusRank(status: ProductStatus): number {
-  return status === 'archived' ? 1 : 0;
-}
+import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
 
 export default function ProductListScreen() {
   const { t } = useTranslation();
@@ -54,9 +51,6 @@ export default function ProductListScreen() {
 
   const closeEditor = () => setEditorOpen(false);
 
-  const showFailure = (messageKey: string) =>
-    Alert.alert(t('products.errorTitle'), t(messageKey));
-
   const renderItem = ({ item }: { item: Product }) => (
     <ProductRow
       product={item}
@@ -65,45 +59,25 @@ export default function ProductListScreen() {
     />
   );
 
-  const handleSave = async (input: NewProductInput) => {
-    try {
-      if (editing) {
-        await editProduct(editing.id, input);
-      } else {
-        await addProduct(input);
-      }
-      closeEditor();
-    } catch {
-      showFailure('products.errorSave');
-    }
-  };
+  const runThenCloseEditor = useRunThenCloseEditor(closeEditor);
 
-  const handleDelete = async (id: string) => {
-    try {
-      await removeProduct(id);
-      closeEditor();
-    } catch {
-      showFailure('products.errorDelete');
-    }
-  };
+  const handleSave = (input: NewProductInput) =>
+    runThenCloseEditor(
+      () => (editing ? editProduct(editing.id, input) : addProduct(input)),
+      'products.errorSave',
+    );
 
-  const handleArchive = async (id: string, completionNote?: string) => {
-    try {
-      await archiveProduct(id, completionNote);
-      closeEditor();
-    } catch {
-      showFailure('products.errorArchive');
-    }
-  };
+  const handleDelete = (id: string) =>
+    runThenCloseEditor(() => removeProduct(id), 'products.errorDelete');
 
-  const handleRestore = async (id: string) => {
-    try {
-      await restoreProduct(id);
-      closeEditor();
-    } catch {
-      showFailure('products.errorRestore');
-    }
-  };
+  const handleArchive = (id: string, completionNote?: string) =>
+    runThenCloseEditor(
+      () => archiveProduct(id, completionNote),
+      'products.errorArchive',
+    );
+
+  const handleRestore = (id: string) =>
+    runThenCloseEditor(() => restoreProduct(id), 'products.errorRestore');
 
   return (
     <TabSwipe>
@@ -116,38 +90,30 @@ export default function ProductListScreen() {
             renderItem={renderItem}
             ListFooterComponent={
               <ThemedView style={styles.footer}>
-                <Pressable
-                  onPress={openCreate}
-                  style={({ pressed }) => pressed && styles.pressed}
-                >
-                  <ThemedView type="backgroundElement" style={styles.addRow}>
-                    <ThemedText themeColor="accent" style={styles.addText}>
-                      + {t('products.add')}
-                    </ThemedText>
-                  </ThemedView>
-                </Pressable>
-                <Pressable
-                  onPress={() => setOverviewOpen(true)}
-                  accessibilityRole="button"
-                  style={({ pressed }) => pressed && styles.pressed}
-                >
-                  <ThemedView type="backgroundElement" style={styles.addRow}>
-                    <ThemedText themeColor="accent" style={styles.addText}>
-                      {t('overview.open')}
-                    </ThemedText>
-                  </ThemedView>
-                </Pressable>
-                <Pressable
-                  onPress={() => setPeriodOpen(true)}
-                  accessibilityRole="button"
-                  style={({ pressed }) => pressed && styles.pressed}
-                >
-                  <ThemedView type="backgroundElement" style={styles.addRow}>
-                    <ThemedText themeColor="accent" style={styles.addText}>
-                      {t('period.open')}
-                    </ThemedText>
-                  </ThemedView>
-                </Pressable>
+                {[
+                  { label: `+ ${t('products.add')}`, onPress: openCreate },
+                  {
+                    label: t('overview.open'),
+                    onPress: () => setOverviewOpen(true),
+                  },
+                  {
+                    label: t('period.open'),
+                    onPress: () => setPeriodOpen(true),
+                  },
+                ].map(({ label, onPress }) => (
+                  <Pressable
+                    key={label}
+                    onPress={onPress}
+                    accessibilityRole="button"
+                    style={({ pressed }) => pressed && styles.pressed}
+                  >
+                    <ThemedView type="backgroundElement" style={styles.addRow}>
+                      <ThemedText themeColor="accent" style={styles.addText}>
+                        {label}
+                      </ThemedText>
+                    </ThemedView>
+                  </Pressable>
+                ))}
               </ThemedView>
             }
           />
@@ -175,6 +141,10 @@ export default function ProductListScreen() {
       </ThemedView>
     </TabSwipe>
   );
+}
+
+function statusRank(status: ProductStatus): number {
+  return status === 'archived' ? 1 : 0;
 }
 
 const styles = StyleSheet.create({

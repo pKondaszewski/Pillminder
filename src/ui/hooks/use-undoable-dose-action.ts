@@ -14,10 +14,6 @@ interface Undoable {
 
 const log = createLogger('use-undoable-dose-action');
 
-/**
- * Wraps take/skip so the just-changed dose can be reverted from a snackbar.
- * `undoable` is the dose still within its undo window (null when none).
- */
 export function useUndoableDoseAction(
   actions: Record<UndoableKind, { apply: DoseFn; revert: DoseFn }>,
 ) {

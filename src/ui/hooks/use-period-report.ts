@@ -17,7 +17,7 @@ export function usePeriodReport(
 ): PeriodReportEntry[] | null {
   const { i18n } = useTranslation();
   const { products } = useProducts();
-  const [loaded, setReport] = useState<{
+  const [loadedReport, setLoadedReport] = useState<{
     rangeKey: string;
     report: AdherenceReport;
   } | null>(null);
@@ -33,7 +33,7 @@ export function usePeriodReport(
     );
     getAdherence(from, to, new Date())
       .then((result) => {
-        if (!cancelled) setReport({ rangeKey, report: result });
+        if (!cancelled) setLoadedReport({ rangeKey, report: result });
       })
       .catch((err) => log.error('Failed to load adherence report', err));
     return () => {
@@ -41,7 +41,7 @@ export function usePeriodReport(
     };
   }, [firstKey, lastKey, rangeKey]);
 
-  return loaded?.rangeKey === rangeKey
-    ? buildPeriodReport(products, loaded.report, i18n.language)
+  return loadedReport?.rangeKey === rangeKey
+    ? buildPeriodReport(products, loadedReport.report, i18n.language)
     : null;
 }

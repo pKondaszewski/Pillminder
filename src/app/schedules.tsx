@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, FlatList, Pressable, StyleSheet } from 'react-native';
+import { FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
@@ -12,6 +12,7 @@ import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { ScheduleEditorModal } from '@/ui/components/schedules/editor-modal';
 import { useProducts } from '@/ui/hooks/use-products';
+import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 
 export default function ScheduleListScreen() {
@@ -29,11 +30,7 @@ export default function ScheduleListScreen() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<Schedule | null>(null);
 
-  const productName = (id: string) =>
-    products.find((p) => p.id === id)?.name ?? t('schedule.unknownProduct');
-
-  const unitOf = (id: string) =>
-    products.find((p) => p.id === id)?.unit ?? null;
+  const findProduct = (id: string) => products.find((p) => p.id === id);
 
   const openCreate = () => {
     setEditing(null);
@@ -49,62 +46,44 @@ export default function ScheduleListScreen() {
 
   const now = new Date();
 
-  const renderItem = ({ item }: { item: Schedule }) => (
-    <Pressable
-      onPress={() => openEdit(item)}
-      style={({ pressed }) => pressed && styles.pressed}
-    >
-      <ThemedView type="backgroundElement" style={styles.row}>
-        <ThemedText>{productName(item.productId)}</ThemedText>
-        <ThemedText type="small">
-          {describeRhythm(item, t, formatDate, unitOf(item.productId), now)}
-        </ThemedText>
-      </ThemedView>
-    </Pressable>
-  );
-
-  const showFailure = (messageKey: string) =>
-    Alert.alert(t('products.errorTitle'), t(messageKey));
-
-  const handleSave = async (input: NewScheduleInput) => {
-    try {
-      if (editing) {
-        await editSchedule(editing.id, input);
-      } else {
-        await addSchedule(input);
-      }
-      closeEditor();
-    } catch {
-      showFailure('schedule.errorSave');
-    }
+  const renderItem = ({ item }: { item: Schedule }) => {
+    const product = findProduct(item.productId);
+    return (
+      <Pressable
+        onPress={() => openEdit(item)}
+        style={({ pressed }) => pressed && styles.pressed}
+      >
+        <ThemedView type="backgroundElement" style={styles.row}>
+          <ThemedText>
+            {product?.name ?? t('schedule.unknownProduct')}
+          </ThemedText>
+          <ThemedText type="small">
+            {describeRhythm(item, t, formatDate, product?.unit ?? null, now)}
+          </ThemedText>
+        </ThemedView>
+      </Pressable>
+    );
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await removeSchedule(id);
-      closeEditor();
-    } catch {
-      showFailure('schedule.errorDelete');
-    }
-  };
+  const runThenCloseEditor = useRunThenCloseEditor(closeEditor);
 
-  const handlePause = async (id: string, resumeAt: Date | null) => {
-    try {
-      await pauseSchedule(id, resumeAt);
-      closeEditor();
-    } catch {
-      showFailure('schedule.errorPause');
-    }
-  };
+  const handleSave = (input: NewScheduleInput) =>
+    runThenCloseEditor(
+      () => (editing ? editSchedule(editing.id, input) : addSchedule(input)),
+      'schedule.errorSave',
+    );
 
-  const handleResume = async (id: string) => {
-    try {
-      await resumeSchedule(id);
-      closeEditor();
-    } catch {
-      showFailure('schedule.errorResume');
-    }
-  };
+  const handleDelete = (id: string) =>
+    runThenCloseEditor(() => removeSchedule(id), 'schedule.errorDelete');
+
+  const handlePause = (id: string, resumeAt: Date | null) =>
+    runThenCloseEditor(
+      () => pauseSchedule(id, resumeAt),
+      'schedule.errorPause',
+    );
+
+  const handleResume = (id: string) =>
+    runThenCloseEditor(() => resumeSchedule(id), 'schedule.errorResume');
 
   return (
     <TabSwipe>
