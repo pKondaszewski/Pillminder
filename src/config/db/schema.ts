@@ -7,6 +7,7 @@ import {
 } from 'drizzle-orm/sqlite-core';
 
 // Relative on purpose: drizzle-kit loads this file without the @ alias.
+import { DOSE_STATES } from '../../doses/dose-transition';
 import { PRODUCT_UNITS } from '../../products/product-unit';
 
 export const products = sqliteTable('products', {
@@ -57,9 +58,7 @@ export const doses = sqliteTable(
       .notNull()
       .references(() => schedules.id, { onDelete: 'cascade' }),
     plannedAt: integer('planned_at', { mode: 'timestamp' }).notNull(),
-    state: text('state', { enum: ['pending', 'taken', 'skipped'] })
-      .notNull()
-      .default('pending'),
+    state: text('state', { enum: DOSE_STATES }).notNull().default('pending'),
     takenAt: integer('taken_at', { mode: 'timestamp' }),
     takenQuantity: integer('taken_quantity'),
     snoozedUntil: integer('snoozed_until', { mode: 'timestamp' }),

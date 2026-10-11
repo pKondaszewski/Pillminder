@@ -1,15 +1,10 @@
-import type {
-  products as productsTable,
-  schedules as schedulesTable,
-} from '@/config/db/schema';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
+import type { Product } from '@/products/product-service';
 import { reorderStatus } from '@/products/reorder';
+import type { Schedule } from '@/schedules/schedule-service';
 
 import { useProducts } from './use-products';
 import { useSchedules } from './use-schedules';
-
-type Product = typeof productsTable.$inferSelect;
-type Schedule = typeof schedulesTable.$inferSelect;
 
 export function useReorderStatuses(): Record<string, ReorderStatus> {
   const { products } = useProducts();

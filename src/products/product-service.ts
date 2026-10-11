@@ -9,6 +9,7 @@ import {
   getProductsByIds,
   type Product,
   productsQuery,
+  type ProductStatus,
   setProductStatusRow,
   updateProductRow,
 } from './product-repository';
@@ -18,7 +19,7 @@ export type {
   ProductOverview,
   ProductOverviewEntry,
 } from './dto/product-overview-output';
-export type { Product } from './product-repository';
+export type { Product, ProductStatus } from './product-repository';
 
 const log = createLogger('product-service');
 
@@ -65,7 +66,7 @@ export async function updateProduct(
 
 export async function setProductStatus(
   id: string,
-  status: 'active' | 'archived',
+  status: ProductStatus,
 ): Promise<void> {
   log.info(`Setting product ${id} status to ${status}`);
   try {

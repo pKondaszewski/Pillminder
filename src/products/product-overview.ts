@@ -1,16 +1,16 @@
-import { categoryLabel, isBuiltInCategory } from '@/products/category';
-import { productLabel } from '@/products/product-label';
-import type { Product } from '@/products/product-service';
-import { formatAmount, type ProductUnit } from '@/products/product-unit';
-import { reorderStatus } from '@/products/reorder';
 import { describeRhythm, type Translate } from '@/schedules/schedule-rhythm';
 import type { Schedule } from '@/schedules/schedule-service';
 
+import { categoryLabel, isBuiltInCategory } from './category';
 import type {
   ProductOverview,
   ProductOverviewEntry,
   ProductOverviewStock,
 } from './dto/product-overview-output';
+import { productLabel } from './product-label';
+import type { Product } from './product-service';
+import { formatAmount, type ProductUnit } from './product-unit';
+import { reorderStatus } from './reorder';
 
 const BUILT_IN_ORDER = ['medication', 'supplement', 'care'];
 
