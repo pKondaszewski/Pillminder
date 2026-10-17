@@ -35,30 +35,11 @@ export default function HomeScreen() {
       skipped: { apply: skipDose, revert: unskipDose },
     });
 
-  const confirmRevert = (item: TodayDose, kind: UndoableKind) => {
-    const { title, message } = DOSE_ACTION_TEXT_KEYS[kind];
-    Alert.alert(t(title), t(message, { name: item.productName }), [
-      { text: t('editor.cancel'), style: 'cancel' },
-      { text: t('home.undo'), onPress: () => revert(kind, item.id) },
-    ]);
-  };
-
   const stats = useAdherenceStats(doses);
   const statsText = adherenceStatsText(stats, t);
 
   const overdue = overdueDoses(doses, new Date());
   const showBulkTake = overdue.length >= BULK_TAKE_MIN_OVERDUE;
-
-  const confirmTakeOverdue = () => {
-    const count = overdue.length;
-    Alert.alert(t('home.bulkTakeTitle'), t('home.bulkTakeConfirm', { count }), [
-      { text: t('editor.cancel'), style: 'cancel' },
-      {
-        text: t('home.take'),
-        onPress: () => takeAll(overdue.map(({ id }) => id)),
-      },
-    ]);
-  };
 
   const renderItem = ({ item }: { item: TodayDose }) => {
     const quantityText = doseQuantityText(item.quantity, item.unit, t);
@@ -89,8 +70,8 @@ export default function HomeScreen() {
           takenAt={item.takenAt}
           onTake={() => applyWithUndo('taken', item.id)}
           onSkip={() => applyWithUndo('skipped', item.id)}
-          onUndo={() => confirmRevert(item, 'taken')}
-          onUnskip={() => confirmRevert(item, 'skipped')}
+          onUndo={() => confirmRevert(item, 'taken', t, revert)}
+          onUnskip={() => confirmRevert(item, 'skipped', t, revert)}
         />
       </ThemedView>
     );
@@ -120,7 +101,7 @@ export default function HomeScreen() {
                 ) : null}
                 {showBulkTake ? (
                   <Pressable
-                    onPress={confirmTakeOverdue}
+                    onPress={() => confirmTakeOverdue(overdue, t, takeAll)}
                     accessibilityRole="button"
                     style={({ pressed }) => pressed && styles.pressed}
                   >
@@ -166,6 +147,34 @@ function adherenceStatsText(
   });
   if (stats.streak === 0) return monthText;
   return `${monthText} · ${t('home.statsStreak', { count: stats.streak })}`;
+}
+
+function confirmRevert(
+  item: TodayDose,
+  kind: UndoableKind,
+  t: TFunction,
+  revert: (kind: UndoableKind, id: string) => void,
+) {
+  const { title, message } = DOSE_ACTION_TEXT_KEYS[kind];
+  Alert.alert(t(title), t(message, { name: item.productName }), [
+    { text: t('editor.cancel'), style: 'cancel' },
+    { text: t('home.undo'), onPress: () => revert(kind, item.id) },
+  ]);
+}
+
+function confirmTakeOverdue(
+  overdue: TodayDose[],
+  t: TFunction,
+  takeAll: (ids: string[]) => void,
+) {
+  const count = overdue.length;
+  Alert.alert(t('home.bulkTakeTitle'), t('home.bulkTakeConfirm', { count }), [
+    { text: t('editor.cancel'), style: 'cancel' },
+    {
+      text: t('home.take'),
+      onPress: () => takeAll(overdue.map(({ id }) => id)),
+    },
+  ]);
 }
 
 function DoseActionButton({
