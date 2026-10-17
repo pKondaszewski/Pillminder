@@ -7,6 +7,7 @@ import {
   dismissDoseReminder,
   scheduleDoseReminder,
 } from '@/notifications/notification-service';
+import { isWithinRetryHorizon } from '@/notifications/reminder-plan';
 import { productLabel } from '@/products/product-label';
 import {
   getProduct,
@@ -231,7 +232,7 @@ export async function syncDosesForSchedules(
       `Syncing ${slots.length} dose slot(s) for schedule ${schedule.id}`,
     );
     try {
-      const { removedIds, inserted } = await replaceFuturePendingDoseRows(
+      const { removedIds, inserted, kept } = await replaceFuturePendingDoseRows(
         schedule.id,
         from,
         slots.map((plannedAt) => ({
@@ -244,8 +245,14 @@ export async function syncDosesForSchedules(
       await cancelDoseReminders(removedIds);
       if (!product) continue;
 
+      const toSchedule = [
+        ...inserted,
+        ...kept.filter(({ plannedAt }) =>
+          isWithinRetryHorizon(plannedAt, from),
+        ),
+      ];
       await Promise.all(
-        inserted.map((dose) =>
+        toSchedule.map((dose) =>
           scheduleDoseReminder(
             {
               id: dose.id,
