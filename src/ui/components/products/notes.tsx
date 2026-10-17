@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, StyleSheet, TextInput } from 'react-native';
 
@@ -31,24 +32,6 @@ export function ProductNotes({
     }
   };
 
-  const handleDelete = (note: Note) => {
-    Alert.alert(t('notes.deleteTitle'), t('notes.deleteConfirm'), [
-      { text: t('editor.cancel'), style: 'cancel' },
-      {
-        text: t('editor.delete'),
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await removeNote(note.id);
-            if (note.id === editingId) reset();
-          } catch {
-            Alert.alert(t('products.errorTitle'), t('notes.errorDelete'));
-          }
-        },
-      },
-    ]);
-  };
-
   return (
     <ThemedView style={styles.section}>
       <ThemedText type="small">{t('notes.title')}</ThemedText>
@@ -79,7 +62,9 @@ export function ProductNotes({
                 </ThemedText>
               </Pressable>
               <Pressable
-                onPress={() => handleDelete(note)}
+                onPress={() =>
+                  confirmDeleteNote(note, editingId, t, removeNote, reset)
+                }
                 hitSlop={Spacing.two}
                 style={({ pressed }) => pressed && styles.pressed}
               >
@@ -128,6 +113,30 @@ export function ProductNotes({
       </ThemedView>
     </ThemedView>
   );
+}
+
+function confirmDeleteNote(
+  note: Note,
+  editingId: string | null,
+  t: TFunction,
+  removeNote: (id: string) => Promise<void>,
+  reset: () => void,
+) {
+  Alert.alert(t('notes.deleteTitle'), t('notes.deleteConfirm'), [
+    { text: t('editor.cancel'), style: 'cancel' },
+    {
+      text: t('editor.delete'),
+      style: 'destructive',
+      onPress: async () => {
+        try {
+          await removeNote(note.id);
+          if (note.id === editingId) reset();
+        } catch {
+          Alert.alert(t('products.errorTitle'), t('notes.errorDelete'));
+        }
+      },
+    },
+  ]);
 }
 
 const styles = StyleSheet.create({

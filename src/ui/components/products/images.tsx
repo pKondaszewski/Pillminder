@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Modal, Pressable, StyleSheet } from 'react-native';
@@ -22,23 +23,6 @@ export function ProductImages({ productId }: { productId: string }) {
     useProductImages(productId);
   const [role, setRole] = useState<ImageRole>(IMAGE_ROLES[0]);
   const [previewed, setPreviewed] = useState<ProductImage | null>(null);
-
-  const handleDelete = (image: ProductImage) => {
-    Alert.alert(t('images.deleteTitle'), t('images.deleteConfirm'), [
-      { text: t('editor.cancel'), style: 'cancel' },
-      {
-        text: t('editor.delete'),
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await removeImage(image);
-          } catch {
-            Alert.alert(t('products.errorTitle'), t('images.errorDelete'));
-          }
-        },
-      },
-    ]);
-  };
 
   return (
     <ThemedView style={styles.section}>
@@ -66,7 +50,7 @@ export function ProductImages({ productId }: { productId: string }) {
                 {t(`images.role.${image.role}`)}
               </ThemedText>
               <Pressable
-                onPress={() => handleDelete(image)}
+                onPress={() => confirmDeleteImage(image, t, removeImage)}
                 hitSlop={Spacing.two}
                 style={({ pressed }) => pressed && styles.pressed}
               >
@@ -120,6 +104,27 @@ export function ProductImages({ productId }: { productId: string }) {
       </Modal>
     </ThemedView>
   );
+}
+
+function confirmDeleteImage(
+  image: ProductImage,
+  t: TFunction,
+  removeImage: (image: ProductImage) => Promise<void>,
+) {
+  Alert.alert(t('images.deleteTitle'), t('images.deleteConfirm'), [
+    { text: t('editor.cancel'), style: 'cancel' },
+    {
+      text: t('editor.delete'),
+      style: 'destructive',
+      onPress: async () => {
+        try {
+          await removeImage(image);
+        } catch {
+          Alert.alert(t('products.errorTitle'), t('images.errorDelete'));
+        }
+      },
+    },
+  ]);
 }
 
 const styles = StyleSheet.create({

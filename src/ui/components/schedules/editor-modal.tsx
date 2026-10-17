@@ -1,6 +1,7 @@
 import DateTimePicker, {
   type DateTimePickerChangeEvent,
 } from '@react-native-community/datetimepicker';
+import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Modal, Pressable, ScrollView, StyleSheet } from 'react-native';
@@ -179,18 +180,6 @@ function EditorForm({
     if (schedule) onResume?.(schedule.id);
   };
 
-  const handleDelete = () => {
-    if (!schedule) return;
-    Alert.alert(t('schedule.deleteTitle'), t('schedule.deleteConfirm'), [
-      { text: t('editor.cancel'), style: 'cancel' },
-      {
-        text: t('editor.delete'),
-        style: 'destructive',
-        onPress: () => onDelete?.(schedule.id),
-      },
-    ]);
-  };
-
   const pickedDates = { start: startDate, end: endDate, resume: resumeDate };
   const minimumPickerDate = datePickerFor === 'resume' ? tomorrow() : undefined;
 
@@ -365,7 +354,7 @@ function EditorForm({
           {schedule ? (
             <ActionButton
               label={t('editor.delete')}
-              onPress={handleDelete}
+              onPress={() => confirmDeleteSchedule(schedule, t, onDelete)}
               themeColor="danger"
             />
           ) : null}
@@ -378,6 +367,21 @@ function EditorForm({
       </SafeAreaView>
     </ThemedView>
   );
+}
+
+function confirmDeleteSchedule(
+  schedule: Schedule,
+  t: TFunction,
+  onDelete?: (id: string) => void,
+) {
+  Alert.alert(t('schedule.deleteTitle'), t('schedule.deleteConfirm'), [
+    { text: t('editor.cancel'), style: 'cancel' },
+    {
+      text: t('editor.delete'),
+      style: 'destructive',
+      onPress: () => onDelete?.(schedule.id),
+    },
+  ]);
 }
 
 function ProductPicker({

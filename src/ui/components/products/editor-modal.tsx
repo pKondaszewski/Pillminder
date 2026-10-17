@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -164,22 +165,6 @@ function EditorForm({
 
   const startAddingCategory = () => {
     if (!addingCategory) setNewCategoryName('');
-  };
-
-  const handleDelete = () => {
-    if (!product) return;
-    Alert.alert(
-      t('editor.deleteTitle'),
-      t('editor.deleteConfirm', { name: product.name }),
-      [
-        { text: t('editor.cancel'), style: 'cancel' },
-        {
-          text: t('editor.delete'),
-          style: 'destructive',
-          onPress: () => onDelete(product.id),
-        },
-      ],
-    );
   };
 
   const handleToggleStatus = () => {
@@ -456,7 +441,7 @@ function EditorForm({
           {product ? (
             <ActionButton
               label={t('editor.delete')}
-              onPress={handleDelete}
+              onPress={() => confirmDeleteProduct(product, t, onDelete)}
               themeColor="danger"
             />
           ) : null}
@@ -468,6 +453,25 @@ function EditorForm({
         </ThemedView>
       </SafeAreaView>
     </ThemedView>
+  );
+}
+
+function confirmDeleteProduct(
+  product: Product,
+  t: TFunction,
+  onDelete: (id: string) => void,
+) {
+  Alert.alert(
+    t('editor.deleteTitle'),
+    t('editor.deleteConfirm', { name: product.name }),
+    [
+      { text: t('editor.cancel'), style: 'cancel' },
+      {
+        text: t('editor.delete'),
+        style: 'destructive',
+        onPress: () => onDelete(product.id),
+      },
+    ],
   );
 }
 

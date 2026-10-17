@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, StyleSheet } from 'react-native';
@@ -50,30 +51,10 @@ export function ProductHistory({ productId }: { productId: string }) {
 function HistoryRow({ entry }: { entry: HistoryEntry }) {
   const { t } = useTranslation();
   const taken = entry.status === 'taken';
-  const target = taken ? 'skipped' : 'taken';
-
-  const correct = async () => {
-    try {
-      await correctDoseState(entry.id, target);
-    } catch {
-      Alert.alert(t('products.errorTitle'), t('history.errorCorrect'));
-    }
-  };
-
-  // Confirmation keeps an accidental tap from silently rewriting history.
-  const confirmCorrection = () =>
-    Alert.alert(
-      formatDateTime(entry.occurredAt),
-      t(taken ? 'history.confirmSkipped' : 'history.confirmTaken'),
-      [
-        { text: t('editor.cancel'), style: 'cancel' },
-        { text: t('history.change'), onPress: correct },
-      ],
-    );
 
   return (
     <Pressable
-      onPress={confirmCorrection}
+      onPress={() => confirmCorrection(entry, t)}
       style={({ pressed }) => pressed && styles.pressed}
     >
       <ThemedView type="backgroundElement" style={styles.row}>
@@ -84,6 +65,34 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
       </ThemedView>
     </Pressable>
   );
+}
+
+// Confirmation keeps an accidental tap from silently rewriting history.
+function confirmCorrection(entry: HistoryEntry, t: TFunction) {
+  const taken = entry.status === 'taken';
+  Alert.alert(
+    formatDateTime(entry.occurredAt),
+    t(taken ? 'history.confirmSkipped' : 'history.confirmTaken'),
+    [
+      { text: t('editor.cancel'), style: 'cancel' },
+      {
+        text: t('history.change'),
+        onPress: () => correctDose(entry.id, taken ? 'skipped' : 'taken', t),
+      },
+    ],
+  );
+}
+
+async function correctDose(
+  id: string,
+  target: 'taken' | 'skipped',
+  t: TFunction,
+) {
+  try {
+    await correctDoseState(id, target);
+  } catch {
+    Alert.alert(t('products.errorTitle'), t('history.errorCorrect'));
+  }
 }
 
 const styles = StyleSheet.create({
