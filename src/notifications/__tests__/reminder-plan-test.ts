@@ -1,5 +1,6 @@
 import {
   doseNotificationIdentifiers,
+  isWithinRetryHorizon,
   planDoseNotifications,
 } from '../reminder-plan';
 
@@ -70,6 +71,22 @@ describe('planDoseNotifications', () => {
 
     // then
     expect(plan).toEqual([{ identifier: 'd1', kind: 'first', at: plannedAt }]);
+  });
+});
+
+describe('isWithinRetryHorizon', () => {
+  it('is false for a dose 8 days ahead and true for one 6 days ahead', () => {
+    // given
+    const eightDaysAhead = new Date(2026, 0, 18, 12, 0);
+    const sixDaysAhead = new Date(2026, 0, 16, 12, 0);
+
+    // when
+    const result = [eightDaysAhead, sixDaysAhead].map((plannedAt) =>
+      isWithinRetryHorizon(plannedAt, NOW),
+    );
+
+    // then
+    expect(result).toEqual([false, true]);
   });
 });
 

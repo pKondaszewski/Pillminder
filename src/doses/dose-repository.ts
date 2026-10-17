@@ -201,17 +201,14 @@ export async function replaceFuturePendingDoseRows(
       gte(doses.plannedAt, from),
     );
 
-    const existing = tx
-      .select({ id: doses.id, plannedAt: doses.plannedAt })
-      .from(doses)
-      .where(futurePending)
-      .all();
+    const existing = tx.select().from(doses).where(futurePending).all();
 
     const wanted = new Set(slots.map((slot) => slot.plannedAt.getTime()));
     const existingTimes = new Set(
       existing.map((row) => row.plannedAt.getTime()),
     );
 
+    const kept = existing.filter((row) => wanted.has(row.plannedAt.getTime()));
     const removedIds = existing
       .filter((row) => !wanted.has(row.plannedAt.getTime()))
       .map((row) => row.id);
@@ -224,7 +221,7 @@ export async function replaceFuturePendingDoseRows(
       (slot) => !existingTimes.has(slot.plannedAt.getTime()),
     );
 
-    if (newSlots.length === 0) return { removedIds, inserted: [] };
+    if (newSlots.length === 0) return { removedIds, inserted: [], kept };
 
     const inserted = tx
       .insert(doses)
@@ -242,6 +239,6 @@ export async function replaceFuturePendingDoseRows(
       .returning()
       .all();
 
-    return { removedIds, inserted };
+    return { removedIds, inserted, kept };
   });
 }

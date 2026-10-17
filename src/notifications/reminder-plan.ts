@@ -3,7 +3,7 @@ import { addDays } from '@/config/date-utils';
 const RETRY_DELAYS_MINUTES = [15, 45];
 
 // Android caps an app at 500 alarms, so retries are planned only for the
-// nearest days; the daily sync and refresh extend them as time passes.
+// nearest days; every dose sync re-plans the doses that have entered this window.
 const RETRY_HORIZON_DAYS = 7;
 
 const MINUTE_MS = 60_000;
@@ -26,12 +26,15 @@ export function planDoseNotifications(
     kind: 'first',
     at: plannedAt,
   };
-  const withinRetryHorizon = plannedAt < addDays(now, RETRY_HORIZON_DAYS);
-  const retries = withinRetryHorizon
+  const retries = isWithinRetryHorizon(plannedAt, now)
     ? retryNotifications(doseId, plannedAt)
     : [];
 
   return [first, ...retries].filter(({ at }) => at > now);
+}
+
+export function isWithinRetryHorizon(plannedAt: Date, now: Date): boolean {
+  return plannedAt < addDays(now, RETRY_HORIZON_DAYS);
 }
 
 export function doseNotificationIdentifiers(doseId: string): string[] {
