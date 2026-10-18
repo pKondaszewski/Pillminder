@@ -493,6 +493,7 @@
     "timesRequired": "Dodaj co najmniej jedną godzinę"
   },
   "settings": {
+    "aboutLink": "Pillminder na GitHubie",
     "appearance": "Wygląd",
     "batteryOptimization": "Optymalizacja baterii",
     "batteryRestricted": "Włączona: Android może opóźniać przypomnienia",
@@ -508,6 +509,7 @@
     "notificationsBlocked": "Zablokowane w ustawieniach systemu",
     "notificationsGranted": "Zezwolono",
     "notificationsPermission": "Uprawnienie do powiadomień",
+    "permissions": "Uprawnienia",
     "reminders": "Przypomnienia",
     "shopping": "Zakupy",
     "snooze": "Czas drzemki",

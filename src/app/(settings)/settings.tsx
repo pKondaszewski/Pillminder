@@ -65,7 +65,7 @@ export default function SettingsScreen() {
           <ScrollView contentContainerStyle={styles.content}>
             <ScreenTitle title={t('tabs.settings')} />
 
-            <SettingsSection title={t('settings.reminders')}>
+            <SettingsSection title={t('settings.permissions')}>
               {notifications ? (
                 <StatusCard
                   ok={notifications.ok}
@@ -88,6 +88,9 @@ export default function SettingsScreen() {
                   onFix={() => void battery.openSettings()}
                 />
               ) : null}
+            </SettingsSection>
+
+            <SettingsSection title={t('settings.reminders')}>
               <FieldRow
                 label={t('settings.snooze')}
                 value={`${settings.snoozeMinutes} ${t('settings.minutesUnit')}`}
@@ -137,6 +140,9 @@ export default function SettingsScreen() {
             <AboutLine
               appName={Constants.expoConfig?.name ?? ''}
               version={Constants.expoConfig?.version ?? ''}
+              repositoryUrl={String(
+                Constants.expoConfig?.extra?.repositoryUrl ?? '',
+              )}
               author={AUTHOR_NAME}
             />
           </ScrollView>

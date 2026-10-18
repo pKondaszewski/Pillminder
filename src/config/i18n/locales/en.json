@@ -463,6 +463,7 @@
     "timesRequired": "Add at least one time"
   },
   "settings": {
+    "aboutLink": "Pillminder on GitHub",
     "appearance": "Appearance",
     "batteryOptimization": "Battery optimization",
     "batteryRestricted": "On: Android may delay reminders",
@@ -478,6 +479,7 @@
     "notificationsBlocked": "Blocked in system settings",
     "notificationsGranted": "Allowed",
     "notificationsPermission": "Notification permission",
+    "permissions": "Permissions",
     "reminders": "Reminders",
     "shopping": "Shopping",
     "snooze": "Snooze duration",
