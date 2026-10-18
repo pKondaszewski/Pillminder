@@ -11,7 +11,7 @@ import {
   wholeDaysLeft,
 } from '../product-text';
 
-const CLOCK_24H = { locale: 'pl', uses24hourClock: true };
+const LANGUAGE = 'pl';
 const joinTimes = (times: string[]) => times.join(', ');
 
 const formatDate = (date: Date) => date.toLocaleDateString('sv');
@@ -222,7 +222,7 @@ describe('lastUsedText', () => {
   ])('describes %s', (lastUsedAt, expected) => {
     // when
     const text = lastUsedText(lastUsedAt, NOW, t, formatDate, (date) =>
-      formatTime(date, CLOCK_24H),
+      formatTime(date, LANGUAGE),
     );
 
     // then

@@ -1,8 +1,7 @@
-import { getCalendars, getLocales } from 'expo-localization';
+import { getLocales } from 'expo-localization';
 import { useTranslation } from 'react-i18next';
 
 import {
-  type ClockFormat,
   formatDateTime,
   formatLongDate,
   formatTime,
@@ -32,16 +31,12 @@ export type TimeFormatter = {
 };
 
 export function useFormatTime(): TimeFormatter {
-  const locale = useDateLocale();
-  const clock: ClockFormat = {
-    locale,
-    uses24hourClock: getCalendars()[0]?.uses24hourClock ?? null,
-  };
+  const { language } = useTranslation().i18n;
   return {
-    formatTime: (date) => formatTime(date, clock),
-    formatTimeOfDay: (time) => formatTimeOfDay(time, clock),
-    formatTimes: (times) => formatTimesOfDay(times, clock),
-    formatDateTime: (date) => formatDateTime(date, clock),
-    is24Hour: is24HourClock(clock),
+    formatTime: (date) => formatTime(date, language),
+    formatTimeOfDay: (time) => formatTimeOfDay(time, language),
+    formatTimes: (times) => formatTimesOfDay(times, language),
+    formatDateTime: (date) => formatDateTime(date, language),
+    is24Hour: is24HourClock(language),
   };
 }
