@@ -259,6 +259,11 @@ The app controls only the small icon, accent color, title, body and actions.
   the last one hollow. Not the full logo.
 - Prices everywhere use the currency symbol, not the code: `Intl.NumberFormat` with
   `currencyDisplay: 'symbol'` in the app language ("25 zł", "25 €", "$25").
+- Times follow the app language, not the phone clock: Polish is always 24 h ("20:00"), English
+  always 12 h ("8:00 PM"), also in the time picker.
+- English dates carry ordinal suffixes on the day ("14th October" in en-GB, "October 14th" in
+  en-US, ranges "24th-30th October"); the day/month order follows the device region. Polish has
+  no suffixes ("14 października").
 
 ## 4. Behavior rules
 

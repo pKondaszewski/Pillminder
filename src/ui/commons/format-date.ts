@@ -11,7 +11,12 @@ export function formatLongDate(
   now: Date,
   withWeekday = false,
 ): string {
-  return longDateFormat(date, locale, now, withWeekday).format(date);
+  return longDateFormat(date, locale, now, withWeekday)
+    .formatToParts(date)
+    .map(({ type, value }) =>
+      type === 'day' ? withOrdinal(date.getDate(), locale) : value,
+    )
+    .join('');
 }
 
 export function formatDateRange(
@@ -30,40 +35,34 @@ export function formatDateRange(
   return longDateFormat(to, locale, now, false)
     .formatToParts(to)
     .map(({ type, value }) =>
-      type === 'day' ? `${from.getDate()}-${value}` : value,
+      type === 'day'
+        ? `${withOrdinal(from.getDate(), locale)}-${withOrdinal(to.getDate(), locale)}`
+        : value,
     )
     .join('');
 }
 
-export type ClockFormat = {
-  locale: string;
-  uses24hourClock: boolean | null;
-};
-
-export function is24HourClock({
-  locale,
-  uses24hourClock,
-}: ClockFormat): boolean {
-  return uses24hourClock ?? !/^en(-US)?$/.test(locale);
+export function is24HourClock(language: string): boolean {
+  return !language.startsWith('en');
 }
 
-export function formatTime(date: Date, clock: ClockFormat): string {
-  return formatClockTime(date.getHours(), date.getMinutes(), clock);
+export function formatTime(date: Date, language: string): string {
+  return formatClockTime(date.getHours(), date.getMinutes(), language);
 }
 
-export function formatTimeOfDay(time: string, clock: ClockFormat): string {
+export function formatTimeOfDay(time: string, language: string): string {
   const [hours, minutes] = time.split(':').map(Number);
-  return formatClockTime(hours, minutes, clock);
+  return formatClockTime(hours, minutes, language);
 }
 
-export function formatTimesOfDay(times: string[], clock: ClockFormat): string {
-  return times.map((time) => formatTimeOfDay(time, clock)).join(', ');
+export function formatTimesOfDay(times: string[], language: string): string {
+  return times.map((time) => formatTimeOfDay(time, language)).join(', ');
 }
 
-export function formatDateTime(date: Date, clock: ClockFormat): string {
+export function formatDateTime(date: Date, language: string): string {
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
-  return `${day}.${month} · ${formatTime(date, clock)}`;
+  return `${day}.${month} · ${formatTime(date, language)}`;
 }
 
 export function toTimeOfDay(date: Date): string {
@@ -75,10 +74,10 @@ export function toTimeOfDay(date: Date): string {
 function formatClockTime(
   hours: number,
   minutes: number,
-  clock: ClockFormat,
+  language: string,
 ): string {
   const mm = String(minutes).padStart(2, '0');
-  if (is24HourClock(clock)) return `${String(hours).padStart(2, '0')}:${mm}`;
+  if (is24HourClock(language)) return `${String(hours).padStart(2, '0')}:${mm}`;
   return `${hours % 12 || 12}:${mm} ${hours < 12 ? 'AM' : 'PM'}`;
 }
 
@@ -96,3 +95,15 @@ function longDateFormat(
     ...(withYear && { year: 'numeric' }),
   });
 }
+
+function withOrdinal(day: number, locale: string): string {
+  if (!locale.startsWith('en')) return String(day);
+  return `${day}${ORDINAL_SUFFIXES[new Intl.PluralRules('en', { type: 'ordinal' }).select(day)] ?? 'th'}`;
+}
+
+const ORDINAL_SUFFIXES: Partial<Record<Intl.LDMLPluralRule, string>> = {
+  one: 'st',
+  two: 'nd',
+  few: 'rd',
+  other: 'th',
+};
