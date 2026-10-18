@@ -8,6 +8,7 @@ import {
   pickBackup,
 } from '@/backup/backup-service';
 import { createLogger } from '@/config/logger';
+import { useConfirmation } from '@/ui/hooks/use-confirmation';
 
 const log = createLogger('use-backup-import');
 
@@ -30,38 +31,23 @@ export function useBackupImport(
     }
   };
 
+  const importConfirmation = useConfirmation<BackupRows>(
+    (rows) => void run(() => applyRows(rows)),
+  );
+
   const showInvalidFile = ({ code, detail }: BackupError) =>
     Alert.alert(
       t('backup.importInvalidTitle'),
       [t(`backup.error.${code}`), detail].filter(Boolean).join('\n'),
     );
 
-  const confirmReplace = (rows: BackupRows) =>
-    Alert.alert(
-      t('backup.confirmTitle'),
-      t('backup.confirmMessage', {
-        products: rows.products.length,
-        schedules: rows.schedules.length,
-        doses: rows.doses.length,
-        notes: rows.notes.length,
-      }),
-      [
-        { text: t('backup.cancel'), style: 'cancel' },
-        {
-          text: t('backup.confirmAction'),
-          style: 'destructive',
-          onPress: () => void run(() => applyRows(rows)),
-        },
-      ],
-    );
-
   const importData = () =>
     run(async () => {
       const result = await pickBackup();
       if (!result) return;
-      if (result.ok) confirmReplace(result.rows);
+      if (result.ok) importConfirmation.request(result.rows);
       else showInvalidFile(result.error);
     });
 
-  return { busy, run, importData };
+  return { busy, run, importData, importConfirmation };
 }

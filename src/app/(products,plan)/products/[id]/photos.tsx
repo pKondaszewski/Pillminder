@@ -1,15 +1,16 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
-import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, StyleSheet } from 'react-native';
 
 import type { ProductImage } from '@/images/image-service';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { ConfirmDialog } from '@/ui/components/commons/confirm-dialog';
 import { Snackbar } from '@/ui/components/commons/snackbar';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ImageSourceSheet } from '@/ui/components/products/image-source-sheet';
 import { PhotoGrid } from '@/ui/components/products/photo-grid';
+import { useConfirmation } from '@/ui/hooks/use-confirmation';
 import { useProductImages } from '@/ui/hooks/use-product-images';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useProfileUndo } from '@/ui/hooks/use-profile-undo';
@@ -23,6 +24,13 @@ export default function ProductPhotosScreen() {
   const { images, busy, pickAndAddImage, removeImage } = useProductImages(id);
   const { undoable, setProfileWithUndo, undoProfile, dismissUndo } =
     useProfileUndo(id, profileImageId);
+  const deletion = useConfirmation<ProductImage>(async (image) => {
+    try {
+      await removeImage(image);
+    } catch {
+      Alert.alert(t('products.errorTitle'), t('images.errorDelete'));
+    }
+  });
   const [sourceSheetVisible, setSourceSheetVisible] = useState(false);
 
   return (
@@ -35,7 +43,7 @@ export default function ProductPhotosScreen() {
           addDisabled={busy}
           onAdd={() => setSourceSheetVisible(true)}
           onSetProfile={(image) => setProfileWithUndo(image.id)}
-          onDelete={(image) => confirmDeleteImage(image, t, removeImage)}
+          onDelete={deletion.request}
         />
       </ScrollView>
       {undoable ? (
@@ -47,6 +55,15 @@ export default function ProductPhotosScreen() {
           onDismiss={dismissUndo}
         />
       ) : null}
+      <ConfirmDialog
+        visible={deletion.pending !== null}
+        destructive
+        title={t('images.deleteTitle')}
+        message={t('images.deleteConfirm')}
+        confirmLabel={t('editor.delete')}
+        onConfirm={deletion.confirm}
+        onCancel={deletion.cancel}
+      />
       <ImageSourceSheet
         visible={sourceSheetVisible}
         onClose={() => setSourceSheetVisible(false)}
@@ -54,27 +71,6 @@ export default function ProductPhotosScreen() {
       />
     </ThemedView>
   );
-}
-
-function confirmDeleteImage(
-  image: ProductImage,
-  t: TFunction,
-  removeImage: (image: ProductImage) => Promise<void>,
-) {
-  Alert.alert(t('images.deleteTitle'), t('images.deleteConfirm'), [
-    { text: t('editor.cancel'), style: 'cancel' },
-    {
-      text: t('editor.delete'),
-      style: 'destructive',
-      onPress: async () => {
-        try {
-          await removeImage(image);
-        } catch {
-          Alert.alert(t('products.errorTitle'), t('images.errorDelete'));
-        }
-      },
-    },
-  ]);
 }
 
 const styles = StyleSheet.create({
