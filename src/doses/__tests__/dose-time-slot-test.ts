@@ -95,7 +95,11 @@ describe('timeSlotLayout', () => {
     return { ...doseAt(id, at(8)), state };
   }
 
-  it('collapses a slot where every dose is handled', () => {
+  function pendingDoses(ids: string[]): TodayDose[] {
+    return ids.map((id) => withState(id, 'pending'));
+  }
+
+  it('collapses a slot where every dose is handled unless expanded', () => {
     // given
     const doses = [
       withState('a', 'taken'),
@@ -110,7 +114,7 @@ describe('timeSlotLayout', () => {
     expect(layout).toEqual({ kind: 'collapsed', taken: 2, skipped: 1 });
   });
 
-  it('lists a collapsed slot after it is expanded', () => {
+  it('lists a handled slot as collapsible once expanded manually', () => {
     // given
     const doses = [withState('a', 'taken')];
 
@@ -121,11 +125,26 @@ describe('timeSlotLayout', () => {
     expect(layout).toEqual({
       kind: 'list',
       visible: doses,
-      showAllCount: null,
+      collapsible: true,
+      overflowCount: null,
     });
   });
 
-  it('lists every dose while one is still pending', () => {
+  it('keeps an expanded slot open when its last pending dose gets handled', () => {
+    // given
+    const before = [withState('a', 'taken'), withState('b', 'pending')];
+    const after = [withState('a', 'taken'), withState('b', 'taken')];
+
+    // when
+    const duringEdit = timeSlotLayout(before, true);
+    const afterEdit = timeSlotLayout(after, true);
+
+    // then
+    expect(duringEdit).toMatchObject({ kind: 'list', collapsible: false });
+    expect(afterEdit).toMatchObject({ kind: 'list', collapsible: true });
+  });
+
+  it('lists every dose while one is still pending and keeps the slot not collapsible', () => {
     // given
     const doses = [withState('a', 'taken'), withState('b', 'pending')];
 
@@ -136,59 +155,52 @@ describe('timeSlotLayout', () => {
     expect(layout).toEqual({
       kind: 'list',
       visible: doses,
-      showAllCount: null,
+      collapsible: false,
+      overflowCount: null,
     });
   });
 
   it('lists five active doses in full', () => {
     // given
-    const doses = ['a', 'b', 'c', 'd', 'e'].map((id) =>
-      withState(id, 'pending'),
-    );
+    const doses = pendingDoses(['a', 'b', 'c', 'd', 'e']);
 
     // when
     const layout = timeSlotLayout(doses, false);
 
     // then
-    expect(layout).toEqual({
-      kind: 'list',
+    expect(layout).toMatchObject({
       visible: doses,
-      showAllCount: null,
+      overflowCount: null,
     });
   });
 
   it('shows four active doses and the total above five', () => {
     // given
     const handled = withState('done', 'taken');
-    const active = ['a', 'b', 'c', 'd', 'e', 'f'].map((id) =>
-      withState(id, 'pending'),
-    );
+    const active = pendingDoses(['a', 'b', 'c', 'd', 'e', 'f']);
 
     // when
     const layout = timeSlotLayout([handled, ...active], false);
 
     // then
-    expect(layout).toEqual({
+    expect(layout).toMatchObject({
       kind: 'list',
       visible: active.slice(0, 4),
-      showAllCount: 7,
+      overflowCount: 7,
     });
   });
 
-  it('shows everything once expanded', () => {
+  it('shows everything and offers to show less once the overflow is expanded', () => {
     // given
-    const doses = ['a', 'b', 'c', 'd', 'e', 'f'].map((id) =>
-      withState(id, 'pending'),
-    );
+    const doses = pendingDoses(['a', 'b', 'c', 'd', 'e', 'f']);
 
     // when
     const layout = timeSlotLayout(doses, true);
 
     // then
-    expect(layout).toEqual({
-      kind: 'list',
+    expect(layout).toMatchObject({
       visible: doses,
-      showAllCount: null,
+      overflowCount: 6,
     });
   });
 });

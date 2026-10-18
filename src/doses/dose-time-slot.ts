@@ -9,7 +9,12 @@ export interface TimeSlotGroup {
 
 export type TimeSlotLayout =
   | { kind: 'collapsed'; taken: number; skipped: number }
-  | { kind: 'list'; visible: TodayDose[]; showAllCount: number | null };
+  | {
+      kind: 'list';
+      visible: TodayDose[];
+      collapsible: boolean;
+      overflowCount: number | null;
+    };
 
 const SLOT_MAX_ACTIVE_DOSES = 5;
 const SLOT_ACTIVE_DOSES_SHOWN = 4;
@@ -32,24 +37,22 @@ export function timeSlotLayout(
   doses: TodayDose[],
   expanded: boolean,
 ): TimeSlotLayout {
-  if (expanded) return { kind: 'list', visible: doses, showAllCount: null };
-
   const active = doses.filter((dose) => dose.state === 'pending');
-  if (active.length === 0) {
+  if (active.length === 0 && !expanded) {
     return {
       kind: 'collapsed',
       taken: doses.filter((dose) => dose.state === 'taken').length,
       skipped: doses.filter((dose) => dose.state === 'skipped').length,
     };
   }
-  if (active.length > SLOT_MAX_ACTIVE_DOSES) {
-    return {
-      kind: 'list',
-      visible: active.slice(0, SLOT_ACTIVE_DOSES_SHOWN),
-      showAllCount: doses.length,
-    };
-  }
-  return { kind: 'list', visible: doses, showAllCount: null };
+  const overflows = active.length > SLOT_MAX_ACTIVE_DOSES;
+  return {
+    kind: 'list',
+    visible:
+      overflows && !expanded ? active.slice(0, SLOT_ACTIVE_DOSES_SHOWN) : doses,
+    collapsible: active.length === 0,
+    overflowCount: overflows ? doses.length : null,
+  };
 }
 
 function timeSlotOf(plannedAt: Date): TimeSlot {

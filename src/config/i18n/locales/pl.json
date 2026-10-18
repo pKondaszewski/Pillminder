@@ -155,6 +155,7 @@
       "overdueOne": "Spóźniona {{duration}}",
       "pastTitle": "Podsumowanie dnia"
     },
+    "collapseSlot": "Zwiń: {{slot}}",
     "correction": {
       "skipped": "Pominięta",
       "stockLess": "Zapas zmniejszy się o {{amount}}",
@@ -198,6 +199,7 @@
       "message": "Dodaj lek lub suplement i ustaw harmonogram, a resztą zajmie się aplikacja.",
       "title": "Zacznij od pierwszego produktu"
     },
+    "expandSlot": "Rozwiń: {{slot}}",
     "pager": {
       "backToToday": "Wróć do dziś",
       "nextDay": "Następny dzień",
@@ -206,6 +208,7 @@
     },
     "quantity": "× {{count}}",
     "showAll": "Pokaż wszystkie ({{count}})",
+    "showLess": "Pokaż mniej",
     "skip": "Pomiń",
     "skipped": "Pominięto",
     "skippedToast": "Pominięto: {{name}}",

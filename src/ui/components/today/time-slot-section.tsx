@@ -8,7 +8,7 @@ import {
   timeSlotLayout,
   type TodayDose,
 } from '@/doses/dose-service';
-import { Spacing } from '@/ui/commons/constants/theme';
+import { MIN_TOUCH_SIZE, Spacing } from '@/ui/commons/constants/theme';
 import { Icon } from '@/ui/components/commons/icon';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { useTheme } from '@/ui/hooks/use-theme';
@@ -30,6 +30,7 @@ export function TimeSlotSection({ group, renderDose }: Props) {
       <Pressable
         onPress={() => setExpanded(true)}
         accessibilityRole="button"
+        accessibilityLabel={t('home.expandSlot', { slot: slotName })}
         style={({ pressed }) => [styles.collapsed, pressed && styles.pressed]}
       >
         <ThemedText type="smallBold" themeColor="textSecondary">
@@ -43,20 +44,36 @@ export function TimeSlotSection({ group, renderDose }: Props) {
     );
   }
 
+  const overflowToggleLabel = expanded
+    ? t('home.showLess')
+    : t('home.showAll', { count: layout.overflowCount });
+
   return (
     <View style={styles.section}>
-      <ThemedText type="label">{slotName}</ThemedText>
+      {layout.collapsible ? (
+        <Pressable
+          onPress={() => setExpanded(false)}
+          accessibilityRole="button"
+          accessibilityLabel={t('home.collapseSlot', { slot: slotName })}
+          style={({ pressed }) => [styles.header, pressed && styles.pressed]}
+        >
+          <ThemedText type="label">{slotName}</ThemedText>
+          <Icon name="expand_less" size={20} color={theme.textTertiary} />
+        </Pressable>
+      ) : (
+        <ThemedText type="label">{slotName}</ThemedText>
+      )}
       {layout.visible.map((dose) => (
         <View key={dose.id}>{renderDose(dose)}</View>
       ))}
-      {layout.showAllCount !== null ? (
+      {layout.overflowCount !== null ? (
         <Pressable
-          onPress={() => setExpanded(true)}
+          onPress={() => setExpanded(!expanded)}
           accessibilityRole="button"
           style={({ pressed }) => pressed && styles.pressed}
         >
           <ThemedText type="smallBold" themeColor="accent">
-            {t('home.showAll', { count: layout.showAllCount })}
+            {overflowToggleLabel}
           </ThemedText>
         </Pressable>
       ) : null}
@@ -73,6 +90,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: Spacing.twelve,
+  },
+  header: {
+    minHeight: MIN_TOUCH_SIZE,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   pressed: {
     opacity: 0.7,
