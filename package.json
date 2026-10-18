@@ -6,6 +6,7 @@
     "@expo-google-fonts/ibm-plex-mono": "^0.4.1",
     "@expo-google-fonts/ibm-plex-sans": "^0.4.1",
     "@expo/ui": "~57.0.16",
+    "@formatjs/intl-pluralrules": "^6.3.15",
     "@react-native-community/datetimepicker": "9.1.0",
     "drizzle-orm": "^0.45.2",
     "expo": "~57.0.20",
@@ -77,6 +78,9 @@
     "moduleNameMapper": {
       "^@/assets/(.*)$": "<rootDir>/assets/$1",
       "^@/(.*)$": "<rootDir>/src/$1"
-    }
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(react-native|@react-native|expo|@expo|@expo-google-fonts|@react-navigation|@formatjs))"
+    ]
   }
 }
