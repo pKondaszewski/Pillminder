@@ -121,6 +121,7 @@
     "bulkTakeError": "Nie wszystkie dawki udało się zapisać. Pozostałe zostały oznaczone.",
     "bulkTakeTitle": "Oznaczyć zaległe jako wzięte?",
     "empty": "Nic na dziś, wolne 🎉",
+    "openHistory": "Historia",
     "quantity": "× {{count}}",
     "skip": "Pomiń",
     "skipped": "Pominięto",
@@ -280,6 +281,7 @@
     "intervalDays": "Częstotliwość",
     "intervalLess": "Rzadziej",
     "intervalMore": "Częściej",
+    "newProduct": "+ Nowy produkt",
     "newTitle": "Nowy harmonogram",
     "noMatchingProducts": "Brak pasujących produktów",
     "noProducts": "Najpierw dodaj produkt",
@@ -362,8 +364,8 @@
   "tabs": {
     "history": "Historia",
     "home": "Dziś",
+    "plan": "Plan",
     "products": "Produkty",
-    "schedules": "Harmonogramy",
     "settings": "Ustawienia"
   },
   "travel": {

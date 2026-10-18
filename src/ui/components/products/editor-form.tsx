@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -43,18 +42,16 @@ import { useSettings } from '@/ui/hooks/use-settings';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
-  visible: boolean;
   product: Product | null;
   onClose: () => void;
   onSave: (input: NewProductInput) => void;
-  onDelete: (id: string) => void;
-  onArchive: (id: string, completionNote?: string) => void;
-  onRestore: (id: string) => void;
-  onAddSchedule: () => void;
+  onDelete?: (id: string) => void;
+  onArchive?: (id: string, completionNote?: string) => void;
+  onRestore?: (id: string) => void;
+  onAddSchedule?: () => void;
 };
 
-export function ProductEditorModal({
-  visible,
+export function ProductEditorForm({
   product,
   onClose,
   onSave,
@@ -63,38 +60,6 @@ export function ProductEditorModal({
   onRestore,
   onAddSchedule,
 }: Props) {
-  return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-    >
-      {visible ? (
-        <EditorForm
-          key={product?.id ?? 'new'}
-          product={product}
-          onClose={onClose}
-          onSave={onSave}
-          onDelete={onDelete}
-          onArchive={onArchive}
-          onRestore={onRestore}
-          onAddSchedule={onAddSchedule}
-        />
-      ) : null}
-    </Modal>
-  );
-}
-
-function EditorForm({
-  product,
-  onClose,
-  onSave,
-  onDelete,
-  onArchive,
-  onRestore,
-  onAddSchedule,
-}: Omit<Props, 'visible'>) {
   const { t } = useTranslation();
   const theme = useTheme();
   const { currency } = useSettings();
@@ -174,7 +139,7 @@ function EditorForm({
   const handleToggleStatus = () => {
     if (!product) return;
     if (product.status === 'archived') {
-      onRestore(product.id);
+      onRestore?.(product.id);
     } else {
       setArchiving(true);
     }
@@ -182,7 +147,7 @@ function EditorForm({
 
   const handleConfirmArchive = () => {
     if (!product) return;
-    onArchive(product.id, completionNote.trim() || undefined);
+    onArchive?.(product.id, completionNote.trim() || undefined);
   };
 
   const increaseStock = () => {
@@ -215,15 +180,11 @@ function EditorForm({
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.safeArea} edges={['bottom']}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <ThemedText type="subtitle">
-            {product ? t('editor.editTitle') : t('editor.newTitle')}
-          </ThemedText>
-
           <ThemedText type="small">{t('editor.name')}</ThemedText>
           <TextInput
             value={name}
@@ -396,7 +357,10 @@ function EditorForm({
             </ThemedView>
           ) : null}
 
-          {product && product.status !== 'archived' && !archiving ? (
+          {product &&
+          product.status !== 'archived' &&
+          !archiving &&
+          onAddSchedule ? (
             <ThemedView style={styles.actions}>
               <SecondaryButton
                 label={t('schedule.add')}
@@ -455,7 +419,7 @@ function EditorForm({
 function confirmDeleteProduct(
   product: Product,
   t: TFunction,
-  onDelete: (id: string) => void,
+  onDelete?: (id: string) => void,
 ) {
   Alert.alert(
     t('editor.deleteTitle'),
@@ -465,7 +429,7 @@ function confirmDeleteProduct(
       {
         text: t('editor.delete'),
         style: 'destructive',
-        onPress: () => onDelete(product.id),
+        onPress: () => onDelete?.(product.id),
       },
     ],
   );

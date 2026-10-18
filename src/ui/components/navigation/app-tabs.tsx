@@ -13,27 +13,21 @@ export default function AppTabs() {
       indicatorColor={theme.surface}
       labelStyle={{ selected: { color: theme.text } }}
     >
-      <NativeTabs.Trigger name="index">
+      <NativeTabs.Trigger name="(today)">
         <NativeTabs.Trigger.Label>{t('tabs.home')}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon md="home" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="products">
+      <NativeTabs.Trigger name="(products)">
         <NativeTabs.Trigger.Label>
           {t('tabs.products')}
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon md="medication" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="schedules">
-        <NativeTabs.Trigger.Label>
-          {t('tabs.schedules')}
-        </NativeTabs.Trigger.Label>
+      <NativeTabs.Trigger name="(plan)">
+        <NativeTabs.Trigger.Label>{t('tabs.plan')}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon md="event" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="history">
-        <NativeTabs.Trigger.Label>{t('tabs.history')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon md="history" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="settings">
+      <NativeTabs.Trigger name="(settings)">
         <NativeTabs.Trigger.Label>
           {t('tabs.settings')}
         </NativeTabs.Trigger.Label>

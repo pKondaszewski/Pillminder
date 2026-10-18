@@ -41,11 +41,12 @@ export function listCustomCategories(): Promise<string[]> {
   return getCustomCategories();
 }
 
-export async function addProduct(input: NewProductInput): Promise<void> {
+export async function addProduct(input: NewProductInput): Promise<string> {
   log.info(`Adding product "${input.name}"`);
   try {
     const created = await createProductRow(input);
     log.info(`Created product ${JSON.stringify(created)}`);
+    return created.id;
   } catch (err) {
     log.error(`Failed to add product "${input.name}"`, err);
     throw err;

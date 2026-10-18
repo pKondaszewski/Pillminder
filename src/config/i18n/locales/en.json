@@ -119,6 +119,7 @@
     "bulkTakeError": "Some doses could not be saved. The rest were marked.",
     "bulkTakeTitle": "Mark overdue as taken?",
     "empty": "Nothing today, you're free 🎉",
+    "openHistory": "History",
     "quantity": "× {{count}}",
     "skip": "Skip",
     "skipped": "Skipped",
@@ -276,6 +277,7 @@
     "intervalDays": "Frequency",
     "intervalLess": "Less often",
     "intervalMore": "More often",
+    "newProduct": "+ New product",
     "newTitle": "New schedule",
     "noMatchingProducts": "No products match",
     "noProducts": "Add a product first",
@@ -358,8 +360,8 @@
   "tabs": {
     "history": "History",
     "home": "Today",
+    "plan": "Plan",
     "products": "Products",
-    "schedules": "Schedules",
     "settings": "Settings"
   },
   "travel": {

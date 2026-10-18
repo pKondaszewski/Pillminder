@@ -8,19 +8,13 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, { Keyframe } from 'react-native-reanimated';
 
-const TAB_ORDER = [
-  '/',
-  '/products',
-  '/schedules',
-  '/history',
-  '/settings',
-] as const;
+import { neighbourTab, tabIndexOf } from './tab-order';
 
 let prevIndex = 0;
 
 export function TabSwipe({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const index = (TAB_ORDER as readonly string[]).indexOf(pathname);
+  const index = tabIndexOf(pathname);
 
   const [anim, setAnim] = useState({ tick: 0, direction: 1 });
 
@@ -30,20 +24,20 @@ export function TabSwipe({ children }: { children: ReactNode }) {
     setAnim((prev) => ({ tick: prev.tick + 1, direction }));
   });
 
-  const goTo = (target: number) => {
-    if (index < 0 || target < 0 || target >= TAB_ORDER.length) return;
-    router.navigate(TAB_ORDER[target]);
+  const swipeTo = (offset: 1 | -1) => {
+    const target = neighbourTab(pathname, offset);
+    if (target) router.navigate(target);
   };
 
   const swipe = Gesture.Race(
     Gesture.Fling()
       .direction(Directions.LEFT)
       .runOnJS(true)
-      .onEnd(() => goTo(index + 1)),
+      .onEnd(() => swipeTo(1)),
     Gesture.Fling()
       .direction(Directions.RIGHT)
       .runOnJS(true)
-      .onEnd(() => goTo(index - 1)),
+      .onEnd(() => swipeTo(-1)),
   );
 
   const entering = new Keyframe({

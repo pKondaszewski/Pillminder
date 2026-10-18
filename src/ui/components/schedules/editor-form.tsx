@@ -4,7 +4,7 @@ import DateTimePicker, {
 import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Modal, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { addDays, startOfDay } from '@/config/date-utils';
@@ -40,68 +40,41 @@ import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 
 type Props = {
-  visible: boolean;
   schedule: Schedule | null;
   products: Product[];
+  selectedProductId?: string;
   productLocked?: boolean;
   onClose: () => void;
   onSave: (input: NewScheduleInput) => void;
+  onNewProduct?: () => void;
   onDelete?: (id: string) => void;
   onPause?: (id: string, resumeAt: Date | null) => void;
   onResume?: (id: string) => void;
 };
 
-export function ScheduleEditorModal({
-  visible,
+export function ScheduleEditorForm({
   schedule,
   products,
+  selectedProductId,
   productLocked,
   onClose,
   onSave,
+  onNewProduct,
   onDelete,
   onPause,
   onResume,
 }: Props) {
-  return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-    >
-      {visible ? (
-        <EditorForm
-          key={schedule?.id ?? 'new'}
-          schedule={schedule}
-          products={products}
-          productLocked={productLocked}
-          onClose={onClose}
-          onSave={onSave}
-          onDelete={onDelete}
-          onPause={onPause}
-          onResume={onResume}
-        />
-      ) : null}
-    </Modal>
-  );
-}
-
-function EditorForm({
-  schedule,
-  products,
-  productLocked,
-  onClose,
-  onSave,
-  onDelete,
-  onPause,
-  onResume,
-}: Omit<Props, 'visible'>) {
   const { t, i18n } = useTranslation();
 
   const sortedProducts = sortProductsByName(products, i18n.language);
   const [productId, setProductId] = useState(
-    schedule?.productId ?? sortedProducts[0]?.id ?? '',
+    schedule?.productId ?? selectedProductId ?? sortedProducts[0]?.id ?? '',
   );
+  const [seenProductId, setSeenProductId] = useState(selectedProductId);
+  if (selectedProductId !== seenProductId) {
+    setSeenProductId(selectedProductId);
+    if (selectedProductId) setProductId(selectedProductId);
+  }
   const selectedProduct = products.find((p) => p.id === productId);
   const unit = selectedProduct?.unit ?? null;
   const [intervalDays, setIntervalDays] = useState(schedule?.intervalDays ?? 1);
@@ -189,21 +162,18 @@ function EditorForm({
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.safeArea} edges={['bottom']}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <ThemedText type="subtitle">
-            {schedule ? t('schedule.editTitle') : t('schedule.newTitle')}
-          </ThemedText>
-
           <ThemedText type="small">{t('schedule.product')}</ThemedText>
           <ProductPicker
             products={sortedProducts}
             selectedProduct={selectedProduct}
             locked={productLocked}
             onSelect={setProductId}
+            onNewProduct={onNewProduct}
           />
 
           <ThemedText type="small">{t('schedule.intervalDays')}</ThemedText>
@@ -369,22 +339,35 @@ function ProductPicker({
   selectedProduct,
   locked,
   onSelect,
+  onNewProduct,
 }: {
   products: Product[];
   selectedProduct: Product | undefined;
   locked: boolean | undefined;
   onSelect: (productId: string) => void;
+  onNewProduct: (() => void) | undefined;
 }) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
 
   if (locked) return <ThemedText>{selectedProduct?.name}</ThemedText>;
 
+  const newProductChip = onNewProduct ? (
+    <Chip
+      label={t('schedule.newProduct')}
+      selected={false}
+      onPress={onNewProduct}
+    />
+  ) : null;
+
   if (products.length === 0) {
     return (
-      <ThemedText type="small" themeColor="textSecondary">
-        {t('schedule.noProducts')}
-      </ThemedText>
+      <>
+        <ThemedText type="small" themeColor="textSecondary">
+          {t('schedule.noProducts')}
+        </ThemedText>
+        <ThemedView style={styles.chipsRow}>{newProductChip}</ThemedView>
+      </>
     );
   }
 
@@ -400,9 +383,12 @@ function ProductPicker({
         />
       ) : null}
       {visibleProducts.length === 0 ? (
-        <ThemedText type="small" themeColor="textSecondary">
-          {t('schedule.noMatchingProducts')}
-        </ThemedText>
+        <>
+          <ThemedText type="small" themeColor="textSecondary">
+            {t('schedule.noMatchingProducts')}
+          </ThemedText>
+          <ThemedView style={styles.chipsRow}>{newProductChip}</ThemedView>
+        </>
       ) : (
         <ThemedView style={styles.chipsRow}>
           {visibleProducts.map((p) => (
@@ -413,6 +399,7 @@ function ProductPicker({
               onPress={() => onSelect(p.id)}
             />
           ))}
+          {newProductChip}
         </ThemedView>
       )}
     </>

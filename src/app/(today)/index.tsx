@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, SectionList, StyleSheet } from 'react-native';
@@ -94,6 +95,16 @@ export default function HomeScreen() {
             stickySectionHeadersEnabled={false}
             ListHeaderComponent={
               <>
+                {/* Temporary entry point until #149 replaces History with the day view */}
+                <Pressable
+                  onPress={() => router.push('/history')}
+                  accessibilityRole="button"
+                  style={({ pressed }) => pressed && styles.pressed}
+                >
+                  <ThemedText type="smallBold" themeColor="accent">
+                    {t('home.openHistory')}
+                  </ThemedText>
+                </Pressable>
                 {statsText ? (
                   <ThemedText type="small" themeColor="textSecondary">
                     {statsText}
