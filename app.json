@@ -58,6 +58,9 @@
       "expo-status-bar",
       "expo-sharing"
     ],
+    "extra": {
+      "repositoryUrl": "https://github.com/pKondaszewski/Pillminder"
+    },
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
