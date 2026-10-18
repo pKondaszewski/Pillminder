@@ -1,4 +1,4 @@
-import { parseWholeNumber } from '../whole-number-input';
+import { adjustWholeNumberText, parseWholeNumber } from '../whole-number-input';
 
 describe('parseWholeNumber', () => {
   it('treats blank text as no value', () => {
@@ -61,5 +61,21 @@ describe('parseWholeNumber', () => {
 
     // then
     expect(result).toEqual({ valid: false });
+  });
+});
+
+describe('adjustWholeNumberText', () => {
+  it.each([
+    ['5', 1, '6'],
+    ['', 1, '1'],
+    ['0', -1, '0'],
+    ['12', -5, '7'],
+    ['abc', 1, 'abc'],
+  ])('moves "%s" by %s to "%s"', (text, delta, expected) => {
+    // when
+    const result = adjustWholeNumberText(text, delta);
+
+    // then
+    expect(result).toBe(expected);
   });
 });

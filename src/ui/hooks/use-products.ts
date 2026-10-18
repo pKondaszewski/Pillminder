@@ -4,9 +4,14 @@ import {
   archiveProduct,
   editProduct,
   removeProduct,
+  restockPack,
   restoreProduct,
 } from '@/products/product-orchestrator';
-import { addProduct, getProductsQuery } from '@/products/product-service';
+import {
+  addProduct,
+  getProductsQuery,
+  setStock,
+} from '@/products/product-service';
 
 export function useProducts() {
   const { data, updatedAt } = useLiveQuery(getProductsQuery());
@@ -19,5 +24,7 @@ export function useProducts() {
     removeProduct,
     archiveProduct,
     restoreProduct,
+    restockPack,
+    setStock,
   };
 }

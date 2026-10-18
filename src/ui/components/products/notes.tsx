@@ -1,28 +1,23 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, StyleSheet, TextInput } from 'react-native';
+import { Alert, Pressable, StyleSheet } from 'react-native';
 
 import type { Note } from '@/notes/note-service';
-import { Spacing } from '@/ui/commons/constants/theme';
+import { Radius, Spacing } from '@/ui/commons/constants/theme';
 import { formatDateTime } from '@/ui/commons/format-date';
+import { SecondaryButton } from '@/ui/components/commons/button';
+import { TextField } from '@/ui/components/commons/text-field';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import type { NoteDraft } from '@/ui/hooks/use-note-draft';
+import { ProductSection } from '@/ui/components/products/section';
+import { useNoteDraft } from '@/ui/hooks/use-note-draft';
 import { useNotes } from '@/ui/hooks/use-notes';
-import { useTheme } from '@/ui/hooks/use-theme';
 
-export function ProductNotes({
-  productId,
-  noteDraft,
-}: {
-  productId: string;
-  noteDraft: NoteDraft;
-}) {
+export function ProductNotes({ productId }: { productId: string }) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const { notes, removeNote } = useNotes(productId);
   const { draft, editingId, canSubmit, setDraft, startEditing, reset, submit } =
-    noteDraft;
+    useNoteDraft(productId);
 
   const handleSubmit = async () => {
     try {
@@ -33,8 +28,7 @@ export function ProductNotes({
   };
 
   return (
-    <ThemedView style={styles.section}>
-      <ThemedText type="small">{t('notes.title')}</ThemedText>
+    <ProductSection title={t('notes.title')}>
       {notes.length === 0 ? (
         <ThemedText type="small" themeColor="textSecondary">
           {t('notes.empty')}
@@ -42,7 +36,7 @@ export function ProductNotes({
       ) : (
         notes.map((note) => (
           <ThemedView key={note.id} type="surface" style={styles.note}>
-            <ThemedText type="small" themeColor="textSecondary">
+            <ThemedText type="caption">
               {formatDateTime(note.createdAt)}
               {note.updatedAt > note.createdAt ? ` · ${t('notes.edited')}` : ''}
             </ThemedText>
@@ -72,42 +66,24 @@ export function ProductNotes({
           </ThemedView>
         ))
       )}
-      <TextInput
+      <TextField
         value={draft}
         onChangeText={setDraft}
         multiline
         placeholder={t('notes.placeholder')}
-        placeholderTextColor={theme.textSecondary}
-        style={[
-          styles.input,
-          { color: theme.text, borderColor: theme.borderStrong },
-        ]}
+        accessibilityLabel={t('notes.placeholder')}
       />
-      <ThemedView style={styles.noteActions}>
+      <ThemedView style={styles.draftActions}>
         {editingId ? (
-          <Pressable
-            onPress={reset}
-            style={({ pressed }) => pressed && styles.pressed}
-          >
-            <ThemedText type="smallBold" themeColor="textSecondary">
-              {t('editor.cancel')}
-            </ThemedText>
-          </Pressable>
+          <SecondaryButton label={t('editor.cancel')} onPress={reset} />
         ) : null}
-        <Pressable
+        <SecondaryButton
+          label={editingId ? t('editor.save') : t('notes.add')}
           onPress={handleSubmit}
           disabled={!canSubmit}
-          style={({ pressed }) => [
-            pressed && styles.pressed,
-            !canSubmit && styles.disabled,
-          ]}
-        >
-          <ThemedText type="smallBold" themeColor="accent">
-            {editingId ? t('editor.save') : t('notes.add')}
-          </ThemedText>
-        </Pressable>
+        />
       </ThemedView>
-    </ThemedView>
+    </ProductSection>
   );
 }
 
@@ -136,33 +112,21 @@ function confirmDeleteNote(
 }
 
 const styles = StyleSheet.create({
-  section: {
-    gap: Spacing.eight,
-    marginTop: Spacing.sixteen,
-  },
   note: {
     gap: Spacing.four,
     padding: Spacing.sixteen,
-    borderRadius: Spacing.eight,
+    borderRadius: Radius.button,
   },
   noteActions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: Spacing.twentyFour,
   },
-  input: {
-    borderWidth: 1,
-    borderRadius: Spacing.eight,
-    paddingHorizontal: Spacing.sixteen,
-    paddingVertical: Spacing.eight,
-    fontSize: 16,
-    minHeight: 80,
-    textAlignVertical: 'top',
+  draftActions: {
+    flexDirection: 'row',
+    gap: Spacing.twelve,
   },
   pressed: {
     opacity: 0.7,
-  },
-  disabled: {
-    opacity: 0.4,
   },
 });

@@ -1,7 +1,7 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { ProductEditorForm } from '@/ui/components/products/editor-form';
+import { NewProductForm } from '@/ui/components/products/new-product-form';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
 
@@ -24,10 +24,8 @@ export default function NewProductScreen() {
       <Stack.Screen
         options={{ headerShown: true, title: t('editor.newTitle') }}
       />
-      <ProductEditorForm
-        product={null}
-        onClose={() => router.back()}
-        onSave={(input) =>
+      <NewProductForm
+        onSubmit={(input) =>
           runThenLeave(() => addProduct(input), 'products.errorSave')
         }
       />

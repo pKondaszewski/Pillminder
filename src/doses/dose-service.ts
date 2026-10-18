@@ -32,7 +32,7 @@ import {
   getDoseById,
   getDosesPlannedBetween,
   getFuturePendingDosesByProduct,
-  productHistoryQuery,
+  productDosesBetweenQuery,
   replaceFuturePendingDoseRows,
   setDoseSnoozedUntilRow,
   setDoseStateRow,
@@ -44,7 +44,6 @@ export type { CorrectionTarget } from './dose-correction';
 export { correctionStockDelta } from './dose-correction';
 export type { DayStatus } from './dose-day';
 export { dayStatus, lastPlannedDay } from './dose-day';
-export { toHistoryEntries } from './dose-history';
 export {
   dayCountsText,
   doseDetailsText,
@@ -57,6 +56,8 @@ export {
 export { monthSummary } from './dose-month';
 export type { DoseStatus } from './dose-status';
 export { doseStatus } from './dose-status';
+export type { RecentDays, StripDay } from './dose-strip';
+export { buildRecentDays, recentDaysRange } from './dose-strip';
 export type { TimeSlotGroup, TimeSlotLayout } from './dose-time-slot';
 export { groupDosesByTimeSlot, timeSlotLayout } from './dose-time-slot';
 export type { TimelineMark } from './dose-timeline';
@@ -68,7 +69,6 @@ export type {
   AdherenceCounts,
   AdherenceReport,
 } from './dto/adherence-report-output';
-export type { HistoryEntry } from './dto/history-entry-output';
 export type { TodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');
@@ -92,8 +92,12 @@ export function getDosesBetweenQuery(from: Date, to: Date) {
   return dosesBetweenQuery(from, to);
 }
 
-export function getProductHistoryQuery(productId: string) {
-  return productHistoryQuery(productId);
+export function getProductDosesBetweenQuery(
+  productId: string,
+  from: Date,
+  to: Date,
+) {
+  return productDosesBetweenQuery(productId, from, to);
 }
 
 export async function getAdherence(

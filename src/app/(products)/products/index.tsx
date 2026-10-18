@@ -1,60 +1,76 @@
 import { router } from 'expo-router';
+import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { categoryLabel } from '@/products/category';
 import {
   categoryFilterIfListed,
+  DEFAULT_PRODUCT_FILTERS,
+  filterableCategories,
   filterProducts,
-  listedCategories,
-  PRODUCT_SEARCH_THRESHOLD,
+  mostUrgentLowStock,
   type ProductListFilters,
   sortProductsByStatusThenName,
 } from '@/products/product-list';
 import type { Product } from '@/products/product-service';
+import { rhythmSummary, stockSummary } from '@/products/product-text';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { openStore } from '@/ui/commons/open-store';
+import { EmptyState } from '@/ui/components/commons/empty-state';
+import {
+  type FilterToken,
+  SearchField,
+} from '@/ui/components/commons/search-field';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
-import { ProductListFilterBar } from '@/ui/components/products/list-filters';
-import { ProductOverviewModal } from '@/ui/components/products/overview-modal';
-import { ProductPeriodModal } from '@/ui/components/products/period-modal';
+import {
+  ADD_PRODUCT_BUTTON_CLEARANCE,
+  AddProductButton,
+} from '@/ui/components/products/add-product-button';
+import { ProductFilterSheet } from '@/ui/components/products/list-filters';
+import { ProductListHeader } from '@/ui/components/products/list-header';
+import { LowStockBanner } from '@/ui/components/products/low-stock-banner';
 import { ProductRow } from '@/ui/components/products/row';
 import { TravelPlanModal } from '@/ui/components/products/travel-plan-modal';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
+import { useSchedules } from '@/ui/hooks/use-schedules';
 
 export default function ProductListScreen() {
   const { t, i18n } = useTranslation();
   const { products } = useProducts();
+  const { schedules } = useSchedules();
   const reorderStatuses = useReorderStatuses();
 
-  const [filters, setFilters] = useState<ProductListFilters>({
-    query: '',
-    category: null,
-    status: null,
-  });
-  const categories = listedCategories(products);
+  const [filters, setFilters] = useState(DEFAULT_PRODUCT_FILTERS);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [travelOpen, setTravelOpen] = useState(false);
+
+  const categories = filterableCategories(products);
   const effectiveFilters = {
     ...filters,
     category: categoryFilterIfListed(filters.category, categories),
   };
-  const searchable = products.length > PRODUCT_SEARCH_THRESHOLD;
-  const visibleProducts = sortProductsByStatusThenName(
-    searchable ? filterProducts(products, effectiveFilters) : products,
-    i18n.language,
-  );
+  const matching = filterProducts(products, effectiveFilters);
+  const visibleProducts = sortProductsByStatusThenName(matching, i18n.language);
+  const lowStock = mostUrgentLowStock(products, reorderStatuses);
 
-  const [overviewOpen, setOverviewOpen] = useState(false);
-  const [periodOpen, setPeriodOpen] = useState(false);
-  const [travelOpen, setTravelOpen] = useState(false);
+  const openNewProduct = () => router.push('/products/new');
+  const openProduct = (id: string) => router.push(`/products/${id}`);
 
   const renderItem = ({ item }: { item: Product }) => (
     <ProductRow
       product={item}
-      reorder={reorderStatuses[item.id]}
-      onPress={() => router.push(`/products/${item.id}`)}
+      rhythm={rhythmSummary(
+        schedules.filter((schedule) => schedule.productId === item.id),
+        t,
+      )}
+      stock={stockSummary(item, reorderStatuses[item.id], t)}
+      onPress={() => openProduct(item.id)}
     />
   );
 
@@ -62,74 +78,61 @@ export default function ProductListScreen() {
     <TabSwipe>
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <FlatList
-            data={visibleProducts}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.list}
-            renderItem={renderItem}
-            keyboardShouldPersistTaps="handled"
-            ListHeaderComponent={
-              searchable ? (
-                <ProductListFilterBar
-                  filters={effectiveFilters}
-                  categories={categories}
-                  onChange={setFilters}
+          <ProductListHeader onTravelPress={() => setTravelOpen(true)} />
+          {products.length === 0 ? (
+            <EmptyState
+              icon="medication"
+              title={t('products.emptyTitle')}
+              message={t('products.emptyMessage')}
+              actionLabel={t('products.add')}
+              onAction={openNewProduct}
+            />
+          ) : (
+            <>
+              <SearchField
+                value={filters.query}
+                onChangeText={(query) => setFilters({ ...filters, query })}
+                label={t('products.search')}
+                tokens={filterTokens(effectiveFilters, setFilters, t)}
+                onFilterPress={() => setFiltersOpen(true)}
+                filterLabel={t('products.filters')}
+              />
+              {lowStock ? (
+                <LowStockBanner
+                  productName={lowStock.product.name}
+                  daysLeft={lowStock.daysLeft}
+                  onPress={() => openProduct(lowStock.product.id)}
+                  onOrder={() =>
+                    lowStock.product.storeLink
+                      ? openStore(lowStock.product.storeLink)
+                      : openProduct(lowStock.product.id)
+                  }
                 />
-              ) : null
-            }
-            ListEmptyComponent={
-              searchable ? (
-                <ThemedText type="small" themeColor="textSecondary">
-                  {t('products.noMatching')}
-                </ThemedText>
-              ) : null
-            }
-            ListFooterComponent={
-              <ThemedView style={styles.footer}>
-                {[
-                  {
-                    label: `+ ${t('products.add')}`,
-                    onPress: () => router.push('/products/new'),
-                  },
-                  {
-                    label: t('overview.open'),
-                    onPress: () => setOverviewOpen(true),
-                  },
-                  {
-                    label: t('period.open'),
-                    onPress: () => setPeriodOpen(true),
-                  },
-                  {
-                    label: t('travel.open'),
-                    onPress: () => setTravelOpen(true),
-                  },
-                ].map(({ label, onPress }) => (
-                  <Pressable
-                    key={label}
-                    onPress={onPress}
-                    accessibilityRole="button"
-                    style={({ pressed }) => pressed && styles.pressed}
-                  >
-                    <ThemedView type="surface" style={styles.addRow}>
-                      <ThemedText type="smallBold" themeColor="accent">
-                        {label}
-                      </ThemedText>
-                    </ThemedView>
-                  </Pressable>
-                ))}
-              </ThemedView>
-            }
-          />
+              ) : null}
+              <FlatList
+                data={visibleProducts}
+                keyExtractor={(item) => item.id}
+                renderItem={renderItem}
+                contentContainerStyle={styles.list}
+                keyboardShouldPersistTaps="handled"
+                ListEmptyComponent={
+                  <ThemedText type="small" themeColor="textSecondary">
+                    {t('products.noMatching')}
+                  </ThemedText>
+                }
+              />
+              <AddProductButton onPress={openNewProduct} />
+            </>
+          )}
         </SafeAreaView>
 
-        <ProductOverviewModal
-          visible={overviewOpen}
-          onClose={() => setOverviewOpen(false)}
-        />
-
-        <ProductPeriodModal
-          visible={periodOpen}
-          onClose={() => setPeriodOpen(false)}
+        <ProductFilterSheet
+          visible={filtersOpen}
+          filters={effectiveFilters}
+          categories={categories}
+          resultCount={matching.length}
+          onChange={setFilters}
+          onClose={() => setFiltersOpen(false)}
         />
 
         <TravelPlanModal
@@ -141,28 +144,45 @@ export default function ProductListScreen() {
   );
 }
 
+function filterTokens(
+  filters: ProductListFilters,
+  onChange: (filters: ProductListFilters) => void,
+  t: TFunction,
+): FilterToken[] {
+  const tokens: FilterToken[] = [];
+  if (filters.category !== null) {
+    const label = categoryLabel(filters.category, t);
+    tokens.push({
+      label,
+      removeLabel: t('products.removeFilter', { label }),
+      onRemove: () => onChange({ ...filters, category: null }),
+    });
+  }
+  if (filters.status !== DEFAULT_PRODUCT_FILTERS.status) {
+    const label =
+      filters.status === 'archived'
+        ? t('products.filterArchived')
+        : t('products.all');
+    tokens.push({
+      label,
+      removeLabel: t('products.removeFilter', { label }),
+      onRemove: () =>
+        onChange({ ...filters, status: DEFAULT_PRODUCT_FILTERS.status }),
+    });
+  }
+  return tokens;
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.twentyFour,
-    gap: Spacing.sixteen,
+    paddingHorizontal: Spacing.twenty,
+    gap: Spacing.twelve,
   },
   list: {
-    gap: Spacing.eight,
-    paddingVertical: Spacing.sixteen,
-  },
-  footer: {
-    gap: Spacing.eight,
-  },
-  addRow: {
-    padding: Spacing.sixteen,
-    borderRadius: Spacing.sixteen,
-    alignItems: 'center',
-  },
-  pressed: {
-    opacity: 0.7,
+    paddingBottom: ADD_PRODUCT_BUTTON_CLEARANCE,
   },
 });

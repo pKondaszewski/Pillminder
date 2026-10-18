@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, StyleSheet } from 'react-native';
 
@@ -13,6 +14,7 @@ type Props = {
   title: string;
   message?: string;
   bullets?: string[];
+  children?: ReactNode;
   confirmLabel: string;
   destructive?: boolean;
   onConfirm: () => void;
@@ -24,6 +26,7 @@ export function ConfirmDialog({
   title,
   message,
   bullets = [],
+  children,
   confirmLabel,
   destructive,
   onConfirm,
@@ -42,6 +45,7 @@ export function ConfirmDialog({
           • {bullet}
         </ThemedText>
       ))}
+      {children}
       <ThemedView style={styles.actions}>
         <SecondaryButton label={t('editor.cancel')} onPress={onCancel} />
         <PrimaryButton

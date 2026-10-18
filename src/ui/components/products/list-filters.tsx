@@ -2,52 +2,55 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
 import { categoryLabel } from '@/products/category';
-import type { ProductListFilters } from '@/products/product-list';
+import {
+  DEFAULT_PRODUCT_FILTERS,
+  type ProductListFilters,
+  type ProductStatusFilter,
+} from '@/products/product-list';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { Chip } from '@/ui/components/commons/chip';
-import { SearchField } from '@/ui/components/commons/search-field';
+import { FilterSheet } from '@/ui/components/commons/filter-sheet';
+import { SegmentedControl } from '@/ui/components/commons/segmented-control';
+import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 
 type Props = {
+  visible: boolean;
   filters: ProductListFilters;
   categories: string[];
+  resultCount: number;
   onChange: (filters: ProductListFilters) => void;
+  onClose: () => void;
 };
 
-export function ProductListFilterBar({ filters, categories, onChange }: Props) {
+export function ProductFilterSheet({
+  visible,
+  filters,
+  categories,
+  resultCount,
+  onChange,
+  onClose,
+}: Props) {
   const { t } = useTranslation();
-
-  const statusOptions = [
-    { label: t('products.all'), status: null },
-    { label: t('products.filterActive'), status: 'active' },
-    { label: t('products.filterArchived'), status: 'archived' },
-  ] as const;
+  const statusOptions: { value: ProductStatusFilter; label: string }[] = [
+    { value: 'active', label: t('products.filterActive') },
+    { value: 'archived', label: t('products.filterArchived') },
+    { value: 'all', label: t('products.all') },
+  ];
 
   return (
-    <ThemedView style={styles.container}>
-      <SearchField
-        value={filters.query}
-        onChangeText={(query) => onChange({ ...filters, query })}
-        label={t('products.search')}
-      />
-      <ThemedView
-        style={styles.row}
-        accessibilityLabel={t('products.filterStatus')}
-      >
-        {statusOptions.map(({ label, status }) => (
-          <Chip
-            key={label}
-            label={label}
-            selected={filters.status === status}
-            onPress={() => onChange({ ...filters, status })}
-          />
-        ))}
-      </ThemedView>
-      {categories.length > 1 ? (
-        <ThemedView
-          style={styles.row}
-          accessibilityLabel={t('products.filterCategory')}
-        >
+    <FilterSheet
+      visible={visible}
+      title={t('products.filters')}
+      applyLabel={t('products.showResults', { count: resultCount })}
+      onClear={() =>
+        onChange({ ...DEFAULT_PRODUCT_FILTERS, query: filters.query })
+      }
+      onClose={onClose}
+    >
+      <ThemedView style={styles.group}>
+        <ThemedText type="label">{t('products.filterCategory')}</ThemedText>
+        <ThemedView style={styles.chips}>
           <Chip
             label={t('products.all')}
             selected={filters.category === null}
@@ -62,16 +65,24 @@ export function ProductListFilterBar({ filters, categories, onChange }: Props) {
             />
           ))}
         </ThemedView>
-      ) : null}
-    </ThemedView>
+      </ThemedView>
+      <ThemedView style={styles.group}>
+        <ThemedText type="label">{t('products.filterStatus')}</ThemedText>
+        <SegmentedControl
+          options={statusOptions}
+          selected={filters.status}
+          onSelect={(status) => onChange({ ...filters, status })}
+        />
+      </ThemedView>
+    </FilterSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  group: {
     gap: Spacing.eight,
   },
-  row: {
+  chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.eight,

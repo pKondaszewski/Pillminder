@@ -1,50 +1,62 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet } from 'react-native';
 
+import { imageFileUri } from '@/images/image-service';
 import { categoryLabel } from '@/products/category';
-import type { ReorderStatus } from '@/products/dto/reorder-status';
 import { productLabel } from '@/products/product-label';
 import type { Product } from '@/products/product-service';
+import type { StockSummary } from '@/products/product-text';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { ProductAvatar } from '@/ui/components/commons/product-avatar';
+import { StockBar } from '@/ui/components/commons/stock-bar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
   product: Product;
-  reorder?: ReorderStatus;
+  rhythm: string;
+  stock: StockSummary;
   onPress: () => void;
 };
 
-export function ProductRow({ product, reorder, onPress }: Props) {
+export function ProductRow({ product, rhythm, stock, onPress }: Props) {
   const { t } = useTranslation();
-  const isArchived = product.status === 'archived';
-  const isLow = !isArchived && reorder?.isLow && reorder.daysLeft !== null;
+  const theme = useTheme();
+  const archived = product.status === 'archived';
+  const detail = archived ? t('products.archived') : rhythm;
 
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => pressed && styles.pressed}
+      accessibilityRole="button"
+      style={({ pressed }) => [
+        styles.row,
+        { borderBottomColor: theme.divider },
+        pressed && styles.pressed,
+      ]}
     >
-      <ThemedView
-        type="surface"
-        style={[styles.row, isArchived && styles.archived]}
-      >
-        <ThemedText>{productLabel(product.name, product.strength)}</ThemedText>
-        <ThemedText type="small">
-          {categoryLabel(product.category, t)}
+      <ProductAvatar
+        category={product.category}
+        size={40}
+        dimmed={archived}
+        imageUri={
+          product.profileImageFileName
+            ? imageFileUri(product.profileImageFileName)
+            : null
+        }
+      />
+      <ThemedView style={styles.texts}>
+        <ThemedText numberOfLines={1}>
+          {productLabel(product.name, product.strength)}
         </ThemedText>
-        {isArchived && (
-          <ThemedText type="small" themeColor="textSecondary">
-            {t('products.archived')}
-          </ThemedText>
-        )}
-        {isLow && (
-          <ThemedText type="smallBold" themeColor="overdueText">
-            {t('products.lowStock')} ·{' '}
-            {t('products.lowStockDays', {
-              days: Math.ceil(reorder.daysLeft as number),
-            })}
-          </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
+          {`${categoryLabel(product.category, t)} · ${detail}`}
+        </ThemedText>
+        {stock.kind === 'bar' ? (
+          <StockBar daysLeft={stock.daysLeft} label={stock.label} />
+        ) : (
+          <ThemedText type="caption">{stock.label}</ThemedText>
         )}
       </ThemedView>
     </Pressable>
@@ -53,12 +65,15 @@ export function ProductRow({ product, reorder, onPress }: Props) {
 
 const styles = StyleSheet.create({
   row: {
-    padding: Spacing.sixteen,
-    borderRadius: Spacing.sixteen,
-    gap: Spacing.four,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.twelve,
+    paddingVertical: Spacing.twelve,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  archived: {
-    opacity: 0.5,
+  texts: {
+    flex: 1,
+    gap: Spacing.four,
   },
   pressed: {
     opacity: 0.7,

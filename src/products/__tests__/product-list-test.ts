@@ -1,8 +1,11 @@
+import type { ReorderStatus } from '../dto/reorder-status';
 import {
   categoryFilterIfListed,
+  DEFAULT_PRODUCT_FILTERS,
+  filterableCategories,
   filterProducts,
   filterProductsByName,
-  listedCategories,
+  mostUrgentLowStock,
   sortProductsByName,
   sortProductsByStatusThenName,
 } from '../product-list';
@@ -96,14 +99,33 @@ describe('filterProducts', () => {
     product('2', 'Vitamin C', 'supplement', 'archived'),
     product('3', 'Ibuprofen', 'medication'),
   ];
-  const noFilters = { query: '', category: null, status: null };
+  const noFilters = { ...DEFAULT_PRODUCT_FILTERS, status: 'all' } as const;
 
-  it('returns everything when no filter is set', () => {
+  it('returns everything for the all-statuses filter', () => {
     // when
     const result = filterProducts(products, noFilters);
 
     // then
     expect(result).toHaveLength(3);
+  });
+
+  it('hides archived products with the default filters', () => {
+    // when
+    const result = filterProducts(products, DEFAULT_PRODUCT_FILTERS);
+
+    // then
+    expect(result.map((p) => p.id)).toEqual(['1', '3']);
+  });
+
+  it('shows only archived products for the archive filter', () => {
+    // when
+    const result = filterProducts(products, {
+      ...noFilters,
+      status: 'archived',
+    });
+
+    // then
+    expect(result.map((p) => p.id)).toEqual(['2']);
   });
 
   it('combines query, category and status with AND', () => {
@@ -130,20 +152,20 @@ describe('filterProducts', () => {
   });
 });
 
-describe('listedCategories', () => {
-  it('returns each category present on the list once', () => {
+describe('filterableCategories', () => {
+  it('lists the built-in categories and each custom category once', () => {
     // given
     const products = [
       product('1', 'A', 'supplement'),
       product('2', 'B', 'Herbs'),
-      product('3', 'C', 'supplement'),
+      product('3', 'C', 'Herbs'),
     ];
 
     // when
-    const result = listedCategories(products);
+    const result = filterableCategories(products);
 
     // then
-    expect(result).toEqual(['supplement', 'Herbs']);
+    expect(result).toEqual(['medication', 'supplement', 'care', 'Herbs']);
   });
 });
 
@@ -170,6 +192,40 @@ describe('categoryFilterIfListed', () => {
   it('keeps no category as no category', () => {
     // when
     const result = categoryFilterIfListed(null, ['medication']);
+
+    // then
+    expect(result).toBeNull();
+  });
+});
+
+describe('mostUrgentLowStock', () => {
+  const status = (daysLeft: number | null, isLow: boolean): ReorderStatus => ({
+    dailyConsumption: 1,
+    daysLeft,
+    runOutAt: null,
+    reorderAt: null,
+    isLow,
+  });
+
+  it('picks the low product that runs out first', () => {
+    // given
+    const products = [product('1', 'Iron'), product('2', 'Zinc')];
+    const statuses = { '1': status(5, true), '2': status(2, true) };
+
+    // when
+    const result = mostUrgentLowStock(products, statuses);
+
+    // then
+    expect(result).toEqual({ product: products[1], daysLeft: 2 });
+  });
+
+  it('ignores products that are not low or have no status', () => {
+    // given
+    const products = [product('1', 'Iron'), product('2', 'Zinc')];
+    const statuses = { '1': status(20, false) };
+
+    // when
+    const result = mostUrgentLowStock(products, statuses);
 
     // then
     expect(result).toBeNull();
