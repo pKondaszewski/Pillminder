@@ -98,27 +98,60 @@ describe('resolveDateLocale', () => {
 });
 
 describe('formatDateRange', () => {
-  const format = (date: Date) => formatLongDate(date, 'pl', NOW);
+  const END_OF_MONTH = new Date(2026, 9, 30);
+  const NEXT_MONTH = new Date(2026, 10, 2);
 
-  it('shares the month within one month', () => {
+  it('shares the month within one month in Polish', () => {
     // when
-    const text = formatDateRange(DATE, new Date(2026, 9, 30), format);
+    const text = formatDateRange(DATE, END_OF_MONTH, 'pl', NOW);
 
     // then
     expect(text).toBe('24-30 października');
   });
 
-  it('names both months across months', () => {
+  it('shares the month within one month in en-GB', () => {
     // when
-    const text = formatDateRange(DATE, new Date(2026, 10, 2), format);
+    const text = formatDateRange(DATE, END_OF_MONTH, 'en-GB', NOW);
+
+    // then
+    expect(text).toBe('24-30 October');
+  });
+
+  it('shares the month within one month in en-US', () => {
+    // when
+    const text = formatDateRange(DATE, END_OF_MONTH, 'en-US', NOW);
+
+    // then
+    expect(text).toBe('October 24-30');
+  });
+
+  it('names both months across months in Polish', () => {
+    // when
+    const text = formatDateRange(DATE, NEXT_MONTH, 'pl', NOW);
 
     // then
     expect(text).toBe('24 października - 2 listopada');
   });
 
+  it('names both months across months in en-GB', () => {
+    // when
+    const text = formatDateRange(DATE, NEXT_MONTH, 'en-GB', NOW);
+
+    // then
+    expect(text).toBe('24 October - 2 November');
+  });
+
+  it('names both months across months in en-US', () => {
+    // when
+    const text = formatDateRange(DATE, NEXT_MONTH, 'en-US', NOW);
+
+    // then
+    expect(text).toBe('October 24 - November 2');
+  });
+
   it('shows a single date for a one-day range', () => {
     // when
-    const text = formatDateRange(DATE, DATE, format);
+    const text = formatDateRange(DATE, DATE, 'pl', NOW);
 
     // then
     expect(text).toBe('24 października');

@@ -1,22 +1,22 @@
 import { isoDay } from '@/config/date-utils';
 
-export interface TripRange {
+export interface RangeDraft {
   from: Date;
   to: Date | null;
 }
 
-export function tapDay(range: TripRange, day: Date): TripRange {
+export function tapDay(range: RangeDraft, day: Date): RangeDraft {
   const extendsRange = range.to === null && isoDay(day) >= isoDay(range.from);
   return extendsRange ? { from: range.from, to: day } : { from: day, to: null };
 }
 
-export function isEdgeOfRange(range: TripRange, day: Date): boolean {
+export function isEdgeOfRange(range: RangeDraft, day: Date): boolean {
   return [range.from, range.to].some(
     (edge) => edge !== null && isoDay(edge) === isoDay(day),
   );
 }
 
-export function isInsideRange(range: TripRange, day: Date): boolean {
+export function isInsideRange(range: RangeDraft, day: Date): boolean {
   return (
     range.to !== null &&
     isoDay(day) > isoDay(range.from) &&

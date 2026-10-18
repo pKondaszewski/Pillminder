@@ -11,7 +11,7 @@ import { PrimaryButton } from '@/ui/components/commons/button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TripRangeSheet } from '@/ui/components/products/trip-range-sheet';
-import { useFormatDate } from '@/ui/hooks/use-format-date';
+import { useDateLocale } from '@/ui/hooks/use-format-date';
 import { useTheme } from '@/ui/hooks/use-theme';
 import { useTravelPlan } from '@/ui/hooks/use-travel-plan';
 
@@ -37,7 +37,7 @@ export function TravelPlanModal({ visible, onClose }: Props) {
 
 function TravelContent({ onClose }: Pick<Props, 'onClose'>) {
   const { t } = useTranslation();
-  const formatDate = useFormatDate();
+  const dateLocale = useDateLocale();
   const [range, setRange] = useState<DateRange>(() => ({
     from: addDays(startOfDay(new Date()), 1),
     to: addDays(startOfDay(new Date()), DEFAULT_TRIP_LENGTH_DAYS),
@@ -65,7 +65,7 @@ function TravelContent({ onClose }: Pick<Props, 'onClose'>) {
                 {t('travel.dates')}
               </ThemedText>
               <ThemedText themeColor="accent">
-                {formatDateRange(range.from, range.to, formatDate)}
+                {formatDateRange(range.from, range.to, dateLocale, new Date())}
               </ThemedText>
             </ThemedView>
           </Pressable>

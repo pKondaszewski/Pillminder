@@ -11,8 +11,8 @@ import type { SupportedLanguage } from '@/config/i18n';
 import {
   isEdgeOfRange,
   isInsideRange,
+  type RangeDraft,
   tapDay,
-  type TripRange,
 } from '@/products/trip-range';
 import type { ThemeColor } from '@/ui/commons/constants/theme';
 import { BottomSheet } from '@/ui/components/commons/bottom-sheet';
@@ -33,7 +33,7 @@ type Props = {
 export function TripRangeSheet({ visible, range, onClose, onSave }: Props) {
   const { t, i18n } = useTranslation();
   const formatDate = useFormatDate();
-  const [draft, setDraft] = useState<TripRange>(range);
+  const [draft, setDraft] = useState<RangeDraft>(range);
   const [month, setMonth] = useState(range.from);
   const now = new Date();
   const firstWeekday = firstWeekdayOf(i18n.language as SupportedLanguage);
@@ -50,6 +50,11 @@ export function TripRangeSheet({ visible, range, onClose, onSave }: Props) {
     };
   };
 
+  const save = () => {
+    if (to === null) return;
+    onSave({ from: draft.from, to });
+  };
+
   const close = () => {
     setDraft(range);
     setMonth(range.from);
@@ -61,7 +66,7 @@ export function TripRangeSheet({ visible, range, onClose, onSave }: Props) {
       visible={visible}
       title={t('travel.dates')}
       onClose={close}
-      onSave={() => to && onSave({ from: draft.from, to })}
+      onSave={save}
       saveDisabled={to === null}
     >
       <MonthHeader

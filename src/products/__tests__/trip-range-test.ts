@@ -3,8 +3,8 @@ import { isoDay } from '@/config/date-utils';
 import {
   isEdgeOfRange,
   isInsideRange,
+  type RangeDraft,
   tapDay,
-  type TripRange,
 } from '../trip-range';
 
 const OCT_24 = new Date(2026, 9, 24);
@@ -12,8 +12,8 @@ const OCT_27 = new Date(2026, 9, 27);
 const OCT_30 = new Date(2026, 9, 30);
 const OCT_20 = new Date(2026, 9, 20);
 
-const complete: TripRange = { from: OCT_24, to: OCT_30 };
-const open: TripRange = { from: OCT_24, to: null };
+const complete: RangeDraft = { from: OCT_24, to: OCT_30 };
+const open: RangeDraft = { from: OCT_24, to: null };
 
 describe('tapDay', () => {
   it('sets the end on the second tap after the start', () => {
