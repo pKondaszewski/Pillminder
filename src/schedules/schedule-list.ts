@@ -1,4 +1,5 @@
 import { daysBetween, startOfDay } from '@/config/date-utils';
+import { productLabel } from '@/products/product-label';
 import { categoryFilterIfListed } from '@/products/product-list';
 
 import { isPaused } from './schedule-pause';
@@ -56,7 +57,7 @@ export function groupSchedules(
   const matching = items
     .filter(
       (item) =>
-        item.productName.toLowerCase().includes(needle) &&
+        scheduleProductLabel(item).toLowerCase().includes(needle) &&
         (category === null || item.productCategory === category),
     )
     .sort(
@@ -71,6 +72,12 @@ export function groupSchedules(
       items: matching.filter((item) => scheduleKind(item, now) === kind),
     }))
     .filter((group) => group.items.length > 0);
+}
+
+export function scheduleProductLabel(
+  item: Pick<ScheduleListItem, 'productName' | 'productStrength'>,
+): string {
+  return productLabel(item.productName, item.productStrength);
 }
 
 export function listedScheduleCategories(items: ScheduleListItem[]): string[] {

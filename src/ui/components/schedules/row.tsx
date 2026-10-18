@@ -1,7 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { courseProgress, type ScheduleKind } from '@/schedules/schedule-list';
+import {
+  courseProgress,
+  type ScheduleKind,
+  scheduleProductLabel,
+} from '@/schedules/schedule-list';
 import {
   describeCourse,
   describeRhythm,
@@ -55,7 +59,9 @@ export function ScheduleRow({
             size={40}
           />
           <View style={styles.text}>
-            <ThemedText numberOfLines={1}>{item.productName}</ThemedText>
+            <ThemedText numberOfLines={1}>
+              {scheduleProductLabel(item)}
+            </ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
               {describeRhythm(
                 item,

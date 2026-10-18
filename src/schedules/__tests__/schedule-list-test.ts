@@ -3,6 +3,7 @@ import {
   groupSchedules,
   scheduleKind,
   type ScheduleListFilters,
+  scheduleProductLabel,
 } from '../schedule-list';
 import type { ScheduleListItem } from '../schedule-repository';
 
@@ -33,6 +34,7 @@ function item(
     pausedAt: null,
     resumeAt: null,
     productName: `Product ${id}`,
+    productStrength: null,
     productCategory: 'supplement',
     productUnit: null,
     productStatus: 'active',
@@ -123,6 +125,33 @@ describe('scheduleKind', () => {
   });
 });
 
+describe('scheduleProductLabel', () => {
+  it('appends the strength to the name', () => {
+    // given
+    const schedule = item('a', {
+      productName: 'Creatine',
+      productStrength: '5 mg',
+    });
+
+    // when
+    const result = scheduleProductLabel(schedule);
+
+    // then
+    expect(result).toBe('Creatine 5 mg');
+  });
+
+  it('is the bare name without a strength', () => {
+    // given
+    const schedule = item('a', { productName: 'Creatine' });
+
+    // when
+    const result = scheduleProductLabel(schedule);
+
+    // then
+    expect(result).toBe('Creatine');
+  });
+});
+
 describe('groupSchedules', () => {
   const ongoing = item('1', { productName: 'Zinc' });
   const timed = item('2', { productName: 'Amoxicillin', endDate: day(10, 25) });
@@ -150,6 +179,29 @@ describe('groupSchedules', () => {
 
     // then
     expect(result).toEqual([{ kind: 'ended', items: [ended] }]);
+  });
+
+  it('finds a schedule by name or by name with strength', () => {
+    // given
+    const creatine = item('6', {
+      productName: 'Creatine',
+      productStrength: '5 mg',
+    });
+    const byName = { ...NO_FILTERS, query: 'creat' };
+    const byLabel = { ...NO_FILTERS, query: 'creatine 5' };
+
+    // when
+    const foundByName = groupSchedules([creatine, ongoing], byName, NOW, 'en');
+    const foundByLabel = groupSchedules(
+      [creatine, ongoing],
+      byLabel,
+      NOW,
+      'en',
+    );
+
+    // then
+    expect(foundByName[0].items).toEqual([creatine]);
+    expect(foundByLabel[0].items).toEqual([creatine]);
   });
 
   it('sorts items by product name inside a group', () => {
