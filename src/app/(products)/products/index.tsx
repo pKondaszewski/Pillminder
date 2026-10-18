@@ -1,9 +1,9 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { NewProductInput } from '@/products/dto/new-product-input';
 import {
   categoryFilterIfListed,
   filterProducts,
@@ -13,34 +13,21 @@ import {
   sortProductsByStatusThenName,
 } from '@/products/product-list';
 import type { Product } from '@/products/product-service';
-import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
-import { ProductEditorModal } from '@/ui/components/products/editor-modal';
 import { ProductListFilterBar } from '@/ui/components/products/list-filters';
 import { ProductOverviewModal } from '@/ui/components/products/overview-modal';
 import { ProductPeriodModal } from '@/ui/components/products/period-modal';
 import { ProductRow } from '@/ui/components/products/row';
 import { TravelPlanModal } from '@/ui/components/products/travel-plan-modal';
-import { ScheduleEditorModal } from '@/ui/components/schedules/editor-modal';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
-import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
-import { useSchedules } from '@/ui/hooks/use-schedules';
 
 export default function ProductListScreen() {
   const { t, i18n } = useTranslation();
-  const {
-    products,
-    addProduct,
-    editProduct,
-    removeProduct,
-    archiveProduct,
-    restoreProduct,
-  } = useProducts();
-  const { addSchedule } = useSchedules();
+  const { products } = useProducts();
   const reorderStatuses = useReorderStatuses();
 
   const [filters, setFilters] = useState<ProductListFilters>({
@@ -59,60 +46,17 @@ export default function ProductListScreen() {
     i18n.language,
   );
 
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editing, setEditing] = useState<Product | null>(null);
   const [overviewOpen, setOverviewOpen] = useState(false);
   const [periodOpen, setPeriodOpen] = useState(false);
   const [travelOpen, setTravelOpen] = useState(false);
-  const [schedulingOpen, setSchedulingOpen] = useState(false);
-  const editedProduct = products.find((p) => p.id === editing?.id) ?? editing;
-
-  const openCreate = () => {
-    setEditing(null);
-    setEditorOpen(true);
-  };
-
-  const openEdit = (product: Product) => {
-    setEditing(product);
-    setEditorOpen(true);
-  };
-
-  const closeEditor = () => setEditorOpen(false);
 
   const renderItem = ({ item }: { item: Product }) => (
     <ProductRow
       product={item}
       reorder={reorderStatuses[item.id]}
-      onPress={() => openEdit(item)}
+      onPress={() => router.push(`/products/${item.id}`)}
     />
   );
-
-  const runThenCloseEditor = useRunThenCloseEditor(closeEditor);
-
-  const handleSave = (input: NewProductInput) =>
-    runThenCloseEditor(
-      () => (editing ? editProduct(editing.id, input) : addProduct(input)),
-      'products.errorSave',
-    );
-
-  const handleDelete = (id: string) =>
-    runThenCloseEditor(() => removeProduct(id), 'products.errorDelete');
-
-  const handleArchive = (id: string, completionNote?: string) =>
-    runThenCloseEditor(
-      () => archiveProduct(id, completionNote),
-      'products.errorArchive',
-    );
-
-  const closeScheduling = () => setSchedulingOpen(false);
-
-  const runThenCloseScheduling = useRunThenCloseEditor(closeScheduling);
-
-  const handleSaveSchedule = (input: NewScheduleInput) =>
-    runThenCloseScheduling(() => addSchedule(input), 'schedule.errorSave');
-
-  const handleRestore = (id: string) =>
-    runThenCloseEditor(() => restoreProduct(id), 'products.errorRestore');
 
   return (
     <TabSwipe>
@@ -143,7 +87,10 @@ export default function ProductListScreen() {
             ListFooterComponent={
               <ThemedView style={styles.footer}>
                 {[
-                  { label: `+ ${t('products.add')}`, onPress: openCreate },
+                  {
+                    label: `+ ${t('products.add')}`,
+                    onPress: () => router.push('/products/new'),
+                  },
                   {
                     label: t('overview.open'),
                     onPress: () => setOverviewOpen(true),
@@ -174,28 +121,6 @@ export default function ProductListScreen() {
             }
           />
         </SafeAreaView>
-
-        <ProductEditorModal
-          visible={editorOpen}
-          product={editedProduct}
-          onClose={closeEditor}
-          onSave={handleSave}
-          onDelete={handleDelete}
-          onArchive={handleArchive}
-          onRestore={handleRestore}
-          onAddSchedule={() => setSchedulingOpen(true)}
-        />
-
-        {editedProduct ? (
-          <ScheduleEditorModal
-            visible={schedulingOpen}
-            schedule={null}
-            products={[editedProduct]}
-            productLocked
-            onClose={closeScheduling}
-            onSave={handleSaveSchedule}
-          />
-        ) : null}
 
         <ProductOverviewModal
           visible={overviewOpen}

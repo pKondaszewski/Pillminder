@@ -1,48 +1,23 @@
-import { useState } from 'react';
+import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
 import { describeRhythm, type Schedule } from '@/schedules/schedule-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDate } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
-import { ScheduleEditorModal } from '@/ui/components/schedules/editor-modal';
 import { useProducts } from '@/ui/hooks/use-products';
-import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 
 export default function ScheduleListScreen() {
   const { t } = useTranslation();
   const { products } = useProducts();
-  const {
-    schedules,
-    addSchedule,
-    editSchedule,
-    removeSchedule,
-    pauseSchedule,
-    resumeSchedule,
-  } = useSchedules();
-
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editing, setEditing] = useState<Schedule | null>(null);
+  const { schedules } = useSchedules();
 
   const findProduct = (id: string) => products.find((p) => p.id === id);
-
-  const openCreate = () => {
-    setEditing(null);
-    setEditorOpen(true);
-  };
-
-  const openEdit = (schedule: Schedule) => {
-    setEditing(schedule);
-    setEditorOpen(true);
-  };
-
-  const closeEditor = () => setEditorOpen(false);
 
   const now = new Date();
 
@@ -50,7 +25,7 @@ export default function ScheduleListScreen() {
     const product = findProduct(item.productId);
     return (
       <Pressable
-        onPress={() => openEdit(item)}
+        onPress={() => router.push(`/schedules/${item.id}`)}
         style={({ pressed }) => pressed && styles.pressed}
       >
         <ThemedView type="surface" style={styles.row}>
@@ -65,26 +40,6 @@ export default function ScheduleListScreen() {
     );
   };
 
-  const runThenCloseEditor = useRunThenCloseEditor(closeEditor);
-
-  const handleSave = (input: NewScheduleInput) =>
-    runThenCloseEditor(
-      () => (editing ? editSchedule(editing.id, input) : addSchedule(input)),
-      'schedule.errorSave',
-    );
-
-  const handleDelete = (id: string) =>
-    runThenCloseEditor(() => removeSchedule(id), 'schedule.errorDelete');
-
-  const handlePause = (id: string, resumeAt: Date | null) =>
-    runThenCloseEditor(
-      () => pauseSchedule(id, resumeAt),
-      'schedule.errorPause',
-    );
-
-  const handleResume = (id: string) =>
-    runThenCloseEditor(() => resumeSchedule(id), 'schedule.errorResume');
-
   return (
     <TabSwipe>
       <ThemedView style={styles.container}>
@@ -96,7 +51,7 @@ export default function ScheduleListScreen() {
             renderItem={renderItem}
             ListFooterComponent={
               <Pressable
-                onPress={openCreate}
+                onPress={() => router.push('/schedules/new')}
                 style={({ pressed }) => pressed && styles.pressed}
               >
                 <ThemedView type="surface" style={styles.addRow}>
@@ -108,17 +63,6 @@ export default function ScheduleListScreen() {
             }
           />
         </SafeAreaView>
-
-        <ScheduleEditorModal
-          visible={editorOpen}
-          schedule={editing}
-          products={products}
-          onClose={closeEditor}
-          onSave={handleSave}
-          onDelete={handleDelete}
-          onPause={handlePause}
-          onResume={handleResume}
-        />
       </ThemedView>
     </TabSwipe>
   );

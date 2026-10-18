@@ -1,3 +1,4 @@
+import { Stack } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
@@ -15,7 +16,6 @@ import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DayDoses } from '@/ui/components/history/day-doses';
 import { MonthGrid, StatusMarker } from '@/ui/components/history/month-grid';
-import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { useCurrentDay } from '@/ui/hooks/use-current-day';
 import { useDosesBetween } from '@/ui/hooks/use-doses-between';
 
@@ -63,9 +63,10 @@ export default function HistoryScreen() {
   };
 
   return (
-    <TabSwipe>
+    <>
+      <Stack.Screen options={{ headerShown: true, title: t('tabs.history') }} />
       <ThemedView style={styles.container}>
-        <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <SafeAreaView style={styles.safeArea} edges={['bottom']}>
           <ScrollView contentContainerStyle={styles.content}>
             <ThemedView style={styles.header}>
               <MonthButton
@@ -109,7 +110,7 @@ export default function HistoryScreen() {
           </ScrollView>
         </SafeAreaView>
       </ThemedView>
-    </TabSwipe>
+    </>
   );
 }
 

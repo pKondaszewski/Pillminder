@@ -9,10 +9,11 @@ import {
 import { addProduct, getProductsQuery } from '@/products/product-service';
 
 export function useProducts() {
-  const { data } = useLiveQuery(getProductsQuery());
+  const { data, updatedAt } = useLiveQuery(getProductsQuery());
 
   return {
     products: data,
+    loaded: updatedAt !== undefined,
     addProduct,
     editProduct,
     removeProduct,
