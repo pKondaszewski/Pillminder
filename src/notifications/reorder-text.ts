@@ -1,6 +1,6 @@
 import type { Translate } from '@/schedules/schedule-rhythm';
+import { formatPrice } from '@/settings/format-price';
 import type { Currency } from '@/settings/settings-store';
-import { formatPrice } from '@/ui/commons/format-price';
 
 import type { NotificationText } from './dto/notification-text';
 
