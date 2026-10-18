@@ -12,6 +12,7 @@ import {
 } from '@/schedules/schedule-list';
 import { MIN_TOUCH_SIZE, Spacing } from '@/ui/commons/constants/theme';
 import { EmptyState } from '@/ui/components/commons/empty-state';
+import { ScreenTitle } from '@/ui/components/commons/screen-title';
 import {
   type FilterToken,
   SearchField,
@@ -51,19 +52,21 @@ export default function ScheduleListScreen() {
   const tokens = filterTokens(filters, setFilters, t);
 
   const header = (
-    <>
-      <ThemedView style={styles.titleRow}>
-        <ThemedText type="title">{t('tabs.plan')}</ThemedText>
-        <Pressable
-          onPress={() => router.push('/schedules/new')}
-          accessibilityRole="button"
-          style={({ pressed }) => [styles.add, pressed && styles.pressed]}
-        >
-          <ThemedText type="smallBold" themeColor="accent">
-            {t('schedule.addShort')}
-          </ThemedText>
-        </Pressable>
-      </ThemedView>
+    <ThemedView style={styles.header}>
+      <ScreenTitle
+        title={t('tabs.plan')}
+        action={
+          <Pressable
+            onPress={() => router.push('/schedules/new')}
+            accessibilityRole="button"
+            style={({ pressed }) => [styles.add, pressed && styles.pressed]}
+          >
+            <ThemedText type="smallBold" themeColor="accent">
+              {t('schedule.addShort')}
+            </ThemedText>
+          </Pressable>
+        }
+      />
       {items.length > 0 ? (
         <SearchField
           value={filters.query}
@@ -74,7 +77,7 @@ export default function ScheduleListScreen() {
           filterLabel={t('schedule.filtersTitle')}
         />
       ) : null}
-    </>
+    </ThemedView>
   );
 
   const empty = !loaded ? null : products.length === 0 ? (
@@ -180,13 +183,10 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: Spacing.eight,
-    paddingVertical: Spacing.sixteen,
+    paddingBottom: Spacing.sixteen,
   },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.eight,
+  header: {
+    gap: Spacing.eight,
   },
   add: {
     minHeight: MIN_TOUCH_SIZE,

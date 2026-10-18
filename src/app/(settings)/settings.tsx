@@ -21,6 +21,7 @@ import {
 } from '@/settings/settings-store';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { FieldRow } from '@/ui/components/commons/field-row';
+import { ScreenTitle } from '@/ui/components/commons/screen-title';
 import { SegmentedControl } from '@/ui/components/commons/segmented-control';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
@@ -62,7 +63,7 @@ export default function SettingsScreen() {
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
           <ScrollView contentContainerStyle={styles.content}>
-            <ThemedText type="title">{t('tabs.settings')}</ThemedText>
+            <ScreenTitle title={t('tabs.settings')} />
 
             <SettingsSection title={t('settings.reminders')}>
               {notifications ? (
@@ -189,6 +190,6 @@ const styles = StyleSheet.create({
   },
   content: {
     gap: Spacing.twentyFour,
-    paddingVertical: Spacing.sixteen,
+    paddingBottom: Spacing.sixteen,
   },
 });
