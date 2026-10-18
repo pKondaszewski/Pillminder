@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { NewScheduleForm } from '@/ui/components/schedules/new-form';
 import { useProducts } from '@/ui/hooks/use-products';
-import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
+import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 
 export default function NewScheduleScreen() {
@@ -15,7 +15,7 @@ export default function NewScheduleScreen() {
   const { products, loaded } = useProducts();
   const { schedules, addSchedule } = useSchedules();
 
-  const runThenGoBack = useRunThenCloseEditor(() => router.back());
+  const runThenGoBack = useRunWithErrorAlert(() => router.back());
 
   if (!loaded) return null;
 

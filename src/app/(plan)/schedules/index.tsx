@@ -22,7 +22,7 @@ import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { ScheduleListFilterSheet } from '@/ui/components/schedules/list-filter-sheet';
 import { ScheduleRow } from '@/ui/components/schedules/row';
 import { useProducts } from '@/ui/hooks/use-products';
-import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
+import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
 import { useScheduleList } from '@/ui/hooks/use-schedule-list';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 
@@ -39,7 +39,7 @@ export default function ScheduleListScreen() {
   const { resumeSchedule } = useSchedules();
   const [filters, setFilters] = useState(NO_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const runResume = useRunThenCloseEditor(() => undefined);
+  const runResume = useRunWithErrorAlert();
 
   const now = new Date();
   const categories = listedScheduleCategories(items);

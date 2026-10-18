@@ -31,7 +31,7 @@ import { useProductImages } from '@/ui/hooks/use-product-images';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useRecentDays } from '@/ui/hooks/use-recent-days';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
-import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
+import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 import { useSettings } from '@/ui/hooks/use-settings';
 import { useStockActions } from '@/ui/hooks/use-stock-actions';
@@ -60,8 +60,9 @@ function ProductDetail({ product }: { product: Product }) {
   const stock = useStockActions(product);
 
   const [sheet, setSheet] = useState<Sheet | null>(null);
-  const runThenCloseSheet = useRunThenCloseEditor(() => setSheet(null));
-  const runThenGoBack = useRunThenCloseEditor(() => router.back());
+  const runThenCloseSheet = useRunWithErrorAlert(() => setSheet(null));
+  const runThenGoBack = useRunWithErrorAlert(() => router.back());
+  const runWithAlert = useRunWithErrorAlert();
 
   const now = new Date();
   const productSchedules = schedules.filter((s) => s.productId === product.id);
@@ -133,7 +134,7 @@ function ProductDetail({ product }: { product: Product }) {
           locale={i18n.language}
           onEdit={editField}
           onFastingChange={(fasting) =>
-            runThenCloseSheet(
+            runWithAlert(
               () =>
                 editProduct(
                   product.id,
@@ -147,7 +148,7 @@ function ProductDetail({ product }: { product: Product }) {
           status={product.status}
           onArchive={() => setSheet({ kind: 'archive' })}
           onRestore={() =>
-            runThenCloseSheet(
+            runWithAlert(
               () => restoreProduct(product.id),
               'products.errorRestore',
             )
