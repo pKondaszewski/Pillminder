@@ -20,6 +20,7 @@ export function scheduleListQuery() {
     .select({
       ...getTableColumns(schedules),
       productName: products.name,
+      productStrength: products.strength,
       productCategory: products.category,
       productUnit: products.unit,
       productStatus: products.status,
