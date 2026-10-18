@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 
 import { formatLongDate, resolveDateLocale } from '@/ui/commons/format-date';
 
-export function useFormatDate(): (date: Date, withWeekday?: boolean) => string {
+export function useDateLocale(): string {
   const { i18n } = useTranslation();
-  const locale = resolveDateLocale(
-    i18n.language,
-    getLocales()[0]?.regionCode ?? null,
-  );
+  return resolveDateLocale(i18n.language, getLocales()[0]?.regionCode ?? null);
+}
+
+export function useFormatDate(): (date: Date, withWeekday?: boolean) => string {
+  const locale = useDateLocale();
   return (date, withWeekday) =>
     formatLongDate(date, locale, new Date(), withWeekday);
 }

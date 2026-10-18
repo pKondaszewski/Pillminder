@@ -1,18 +1,17 @@
-import DateTimePicker, {
-  type DateTimePickerChangeEvent,
-} from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, ScrollView, StyleSheet } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { addDays, startOfDay } from '@/config/date-utils';
+import { addDays, type DateRange, startOfDay } from '@/config/date-utils';
 import type { TravelPlanEntry } from '@/products/product-service';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
+import { formatDateRange } from '@/ui/commons/format-date';
 import { PrimaryButton } from '@/ui/components/commons/button';
-import { DateButton } from '@/ui/components/commons/date-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { TripRangeSheet } from '@/ui/components/products/trip-range-sheet';
+import { useDateLocale } from '@/ui/hooks/use-format-date';
 import { useTheme } from '@/ui/hooks/use-theme';
 import { useTravelPlan } from '@/ui/hooks/use-travel-plan';
 
@@ -22,8 +21,6 @@ type Props = {
   visible: boolean;
   onClose: () => void;
 };
-
-type Edge = 'departure' | 'return';
 
 export function TravelPlanModal({ visible, onClose }: Props) {
   return (
@@ -40,21 +37,17 @@ export function TravelPlanModal({ visible, onClose }: Props) {
 
 function TravelContent({ onClose }: Pick<Props, 'onClose'>) {
   const { t } = useTranslation();
-  const [departure, setDeparture] = useState(() =>
-    addDays(startOfDay(new Date()), 1),
-  );
-  const [returnDay, setReturnDay] = useState(() =>
-    addDays(startOfDay(new Date()), DEFAULT_TRIP_LENGTH_DAYS),
-  );
-  const [pickerFor, setPickerFor] = useState<Edge | null>(null);
-  const plan = useTravelPlan(departure, returnDay);
-  const rangeInvalid = returnDay < departure;
+  const dateLocale = useDateLocale();
+  const [range, setRange] = useState<DateRange>(() => ({
+    from: addDays(startOfDay(new Date()), 1),
+    to: addDays(startOfDay(new Date()), DEFAULT_TRIP_LENGTH_DAYS),
+  }));
+  const [pickingRange, setPickingRange] = useState(false);
+  const plan = useTravelPlan(range.from, range.to);
 
-  const onDateChange = (_event: DateTimePickerChangeEvent, date: Date) => {
-    const day = startOfDay(date);
-    if (pickerFor === 'departure') setDeparture(day);
-    if (pickerFor === 'return') setReturnDay(day);
-    setPickerFor(null);
+  const saveRange = (picked: DateRange) => {
+    setRange(picked);
+    setPickingRange(false);
   };
 
   return (
@@ -62,38 +55,32 @@ function TravelContent({ onClose }: Pick<Props, 'onClose'>) {
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
           <ThemedText type="subtitle">{t('travel.title')}</ThemedText>
-          <ThemedView style={styles.range}>
-            <DateButton
-              label={t('travel.departure')}
-              value={departure}
-              onPress={() => setPickerFor('departure')}
-            />
-            <DateButton
-              label={t('travel.return')}
-              value={returnDay}
-              onPress={() => setPickerFor('return')}
-            />
-          </ThemedView>
-          {pickerFor ? (
-            <DateTimePicker
-              value={pickerFor === 'departure' ? departure : returnDay}
-              mode="date"
-              onValueChange={onDateChange}
-              onDismiss={() => setPickerFor(null)}
-            />
-          ) : null}
-          {rangeInvalid ? (
-            <ThemedText type="small" themeColor="textSecondary">
-              {t('travel.invalidRange')}
-            </ThemedText>
-          ) : (
-            <TravelResults entries={plan} />
-          )}
+          <Pressable
+            onPress={() => setPickingRange(true)}
+            accessibilityRole="button"
+            style={({ pressed }) => pressed && styles.pressed}
+          >
+            <ThemedView type="surface" style={styles.rangeField}>
+              <ThemedText type="small" themeColor="textSecondary">
+                {t('travel.dates')}
+              </ThemedText>
+              <ThemedText themeColor="accent">
+                {formatDateRange(range.from, range.to, dateLocale, new Date())}
+              </ThemedText>
+            </ThemedView>
+          </Pressable>
+          <TravelResults entries={plan} />
           <ThemedView style={styles.actions}>
             <PrimaryButton label={t('editor.close')} onPress={onClose} />
           </ThemedView>
         </ScrollView>
       </SafeAreaView>
+      <TripRangeSheet
+        visible={pickingRange}
+        range={range}
+        onClose={() => setPickingRange(false)}
+        onSave={saveRange}
+      />
     </ThemedView>
   );
 }
@@ -146,7 +133,12 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   safeArea: { flex: 1, paddingHorizontal: Spacing.twenty },
   content: { gap: Spacing.twelve, paddingVertical: Spacing.twenty },
-  range: { flexDirection: 'row', gap: Spacing.twelve },
+  rangeField: {
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
+    gap: Spacing.four,
+  },
+  pressed: { opacity: 0.7 },
   empty: { gap: Spacing.four, paddingVertical: Spacing.sixteen },
   block: {
     padding: Spacing.sixteen,

@@ -10,7 +10,7 @@ import {
   monthGridDays,
   weekdayKeysFrom,
 } from '@/config/calendar-grid';
-import { addDays, isoDay, startOfDay } from '@/config/date-utils';
+import { addDays, addMonths, isoDay, startOfDay } from '@/config/date-utils';
 import type { SupportedLanguage } from '@/config/i18n';
 import {
   buildTimeline,
@@ -129,13 +129,7 @@ export default function HomeScreen() {
     setCalendarOpen(true);
   };
   const changeMonth = (offset: number) =>
-    setCalendarMonth(
-      new Date(
-        calendarMonth.getFullYear(),
-        calendarMonth.getMonth() + offset,
-        1,
-      ),
-    );
+    setCalendarMonth(addMonths(calendarMonth, offset));
   const saveCorrection = async (dose: TodayDose, target: CorrectionTarget) => {
     setCorrecting(null);
     try {

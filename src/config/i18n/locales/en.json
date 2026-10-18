@@ -500,14 +500,12 @@
     "settings": "Settings"
   },
   "travel": {
-    "departure": "Departure",
+    "dates": "Dates",
     "empty": "Nothing to pack for this trip",
     "emptyHint": "Active products with a schedule running during the trip will show up here.",
     "enough": "Your stock covers the trip",
-    "invalidRange": "The return date is before the departure date.",
     "pack": "Pack: {{amount}}",
     "pieces": "{{count}} pcs",
-    "return": "Return",
     "runsOutAfterReturn": "Buy a refill before you go: the stock runs out within a week after you return",
     "runsOutDuringTrip": "Buy a refill before you go: the stock runs out during the trip",
     "title": "Trip planner"

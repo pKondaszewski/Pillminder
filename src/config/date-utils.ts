@@ -30,3 +30,7 @@ export function isoDay(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0');
   return `${date.getFullYear()}-${month}-${day}`;
 }
+
+export function addMonths(month: Date, months: number): Date {
+  return new Date(month.getFullYear(), month.getMonth() + months, 1);
+}
