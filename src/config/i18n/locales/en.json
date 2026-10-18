@@ -324,10 +324,10 @@
         "upcoming": "Planned"
       },
       "decreaseStock": "Decrease stock",
-      "deleteForever": "Delete for good",
+      "deleteForever": "Delete",
       "deleteInstead": "Archive instead",
       "deleteProduct": "Delete product",
-      "deleteTitle": "Delete {{name}} for good?",
+      "deleteTitle": "Delete {{name}}?",
       "deleteWarning": "The schedule, the full dose history, photos and notes will be deleted.",
       "details": "Details",
       "editStock": "Change stock",

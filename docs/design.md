@@ -191,8 +191,8 @@ Tabs: **Dziś, Produkty, Plan, Ustawienia**. There is no History tab.
 - Archive (bottom sheet): "Przypomnienia i przyszłe dawki zostaną wyłączone", "Harmonogram,
   historia, zdjęcia i notatki zostają", "Możesz go przywrócić z filtra Archiwum", optional
   "Dlaczego?" note. Matches `archiveProduct` (schedules are kept).
-- Delete (centered dialog): "Usunąć X na zawsze?", schedule, full dose history, photos and notes
-  go, "Zarchiwizuj zamiast tego" link, red "Usuń na zawsze".
+- Delete (centered dialog): "Usunąć X?", schedule, full dose history, photos and notes
+  go, "Zarchiwizuj zamiast tego" link, red "Usuń".
 - Photos screen: 2-column grid of all photos, exactly one with a filled star (profile), minus on
   each, "Dodaj zdjęcie" tile (camera or gallery). Starring another photo moves the profile. The
   first added photo becomes profile automatically; deleting the profile photo falls back to the
