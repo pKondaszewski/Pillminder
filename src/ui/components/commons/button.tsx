@@ -14,6 +14,7 @@ type Props = {
   onPress: () => void;
   disabled?: boolean;
   busy?: boolean;
+  fitContent?: boolean;
 };
 
 type Variant = 'primary' | 'danger' | 'secondary' | 'destructive';
@@ -39,6 +40,7 @@ function Button({
   onPress,
   disabled,
   busy,
+  fitContent,
 }: Props & { variant: Variant }) {
   const theme = useTheme();
   const { background, border, text } = variantColors(theme, variant);
@@ -51,6 +53,7 @@ function Button({
       accessibilityState={{ disabled, busy }}
       style={({ pressed }) => [
         styles.button,
+        fitContent && styles.fitContent,
         { backgroundColor: background, borderColor: border },
         pressed && styles.pressed,
         disabled && styles.disabled,
@@ -105,6 +108,9 @@ const styles = StyleSheet.create({
     borderRadius: Radius.button,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  fitContent: {
+    flex: 0,
   },
   pressed: {
     opacity: 0.7,

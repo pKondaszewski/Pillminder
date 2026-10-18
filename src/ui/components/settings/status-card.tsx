@@ -6,6 +6,8 @@ import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { useTheme } from '@/ui/hooks/use-theme';
 
+const TEXT_MIN_WIDTH = 140;
+
 type Props = {
   ok: boolean;
   neutral?: boolean;
@@ -44,9 +46,7 @@ export function StatusCard({
         </ThemedText>
       </ThemedView>
       {onFix && fixLabel ? (
-        <ThemedView style={styles.fix}>
-          <SecondaryButton label={fixLabel} onPress={onFix} />
-        </ThemedView>
+        <SecondaryButton fitContent label={fixLabel} onPress={onFix} />
       ) : null}
     </ThemedView>
   );
@@ -84,6 +84,7 @@ function cardPalette(
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     gap: Spacing.twelve,
     padding: Spacing.fourteen,
@@ -96,11 +97,9 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
   },
   texts: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  fix: {
-    flexDirection: 'row',
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: TEXT_MIN_WIDTH,
     backgroundColor: 'transparent',
   },
 });
