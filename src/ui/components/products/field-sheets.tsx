@@ -42,6 +42,7 @@ const TEXT_SHEETS: Record<TextProductField, TextSheetConfig> = {
   strength: {
     title: 'editor.strength',
     placeholder: 'editor.strengthPlaceholder',
+    hint: 'editor.strengthHint',
   },
   price: { title: 'editor.price', hint: 'editor.priceHint', numeric: true },
   stock: { title: 'editor.stock', numeric: true },
@@ -151,6 +152,7 @@ function UnitSheet({ product, onSave, onClose }: SheetProps) {
       onSave={() => onSave({ unit })}
     >
       <UnitChips selected={unit} onSelect={setUnit} />
+      <ThemedText type="caption">{t('editor.unitHint')}</ThemedText>
     </BottomSheet>
   );
 }

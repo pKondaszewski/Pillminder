@@ -143,6 +143,7 @@ export function NewProductForm({ onSubmit }: Props) {
                 onChangeText={(strength) => change({ strength })}
                 placeholder={t('editor.strengthPlaceholder')}
               />
+              <ThemedText type="caption">{t('editor.strengthHint')}</ThemedText>
             </ThemedView>
           ) : null}
 
@@ -152,6 +153,7 @@ export function NewProductForm({ onSubmit }: Props) {
               selected={values.unit}
               onSelect={(unit) => change({ unit })}
             />
+            <ThemedText type="caption">{t('editor.unitHint')}</ThemedText>
           </ThemedView>
 
           {supportsFasting(values.category) ? (

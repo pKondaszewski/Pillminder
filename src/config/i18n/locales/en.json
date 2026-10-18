@@ -105,8 +105,10 @@
     "storeLink": "Where to buy",
     "storeLinkPlaceholder": "e.g. pharmacy or a store link",
     "strength": "Strength",
-    "strengthPlaceholder": "e.g. 5mg",
-    "unit": "Unit",
+    "strengthPlaceholder": "e.g. 50 µg",
+    "strengthHint": "Amount of substance in one unit",
+    "unit": "Form",
+    "unitHint": "What you count in stock and per dose",
     "unitNone": "None",
     "wholeNumberInvalid": "Enter a whole number, 0 or more"
   },
