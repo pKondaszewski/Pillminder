@@ -57,11 +57,15 @@ export function TimeSlotSection({ group, renderDose }: Props) {
           accessibilityLabel={t('home.collapseSlot', { slot: slotName })}
           style={({ pressed }) => [styles.header, pressed && styles.pressed]}
         >
-          <ThemedText type="label">{slotName}</ThemedText>
+          <ThemedText type="smallBold" themeColor="textSecondary">
+            {slotName}
+          </ThemedText>
           <Icon name="expand_less" size={20} color={theme.textTertiary} />
         </Pressable>
       ) : (
-        <ThemedText type="label">{slotName}</ThemedText>
+        <ThemedText type="smallBold" themeColor="textSecondary">
+          {slotName}
+        </ThemedText>
       )}
       {layout.visible.map((dose) => (
         <View key={dose.id}>{renderDose(dose)}</View>
