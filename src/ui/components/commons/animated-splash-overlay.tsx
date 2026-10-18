@@ -1,11 +1,11 @@
+import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, { Easing, Keyframe } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { Colors } from '@/ui/commons/constants/theme';
 
-const INITIAL_SCALE_FACTOR = Dimensions.get('screen').height / 90;
 const DURATION = 600;
 
 export function AnimatedSplashOverlay() {
@@ -15,7 +15,6 @@ export function AnimatedSplashOverlay() {
 
   const splashKeyframe = new Keyframe({
     0: {
-      transform: [{ scale: INITIAL_SCALE_FACTOR }],
       opacity: 1,
     },
     20: {
@@ -27,7 +26,6 @@ export function AnimatedSplashOverlay() {
     },
     100: {
       opacity: 0,
-      transform: [{ scale: 1 }],
       easing: Easing.elastic(0.7),
     },
   });
@@ -41,14 +39,31 @@ export function AnimatedSplashOverlay() {
         }
       })}
       style={styles.backgroundSolidColor}
-    />
+    >
+      <Image
+        source={splashIcon}
+        accessibilityIgnoresInvertColors
+        style={styles.mark}
+      />
+    </Animated.View>
   );
 }
+
+const splashIcon = require('../../../../assets/images/splash-icon.png');
+
+// Must match imageWidth of the expo-splash-screen plugin in app.json
+const SPLASH_IMAGE_WIDTH = 76;
 
 const styles = StyleSheet.create({
   backgroundSolidColor: {
     ...StyleSheet.absoluteFill,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: Colors.light.accent,
     zIndex: 1000,
+  },
+  mark: {
+    width: SPLASH_IMAGE_WIDTH,
+    height: SPLASH_IMAGE_WIDTH,
   },
 });
