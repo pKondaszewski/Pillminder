@@ -47,7 +47,12 @@ export function TabSwipe({ children }: { children: ReactNode }) {
 
   return (
     <GestureDetector gesture={swipe}>
-      <Animated.View key={anim.tick} entering={entering} style={styles.fill}>
+      <Animated.View
+        key={anim.tick}
+        entering={entering}
+        needsOffscreenAlphaCompositing
+        style={styles.fill}
+      >
         {children}
       </Animated.View>
     </GestureDetector>
