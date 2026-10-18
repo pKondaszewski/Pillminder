@@ -9,6 +9,7 @@ import {
   showReorderAlert,
 } from '@/notifications/notification-service';
 import { reorderAlertAction } from '@/notifications/reorder-alert-action';
+import { reorderNotificationText } from '@/notifications/reorder-text';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
 import type { Product } from '@/products/product-service';
 import type { Currency } from '@/settings/settings-store';
@@ -21,17 +22,24 @@ export function useReorderNotifications() {
   const { products } = useProducts();
   const reorderStatuses = useReorderStatuses();
   const { currency } = useSettings();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
-    void syncReorderAlerts(products, reorderStatuses, currency, t);
-  }, [products, reorderStatuses, currency, t]);
+    void syncReorderAlerts(
+      products,
+      reorderStatuses,
+      currency,
+      i18n.language,
+      t,
+    );
+  }, [products, reorderStatuses, currency, i18n.language, t]);
 }
 
 function syncReorderAlerts(
   products: Product[],
   statuses: Record<string, ReorderStatus>,
   currency: Currency,
+  locale: string,
   t: TFunction,
 ): Promise<unknown> {
   const now = new Date();
@@ -49,17 +57,7 @@ function syncReorderAlerts(
         storeLink: product.storeLink,
         canAddPack: product.packSize !== null,
       };
-      const text = {
-        title: t('notification.reorderTitle'),
-        body:
-          product.price === null
-            ? t('notification.reorderBody', { name: product.name })
-            : t('notification.reorderBodyWithPrice', {
-                name: product.name,
-                price: product.price,
-                currency,
-              }),
-      };
+      const text = reorderNotificationText(product, currency, locale, t);
 
       await cancelReorderAlert(product.id);
       return action.kind === 'reschedule'

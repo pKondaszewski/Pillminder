@@ -6,16 +6,19 @@ import { permissionStep } from '@/onboarding/onboarding-service';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { useNotificationPermission } from '@/ui/hooks/use-notification-permission';
 
+import { BlockedSteps } from './blocked-steps';
 import {
+  type OnboardingProgress,
   OnboardingStepLayout,
-  PrimaryButton,
-  SkipButton,
 } from './onboarding-step-layout';
+import { SampleReminderCard } from './sample-reminder-card';
 
 export function NotificationsStep({
+  progress,
   onGranted,
   onDismissed,
 }: {
+  progress: OnboardingProgress;
   onGranted: () => void;
   onDismissed: () => void;
 }) {
@@ -29,47 +32,40 @@ export function NotificationsStep({
 
   if (!step || step === 'granted') return null;
 
+  const blocked = step === 'blocked';
+
   return (
     <OnboardingStepLayout
-      texts={
+      progress={progress}
+      primaryLabel={t(blocked ? 'onboarding.openSettings' : 'onboarding.allow')}
+      onPrimary={blocked ? () => void Linking.openSettings() : request}
+      primaryDisabled={busy}
+      skipLabel={t(blocked ? 'onboarding.continue' : 'onboarding.notNow')}
+      onSkip={onDismissed}
+    >
+      {blocked ? (
+        <>
+          <ThemedText type="title">{t('onboarding.blockedTitle')}</ThemedText>
+          <ThemedText themeColor="textSecondary">
+            {t('onboarding.blocked')}
+          </ThemedText>
+          <BlockedSteps />
+        </>
+      ) : (
         <>
           <ThemedText type="title">{t('onboarding.title')}</ThemedText>
           <ThemedText themeColor="textSecondary">
             {t('onboarding.intro')}
           </ThemedText>
+          <SampleReminderCard />
           <ThemedText themeColor="textSecondary">
             • {t('onboarding.featureDose')}
           </ThemedText>
           <ThemedText themeColor="textSecondary">
             • {t('onboarding.featureReorder')}
           </ThemedText>
-          {step === 'blocked' && (
-            <ThemedText type="smallBold">{t('onboarding.blocked')}</ThemedText>
-          )}
         </>
-      }
-      actions={
-        <>
-          {step === 'askable' ? (
-            <PrimaryButton
-              label={t('onboarding.allow')}
-              onPress={request}
-              disabled={busy}
-            />
-          ) : (
-            <PrimaryButton
-              label={t('onboarding.openSettings')}
-              onPress={() => void Linking.openSettings()}
-            />
-          )}
-          <SkipButton
-            label={t(
-              step === 'askable' ? 'onboarding.notNow' : 'onboarding.continue',
-            )}
-            onPress={onDismissed}
-          />
-        </>
-      }
-    />
+      )}
+    </OnboardingStepLayout>
   );
 }

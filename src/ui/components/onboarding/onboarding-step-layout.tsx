@@ -1,67 +1,66 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet } from 'react-native';
 
 import { Spacing } from '@/ui/commons/constants/theme';
+import { AppLogo } from '@/ui/components/commons/app-logo';
+import { PrimaryButton } from '@/ui/components/commons/button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 
+export type OnboardingProgress = { current: number; total: number };
+
+type Props = {
+  progress: OnboardingProgress;
+  children: ReactNode;
+  primaryLabel: string;
+  onPrimary: () => void;
+  primaryDisabled?: boolean;
+  skipLabel: string;
+  onSkip: () => void;
+};
+
 export function OnboardingStepLayout({
-  texts,
-  actions,
-}: {
-  texts: ReactNode;
-  actions: ReactNode;
-}) {
+  progress,
+  children,
+  primaryLabel,
+  onPrimary,
+  primaryDisabled,
+  skipLabel,
+  onSkip,
+}: Props) {
+  const { t } = useTranslation();
+
   return (
     <ThemedView style={styles.step}>
-      <ThemedView style={styles.texts}>{texts}</ThemedView>
-      <ThemedView style={styles.actions}>{actions}</ThemedView>
-    </ThemedView>
-  );
-}
-
-export function PrimaryButton({
-  label,
-  onPress,
-  disabled,
-}: {
-  label: string;
-  onPress: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      style={({ pressed }) => (pressed || disabled) && styles.pressed}
-    >
-      <ThemedView type="accent" style={styles.primary}>
-        <ThemedText type="smallBold" style={styles.primaryLabel}>
-          {label}
-        </ThemedText>
+      <ThemedView style={styles.header}>
+        <AppLogo size={32} name={t('onboarding.appName')} />
+        {progress.total > 1 ? (
+          <ThemedText type="small" themeColor="textSecondary">
+            {t('onboarding.progress', progress)}
+          </ThemedText>
+        ) : null}
       </ThemedView>
-    </Pressable>
-  );
-}
-
-export function SkipButton({
-  label,
-  onPress,
-}: {
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      style={({ pressed }) => [styles.skip, pressed && styles.pressed]}
-    >
-      <ThemedText type="small" themeColor="textSecondary">
-        {label}
-      </ThemedText>
-    </Pressable>
+      <ThemedView style={styles.body}>{children}</ThemedView>
+      <ThemedView style={styles.actions}>
+        <ThemedView style={styles.primary}>
+          <PrimaryButton
+            label={primaryLabel}
+            onPress={onPrimary}
+            disabled={primaryDisabled}
+          />
+        </ThemedView>
+        <Pressable
+          onPress={onSkip}
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.skip, pressed && styles.pressed]}
+        >
+          <ThemedText type="smallBold" themeColor="textSecondary">
+            {skipLabel}
+          </ThemedText>
+        </Pressable>
+      </ThemedView>
+    </ThemedView>
   );
 }
 
@@ -70,7 +69,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
   },
-  texts: {
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  body: {
     flex: 1,
     justifyContent: 'center',
     gap: Spacing.sixteen,
@@ -79,16 +83,12 @@ const styles = StyleSheet.create({
     gap: Spacing.eight,
   },
   primary: {
-    paddingVertical: Spacing.sixteen,
-    borderRadius: Spacing.sixteen,
-    alignItems: 'center',
-  },
-  primaryLabel: {
-    color: '#ffffff',
+    flexDirection: 'row',
   },
   skip: {
-    paddingVertical: Spacing.eight,
+    minHeight: 44,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   pressed: {
     opacity: 0.7,

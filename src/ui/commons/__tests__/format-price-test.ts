@@ -1,4 +1,4 @@
-import { formatPrice } from '../format-price';
+import { currencyLabel, formatPrice } from '../format-price';
 
 describe('formatPrice', () => {
   it.each([
@@ -11,5 +11,20 @@ describe('formatPrice', () => {
 
     // then
     expect(text.replace(/\s/g, ' ')).toBe(expected);
+  });
+});
+
+describe('currencyLabel', () => {
+  it.each([
+    ['PLN', 'pl', 'zł (PLN)'],
+    ['EUR', 'en', '€ (EUR)'],
+    ['USD', 'en', '$ (USD)'],
+    ['USD', 'pl', 'USD'],
+  ] as const)('labels %s in %s', (currency, locale, expected) => {
+    // when
+    const label = currencyLabel(currency, locale);
+
+    // then
+    expect(label).toBe(expected);
   });
 });
