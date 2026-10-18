@@ -1,4 +1,3 @@
-import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, StyleSheet } from 'react-native';
 
@@ -6,10 +5,12 @@ import type { Note } from '@/notes/note-service';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
 import { formatDateTime } from '@/ui/commons/format-date';
 import { SecondaryButton } from '@/ui/components/commons/button';
+import { ConfirmDialog } from '@/ui/components/commons/confirm-dialog';
 import { TextField } from '@/ui/components/commons/text-field';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductSection } from '@/ui/components/products/section';
+import { useConfirmation } from '@/ui/hooks/use-confirmation';
 import { useNoteDraft } from '@/ui/hooks/use-note-draft';
 import { useNotes } from '@/ui/hooks/use-notes';
 
@@ -18,6 +19,15 @@ export function ProductNotes({ productId }: { productId: string }) {
   const { notes, removeNote } = useNotes(productId);
   const { draft, editingId, canSubmit, setDraft, startEditing, reset, submit } =
     useNoteDraft(productId);
+
+  const deletion = useConfirmation<Note>(async (note) => {
+    try {
+      await removeNote(note.id);
+      if (note.id === editingId) reset();
+    } catch {
+      Alert.alert(t('products.errorTitle'), t('notes.errorDelete'));
+    }
+  });
 
   const handleSubmit = async () => {
     try {
@@ -52,9 +62,7 @@ export function ProductNotes({ productId }: { productId: string }) {
                 </ThemedText>
               </Pressable>
               <Pressable
-                onPress={() =>
-                  confirmDeleteNote(note, editingId, t, removeNote, reset)
-                }
+                onPress={() => deletion.request(note)}
                 hitSlop={Spacing.eight}
                 style={({ pressed }) => pressed && styles.pressed}
               >
@@ -83,32 +91,17 @@ export function ProductNotes({ productId }: { productId: string }) {
           disabled={!canSubmit}
         />
       </ThemedView>
+      <ConfirmDialog
+        visible={deletion.pending !== null}
+        destructive
+        title={t('notes.deleteTitle')}
+        message={t('notes.deleteConfirm')}
+        confirmLabel={t('editor.delete')}
+        onConfirm={deletion.confirm}
+        onCancel={deletion.cancel}
+      />
     </ProductSection>
   );
-}
-
-function confirmDeleteNote(
-  note: Note,
-  editingId: string | null,
-  t: TFunction,
-  removeNote: (id: string) => Promise<void>,
-  reset: () => void,
-) {
-  Alert.alert(t('notes.deleteTitle'), t('notes.deleteConfirm'), [
-    { text: t('editor.cancel'), style: 'cancel' },
-    {
-      text: t('editor.delete'),
-      style: 'destructive',
-      onPress: async () => {
-        try {
-          await removeNote(note.id);
-          if (note.id === editingId) reset();
-        } catch {
-          Alert.alert(t('products.errorTitle'), t('notes.errorDelete'));
-        }
-      },
-    },
-  ]);
 }
 
 const styles = StyleSheet.create({

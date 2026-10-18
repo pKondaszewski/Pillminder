@@ -1,5 +1,4 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import type { TFunction } from 'i18next';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, StyleSheet } from 'react-native';
@@ -22,6 +21,7 @@ import {
   type TodayDose,
 } from '@/doses/dose-service';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { ConfirmDialog } from '@/ui/components/commons/confirm-dialog';
 import { EmptyState } from '@/ui/components/commons/empty-state';
 import { Snackbar } from '@/ui/components/commons/snackbar';
 import { ThemedView } from '@/ui/components/commons/themed-view';
@@ -32,6 +32,7 @@ import { type DayMode, DoseRow } from '@/ui/components/today/dose-row';
 import { MonthCalendarSheet } from '@/ui/components/today/month-calendar-sheet';
 import { TimeSlotSection } from '@/ui/components/today/time-slot-section';
 import { TodayCard } from '@/ui/components/today/today-card';
+import { useConfirmation } from '@/ui/hooks/use-confirmation';
 import { useDayDoses } from '@/ui/hooks/use-day-doses';
 import { useDosesBetween } from '@/ui/hooks/use-doses-between';
 import { useFormatDate } from '@/ui/hooks/use-format-date';
@@ -75,6 +76,17 @@ export default function HomeScreen() {
       taken: { apply: takeDose, revert: untakeDose },
       skipped: { apply: skipDose, revert: unskipDose },
     });
+  const revertConfirmation = useConfirmation<TodayDose>((dose) =>
+    revert(undoableKindOf(dose), dose.id),
+  );
+  const takeOverdueConfirmation = useConfirmation<TodayDose[]>((overdue) =>
+    takeAll(overdue.map(({ id }) => id)),
+  );
+
+  const revertedDose = revertConfirmation.pending?.value;
+  const revertTexts = revertedDose
+    ? DOSE_ACTION_TEXT_KEYS[undoableKindOf(revertedDose)]
+    : null;
 
   const firstWeekday = firstWeekdayOf(i18n.language as SupportedLanguage);
   const calendarDays = monthGridDays(calendarMonth, firstWeekday);
@@ -182,9 +194,7 @@ export default function HomeScreen() {
                   marks={buildTimeline(doses, now)}
                   nowPosition={mode === 'today' ? nowPosition(now) : null}
                   onTake={(dose) => applyWithUndo('taken', dose)}
-                  onTakeOverdue={(overdue) =>
-                    confirmTakeOverdue(overdue, t, takeAll)
-                  }
+                  onTakeOverdue={takeOverdueConfirmation.request}
                 />
                 {groupDosesByTimeSlot(doses).map((group) => (
                   <TimeSlotSection
@@ -197,9 +207,7 @@ export default function HomeScreen() {
                         now={now}
                         onTake={(taken) => applyWithUndo('taken', taken)}
                         onSkip={(skipped) => applyWithUndo('skipped', skipped)}
-                        onRevert={(handled) =>
-                          confirmRevert(handled, t, revert)
-                        }
+                        onRevert={revertConfirmation.request}
                         onCorrect={setCorrecting}
                       />
                     )}
@@ -228,6 +236,28 @@ export default function HomeScreen() {
             onSave={saveCorrection}
           />
         ) : null}
+        <ConfirmDialog
+          visible={revertConfirmation.pending !== null}
+          title={revertTexts ? t(revertTexts.title) : ''}
+          message={
+            revertTexts
+              ? t(revertTexts.message, { name: revertedDose?.productName })
+              : ''
+          }
+          confirmLabel={t('home.undo')}
+          onConfirm={revertConfirmation.confirm}
+          onCancel={revertConfirmation.cancel}
+        />
+        <ConfirmDialog
+          visible={takeOverdueConfirmation.pending !== null}
+          title={t('home.bulkTakeTitle')}
+          message={t('home.bulkTakeConfirm', {
+            count: takeOverdueConfirmation.pending?.value.length ?? 0,
+          })}
+          confirmLabel={t('home.take')}
+          onConfirm={takeOverdueConfirmation.confirm}
+          onCancel={takeOverdueConfirmation.cancel}
+        />
         <MonthCalendarSheet
           visible={calendarOpen}
           month={calendarMonth}
@@ -264,32 +294,8 @@ function dayMode(day: Date, today: Date): DayMode {
   return isoDay(day) > isoDay(today) ? 'future' : 'today';
 }
 
-function confirmRevert(
-  dose: TodayDose,
-  t: TFunction,
-  revert: (kind: UndoableKind, id: string) => void,
-) {
-  const kind: UndoableKind = dose.state === 'taken' ? 'taken' : 'skipped';
-  const { title, message } = DOSE_ACTION_TEXT_KEYS[kind];
-  Alert.alert(t(title), t(message, { name: dose.productName }), [
-    { text: t('editor.cancel'), style: 'cancel' },
-    { text: t('home.undo'), onPress: () => revert(kind, dose.id) },
-  ]);
-}
-
-function confirmTakeOverdue(
-  overdue: TodayDose[],
-  t: TFunction,
-  takeAll: (ids: string[]) => void,
-) {
-  const count = overdue.length;
-  Alert.alert(t('home.bulkTakeTitle'), t('home.bulkTakeConfirm', { count }), [
-    { text: t('editor.cancel'), style: 'cancel' },
-    {
-      text: t('home.take'),
-      onPress: () => takeAll(overdue.map(({ id }) => id)),
-    },
-  ]);
+function undoableKindOf(dose: TodayDose): UndoableKind {
+  return dose.state === 'taken' ? 'taken' : 'skipped';
 }
 
 const DOSE_ACTION_TEXT_KEYS: Record<

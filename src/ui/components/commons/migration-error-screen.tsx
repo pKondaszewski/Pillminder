@@ -4,11 +4,13 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Spacing } from '@/ui/commons/constants/theme';
+import { BackupImportDialog } from '@/ui/components/commons/backup-import-dialog';
 import {
   DestructiveButton,
   PrimaryButton,
   SecondaryButton,
 } from '@/ui/components/commons/button';
+import { ConfirmDialog } from '@/ui/components/commons/confirm-dialog';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { useMigrationRecovery } from '@/ui/hooks/use-migration-recovery';
@@ -20,7 +22,7 @@ type Props = {
 
 export function MigrationErrorScreen({ error, onRerunMigrations }: Props) {
   const { t } = useTranslation();
-  const { busy, retry, restore, reset } =
+  const { busy, retry, restore, reset, importConfirmation, resetConfirmation } =
     useMigrationRecovery(onRerunMigrations);
   const [detailsVisible, setDetailsVisible] = useState(false);
 
@@ -76,6 +78,16 @@ export function MigrationErrorScreen({ error, onRerunMigrations }: Props) {
           )}
         </ScrollView>
       </SafeAreaView>
+      <BackupImportDialog confirmation={importConfirmation} />
+      <ConfirmDialog
+        visible={resetConfirmation.pending !== null}
+        destructive
+        title={t('migrationError.resetConfirmTitle')}
+        message={t('migrationError.resetConfirmMessage')}
+        confirmLabel={t('migrationError.resetConfirmAction')}
+        onConfirm={resetConfirmation.confirm}
+        onCancel={resetConfirmation.cancel}
+      />
     </ThemedView>
   );
 }

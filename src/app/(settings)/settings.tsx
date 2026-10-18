@@ -20,6 +20,7 @@ import {
   type ThemePreference,
 } from '@/settings/settings-store';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { BackupImportDialog } from '@/ui/components/commons/backup-import-dialog';
 import { FieldRow } from '@/ui/components/commons/field-row';
 import { ScreenTitle } from '@/ui/components/commons/screen-title';
 import { SegmentedControl } from '@/ui/components/commons/segmented-control';
@@ -143,6 +144,7 @@ export default function SettingsScreen() {
         </SafeAreaView>
       </ThemedView>
 
+      <BackupImportDialog confirmation={backup.importConfirmation} />
       {sheet === 'snooze' ? (
         <SnoozeSheet
           minutes={settings.snoozeMinutes}
