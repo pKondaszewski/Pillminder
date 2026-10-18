@@ -41,7 +41,7 @@ export function BottomSheet({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="fade"
       statusBarTranslucent
       navigationBarTranslucent
       onRequestClose={onClose}
