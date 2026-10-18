@@ -481,6 +481,7 @@
     "shopping": "Shopping",
     "snooze": "Snooze duration",
     "snoozeInvalid": "Enter a number of minutes from {{min}} to {{max}}",
+    "snoozeSheetTitle": "Snooze duration ({{unit}})",
     "theme": "Theme",
     "themeDark": "Dark",
     "themeLight": "Light",

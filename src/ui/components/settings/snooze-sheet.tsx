@@ -20,6 +20,9 @@ export function SnoozeSheet({ minutes, onSave, onClose }: Props) {
   const [text, setText] = useState(String(minutes));
   const [submitted, setSubmitted] = useState(false);
   const parsed = Number(text);
+  const title = t('settings.snoozeSheetTitle', {
+    unit: t('settings.minutesUnit'),
+  });
   const valid = text !== '' && isValidSnoozeMinutes(parsed);
 
   const save = () => {
@@ -28,18 +31,13 @@ export function SnoozeSheet({ minutes, onSave, onClose }: Props) {
   };
 
   return (
-    <BottomSheet
-      visible
-      title={t('settings.snooze')}
-      onClose={onClose}
-      onSave={save}
-    >
+    <BottomSheet visible title={title} onClose={onClose} onSave={save}>
       <TextField
         value={text}
         onChangeText={(value) => setText(value.replace(/\D/g, ''))}
         keyboardType="number-pad"
         maxLength={String(SNOOZE_MINUTES_MAX).length}
-        accessibilityLabel={t('settings.snooze')}
+        accessibilityLabel={title}
         error={
           submitted && !valid
             ? t('settings.snoozeInvalid', {
