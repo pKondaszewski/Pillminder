@@ -1,10 +1,12 @@
+import Constants from 'expo-constants';
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import Animated, { Easing, Keyframe } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { Colors } from '@/ui/commons/constants/theme';
+import { FontFamily } from '@/ui/commons/constants/fonts';
+import { Colors, Spacing } from '@/ui/commons/constants/theme';
 
 const DURATION = 600;
 
@@ -45,6 +47,9 @@ export function AnimatedSplashOverlay() {
         accessibilityIgnoresInvertColors
         style={styles.mark}
       />
+      <Text style={styles.wordmark} numberOfLines={1}>
+        {Constants.expoConfig?.name}
+      </Text>
     </Animated.View>
   );
 }
@@ -53,6 +58,8 @@ const splashIcon = require('../../../../assets/images/splash-icon.png');
 
 // Must match imageWidth of the expo-splash-screen plugin in app.json
 const SPLASH_IMAGE_WIDTH = 76;
+
+const WORDMARK_WIDTH = 240;
 
 const styles = StyleSheet.create({
   backgroundSolidColor: {
@@ -65,5 +72,17 @@ const styles = StyleSheet.create({
   mark: {
     width: SPLASH_IMAGE_WIDTH,
     height: SPLASH_IMAGE_WIDTH,
+  },
+  // Out of the layout flow so the mark stays at the exact centre where the native splash draws it
+  wordmark: {
+    position: 'absolute',
+    top: '50%',
+    marginTop: SPLASH_IMAGE_WIDTH / 2 + Spacing.sixteen,
+    width: WORDMARK_WIDTH,
+    textAlign: 'center',
+    fontFamily: FontFamily.semiBold,
+    fontSize: 26,
+    lineHeight: 32,
+    color: Colors.light.onAccent,
   },
 });
