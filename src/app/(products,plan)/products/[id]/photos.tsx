@@ -1,12 +1,13 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
 import type { TFunction } from 'i18next';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, StyleSheet } from 'react-native';
 
 import type { ProductImage } from '@/images/image-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { chooseImageSource } from '@/ui/components/products/choose-image-source';
+import { ImageSourceSheet } from '@/ui/components/products/image-source-sheet';
 import { PhotoGrid } from '@/ui/components/products/photo-grid';
 import { useProductImages } from '@/ui/hooks/use-product-images';
 import { useProducts } from '@/ui/hooks/use-products';
@@ -17,6 +18,7 @@ export default function ProductPhotosScreen() {
   const { products } = useProducts();
   const { images, busy, pickAndAddImage, removeImage, setProfile } =
     useProductImages(id);
+  const [sourceSheetVisible, setSourceSheetVisible] = useState(false);
   const profileImageId = products.find((p) => p.id === id)?.profileImageId;
 
   return (
@@ -27,11 +29,16 @@ export default function ProductPhotosScreen() {
           images={images}
           profileImageId={profileImageId ?? null}
           addDisabled={busy}
-          onAdd={() => chooseImageSource(t, pickAndAddImage)}
+          onAdd={() => setSourceSheetVisible(true)}
           onSetProfile={(image) => setProfile(image.id)}
           onDelete={(image) => confirmDeleteImage(image, t, removeImage)}
         />
       </ScrollView>
+      <ImageSourceSheet
+        visible={sourceSheetVisible}
+        onClose={() => setSourceSheetVisible(false)}
+        onSelect={pickAndAddImage}
+      />
     </ThemedView>
   );
 }
