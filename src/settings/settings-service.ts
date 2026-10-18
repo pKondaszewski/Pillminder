@@ -1,6 +1,7 @@
 import { Appearance } from 'react-native';
 
 import i18n, { resolveLanguage } from '@/config/i18n';
+import type { Coords, StoredLocation } from '@/location/dto/coords';
 
 import {
   type Currency,
@@ -46,6 +47,26 @@ export function dismissBatteryPrompt(): void {
 
 export function isBatteryPromptDismissed(): boolean {
   return getSettings().batteryPromptDismissed;
+}
+
+export function dismissLocationPrompt(): void {
+  updateSettings({ locationPromptDismissed: true });
+}
+
+export function isLocationPromptDismissed(): boolean {
+  return getSettings().locationPromptDismissed;
+}
+
+export function saveLocation(coords: Coords, now: number): void {
+  updateSettings({ location: { ...coords, savedAt: now } });
+}
+
+export function clearLocation(): void {
+  updateSettings({ location: null });
+}
+
+export function getStoredLocation(): StoredLocation | null {
+  return getSettings().location;
 }
 
 export function getSnoozeMinutes(): number {

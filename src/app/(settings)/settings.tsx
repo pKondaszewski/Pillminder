@@ -36,10 +36,12 @@ import { SnoozeSheet } from '@/ui/components/settings/snooze-sheet';
 import { StatusCard } from '@/ui/components/settings/status-card';
 import {
   batteryCardState,
+  locationCardState,
   notificationCardState,
 } from '@/ui/components/settings/status-card-state';
 import { useBackup } from '@/ui/hooks/use-backup';
 import { useBatteryOptimization } from '@/ui/hooks/use-battery-optimization';
+import { useLocationPermission } from '@/ui/hooks/use-location-permission';
 import { useNotificationPermission } from '@/ui/hooks/use-notification-permission';
 import { useSettings } from '@/ui/hooks/use-settings';
 import { useUndoSnackbar } from '@/ui/hooks/use-undo-snackbar';
@@ -51,6 +53,7 @@ export default function SettingsScreen() {
   const settings = useSettings();
   const { permission, request } = useNotificationPermission();
   const battery = useBatteryOptimization();
+  const location = useLocationPermission();
   const backup = useBackup();
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const { snackbar, runWithUndo } = useUndoSnackbar();
@@ -60,6 +63,23 @@ export default function SettingsScreen() {
     : null;
   const batteryState =
     battery.enabled === null ? null : batteryCardState(battery.enabled);
+  const notificationsFix =
+    notifications?.fix === 'request'
+      ? request
+      : notifications?.fix === 'openSettings'
+        ? () => void Linking.openSettings()
+        : undefined;
+  const locationState = location.permission
+    ? locationCardState(
+        permissionStep(location.permission),
+        settings.location !== null,
+      )
+    : null;
+  const locationActions = {
+    enable: () => void location.enable(),
+    disable: location.disable,
+    openSettings: () => void Linking.openSettings(),
+  };
   const closeSheet = () => setSheet(null);
 
   return (
@@ -76,11 +96,7 @@ export default function SettingsScreen() {
                   title={t('settings.notificationsPermission')}
                   status={t(notifications.statusKey)}
                   fixLabel={t('settings.fix')}
-                  onFix={
-                    notifications.fix === 'request'
-                      ? request
-                      : () => void Linking.openSettings()
-                  }
+                  onFix={notificationsFix}
                 />
               ) : null}
               {batteryState ? (
@@ -89,7 +105,21 @@ export default function SettingsScreen() {
                   title={t('settings.batteryOptimization')}
                   status={t(batteryState.statusKey)}
                   fixLabel={t('settings.fix')}
-                  onFix={() => void battery.openSettings()}
+                  onFix={
+                    batteryState.ok
+                      ? undefined
+                      : () => void battery.openSettings()
+                  }
+                />
+              ) : null}
+              {locationState ? (
+                <StatusCard
+                  ok={locationState.ok}
+                  neutral={locationState.neutral}
+                  title={t('settings.locationPermission')}
+                  status={t(locationState.statusKey)}
+                  fixLabel={t(locationState.actionKey)}
+                  onFix={locationActions[locationState.action]}
                 />
               ) : null}
             </SettingsSection>

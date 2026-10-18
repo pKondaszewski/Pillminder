@@ -1,10 +1,12 @@
 import { decideOnboardingSteps, permissionStep } from '../onboarding-helper';
 
-const NOTHING_DONE = {
+const NOTHING_DONE: Parameters<typeof decideOnboardingSteps>[0] = {
   permission: { granted: false, canAskAgain: true },
   notificationsPromptDismissed: false,
   batteryOptimizationEnabled: true,
   batteryPromptDismissed: false,
+  locationStep: 'granted',
+  locationPromptDismissed: false,
 };
 
 describe('decideOnboardingSteps', () => {
@@ -70,10 +72,46 @@ describe('decideOnboardingSteps', () => {
       notificationsPromptDismissed: false,
       batteryOptimizationEnabled: false,
       batteryPromptDismissed: true,
+      locationStep: 'blocked',
+      locationPromptDismissed: false,
     });
 
     // then
     expect(result).toEqual([]);
+  });
+});
+
+describe('location step', () => {
+  const ASKABLE = { ...NOTHING_DONE, locationStep: 'askable' } as const;
+
+  it('is offered last when the permission can be asked', () => {
+    // when
+    const result = decideOnboardingSteps(ASKABLE);
+
+    // then
+    expect(result).toEqual(['notifications', 'battery', 'location']);
+  });
+
+  it.each(['granted', 'blocked'] as const)(
+    'is skipped when the location permission is %s',
+    (locationStep) => {
+      // when
+      const result = decideOnboardingSteps({ ...ASKABLE, locationStep });
+
+      // then
+      expect(result).not.toContain('location');
+    },
+  );
+
+  it('is skipped once the user dismissed it', () => {
+    // when
+    const result = decideOnboardingSteps({
+      ...ASKABLE,
+      locationPromptDismissed: true,
+    });
+
+    // then
+    expect(result).not.toContain('location');
   });
 });
 

@@ -15,6 +15,7 @@ import { MigrationErrorScreen } from '@/ui/components/commons/migration-error-sc
 import AppTabs from '@/ui/components/navigation/app-tabs';
 import { OnboardingScreen } from '@/ui/components/onboarding/onboarding-screen';
 import { useDoseSync } from '@/ui/hooks/use-dose-sync';
+import { useLocationRefresh } from '@/ui/hooks/use-location-refresh';
 import {
   useNotificationSetup,
   useReminderResponses,
@@ -86,5 +87,6 @@ function DatabaseBoundEffects() {
   useReminderResponses();
   useReorderNotifications();
   useDoseSync();
+  useLocationRefresh();
   return null;
 }

@@ -1,4 +1,8 @@
-import { batteryCardState, notificationCardState } from '../status-card-state';
+import {
+  batteryCardState,
+  locationCardState,
+  notificationCardState,
+} from '../status-card-state';
 
 describe('notificationCardState', () => {
   it('is fine and offers no fix when the permission is granted', () => {
@@ -52,4 +56,53 @@ describe('batteryCardState', () => {
       statusKey: 'settings.batteryRestricted',
     });
   });
+});
+
+describe('locationCardState', () => {
+  it('is on and offers disabling when permitted and coordinates are saved', () => {
+    // when
+    const state = locationCardState('granted', true);
+
+    // then
+    expect(state).toMatchObject({
+      ok: true,
+      statusKey: 'settings.locationOn',
+      action: 'disable',
+    });
+  });
+
+  it.each([
+    ['askable', false],
+    ['granted', false],
+    ['askable', true],
+  ] as const)(
+    'is off and offers enabling for %s permission (coords saved: %s)',
+    (step, hasCoords) => {
+      // when
+      const state = locationCardState(step, hasCoords);
+
+      // then
+      expect(state).toMatchObject({
+        ok: false,
+        neutral: true,
+        statusKey: 'settings.locationOff',
+        action: 'enable',
+      });
+    },
+  );
+
+  it.each([true, false])(
+    'sends to system settings when blocked (coords saved: %s)',
+    (hasCoords) => {
+      // when
+      const state = locationCardState('blocked', hasCoords);
+
+      // then
+      expect(state).toMatchObject({
+        ok: false,
+        statusKey: 'settings.locationBlocked',
+        action: 'openSettings',
+      });
+    },
+  );
 });

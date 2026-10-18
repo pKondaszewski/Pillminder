@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { createLogger } from '@/config/logger';
 import {
   dismissBatteryPrompt,
+  dismissLocationPrompt,
   dismissNotificationsPrompt,
   getOnboardingSteps,
   type OnboardingStep,
@@ -37,6 +38,7 @@ export function useOnboarding(enabled: boolean) {
   const dismiss = () => {
     if (step === 'notifications') dismissNotificationsPrompt();
     if (step === 'battery') dismissBatteryPrompt();
+    if (step === 'location') dismissLocationPrompt();
     advance();
   };
 
