@@ -138,13 +138,15 @@
       },
       "futureCount": "Planned doses: {{count}}",
       "futureTitle": "Day plan",
+      "hideDetails": "Hide day details",
       "nextDose": "{{name}} · {{time}}",
       "others_one": "and {{count}} other",
       "others_other": "and {{count}} others",
       "overdueMany_one": "{{count}} overdue · oldest {{duration}}",
       "overdueMany_other": "{{count}} overdue · oldest {{duration}}",
       "overdueOne": "Overdue {{duration}}",
-      "pastTitle": "Day summary"
+      "pastTitle": "Day summary",
+      "showDetails": "Show day details"
     },
     "collapseSlot": "Collapse: {{slot}}",
     "correction": {
@@ -206,9 +208,6 @@
     "take": "Take",
     "taken": "✓ {{time}}",
     "takenToast": "Taken: {{name}}",
-    "timeline": {
-      "now": "now"
-    },
     "undo": "Undo",
     "undoConfirm": "Undo taking “{{name}}”?",
     "undoTitle": "Undo taken?",

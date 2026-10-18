@@ -146,6 +146,7 @@
       },
       "futureCount": "Zaplanowane dawki: {{count}}",
       "futureTitle": "Plan dnia",
+      "hideDetails": "Ukryj szczegóły dnia",
       "nextDose": "{{name}} · {{time}}",
       "others_few": "i {{count}} inne",
       "others_many": "i {{count}} innych",
@@ -156,7 +157,8 @@
       "overdueMany_one": "{{count}} zaległa · najstarsza {{duration}}",
       "overdueMany_other": "{{count}} zaległych · najstarsza {{duration}}",
       "overdueOne": "Spóźniona {{duration}}",
-      "pastTitle": "Podsumowanie dnia"
+      "pastTitle": "Podsumowanie dnia",
+      "showDetails": "Pokaż szczegóły dnia"
     },
     "collapseSlot": "Zwiń: {{slot}}",
     "correction": {
@@ -226,9 +228,6 @@
     "take": "Weź",
     "taken": "✓ {{time}}",
     "takenToast": "Wzięto: {{name}}",
-    "timeline": {
-      "now": "teraz"
-    },
     "undo": "Cofnij",
     "undoConfirm": "Cofnąć wzięcie „{{name}}”?",
     "undoTitle": "Cofnąć wzięcie?",

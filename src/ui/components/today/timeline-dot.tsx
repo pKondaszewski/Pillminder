@@ -1,149 +1,81 @@
-import { StyleSheet, View } from 'react-native';
+import { Circle, G, Path, Text as SvgText } from 'react-native-svg';
 
-import type { DoseStatus } from '@/doses/dose-service';
-import { ThemedText } from '@/ui/components/commons/themed-text';
+import {
+  type ArcPoint,
+  type DoseStatus,
+  pieSlicePath,
+} from '@/doses/dose-service';
+import { FontFamily } from '@/ui/commons/constants/fonts';
 import { useTheme } from '@/ui/hooks/use-theme';
 
-const SINGLE_SIZE = 12;
-const PIE_SIZE = 20;
-const COUNT_SIZE = 24;
-const FULL_TURN = 360;
-const HALF_TURN = 180;
+const SINGLE_RADIUS = 7;
+const PIE_RADIUS = 10;
+const COUNT_RADIUS = 12;
+const RING_WIDTH = 2;
+const SLICE_GAP_WIDTH = 1;
+const COUNT_FONT_SIZE = 12;
+const COUNT_BASELINE_OFFSET = 4;
 
 type Props = {
   statuses: DoseStatus[];
   count: number | null;
+  center: ArcPoint;
 };
 
-export function TimelineDot({ statuses, count }: Props) {
+export function TimelineDot({ statuses, count, center }: Props) {
   const theme = useTheme();
-  const colors = statuses.map((status) => theme[status]);
+  const isPlanned = statuses.every((status) => status === 'planned');
+  const radius = dotRadius(statuses, count);
 
   if (count !== null) {
     return (
-      <CountDot
-        color={colors[0]}
-        count={count}
-        planned={statuses[0] === 'planned'}
-      />
+      <G>
+        <Circle
+          cx={center.x}
+          cy={center.y}
+          r={radius}
+          fill={theme[statuses[0]]}
+        />
+        <SvgText
+          x={center.x}
+          y={center.y + COUNT_BASELINE_OFFSET}
+          textAnchor="middle"
+          fontFamily={FontFamily.mono}
+          fontSize={COUNT_FONT_SIZE}
+          fill={isPlanned ? theme.text : theme.onAccent}
+        >
+          {count}
+        </SvgText>
+      </G>
     );
   }
-  if (colors.length > 1) return <PieDot colors={colors} />;
-  if (statuses[0] === 'planned') {
-    return <View style={[styles.ring, { borderColor: colors[0] }]} />;
-  }
-  return <View style={[styles.single, { backgroundColor: colors[0] }]} />;
-}
 
-function CountDot({
-  color,
-  count,
-  planned,
-}: {
-  color: string;
-  count: number;
-  planned: boolean;
-}) {
   return (
-    <View style={[styles.count, { backgroundColor: color }]}>
-      <ThemedText type="caption" themeColor={planned ? 'text' : 'onAccent'}>
-        {count}
-      </ThemedText>
-    </View>
+    <G>
+      <Circle
+        cx={center.x}
+        cy={center.y}
+        r={radius}
+        fill={theme.background}
+        stroke={isPlanned ? theme.planned : theme.background}
+        strokeWidth={RING_WIDTH}
+      />
+      {isPlanned
+        ? null
+        : statuses.map((status, index) => (
+            <Path
+              key={index}
+              d={pieSlicePath(center, radius, index, statuses.length)}
+              fill={theme[status]}
+              stroke={theme.background}
+              strokeWidth={SLICE_GAP_WIDTH}
+            />
+          ))}
+    </G>
   );
 }
 
-function PieDot({ colors }: { colors: string[] }) {
-  const sweep = FULL_TURN / colors.length;
-
-  return (
-    <View style={[styles.pie, { backgroundColor: colors[0] }]}>
-      {colors.slice(1).map((color, index) => (
-        <PieSlice
-          key={index}
-          color={color}
-          startAngle={sweep * (index + 1)}
-          sweep={sweep}
-        />
-      ))}
-    </View>
-  );
+function dotRadius(statuses: DoseStatus[], count: number | null): number {
+  if (count !== null) return COUNT_RADIUS;
+  return statuses.length > 1 ? PIE_RADIUS : SINGLE_RADIUS;
 }
-
-// A slice is the intersection of two half planes: the clip keeps the right half
-// of the dot, the rotated half disc inside it ends exactly `sweep` degrees later.
-function PieSlice({
-  color,
-  startAngle,
-  sweep,
-}: {
-  color: string;
-  startAngle: number;
-  sweep: number;
-}) {
-  return (
-    <View
-      style={[
-        StyleSheet.absoluteFill,
-        { transform: [{ rotate: `${startAngle}deg` }] },
-      ]}
-    >
-      <View style={styles.clip}>
-        <View
-          style={[
-            styles.disc,
-            { transform: [{ rotate: `${sweep - HALF_TURN}deg` }] },
-          ]}
-        >
-          <View style={[styles.half, { backgroundColor: color }]} />
-        </View>
-      </View>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  single: {
-    width: SINGLE_SIZE,
-    height: SINGLE_SIZE,
-    borderRadius: SINGLE_SIZE / 2,
-  },
-  ring: {
-    width: SINGLE_SIZE,
-    height: SINGLE_SIZE,
-    borderRadius: SINGLE_SIZE / 2,
-    borderWidth: 2,
-  },
-  count: {
-    width: COUNT_SIZE,
-    height: COUNT_SIZE,
-    borderRadius: COUNT_SIZE / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pie: {
-    width: PIE_SIZE,
-    height: PIE_SIZE,
-    borderRadius: PIE_SIZE / 2,
-    overflow: 'hidden',
-  },
-  clip: {
-    position: 'absolute',
-    left: PIE_SIZE / 2,
-    width: PIE_SIZE / 2,
-    height: PIE_SIZE,
-    overflow: 'hidden',
-  },
-  disc: {
-    position: 'absolute',
-    left: -PIE_SIZE / 2,
-    width: PIE_SIZE,
-    height: PIE_SIZE,
-  },
-  half: {
-    position: 'absolute',
-    left: PIE_SIZE / 2,
-    width: PIE_SIZE / 2,
-    height: PIE_SIZE,
-  },
-});
