@@ -143,6 +143,7 @@
       "overdueOne": "Overdue {{duration}}",
       "pastTitle": "Day summary"
     },
+    "collapseSlot": "Collapse: {{slot}}",
     "correction": {
       "skipped": "Skipped",
       "stockLess": "Stock will decrease by {{amount}}",
@@ -178,6 +179,7 @@
       "message": "Add a medication or supplement and set a schedule, the app handles the rest.",
       "title": "Start with your first product"
     },
+    "expandSlot": "Expand: {{slot}}",
     "pager": {
       "backToToday": "Back to today",
       "nextDay": "Next day",
@@ -186,6 +188,7 @@
     },
     "quantity": "× {{count}}",
     "showAll": "Show all ({{count}})",
+    "showLess": "Show less",
     "skip": "Skip",
     "skipped": "Skipped",
     "skippedToast": "Skipped: {{name}}",
