@@ -13,11 +13,20 @@ import {
 } from '@/images/image-service';
 import { usePickImage } from '@/ui/hooks/use-pick-image';
 
-export function useProductImages(productId: string) {
+interface ProfileUndo {
+  key: number;
+  previousImageId: string | null;
+}
+
+export function useProductImages(
+  productId: string,
+  profileImageId: string | null,
+) {
   const { t } = useTranslation();
   const { data } = useLiveQuery(getImagesQuery(productId), [productId]);
   const pickImageUri = usePickImage();
   const [busy, setBusy] = useState(false);
+  const [profileUndo, setProfileUndo] = useState<ProfileUndo | null>(null);
 
   const pickAndAddImage = async (source: ImageSource) => {
     setBusy(true);
@@ -31,13 +40,43 @@ export function useProductImages(productId: string) {
     }
   };
 
-  const setProfile = async (imageId: string) => {
+  const changeProfile = async (imageId: string | null) => {
     try {
       await setProfileImage(productId, imageId);
+      return true;
     } catch {
       Alert.alert(t('products.errorTitle'), t('images.errorProfile'));
+      return false;
     }
   };
 
-  return { images: data, busy, pickAndAddImage, removeImage, setProfile };
+  const setProfile = async (imageId: string) => {
+    if (imageId === profileImageId) return;
+    const previousImageId = profileImageId;
+    if (await changeProfile(imageId)) {
+      setProfileUndo((last) => ({
+        key: (last?.key ?? 0) + 1,
+        previousImageId,
+      }));
+    }
+  };
+
+  const undoProfile = async () => {
+    if (!profileUndo) return;
+    setProfileUndo(null);
+    await changeProfile(profileUndo.previousImageId);
+  };
+
+  const dismissProfileUndo = () => setProfileUndo(null);
+
+  return {
+    images: data,
+    busy,
+    pickAndAddImage,
+    removeImage,
+    setProfile,
+    profileUndo,
+    undoProfile,
+    dismissProfileUndo,
+  };
 }

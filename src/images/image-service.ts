@@ -55,7 +55,7 @@ export async function removeImage(image: ProductImage): Promise<void> {
 
 export async function setProfileImage(
   productId: string,
-  imageId: string,
+  imageId: string | null,
 ): Promise<void> {
   log.info(`Setting image ${imageId} as the profile of product ${productId}`);
   try {

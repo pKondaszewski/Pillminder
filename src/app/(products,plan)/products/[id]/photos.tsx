@@ -6,6 +6,7 @@ import { Alert, ScrollView, StyleSheet } from 'react-native';
 
 import type { ProductImage } from '@/images/image-service';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { Snackbar } from '@/ui/components/commons/snackbar';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ImageSourceSheet } from '@/ui/components/products/image-source-sheet';
 import { PhotoGrid } from '@/ui/components/products/photo-grid';
@@ -16,10 +17,19 @@ export default function ProductPhotosScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { products } = useProducts();
-  const { images, busy, pickAndAddImage, removeImage, setProfile } =
-    useProductImages(id);
+  const profileImageId =
+    products.find((p) => p.id === id)?.profileImageId ?? null;
+  const {
+    images,
+    busy,
+    pickAndAddImage,
+    removeImage,
+    setProfile,
+    profileUndo,
+    undoProfile,
+    dismissProfileUndo,
+  } = useProductImages(id, profileImageId);
   const [sourceSheetVisible, setSourceSheetVisible] = useState(false);
-  const profileImageId = products.find((p) => p.id === id)?.profileImageId;
 
   return (
     <ThemedView style={styles.container}>
@@ -27,13 +37,22 @@ export default function ProductPhotosScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <PhotoGrid
           images={images}
-          profileImageId={profileImageId ?? null}
+          profileImageId={profileImageId}
           addDisabled={busy}
           onAdd={() => setSourceSheetVisible(true)}
           onSetProfile={(image) => setProfile(image.id)}
           onDelete={(image) => confirmDeleteImage(image, t, removeImage)}
         />
       </ScrollView>
+      {profileUndo ? (
+        <Snackbar
+          key={profileUndo.key}
+          message={t('images.profileChanged')}
+          actionLabel={t('home.undo')}
+          onAction={undoProfile}
+          onDismiss={dismissProfileUndo}
+        />
+      ) : null}
       <ImageSourceSheet
         visible={sourceSheetVisible}
         onClose={() => setSourceSheetVisible(false)}

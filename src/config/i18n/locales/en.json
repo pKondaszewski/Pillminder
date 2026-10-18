@@ -226,6 +226,7 @@
     "gallery": "Choose from gallery",
     "preview": "Show photo",
     "profile": "Profile photo",
+    "profileChanged": "Profile photo changed",
     "setProfile": "Set as profile photo",
     "title": "Photos"
   },

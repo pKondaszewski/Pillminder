@@ -45,7 +45,7 @@ export async function createImageRow(
 
 export async function setProfileImageRow(
   productId: string,
-  imageId: string,
+  imageId: string | null,
 ): Promise<void> {
   await db
     .update(products)

@@ -57,7 +57,7 @@ function ProductDetail({ product }: { product: Product }) {
     useProducts();
   const { schedules } = useSchedules();
   const reorderStatuses = useReorderStatuses();
-  const { images } = useProductImages(product.id);
+  const { images } = useProductImages(product.id, product.profileImageId);
   const recent = useRecentDays(product.id);
   const stock = useStockActions(product);
 
