@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet } from 'react-native';
 
 import { Spacing } from '@/ui/commons/constants/theme';
-import { formatDate } from '@/ui/commons/format-date';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
@@ -13,6 +13,7 @@ type Props = {
 };
 
 export function DateButton({ label, value, onPress }: Props) {
+  const formatDate = useFormatDate();
   return (
     <Pressable
       onPress={onPress}

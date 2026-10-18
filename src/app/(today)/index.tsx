@@ -34,6 +34,7 @@ import { TimeSlotSection } from '@/ui/components/today/time-slot-section';
 import { TodayCard } from '@/ui/components/today/today-card';
 import { useDayDoses } from '@/ui/hooks/use-day-doses';
 import { useDosesBetween } from '@/ui/hooks/use-doses-between';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 import { useNow } from '@/ui/hooks/use-now';
 import { useProducts } from '@/ui/hooks/use-products';
 import {
@@ -41,14 +42,9 @@ import {
   useUndoableDoseAction,
 } from '@/ui/hooks/use-undoable-dose-action';
 
-const DAY_LABEL_FORMAT = {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'long',
-} as const;
-
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
+  const formatDate = useFormatDate();
   const now = useNow();
   const today = startOfDay(now);
   const { products, loaded } = useProducts();
@@ -155,7 +151,7 @@ export default function HomeScreen() {
         <SafeAreaView style={styles.safeArea} edges={['top']}>
           <ScrollView contentContainerStyle={styles.content}>
             <DayPager
-              label={day.toLocaleDateString(i18n.language, DAY_LABEL_FORMAT)}
+              label={formatDate(day, true)}
               canGoNext={isoDay(day) < isoDay(lastDay)}
               showBackToToday={mode !== 'today'}
               onPrevious={() => selectDay(addDays(day, -1))}

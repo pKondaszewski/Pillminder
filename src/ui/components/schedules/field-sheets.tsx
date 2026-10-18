@@ -9,7 +9,6 @@ import type { ProductUnit } from '@/products/product-unit';
 import type { ScheduleChange } from '@/schedules/dto/new-schedule-input';
 import { scheduleDraftErrors } from '@/schedules/schedule-draft';
 import type { Schedule } from '@/schedules/schedule-service';
-import { formatDate } from '@/ui/commons/format-date';
 import { BottomSheet } from '@/ui/components/commons/bottom-sheet';
 import { Chip } from '@/ui/components/commons/chip';
 import { FieldRow } from '@/ui/components/commons/field-row';
@@ -18,6 +17,7 @@ import { PeriodFields } from '@/ui/components/schedules/period-fields';
 import { QuantityStepper } from '@/ui/components/schedules/quantity-stepper';
 import { RhythmPicker } from '@/ui/components/schedules/rhythm-picker';
 import { TimeChips } from '@/ui/components/schedules/time-chips';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 
 export type ScheduleField =
   | 'rhythm'
@@ -155,6 +155,7 @@ function PauseSheet({
   onPause: (resumeAt: Date | null) => void;
 }) {
   const { t } = useTranslation();
+  const formatDate = useFormatDate();
   const [resumeAt, setResumeAt] = useState<Date | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const tomorrow = addDays(startOfDay(now), 1);

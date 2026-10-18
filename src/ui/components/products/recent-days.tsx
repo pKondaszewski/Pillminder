@@ -3,10 +3,10 @@ import { Pressable, StyleSheet, type ViewStyle } from 'react-native';
 
 import type { DayStatus, RecentDays } from '@/doses/dose-service';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { formatDate } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductSection } from '@/ui/components/products/section';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 const DOT_SIZE = 14;
@@ -23,6 +23,7 @@ export function RecentDaysSection({
   onCalendarPress,
 }: Props) {
   const { t } = useTranslation();
+  const formatDate = useFormatDate();
   const { taken, skipped, missed } = recent.counts;
 
   return (

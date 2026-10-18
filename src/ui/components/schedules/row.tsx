@@ -8,11 +8,11 @@ import {
   type ScheduleListItem,
 } from '@/schedules/schedule-service';
 import { MIN_TOUCH_SIZE, Radius, Spacing } from '@/ui/commons/constants/theme';
-import { formatDate } from '@/ui/commons/format-date';
 import { ProductAvatar } from '@/ui/components/commons/product-avatar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { CourseProgressBar } from '@/ui/components/schedules/course-progress';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 
 type Props = {
   item: ScheduleListItem;
@@ -24,6 +24,7 @@ type Props = {
 
 export function ScheduleRow({ item, kind, now, onPress, onResume }: Props) {
   const { t } = useTranslation();
+  const formatDate = useFormatDate();
   const progress = courseProgress(item, now);
   const dimmed = kind === 'paused' || kind === 'ended';
 
