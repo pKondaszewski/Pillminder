@@ -12,6 +12,7 @@ import { ImageSourceSheet } from '@/ui/components/products/image-source-sheet';
 import { PhotoGrid } from '@/ui/components/products/photo-grid';
 import { useProductImages } from '@/ui/hooks/use-product-images';
 import { useProducts } from '@/ui/hooks/use-products';
+import { useProfileUndo } from '@/ui/hooks/use-profile-undo';
 
 export default function ProductPhotosScreen() {
   const { t } = useTranslation();
@@ -19,16 +20,9 @@ export default function ProductPhotosScreen() {
   const { products } = useProducts();
   const profileImageId =
     products.find((p) => p.id === id)?.profileImageId ?? null;
-  const {
-    images,
-    busy,
-    pickAndAddImage,
-    removeImage,
-    setProfile,
-    profileUndo,
-    undoProfile,
-    dismissProfileUndo,
-  } = useProductImages(id, profileImageId);
+  const { images, busy, pickAndAddImage, removeImage } = useProductImages(id);
+  const { undoable, setProfileWithUndo, undoProfile, dismissUndo } =
+    useProfileUndo(id, profileImageId);
   const [sourceSheetVisible, setSourceSheetVisible] = useState(false);
 
   return (
@@ -40,17 +34,17 @@ export default function ProductPhotosScreen() {
           profileImageId={profileImageId}
           addDisabled={busy}
           onAdd={() => setSourceSheetVisible(true)}
-          onSetProfile={(image) => setProfile(image.id)}
+          onSetProfile={(image) => setProfileWithUndo(image.id)}
           onDelete={(image) => confirmDeleteImage(image, t, removeImage)}
         />
       </ScrollView>
-      {profileUndo ? (
+      {undoable ? (
         <Snackbar
-          key={profileUndo.key}
+          key={undoable.key}
           message={t('images.profileChanged')}
           actionLabel={t('home.undo')}
           onAction={undoProfile}
-          onDismiss={dismissProfileUndo}
+          onDismiss={dismissUndo}
         />
       ) : null}
       <ImageSourceSheet
