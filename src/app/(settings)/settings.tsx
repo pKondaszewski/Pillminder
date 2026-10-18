@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AUTHOR_NAME } from '@/config/app-info';
 import { permissionStep } from '@/onboarding/onboarding-service';
+import { currencyLabel } from '@/settings/format-price';
 import {
   setCurrency,
   setLanguage,
@@ -19,7 +20,6 @@ import {
   type ThemePreference,
 } from '@/settings/settings-store';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { currencyLabel } from '@/ui/commons/format-price';
 import { FieldRow } from '@/ui/components/commons/field-row';
 import { SegmentedControl } from '@/ui/components/commons/segmented-control';
 import { ThemedText } from '@/ui/components/commons/themed-text';

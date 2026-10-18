@@ -20,6 +20,7 @@ import {
   validateProductForm,
 } from '@/products/product-form';
 import { adjustWholeNumberText } from '@/products/whole-number-input';
+import { currencySymbol } from '@/settings/format-price';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
 import { PrimaryButton } from '@/ui/components/commons/button';
 import { Icon } from '@/ui/components/commons/icon';
@@ -44,7 +45,7 @@ type Props = {
 };
 
 export function NewProductForm({ onSubmit }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { currency } = useSettings();
   const pickImageUri = usePickImage();
   const scrollRef = useRef<ScrollView>(null);
@@ -74,6 +75,9 @@ export function NewProductForm({ onSubmit }: Props) {
   const recordOffset = (field: ProductFormField, offset: number) => {
     fieldOffsets.current[field] = offset;
   };
+  const priceLabel = t('editor.price', {
+    currency: currencySymbol(currency, i18n.language),
+  });
 
   const submit = () => {
     const found = validateProductForm(values);
@@ -194,7 +198,7 @@ export function NewProductForm({ onSubmit }: Props) {
 
           <ThemedText type="label">{t('editor.sectionShopping')}</ThemedText>
           <FormField field="price" onOffset={recordOffset}>
-            <FieldLabel text={t('editor.price', { currency })} />
+            <FieldLabel text={priceLabel} />
             <TextField
               value={values.price}
               onChangeText={(price) => change({ price })}

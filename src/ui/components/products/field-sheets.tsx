@@ -9,6 +9,7 @@ import {
 } from '@/products/product-form';
 import type { Product } from '@/products/product-service';
 import type { ProductUnit } from '@/products/product-unit';
+import { currencySymbol } from '@/settings/format-price';
 import type { Currency } from '@/settings/settings-store';
 import { BottomSheet } from '@/ui/components/commons/bottom-sheet';
 import { TextField } from '@/ui/components/commons/text-field';
@@ -69,8 +70,11 @@ function TextSheet({
   onSave,
   onClose,
 }: SheetProps & { field: TextProductField }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const config = TEXT_SHEETS[field];
+  const title = t(config.title, {
+    currency: currencySymbol(currency, i18n.language),
+  });
   const current = product[field];
   const [text, setText] = useState(current == null ? '' : String(current));
   const [submitted, setSubmitted] = useState(false);
@@ -85,18 +89,13 @@ function TextSheet({
   };
 
   return (
-    <BottomSheet
-      visible
-      title={t(config.title, { currency })}
-      onClose={onClose}
-      onSave={save}
-    >
+    <BottomSheet visible title={title} onClose={onClose} onSave={save}>
       <TextField
         value={text}
         onChangeText={setText}
         keyboardType={config.numeric ? 'numeric' : 'default'}
         placeholder={config.placeholder ? t(config.placeholder) : undefined}
-        accessibilityLabel={t(config.title, { currency })}
+        accessibilityLabel={title}
         error={error ? t(error) : undefined}
         autoFocus
       />

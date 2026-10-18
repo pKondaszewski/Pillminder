@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
+import { currencyLabel } from '@/settings/format-price';
 import { type Currency, CURRENCY_OPTIONS } from '@/settings/settings-store';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { currencyLabel } from '@/ui/commons/format-price';
 import { BottomSheet } from '@/ui/components/commons/bottom-sheet';
 import { Chip } from '@/ui/components/commons/chip';
 import { ThemedView } from '@/ui/components/commons/themed-view';

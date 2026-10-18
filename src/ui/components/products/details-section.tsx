@@ -6,8 +6,8 @@ import {
   supportsStrength,
 } from '@/products/category';
 import type { Product } from '@/products/product-service';
+import { formatPrice } from '@/settings/format-price';
 import type { Currency } from '@/settings/settings-store';
-import { formatPrice } from '@/ui/commons/format-price';
 import { FieldRow } from '@/ui/components/commons/field-row';
 import { FastingRow } from '@/ui/components/products/fasting-row';
 import type { ProductSheetField } from '@/ui/components/products/field-sheets';
