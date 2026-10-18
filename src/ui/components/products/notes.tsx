@@ -3,7 +3,6 @@ import { Alert, Pressable, StyleSheet } from 'react-native';
 
 import type { Note } from '@/notes/note-service';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
-import { formatDateTime } from '@/ui/commons/format-date';
 import { SecondaryButton } from '@/ui/components/commons/button';
 import { ConfirmDialog } from '@/ui/components/commons/confirm-dialog';
 import { TextField } from '@/ui/components/commons/text-field';
@@ -11,11 +10,13 @@ import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductSection } from '@/ui/components/products/section';
 import { useConfirmation } from '@/ui/hooks/use-confirmation';
+import { useFormatTime } from '@/ui/hooks/use-format-date';
 import { useNoteDraft } from '@/ui/hooks/use-note-draft';
 import { useNotes } from '@/ui/hooks/use-notes';
 
 export function ProductNotes({ productId }: { productId: string }) {
   const { t } = useTranslation();
+  const { formatDateTime } = useFormatTime();
   const { notes, removeNote } = useNotes(productId);
   const { draft, editingId, canSubmit, setDraft, startEditing, reset, submit } =
     useNoteDraft(productId);

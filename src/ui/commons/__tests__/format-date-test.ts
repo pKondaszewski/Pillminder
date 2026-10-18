@@ -1,7 +1,14 @@
 import {
+  type ClockFormat,
   formatDateRange,
+  formatDateTime,
   formatLongDate,
+  formatTime,
+  formatTimeOfDay,
+  formatTimesOfDay,
+  is24HourClock,
   resolveDateLocale,
+  toTimeOfDay,
 } from '../format-date';
 
 const NOW = new Date(2026, 9, 18);
@@ -155,5 +162,116 @@ describe('formatDateRange', () => {
 
     // then
     expect(text).toBe('24 października');
+  });
+});
+
+const clock = (
+  locale: string,
+  uses24hourClock: boolean | null = null,
+): ClockFormat => ({ locale, uses24hourClock });
+
+describe('formatTime', () => {
+  it('pads hours in the 24 h clock', () => {
+    // when
+    const text = formatTime(new Date(2026, 9, 18, 7, 5), clock('pl', true));
+
+    // then
+    expect(text).toBe('07:05');
+  });
+
+  it('shows the afternoon in the 12 h clock', () => {
+    // when
+    const text = formatTime(
+      new Date(2026, 9, 18, 14, 0),
+      clock('en-US', false),
+    );
+
+    // then
+    expect(text).toBe('2:00 PM');
+  });
+
+  it('turns midnight into 12:30 AM', () => {
+    // when
+    const text = formatTime(
+      new Date(2026, 9, 18, 0, 30),
+      clock('en-US', false),
+    );
+
+    // then
+    expect(text).toBe('12:30 AM');
+  });
+
+  it('turns noon into 12:00 PM', () => {
+    // when
+    const text = formatTime(
+      new Date(2026, 9, 18, 12, 0),
+      clock('en-US', false),
+    );
+
+    // then
+    expect(text).toBe('12:00 PM');
+  });
+
+  it('lets the phone setting override the locale', () => {
+    // when
+    const text = formatTime(new Date(2026, 9, 18, 14, 0), clock('en-US', true));
+
+    // then
+    expect(text).toBe('14:00');
+  });
+});
+
+describe('is24HourClock', () => {
+  it.each([
+    ['en-US', null, false],
+    ['en', null, false],
+    ['en-GB', null, true],
+    ['pl', null, true],
+    ['pl-PL', false, false],
+    ['en-GB', false, false],
+  ])('for %s with phone setting %s is %s', (locale, phone, expected) => {
+    // when
+    const result = is24HourClock(clock(locale, phone));
+
+    // then
+    expect(result).toBe(expected);
+  });
+});
+
+describe('formatTimeOfDay', () => {
+  it('converts a stored HH:mm value', () => {
+    // when
+    const text = formatTimeOfDay('20:15', clock('en-US'));
+
+    // then
+    expect(text).toBe('8:15 PM');
+  });
+
+  it('joins several stored times', () => {
+    // when
+    const text = formatTimesOfDay(['08:00', '20:00'], clock('en-US'));
+
+    // then
+    expect(text).toBe('8:00 AM, 8:00 PM');
+  });
+});
+
+describe('formatDateTime', () => {
+  it('appends the time in the chosen clock', () => {
+    // when
+    const text = formatDateTime(new Date(2026, 9, 5, 14, 35), clock('en-US'));
+
+    // then
+    expect(text).toBe('05.10 · 2:35 PM');
+  });
+});
+
+describe('toTimeOfDay', () => {
+  it('always stores 24 h HH:mm', () => {
+    // when
+    const text = toTimeOfDay(new Date(2026, 9, 18, 9, 3));
+
+    // then
+    expect(text).toBe('09:03');
   });
 });

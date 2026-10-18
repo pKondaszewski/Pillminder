@@ -9,12 +9,12 @@ import {
   type TodayDose,
 } from '@/doses/dose-service';
 import { Radius, Spacing, type ThemeColor } from '@/ui/commons/constants/theme';
-import { formatTime } from '@/ui/commons/format-date';
 import { Icon } from '@/ui/components/commons/icon';
 import { ProductAvatar } from '@/ui/components/commons/product-avatar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DoseActionButton } from '@/ui/components/today/dose-action-button';
+import { useFormatTime } from '@/ui/hooks/use-format-date';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 export type DayMode = 'today' | 'past' | 'future';
@@ -39,6 +39,7 @@ export function DoseRow({
   onCorrect,
 }: Props) {
   const { t } = useTranslation();
+  const { formatTime } = useFormatTime();
   const status = doseStatus(dose, now);
   const details = doseDetailsText(dose, t);
   const tinted = mode === 'today' && status === 'overdue';
@@ -78,7 +79,9 @@ export function DoseRow({
           ) : null}
           {dose.snoozedUntil && status !== 'taken' ? (
             <ThemedText type="small" themeColor="textSecondary">
-              {t('home.snoozed', { time: formatTime(dose.snoozedUntil) })}
+              {t('home.snoozed', {
+                time: formatTime(dose.snoozedUntil),
+              })}
             </ThemedText>
           ) : null}
         </View>
@@ -108,11 +111,12 @@ function DoseTrailing({
   onSkip: Props['onSkip'];
 }) {
   const { t } = useTranslation();
+  const { formatTime } = useFormatTime();
   const theme = useTheme();
   const status = doseStatus(dose, now);
   const statusText = (
     <ThemedText type="small" themeColor={STATUS_TEXT_COLORS[status]}>
-      {statusLabel(dose, status, t)}
+      {statusLabel(dose, status, t, formatTime)}
     </ThemedText>
   );
 
@@ -157,6 +161,7 @@ function statusLabel(
   dose: TodayDose,
   status: DoseStatus,
   t: TFunction,
+  formatTime: (date: Date) => string,
 ): string {
   if (status === 'taken') {
     return t('home.taken', {

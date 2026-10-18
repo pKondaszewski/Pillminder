@@ -11,6 +11,9 @@ import {
   wholeDaysLeft,
 } from '../product-text';
 
+const CLOCK_24H = { locale: 'pl', uses24hourClock: true };
+const joinTimes = (times: string[]) => times.join(', ');
+
 const formatDate = (date: Date) => date.toLocaleDateString('sv');
 
 const NOW = new Date(2026, 9, 18, 12, 0);
@@ -169,7 +172,7 @@ describe('supplyHint', () => {
 describe('rhythmSummary', () => {
   it('has a message for a product without a schedule', () => {
     // when
-    const text = rhythmSummary([], t);
+    const text = rhythmSummary([], t, joinTimes);
 
     // then
     expect(text).toBe('products.noSchedule');
@@ -177,7 +180,7 @@ describe('rhythmSummary', () => {
 
   it('describes a single schedule with its times', () => {
     // when
-    const text = rhythmSummary([schedule({})], t);
+    const text = rhythmSummary([schedule({})], t, joinTimes);
 
     // then
     expect(text).toBe('schedule.daily · 08:00, 20:00');
@@ -185,7 +188,7 @@ describe('rhythmSummary', () => {
 
   it('describes a schedule repeating every few days', () => {
     // when
-    const text = rhythmSummary([schedule({ intervalDays: 3 })], t);
+    const text = rhythmSummary([schedule({ intervalDays: 3 })], t, joinTimes);
 
     // then
     expect(text).toBe('schedule.everyXDays {"days":3} · 08:00, 20:00');
@@ -193,7 +196,11 @@ describe('rhythmSummary', () => {
 
   it('counts the schedules when there are several', () => {
     // when
-    const text = rhythmSummary([schedule({}), schedule({ id: 's2' })], t);
+    const text = rhythmSummary(
+      [schedule({}), schedule({ id: 's2' })],
+      t,
+      joinTimes,
+    );
 
     // then
     expect(text).toBe('products.schedulesCount {"count":2}');
@@ -214,7 +221,9 @@ describe('lastUsedText', () => {
     ],
   ])('describes %s', (lastUsedAt, expected) => {
     // when
-    const text = lastUsedText(lastUsedAt, NOW, t, formatDate, formatTime);
+    const text = lastUsedText(lastUsedAt, NOW, t, formatDate, (date) =>
+      formatTime(date, CLOCK_24H),
+    );
 
     // then
     expect(text).toBe(expected);

@@ -7,10 +7,11 @@ import { Pressable, StyleSheet } from 'react-native';
 
 import { addTimeOfDay, QUICK_TIMES } from '@/schedules/times-of-day';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
-import { formatTime } from '@/ui/commons/format-date';
+import { toTimeOfDay } from '@/ui/commons/format-date';
 import { Chip } from '@/ui/components/commons/chip';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { useFormatTime } from '@/ui/hooks/use-format-date';
 
 type Props = {
   times: string[];
@@ -20,11 +21,12 @@ type Props = {
 
 export function TimeChips({ times, error, onChange }: Props) {
   const { t } = useTranslation();
+  const { formatTimeOfDay, is24Hour } = useFormatTime();
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const onPicked = (_event: DateTimePickerChangeEvent, date: Date) => {
     setPickerOpen(false);
-    onChange(addTimeOfDay(times, formatTime(date)));
+    onChange(addTimeOfDay(times, toTimeOfDay(date)));
   };
 
   return (
@@ -35,12 +37,14 @@ export function TimeChips({ times, error, onChange }: Props) {
             key={time}
             onPress={() => onChange(times.filter((x) => x !== time))}
             accessibilityRole="button"
-            accessibilityLabel={t('schedule.removeTime', { time })}
+            accessibilityLabel={t('schedule.removeTime', {
+              time: formatTimeOfDay(time),
+            })}
             hitSlop={Spacing.four}
           >
             <ThemedView type="accentSoft" style={styles.token}>
               <ThemedText type="mono" themeColor="accent">
-                {time} ×
+                {formatTimeOfDay(time)} ×
               </ThemedText>
             </ThemedView>
           </Pressable>
@@ -55,7 +59,7 @@ export function TimeChips({ times, error, onChange }: Props) {
         {QUICK_TIMES.filter((time) => !times.includes(time)).map((time) => (
           <Chip
             key={time}
-            label={time}
+            label={formatTimeOfDay(time)}
             selected={false}
             onPress={() => onChange(addTimeOfDay(times, time))}
           />
@@ -70,7 +74,7 @@ export function TimeChips({ times, error, onChange }: Props) {
         <DateTimePicker
           value={new Date()}
           mode="time"
-          is24Hour
+          is24Hour={is24Hour}
           onValueChange={onPicked}
           onDismiss={() => setPickerOpen(false)}
         />
