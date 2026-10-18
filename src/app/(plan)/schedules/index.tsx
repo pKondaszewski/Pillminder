@@ -39,12 +39,12 @@ const NO_FILTERS: ScheduleListFilters = {
 
 export default function ScheduleListScreen() {
   const { t, i18n } = useTranslation();
-  const { products } = useProducts();
+  const { products, restoreProduct } = useProducts();
   const { items, loaded } = useScheduleList();
   const { resumeSchedule } = useSchedules();
   const [filters, setFilters] = useState(NO_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const runResume = useRunWithErrorAlert();
+  const runWithAlert = useRunWithErrorAlert();
 
   const now = new Date();
   const categories = listedScheduleCategories(items);
@@ -118,9 +118,15 @@ export default function ScheduleListScreen() {
                 now={now}
                 onPress={() => router.push(`/schedules/${item.id}`)}
                 onResume={() =>
-                  runResume(
+                  runWithAlert(
                     () => resumeSchedule(item.id),
                     'schedule.errorResume',
+                  )
+                }
+                onRestoreProduct={() =>
+                  runWithAlert(
+                    () => restoreProduct(item.productId),
+                    'schedule.errorRestoreProduct',
                   )
                 }
               />

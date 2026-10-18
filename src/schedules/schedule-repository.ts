@@ -22,6 +22,7 @@ export function scheduleListQuery() {
       productName: products.name,
       productCategory: products.category,
       productUnit: products.unit,
+      productStatus: products.status,
       profileImageFileName: productImages.fileName,
     })
     .from(schedules)

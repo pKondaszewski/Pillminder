@@ -35,12 +35,38 @@ function item(
     productName: `Product ${id}`,
     productCategory: 'supplement',
     productUnit: null,
+    productStatus: 'active',
     profileImageFileName: null,
     ...overrides,
   };
 }
 
 describe('scheduleKind', () => {
+  it('is paused when the product is archived', () => {
+    // given
+    const schedule = item('a', { productStatus: 'archived' });
+
+    // when
+    const result = scheduleKind(schedule, NOW);
+
+    // then
+    expect(result).toBe('paused');
+  });
+
+  it('is paused for an archived product even after the end date', () => {
+    // given
+    const schedule = item('a', {
+      productStatus: 'archived',
+      endDate: day(10, 1),
+    });
+
+    // when
+    const result = scheduleKind(schedule, NOW);
+
+    // then
+    expect(result).toBe('paused');
+  });
+
   it('is ongoing without an end date', () => {
     // given
     const schedule = item('a');
@@ -235,5 +261,33 @@ describe('courseProgress', () => {
 
     // then
     expect(result).toEqual({ day: 5, total: 5 });
+  });
+});
+
+describe('groupSchedules with archived products', () => {
+  it('lists an archived product schedule under paused', () => {
+    // given
+    const items = [item('a', { productStatus: 'archived' }), item('b')];
+
+    // when
+    const result = groupSchedules(items, NO_FILTERS, NOW, 'en');
+
+    // then
+    expect(result.map((g) => [g.kind, g.items.map((i) => i.id)])).toEqual([
+      ['ongoing', ['b']],
+      ['paused', ['a']],
+    ]);
+  });
+
+  it('matches the paused kind filter', () => {
+    // given
+    const items = [item('a', { productStatus: 'archived' }), item('b')];
+    const filters = { ...NO_FILTERS, kind: 'paused' as const };
+
+    // when
+    const result = groupSchedules(items, filters, NOW, 'en');
+
+    // then
+    expect(result.map((g) => g.items.map((i) => i.id))).toEqual([['a']]);
   });
 });
