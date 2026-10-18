@@ -6,6 +6,7 @@ import {
   deleteImageRow,
   imagesByProductQuery,
   type ProductImage,
+  setProfileImageRow,
 } from './image-repository';
 import type { ImageRole } from './image-role';
 
@@ -50,4 +51,17 @@ export async function removeImage(image: ProductImage): Promise<void> {
     throw err;
   }
   deleteImageFiles([image.fileName]);
+}
+
+export async function setProfileImage(
+  productId: string,
+  imageId: string,
+): Promise<void> {
+  log.info(`Setting image ${imageId} as the profile of product ${productId}`);
+  try {
+    await setProfileImageRow(productId, imageId);
+  } catch (err) {
+    log.error(`Failed to set the profile image of product ${productId}`, err);
+    throw err;
+  }
 }

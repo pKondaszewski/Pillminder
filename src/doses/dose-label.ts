@@ -14,6 +14,17 @@ export function reminderBody(
   name: string,
   quantity: number,
   unit: ProductUnit | null,
+  fasting: boolean,
+  t: Translate,
+): string {
+  const body = quantityBody(name, quantity, unit, t);
+  return fasting ? `${body} · ${t('notification.fastingSuffix')}` : body;
+}
+
+function quantityBody(
+  name: string,
+  quantity: number,
+  unit: ProductUnit | null,
   t: Translate,
 ): string {
   if (unit) {

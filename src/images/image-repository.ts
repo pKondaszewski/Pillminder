@@ -1,8 +1,8 @@
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
-import { productImages } from '@/config/db/schema';
+import { productImages, products } from '@/config/db/schema';
 
 import type { ImageRole } from './image-role';
 
@@ -31,15 +31,36 @@ export async function createImageRow(
   fileName: string,
   role: ImageRole,
 ): Promise<void> {
-  await db.insert(productImages).values({
-    id: Crypto.randomUUID(),
-    productId,
-    fileName,
-    role,
-    createdAt: new Date(),
+  const id = Crypto.randomUUID();
+  db.transaction((tx) => {
+    tx.insert(productImages)
+      .values({ id, productId, fileName, role, createdAt: new Date() })
+      .run();
+    tx.update(products)
+      .set({ profileImageId: id })
+      .where(and(eq(products.id, productId), isNull(products.profileImageId)))
+      .run();
   });
 }
 
+export async function setProfileImageRow(
+  productId: string,
+  imageId: string,
+): Promise<void> {
+  await db
+    .update(products)
+    .set({ profileImageId: imageId })
+    .where(eq(products.id, productId));
+}
+
 export async function deleteImageRow(id: string): Promise<void> {
-  await db.delete(productImages).where(eq(productImages.id, id));
+  // useLiveQuery only reacts to writes on the queried table, so the profile
+  // reference is cleared explicitly instead of through the foreign key action.
+  db.transaction((tx) => {
+    tx.update(products)
+      .set({ profileImageId: null })
+      .where(eq(products.profileImageId, id))
+      .run();
+    tx.delete(productImages).where(eq(productImages.id, id)).run();
+  });
 }

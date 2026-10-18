@@ -71,6 +71,20 @@
       "when": 1791756010349,
       "tag": "0009_add_product_images",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1792334026169,
+      "tag": "0010_add_product_fasting",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1792334026763,
+      "tag": "0011_add_product_profile_image",
+      "breakpoints": true
     }
   ]
 }

@@ -1,27 +1,42 @@
-import { and, eq, inArray, isNotNull, notInArray, sql } from 'drizzle-orm';
+import {
+  and,
+  eq,
+  getTableColumns,
+  inArray,
+  isNotNull,
+  notInArray,
+  sql,
+} from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
-import { products } from '@/config/db/schema';
+import { productImages, products } from '@/config/db/schema';
 
 import { BUILT_IN_CATEGORIES, normalizeCategory } from './category';
 import type { NewProductInput } from './dto/new-product-input';
 
-export type Product = typeof products.$inferSelect;
+type ProductRow = typeof products.$inferSelect;
+export type Product = Awaited<ReturnType<typeof productsQuery>>[number];
 export type ProductStatus = Product['status'];
 
 export function productsQuery() {
-  return db.select().from(products);
+  return db
+    .select({
+      ...getTableColumns(products),
+      profileImageFileName: productImages.fileName,
+    })
+    .from(products)
+    .leftJoin(productImages, eq(products.profileImageId, productImages.id));
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {
-  const [product] = await db.select().from(products).where(eq(products.id, id));
+  const [product] = await productsQuery().where(eq(products.id, id));
   return product;
 }
 
 export async function getProductsByIds(ids: string[]): Promise<Product[]> {
   if (ids.length === 0) return [];
-  return db.select().from(products).where(inArray(products.id, ids));
+  return productsQuery().where(inArray(products.id, ids));
 }
 
 export async function getCustomCategories(): Promise<string[]> {
@@ -35,7 +50,7 @@ export async function getCustomCategories(): Promise<string[]> {
 
 export async function createProductRow(
   input: NewProductInput,
-): Promise<Product> {
+): Promise<ProductRow> {
   const category = await resolveCategory(input.category);
   const now = new Date();
   const [created] = await db
@@ -55,7 +70,7 @@ export async function createProductRow(
 export async function updateProductRow(
   id: string,
   input: NewProductInput,
-): Promise<Product> {
+): Promise<ProductRow> {
   const category = await resolveCategory(input.category);
   const [updated] = await db
     .update(products)
@@ -114,5 +129,6 @@ function productFields(input: NewProductInput, category: string) {
     storeLink: input.storeLink ?? null,
     stock: input.stock ?? null,
     packSize: input.packSize ?? null,
+    fasting: input.fasting ?? false,
   };
 }

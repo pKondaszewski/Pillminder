@@ -64,8 +64,12 @@ const HORIZON_DAYS = 30;
 
 function reminderTexts(product: Product, quantity: number) {
   const name = productLabel(product.name, product.strength);
-  const body = reminderBody(name, quantity, product.unit, (key, options) =>
-    i18n.t(key, options),
+  const body = reminderBody(
+    name,
+    quantity,
+    product.unit,
+    product.fasting,
+    (key, options) => i18n.t(key, options),
   );
   return {
     first: { title: i18n.t('notification.title'), body },

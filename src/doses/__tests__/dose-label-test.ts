@@ -54,7 +54,7 @@ describe('doseQuantityText', () => {
 describe('reminderBody', () => {
   it('keeps the plain body for a single piece without a unit', () => {
     // when
-    const body = reminderBody('Vitamin D', 1, null, translator('en'));
+    const body = reminderBody('Vitamin D', 1, null, false, translator('en'));
 
     // then
     expect(body).toBe('Time to take Vitamin D');
@@ -62,7 +62,7 @@ describe('reminderBody', () => {
 
   it('keeps the multiplied body for several pieces without a unit', () => {
     // when
-    const body = reminderBody('Vitamin D', 2, null, translator('en'));
+    const body = reminderBody('Vitamin D', 2, null, false, translator('en'));
 
     // then
     expect(body).toBe('Time to take 2 × Vitamin D');
@@ -70,7 +70,13 @@ describe('reminderBody', () => {
 
   it('names the amount with a unit, also for 1', () => {
     // when
-    const body = reminderBody('Vitamin D', 1, 'tablet', translator('en'));
+    const body = reminderBody(
+      'Vitamin D',
+      1,
+      'tablet',
+      false,
+      translator('en'),
+    );
 
     // then
     expect(body).toBe('Time to take Vitamin D: 1 tablet');
@@ -78,9 +84,31 @@ describe('reminderBody', () => {
 
   it('uses the Polish plural form with a unit', () => {
     // when
-    const body = reminderBody('Witamina D', 5, 'drop', translator('pl'));
+    const body = reminderBody('Witamina D', 5, 'drop', false, translator('pl'));
 
     // then
     expect(body).toBe('Czas wziąć Witamina D: 5 kropli');
+  });
+
+  it('appends the fasting note in Polish', () => {
+    // when
+    const body = reminderBody(
+      'Euthyrox 50 µg',
+      1,
+      null,
+      true,
+      translator('pl'),
+    );
+
+    // then
+    expect(body).toBe('Czas wziąć Euthyrox 50 µg · na czczo');
+  });
+
+  it('appends the fasting note after the amount in English', () => {
+    // when
+    const body = reminderBody('Euthyrox', 2, 'tablet', true, translator('en'));
+
+    // then
+    expect(body).toBe('Time to take Euthyrox: 2 tablets · on an empty stomach');
   });
 });
