@@ -1,34 +1,32 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { isoDay } from '@/config/date-utils';
 import {
+  type DayStatus,
+  dayStatus,
   monthSummary,
   monthSummaryText,
   type TodayDose,
 } from '@/doses/dose-service';
-import { MIN_TOUCH_SIZE, Radius, Spacing } from '@/ui/commons/constants/theme';
+import { Radius, Spacing, type ThemeColor } from '@/ui/commons/constants/theme';
 import { BottomSheet } from '@/ui/components/commons/bottom-sheet';
 import { SecondaryButton } from '@/ui/components/commons/button';
 import { Chip } from '@/ui/components/commons/chip';
+import {
+  type DayCellState,
+  MonthGrid,
+} from '@/ui/components/commons/month-grid';
+import { MonthHeader, monthName } from '@/ui/components/commons/month-header';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { MonthGrid } from '@/ui/components/today/month-grid';
 
-const MONTH_KEYS = [
-  'january',
-  'february',
-  'march',
-  'april',
-  'may',
-  'june',
-  'july',
-  'august',
-  'september',
-  'october',
-  'november',
-  'december',
-] as const;
+const MARKER_COLORS: Partial<Record<DayStatus, ThemeColor>> = {
+  allTaken: 'taken',
+  skipped: 'skipped',
+  missed: 'overdue',
+};
 
 type FilterProduct = { id: string; name: string };
 
@@ -71,7 +69,23 @@ export function MonthCalendarSheet({
 }: Props) {
   const { t } = useTranslation();
   const [choosingProduct, setChoosingProduct] = useState(false);
-  const monthName = t(`calendar.month.${MONTH_KEYS[month.getMonth()]}`);
+  const currentMonthName = monthName(month, t);
+
+  const cellState = (day: Date): DayCellState => {
+    const status = dayStatus(day, doses, now);
+    const selected = isoDay(day) === isoDay(selectedDay);
+    const statusLabel =
+      status === 'none'
+        ? t('calendar.emptyDay')
+        : t(`calendar.status.${status}`);
+    return {
+      selected,
+      fill: selected ? 'surface' : 'background',
+      disabled: isoDay(day) > isoDay(lastDay),
+      markerColor: MARKER_COLORS[status],
+      accessibilityLabel: `${day.getDate()}, ${statusLabel}`,
+    };
+  };
 
   const chooseProduct = (productId: string | null) => {
     onFilterProduct(productId);
@@ -92,29 +106,13 @@ export function MonthCalendarSheet({
         />
       ) : (
         <>
-          <View style={styles.monthHeader}>
-            <MonthButton
-              symbol="‹"
-              accessibilityLabel={t('calendar.previousMonth')}
-              onPress={() => onChangeMonth(-1)}
-            />
-            <ThemedText type="headline">
-              {`${monthName} ${month.getFullYear()}`}
-            </ThemedText>
-            <MonthButton
-              symbol="›"
-              accessibilityLabel={t('calendar.nextMonth')}
-              onPress={() => onChangeMonth(1)}
-            />
-          </View>
+          <MonthHeader month={month} onChangeMonth={onChangeMonth} />
           <MonthGrid
             days={days}
             month={month}
-            doses={doses}
-            selectedDay={selectedDay}
-            lastDay={lastDay}
             weekdayKeys={weekdayKeys}
             now={now}
+            cellState={cellState}
             onSelectDay={onSelectDay}
           />
           <View style={styles.filter}>
@@ -132,7 +130,11 @@ export function MonthCalendarSheet({
           </View>
           <ThemedView type="surface" style={styles.summary}>
             <ThemedText type="small">
-              {monthSummaryText(monthSummary(doses, month, now), monthName, t)}
+              {monthSummaryText(
+                monthSummary(doses, month, now),
+                currentMonthName,
+                t,
+              )}
             </ThemedText>
           </ThemedView>
           <View style={styles.actions}>
@@ -183,41 +185,7 @@ function ProductChoices({
   );
 }
 
-function MonthButton({
-  symbol,
-  accessibilityLabel,
-  onPress,
-}: {
-  symbol: string;
-  accessibilityLabel: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      style={({ pressed }) => [styles.monthButton, pressed && styles.pressed]}
-    >
-      <ThemedText type="subtitle" themeColor="accent">
-        {symbol}
-      </ThemedText>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
-  monthHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  monthButton: {
-    width: MIN_TOUCH_SIZE,
-    height: MIN_TOUCH_SIZE,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   filter: {
     flexDirection: 'row',
   },
@@ -232,8 +200,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.eight,
-  },
-  pressed: {
-    opacity: 0.7,
   },
 });

@@ -1,4 +1,8 @@
-import { formatLongDate, resolveDateLocale } from '../format-date';
+import {
+  formatDateRange,
+  formatLongDate,
+  resolveDateLocale,
+} from '../format-date';
 
 const NOW = new Date(2026, 9, 18);
 const DATE = new Date(2026, 9, 24);
@@ -90,5 +94,33 @@ describe('resolveDateLocale', () => {
 
     // then
     expect(locale).toBe('pl-PL');
+  });
+});
+
+describe('formatDateRange', () => {
+  const format = (date: Date) => formatLongDate(date, 'pl', NOW);
+
+  it('shares the month within one month', () => {
+    // when
+    const text = formatDateRange(DATE, new Date(2026, 9, 30), format);
+
+    // then
+    expect(text).toBe('24-30 października');
+  });
+
+  it('names both months across months', () => {
+    // when
+    const text = formatDateRange(DATE, new Date(2026, 10, 2), format);
+
+    // then
+    expect(text).toBe('24 października - 2 listopada');
+  });
+
+  it('shows a single date for a one-day range', () => {
+    // when
+    const text = formatDateRange(DATE, DATE, format);
+
+    // then
+    expect(text).toBe('24 października');
   });
 });

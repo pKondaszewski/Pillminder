@@ -3,11 +3,6 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { splitIntoWeeks } from '@/config/calendar-grid';
 import { isoDay } from '@/config/date-utils';
-import {
-  type DayStatus,
-  dayStatus,
-  type TodayDose,
-} from '@/doses/dose-service';
 import { Radius, Spacing, type ThemeColor } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
@@ -15,31 +10,29 @@ import { useTheme } from '@/ui/hooks/use-theme';
 
 const MARKER_SIZE = 8;
 
-const MARKER_COLORS: Partial<Record<DayStatus, ThemeColor>> = {
-  allTaken: 'taken',
-  skipped: 'skipped',
-  missed: 'overdue',
+export type DayCellState = {
+  selected: boolean;
+  fill: ThemeColor;
+  disabled: boolean;
+  markerColor?: ThemeColor;
+  accessibilityLabel: string;
 };
 
 type Props = {
   days: Date[];
   month: Date;
-  doses: TodayDose[];
-  selectedDay: Date;
-  lastDay: Date;
   weekdayKeys: string[];
   now: Date;
+  cellState: (day: Date) => DayCellState;
   onSelectDay: (day: Date) => void;
 };
 
 export function MonthGrid({
   days,
   month,
-  doses,
-  selectedDay,
-  lastDay,
   weekdayKeys,
   now,
+  cellState,
   onSelectDay,
 }: Props) {
   const { t } = useTranslation();
@@ -65,10 +58,8 @@ export function MonthGrid({
               key={isoDay(day)}
               day={day}
               inMonth={day.getMonth() === month.getMonth()}
-              selected={isoDay(day) === isoDay(selectedDay)}
               isToday={isoDay(day) === isoDay(now)}
-              disabled={isoDay(day) > isoDay(lastDay)}
-              status={dayStatus(day, doses, now)}
+              state={cellState(day)}
               onPress={() => onSelectDay(day)}
             />
           ))}
@@ -81,42 +72,34 @@ export function MonthGrid({
 function DayCell({
   day,
   inMonth,
-  selected,
   isToday,
-  disabled,
-  status,
+  state: { selected, fill, disabled, markerColor, accessibilityLabel },
   onPress,
 }: {
   day: Date;
   inMonth: boolean;
-  selected: boolean;
   isToday: boolean;
-  disabled: boolean;
-  status: DayStatus;
+  state: DayCellState;
   onPress: () => void;
 }) {
-  const { t } = useTranslation();
   const theme = useTheme();
-  const markerColor = MARKER_COLORS[status];
-  const statusLabel =
-    status === 'none' ? t('calendar.emptyDay') : t(`calendar.status.${status}`);
 
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
       accessibilityRole="button"
-      accessibilityLabel={`${day.getDate()}, ${statusLabel}`}
+      accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected, disabled }}
       style={[styles.cellPressable, disabled && styles.disabled]}
     >
       <ThemedView
-        type={selected ? 'surface' : 'background'}
+        type={fill}
         style={[styles.cell, isToday && { borderColor: theme.accent }]}
       >
         <ThemedText
           type={isToday ? 'smallBold' : 'small'}
-          themeColor={dayNumberColor(inMonth, isToday)}
+          themeColor={dayNumberColor(inMonth, isToday, fill)}
         >
           {day.getDate()}
         </ThemedText>
@@ -131,7 +114,12 @@ function DayCell({
   );
 }
 
-function dayNumberColor(inMonth: boolean, isToday: boolean): ThemeColor {
+function dayNumberColor(
+  inMonth: boolean,
+  isToday: boolean,
+  fill: ThemeColor,
+): ThemeColor {
+  if (fill === 'accent') return 'onAccent';
   if (isToday) return 'accent';
   return inMonth ? 'text' : 'textTertiary';
 }

@@ -20,6 +20,7 @@ type Props = {
   title: string;
   onClose: () => void;
   onSave?: () => void;
+  saveDisabled?: boolean;
   children: ReactNode;
 };
 
@@ -29,6 +30,7 @@ export function BottomSheet({
   title,
   onClose,
   onSave,
+  saveDisabled,
   children,
 }: Props) {
   const { t } = useTranslation();
@@ -68,7 +70,11 @@ export function BottomSheet({
           {onSave ? (
             <ThemedView style={styles.actions}>
               <SecondaryButton label={t('editor.cancel')} onPress={onClose} />
-              <PrimaryButton label={t('editor.save')} onPress={onSave} />
+              <PrimaryButton
+                label={t('editor.save')}
+                onPress={onSave}
+                disabled={saveDisabled}
+              />
             </ThemedView>
           ) : null}
         </ThemedView>

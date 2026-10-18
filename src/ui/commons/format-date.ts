@@ -20,6 +20,20 @@ export function formatLongDate(
   }).format(date);
 }
 
+export function formatDateRange(
+  from: Date,
+  to: Date,
+  formatDate: (date: Date) => string,
+): string {
+  if (from.getTime() === to.getTime()) return formatDate(from);
+  const sameMonth =
+    from.getFullYear() === to.getFullYear() &&
+    from.getMonth() === to.getMonth();
+  return sameMonth
+    ? `${from.getDate()}-${formatDate(to)}`
+    : `${formatDate(from)} - ${formatDate(to)}`;
+}
+
 export function formatTime(date: Date): string {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
