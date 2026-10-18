@@ -26,6 +26,10 @@ export function supportsStrength(category: string): boolean {
   return category !== 'care';
 }
 
+export function supportsFasting(category: string): boolean {
+  return category === 'medication';
+}
+
 export function storeSuggestionKeys(category: string): string[] {
   return isBuiltInCategory(category)
     ? BUILT_IN_STORE_SUGGESTIONS[category]

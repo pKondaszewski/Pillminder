@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet } from 'react-native';
 
-import { imageFileUri } from '@/images/image-service';
 import { categoryLabel } from '@/products/category';
 import { productLabel } from '@/products/product-label';
 import type { Product } from '@/products/product-service';
@@ -40,11 +39,7 @@ export function ProductRow({ product, rhythm, stock, onPress }: Props) {
         category={product.category}
         size={40}
         dimmed={archived}
-        imageUri={
-          product.profileImageFileName
-            ? imageFileUri(product.profileImageFileName)
-            : null
-        }
+        imageFileName={product.profileImageFileName}
       />
       <ThemedView style={styles.texts}>
         <ThemedText numberOfLines={1}>

@@ -5,6 +5,7 @@ import {
   isBuiltInCategory,
   normalizeCategory,
   storeSuggestionKeys,
+  supportsFasting,
   supportsStrength,
 } from '../category';
 
@@ -73,6 +74,19 @@ describe('category-dependent behaviour', () => {
   ])('supportsStrength(%s) is %s', (category, expected) => {
     // when
     const result = supportsStrength(category);
+
+    // then
+    expect(result).toBe(expected);
+  });
+
+  it.each([
+    ['medication', true],
+    ['supplement', false],
+    ['care', false],
+    ['Eye drops', false],
+  ])('supportsFasting(%s) is %s', (category, expected) => {
+    // when
+    const result = supportsFasting(category);
 
     // then
     expect(result).toBe(expected);

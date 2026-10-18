@@ -5,27 +5,25 @@ import { Alert } from 'react-native';
 
 import {
   addImage,
+  DEFAULT_IMAGE_ROLE,
   getImagesQuery,
-  type ImageRole,
   type ImageSource,
-  pickImage,
   removeImage,
+  setProfileImage,
 } from '@/images/image-service';
+import { usePickImage } from '@/ui/hooks/use-pick-image';
 
 export function useProductImages(productId: string) {
   const { t } = useTranslation();
   const { data } = useLiveQuery(getImagesQuery(productId), [productId]);
+  const pickImageUri = usePickImage();
   const [busy, setBusy] = useState(false);
 
-  const pickAndAddImage = async (source: ImageSource, role: ImageRole) => {
+  const pickAndAddImage = async (source: ImageSource) => {
     setBusy(true);
     try {
-      const result = await pickImage(source);
-      if (result.status === 'permissionDenied') {
-        Alert.alert(t('products.errorTitle'), t('images.cameraDenied'));
-      } else if (result.status === 'picked') {
-        await addImage(productId, result.uri, role);
-      }
+      const uri = await pickImageUri(source);
+      if (uri) await addImage(productId, uri, DEFAULT_IMAGE_ROLE);
     } catch {
       Alert.alert(t('products.errorTitle'), t('images.errorSave'));
     } finally {
@@ -33,5 +31,13 @@ export function useProductImages(productId: string) {
     }
   };
 
-  return { images: data, busy, pickAndAddImage, removeImage };
+  const setProfile = async (imageId: string) => {
+    try {
+      await setProfileImage(productId, imageId);
+    } catch {
+      Alert.alert(t('products.errorTitle'), t('images.errorProfile'));
+    }
+  };
+
+  return { images: data, busy, pickAndAddImage, removeImage, setProfile };
 }

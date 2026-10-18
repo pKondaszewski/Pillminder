@@ -9,10 +9,10 @@ import {
 } from '@/products/product-list';
 import type { Product } from '@/products/product-service';
 import { MIN_TOUCH_SIZE, Spacing } from '@/ui/commons/constants/theme';
+import { ProductAvatar } from '@/ui/components/commons/product-avatar';
 import { SearchField } from '@/ui/components/commons/search-field';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { ScheduleProductAvatar } from '@/ui/components/schedules/avatar';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
@@ -104,9 +104,9 @@ function ProductRadioRow({
           <View style={[styles.radioDot, { backgroundColor: theme.accent }]} />
         ) : null}
       </View>
-      <ScheduleProductAvatar
+      <ProductAvatar
         category={product.category}
-        profileImageFileName={product.profileImageFileName}
+        imageFileName={product.profileImageFileName}
         size={36}
       />
       <ThemedText numberOfLines={1} style={styles.name}>

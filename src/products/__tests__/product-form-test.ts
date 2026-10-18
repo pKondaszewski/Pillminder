@@ -18,6 +18,7 @@ const VALID_VALUES: ProductFormValues = {
   stock: '60',
   packSize: '90',
   storeLink: ' rossmann ',
+  fasting: true,
 };
 
 const PRODUCT = {
@@ -128,7 +129,7 @@ describe('firstErrorField', () => {
 });
 
 describe('newProductInput', () => {
-  it('trims text, parses numbers and never sets the fasting flag', () => {
+  it('trims text, parses numbers and drops the fasting flag outside medication', () => {
     // when
     const input = newProductInput(VALID_VALUES);
 
@@ -144,6 +145,14 @@ describe('newProductInput', () => {
       packSize: 90,
       fasting: false,
     });
+  });
+
+  it('keeps the fasting flag for a medication', () => {
+    // when
+    const input = newProductInput({ ...VALID_VALUES, category: 'medication' });
+
+    // then
+    expect(input.fasting).toBe(true);
   });
 
   it('drops the strength for a category without one', () => {

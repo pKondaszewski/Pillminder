@@ -9,9 +9,9 @@ import {
 } from '@/schedules/schedule-service';
 import { MIN_TOUCH_SIZE, Radius, Spacing } from '@/ui/commons/constants/theme';
 import { formatDate } from '@/ui/commons/format-date';
+import { ProductAvatar } from '@/ui/components/commons/product-avatar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { ScheduleProductAvatar } from '@/ui/components/schedules/avatar';
 import { CourseProgressBar } from '@/ui/components/schedules/course-progress';
 
 type Props = {
@@ -35,9 +35,9 @@ export function ScheduleRow({ item, kind, now, onPress, onResume }: Props) {
         style={({ pressed }) => [styles.content, pressed && styles.pressed]}
       >
         <View style={[styles.main, dimmed && styles.dimmed]}>
-          <ScheduleProductAvatar
+          <ProductAvatar
             category={item.productCategory}
-            profileImageFileName={item.profileImageFileName}
+            imageFileName={item.profileImageFileName}
             size={40}
           />
           <View style={styles.text}>

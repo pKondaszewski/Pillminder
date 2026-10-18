@@ -8,7 +8,6 @@ import {
   doseStatus,
   type TodayDose,
 } from '@/doses/dose-service';
-import { imageFileUri } from '@/images/image-files';
 import { Radius, Spacing, type ThemeColor } from '@/ui/commons/constants/theme';
 import { formatTime } from '@/ui/commons/format-date';
 import { Icon } from '@/ui/components/commons/icon';
@@ -44,9 +43,6 @@ export function DoseRow({
   const details = doseDetailsText(dose, t);
   const tinted = mode === 'today' && status === 'overdue';
   const handled = status === 'taken' || status === 'skipped';
-  const imageUri = dose.profileImageFileName
-    ? imageFileUri(dose.profileImageFileName)
-    : null;
   const onPress = rowPressHandler(mode, handled, dose, onRevert, onCorrect);
 
   return (
@@ -65,7 +61,7 @@ export function DoseRow({
         <ProductAvatar
           category={dose.category}
           size={36}
-          imageUri={imageUri}
+          imageFileName={dose.profileImageFileName}
           dimmed={handled}
         />
         <View style={styles.info}>

@@ -18,7 +18,7 @@ export {
 export { type ImageSource, pickImage } from './image-picker';
 export type { ProductImage } from './image-repository';
 export { getImageFileNamesByProduct } from './image-repository';
-export { IMAGE_ROLES, type ImageRole } from './image-role';
+export { DEFAULT_IMAGE_ROLE, IMAGE_ROLES, type ImageRole } from './image-role';
 
 const log = createLogger('image-service');
 

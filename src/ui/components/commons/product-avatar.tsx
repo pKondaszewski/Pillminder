@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { StyleSheet } from 'react-native';
 
+import { imageFileUri } from '@/images/image-service';
 import { categoryAvatar } from '@/products/category-avatar';
 import { Icon } from '@/ui/components/commons/icon';
 import { ThemedView } from '@/ui/components/commons/themed-view';
@@ -11,11 +12,16 @@ const RADIUS_BY_SIZE = { 36: 10, 40: 12, 88: 22 } as const;
 type Props = {
   category: string;
   size: keyof typeof RADIUS_BY_SIZE;
-  imageUri?: string | null;
+  imageFileName?: string | null;
   dimmed?: boolean;
 };
 
-export function ProductAvatar({ category, size, imageUri, dimmed }: Props) {
+export function ProductAvatar({
+  category,
+  size,
+  imageFileName,
+  dimmed,
+}: Props) {
   const theme = useTheme();
   const { tone, icon } = categoryAvatar(category);
   const colors = theme.category[tone];
@@ -34,8 +40,8 @@ export function ProductAvatar({ category, size, imageUri, dimmed }: Props) {
         dimmed && styles.dimmed,
       ]}
     >
-      {imageUri ? (
-        <Image source={{ uri: imageUri }} style={shape} />
+      {imageFileName ? (
+        <Image source={{ uri: imageFileUri(imageFileName) }} style={shape} />
       ) : (
         <Icon name={icon} size={size / 2} color={colors.icon} />
       )}
