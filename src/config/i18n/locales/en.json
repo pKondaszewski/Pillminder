@@ -190,6 +190,7 @@
     "bodyAmount": "Time to take {{name}}: {{amount}}",
     "bodyQuantity": "Time to take {{quantity}} × {{name}}",
     "buy": "Buy",
+    "fastingSuffix": "on an empty stomach",
     "reorderBody": "{{name}} is running low — time to reorder",
     "reorderBodyWithPrice": "{{name}} is running low — time to reorder ({{price}} {{currency}})",
     "reorderTitle": "Running low",

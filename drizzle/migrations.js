@@ -9,6 +9,8 @@ import m0006 from './0006_add_schedule_pause.sql';
 import m0007 from './0007_repair_schedule_interval_and_quantity.sql';
 import m0008 from './0008_add_product_pack_size.sql';
 import m0009 from './0009_add_product_images.sql';
+import m0010 from './0010_add_product_fasting.sql';
+import m0011 from './0011_add_product_profile_image.sql';
 
   export default {
     journal,
@@ -22,7 +24,9 @@ m0005,
 m0006,
 m0007,
 m0008,
-m0009
+m0009,
+m0010,
+m0011
     }
   }
   

@@ -194,6 +194,7 @@
     "bodyAmount": "Czas wziąć {{name}}: {{amount}}",
     "bodyQuantity": "Czas wziąć {{quantity}} × {{name}}",
     "buy": "Kup",
+    "fastingSuffix": "na czczo",
     "reorderBody": "{{name}} się kończy — czas dokupić",
     "reorderBodyWithPrice": "{{name}} się kończy — czas dokupić ({{price}} {{currency}})",
     "reorderTitle": "Kończy się zapas",

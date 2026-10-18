@@ -94,6 +94,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           stock: 30,
           packSize: 10,
           lastUsedAt: new Date('2026-02-10T07:30:00.000Z'),
+          fasting: true,
           createdAt: new Date('2026-01-01T00:00:00.000Z'),
           updatedAt: new Date('2026-02-10T07:30:00.000Z'),
         },
@@ -108,6 +109,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           status: 'active',
           stock: null,
           packSize: null,
+          fasting: false,
           lastUsedAt: null,
           createdAt: new Date('2026-01-05T00:00:00.000Z'),
           updatedAt: new Date('2026-01-05T00:00:00.000Z'),
@@ -272,6 +274,7 @@ describe('parseBackup: older schema and unknown fields', () => {
       status: 'active',
       stock: null,
       packSize: null,
+      fasting: false,
       lastUsedAt: null,
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-02T00:00:00.000Z'),
@@ -1054,5 +1057,58 @@ describe('parseBackup: product pack size', () => {
       code: 'invalidRow',
       detail: 'products[0].packSize',
     });
+  });
+});
+
+describe('parseBackup: product fasting flag', () => {
+  it('imports a backup made before the fasting flag as not fasting', () => {
+    // given
+    const text = backupText();
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.products[0].fasting).toBe(false);
+  });
+
+  it('keeps the fasting flag through a round trip', () => {
+    // given
+    const text = backupText({ products: [product({ fasting: true })] });
+
+    // when
+    const rows = rowsOf(serializeBackup(rowsOf(text), EXPORTED_AT));
+
+    // then
+    expect(rows.products[0].fasting).toBe(true);
+  });
+
+  it('rejects a fasting flag that is not a boolean', () => {
+    // given
+    const text = backupText({ products: [product({ fasting: 'yes' })] });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({
+      code: 'invalidRow',
+      detail: 'products[0].fasting',
+    });
+  });
+});
+
+describe('parseBackup: product profile image', () => {
+  it('drops the profile image reference on import and export', () => {
+    // given
+    const text = backupText({
+      products: [product({ profileImageId: 'img1' })],
+    });
+
+    // when
+    const rows = rowsOf(serializeBackup(rowsOf(text), EXPORTED_AT));
+
+    // then
+    expect(rows.products[0]).not.toHaveProperty('profileImageId');
   });
 });

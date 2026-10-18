@@ -88,7 +88,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function columnsOf(table: BackupTable): [string, SQLiteColumn][] {
-  return Object.entries(getTableColumns(TABLES[table]));
+  return Object.entries(getTableColumns(TABLES[table])).filter(
+    ([key]) => !(table === 'products' && key === 'profileImageId'),
+  );
 }
 
 function rowToJson(table: BackupTable, row: BackupRow): BackupRow {
@@ -159,6 +161,8 @@ function isValidValue(
   switch (column.dataType) {
     case 'date':
       return toDate(value) !== null;
+    case 'boolean':
+      return typeof value === 'boolean';
     case 'number':
       return Number.isInteger(value);
     case 'string':

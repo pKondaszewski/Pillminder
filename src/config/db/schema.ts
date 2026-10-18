@@ -1,4 +1,5 @@
 import {
+  type AnySQLiteColumn,
   index,
   integer,
   sqliteTable,
@@ -24,6 +25,11 @@ export const products = sqliteTable('products', {
     .default('active'),
   stock: integer('stock'),
   packSize: integer('pack_size'),
+  fasting: integer('fasting', { mode: 'boolean' }).notNull().default(false),
+  profileImageId: text('profile_image_id').references(
+    (): AnySQLiteColumn => productImages.id,
+    { onDelete: 'set null' },
+  ),
   lastUsedAt: integer('last_used_at', { mode: 'timestamp' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),

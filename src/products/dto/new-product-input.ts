@@ -11,4 +11,5 @@ export interface NewProductInput {
   storeLink?: string | null;
   stock?: number | null;
   packSize?: number | null;
+  fasting?: boolean;
 }
