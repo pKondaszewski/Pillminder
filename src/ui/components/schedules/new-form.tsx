@@ -23,9 +23,9 @@ import { describeStockSufficiency } from '@/schedules/stock-sufficiency';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDate } from '@/ui/commons/format-date';
 import { PrimaryButton } from '@/ui/components/commons/button';
+import { ProductAvatar } from '@/ui/components/commons/product-avatar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { ScheduleProductAvatar } from '@/ui/components/schedules/avatar';
 import { DosePreview } from '@/ui/components/schedules/dose-preview';
 import {
   type Period,
@@ -128,9 +128,9 @@ export function NewScheduleForm({
           >
             {productLocked && product ? (
               <View style={styles.locked}>
-                <ScheduleProductAvatar
+                <ProductAvatar
                   category={product.category}
-                  profileImageFileName={product.profileImageFileName}
+                  imageFileName={product.profileImageFileName}
                   size={36}
                 />
                 <ThemedText>

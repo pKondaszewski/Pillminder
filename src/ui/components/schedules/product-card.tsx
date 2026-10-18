@@ -6,9 +6,9 @@ import { productLabel } from '@/products/product-label';
 import type { Product } from '@/products/product-service';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
 import { Icon } from '@/ui/components/commons/icon';
+import { ProductAvatar } from '@/ui/components/commons/product-avatar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { ScheduleProductAvatar } from '@/ui/components/schedules/avatar';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
@@ -27,9 +27,9 @@ export function ScheduleProductCard({ product, onPress }: Props) {
       style={({ pressed }) => pressed && styles.pressed}
     >
       <ThemedView type="surface" style={styles.card}>
-        <ScheduleProductAvatar
+        <ProductAvatar
           category={product.category}
-          profileImageFileName={product.profileImageFileName}
+          imageFileName={product.profileImageFileName}
           size={40}
         />
         <View style={styles.text}>

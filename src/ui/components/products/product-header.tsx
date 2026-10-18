@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet } from 'react-native';
 
-import { imageFileUri } from '@/images/image-service';
 import { categoryLabel } from '@/products/category';
 import { categoryAvatar } from '@/products/category-avatar';
 import { productLabel } from '@/products/product-label';
@@ -45,11 +44,7 @@ export function ProductHeader({
         <ProductAvatar
           category={product.category}
           size={88}
-          imageUri={
-            product.profileImageFileName
-              ? imageFileUri(product.profileImageFileName)
-              : null
-          }
+          imageFileName={product.profileImageFileName}
         />
         {photoCount > 0 ? (
           <ThemedView type="accent" style={styles.badge}>

@@ -83,6 +83,7 @@
     "categoryRequired": "Pick a category",
     "close": "Close",
     "delete": "Delete",
+    "fasting": "On an empty stomach",
     "name": "Name",
     "namePlaceholder": "e.g. Vitamin D",
     "nameRequired": "Enter a product name",
@@ -215,20 +216,19 @@
     "unticked": "Not ticked"
   },
   "images": {
+    "add": "Add photo",
     "camera": "Take photo",
     "cameraDenied": "Camera access is denied. Allow it in the system settings or add the photo from the gallery.",
+    "delete": "Delete photo",
     "deleteConfirm": "Delete this photo?",
     "deleteTitle": "Delete photo?",
-    "empty": "No photos yet",
     "errorDelete": "Could not delete the photo. Try again.",
+    "errorProfile": "Could not change the profile photo. Try again.",
     "errorSave": "Could not add the photo. Try again.",
     "gallery": "From gallery",
     "preview": "Show photo",
-    "role": {
-      "box": "Box",
-      "document": "Receipt / prescription",
-      "pill": "Pill"
-    },
+    "profile": "Profile photo",
+    "setProfile": "Set as profile photo",
     "title": "Photos"
   },
   "migrationError": {

@@ -87,6 +87,7 @@
     "categoryRequired": "Wybierz kategorię",
     "close": "Zamknij",
     "delete": "Usuń",
+    "fasting": "Na czczo",
     "name": "Nazwa",
     "namePlaceholder": "np. Witamina D",
     "nameRequired": "Podaj nazwę produktu",
@@ -235,20 +236,19 @@
     "unticked": "Nieodhaczona"
   },
   "images": {
+    "add": "Dodaj zdjęcie",
     "camera": "Zrób zdjęcie",
     "cameraDenied": "Brak dostępu do aparatu. Zezwól na niego w ustawieniach systemu albo dodaj zdjęcie z galerii.",
+    "delete": "Usuń zdjęcie",
     "deleteConfirm": "Usunąć to zdjęcie?",
     "deleteTitle": "Usunąć zdjęcie?",
-    "empty": "Brak zdjęć",
     "errorDelete": "Nie udało się usunąć zdjęcia. Spróbuj ponownie.",
+    "errorProfile": "Nie udało się zmienić zdjęcia profilowego. Spróbuj ponownie.",
     "errorSave": "Nie udało się dodać zdjęcia. Spróbuj ponownie.",
     "gallery": "Z galerii",
     "preview": "Pokaż zdjęcie",
-    "role": {
-      "box": "Pudełko",
-      "document": "Paragon / recepta",
-      "pill": "Tabletka"
-    },
+    "profile": "Zdjęcie profilowe",
+    "setProfile": "Ustaw jako profilowe",
     "title": "Zdjęcia"
   },
   "migrationError": {

@@ -1,4 +1,4 @@
-import { supportsStrength } from './category';
+import { supportsFasting, supportsStrength } from './category';
 import type { NewProductInput } from './dto/new-product-input';
 import type { Product } from './product-service';
 import type { ProductUnit } from './product-unit';
@@ -29,6 +29,7 @@ export type ProductFormErrors = Partial<
 export type ProductFormValues = Record<TextProductField, string> & {
   category: string;
   unit: ProductUnit | null;
+  fasting: boolean;
 };
 
 const FORM_FIELD_ORDER: ProductFormField[] = [
@@ -108,7 +109,7 @@ export function newProductInput(values: ProductFormValues): NewProductInput {
     storeLink: values.storeLink.trim() || null,
     stock: wholeNumberOrNull(values.stock, 0),
     packSize: wholeNumberOrNull(values.packSize, 1),
-    fasting: false,
+    fasting: supportsFasting(values.category) && values.fasting,
   };
 }
 

@@ -1,6 +1,9 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { Alert } from 'react-native';
 
+import { addImage, DEFAULT_IMAGE_ROLE } from '@/images/image-service';
+import type { NewProductInput } from '@/products/dto/new-product-input';
 import { NewProductForm } from '@/ui/components/products/new-product-form';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
@@ -19,14 +22,34 @@ export default function NewProductScreen() {
       : router.back(),
   );
 
+  const createProduct = async (
+    input: NewProductInput,
+    photoUri: string | null,
+  ) => {
+    const createdId = await addProduct(input);
+    if (photoUri) await addPhoto(createdId, photoUri);
+    return createdId;
+  };
+
+  const addPhoto = async (productId: string, uri: string) => {
+    try {
+      await addImage(productId, uri, DEFAULT_IMAGE_ROLE);
+    } catch {
+      Alert.alert(t('products.errorTitle'), t('images.errorSave'));
+    }
+  };
+
   return (
     <>
       <Stack.Screen
         options={{ headerShown: true, title: t('editor.newTitle') }}
       />
       <NewProductForm
-        onSubmit={(input) =>
-          runThenLeave(() => addProduct(input), 'products.errorSave')
+        onSubmit={(input, photoUri) =>
+          runThenLeave(
+            () => createProduct(input, photoUri),
+            'products.errorSave',
+          )
         }
       />
     </>

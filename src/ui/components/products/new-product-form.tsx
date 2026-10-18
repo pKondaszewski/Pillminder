@@ -1,9 +1,16 @@
+import { Image } from 'expo-image';
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type LayoutChangeEvent, ScrollView, StyleSheet } from 'react-native';
+import {
+  type LayoutChangeEvent,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { supportsStrength } from '@/products/category';
+import type { ImageSource } from '@/images/image-service';
+import { supportsFasting, supportsStrength } from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import {
   firstErrorField,
@@ -13,26 +20,33 @@ import {
   validateProductForm,
 } from '@/products/product-form';
 import { adjustWholeNumberText } from '@/products/whole-number-input';
-import { Spacing } from '@/ui/commons/constants/theme';
+import { Radius, Spacing } from '@/ui/commons/constants/theme';
 import { PrimaryButton } from '@/ui/components/commons/button';
+import { Icon } from '@/ui/components/commons/icon';
 import { Stepper } from '@/ui/components/commons/stepper';
 import { TextField } from '@/ui/components/commons/text-field';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { CategoryPicker } from '@/ui/components/products/category-picker';
+import { chooseImageSource } from '@/ui/components/products/choose-image-source';
+import { FastingRow } from '@/ui/components/products/fasting-row';
 import { StoreSuggestions } from '@/ui/components/products/store-suggestions';
 import { UnitChips } from '@/ui/components/products/unit-chips';
+import { usePickImage } from '@/ui/hooks/use-pick-image';
 import { useSettings } from '@/ui/hooks/use-settings';
+import { useTheme } from '@/ui/hooks/use-theme';
 
 const SUBMIT_BUTTON_HEIGHT = 52;
+const PHOTO_TILE_SIZE = 96;
 
 type Props = {
-  onSubmit: (input: NewProductInput) => void;
+  onSubmit: (input: NewProductInput, photoUri: string | null) => void;
 };
 
 export function NewProductForm({ onSubmit }: Props) {
   const { t } = useTranslation();
   const { currency } = useSettings();
+  const pickImageUri = usePickImage();
   const scrollRef = useRef<ScrollView>(null);
   const fieldOffsets = useRef<Partial<Record<ProductFormField, number>>>({});
 
@@ -45,7 +59,9 @@ export function NewProductForm({ onSubmit }: Props) {
     stock: '',
     packSize: '',
     storeLink: '',
+    fasting: false,
   });
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const errors = submitted ? validateProductForm(values) : {};
@@ -63,7 +79,7 @@ export function NewProductForm({ onSubmit }: Props) {
     const found = validateProductForm(values);
     const first = firstErrorField(found);
     if (first === null) {
-      onSubmit(newProductInput(values));
+      onSubmit(newProductInput(values), photoUri);
       return;
     }
     setSubmitted(true);
@@ -71,6 +87,11 @@ export function NewProductForm({ onSubmit }: Props) {
       y: Math.max(0, (fieldOffsets.current[first] ?? 0) - Spacing.sixteen),
       animated: true,
     });
+  };
+
+  const pickPhoto = async (source: ImageSource) => {
+    const uri = await pickImageUri(source);
+    if (uri) setPhotoUri(uri);
   };
 
   const showStrength =
@@ -84,6 +105,12 @@ export function NewProductForm({ onSubmit }: Props) {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
+          <PhotoPickerTile
+            uri={photoUri}
+            label={t('images.add')}
+            onPress={() => chooseImageSource(t, pickPhoto)}
+          />
+
           <FormField field="name" onOffset={recordOffset}>
             <FieldLabel text={t('editor.name')} />
             <TextField
@@ -121,6 +148,13 @@ export function NewProductForm({ onSubmit }: Props) {
               onSelect={(unit) => change({ unit })}
             />
           </ThemedView>
+
+          {supportsFasting(values.category) ? (
+            <FastingRow
+              value={values.fasting}
+              onChange={(fasting) => change({ fasting })}
+            />
+          ) : null}
 
           <ThemedText type="label">{t('editor.sectionStock')}</ThemedText>
           <FormField field="stock" onOffset={recordOffset}>
@@ -192,6 +226,33 @@ export function NewProductForm({ onSubmit }: Props) {
   );
 }
 
+function PhotoPickerTile({
+  uri,
+  label,
+  onPress,
+}: {
+  uri: string | null;
+  label: string;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={[styles.photoTile, { borderColor: theme.borderStrong }]}
+    >
+      {uri ? (
+        <Image source={{ uri }} style={styles.photoImage} contentFit="cover" />
+      ) : (
+        <Icon name="add_a_photo" size={28} color={theme.textSecondary} />
+      )}
+    </Pressable>
+  );
+}
+
 function FormField({
   field,
   onOffset,
@@ -234,6 +295,21 @@ const styles = StyleSheet.create({
   },
   field: {
     gap: Spacing.eight,
+  },
+  photoTile: {
+    width: PHOTO_TILE_SIZE,
+    height: PHOTO_TILE_SIZE,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderRadius: Radius.card,
+  },
+  photoImage: {
+    width: '100%',
+    height: '100%',
   },
   stepperValue: {
     flex: 1,

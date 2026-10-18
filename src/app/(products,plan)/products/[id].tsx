@@ -10,7 +10,6 @@ import { lastUsedText } from '@/products/product-text';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDate, formatTime } from '@/ui/commons/format-date';
 import { openStore } from '@/ui/commons/open-store';
-import { BottomSheet } from '@/ui/components/commons/bottom-sheet';
 import { Snackbar } from '@/ui/components/commons/snackbar';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DetailsSection } from '@/ui/components/products/details-section';
@@ -18,7 +17,6 @@ import {
   ProductFieldSheet,
   type ProductSheetField,
 } from '@/ui/components/products/field-sheets';
-import { ProductImages } from '@/ui/components/products/images';
 import { ProductNotes } from '@/ui/components/products/notes';
 import {
   ArchiveProductDialog,
@@ -40,7 +38,7 @@ import { useStockActions } from '@/ui/hooks/use-stock-actions';
 
 type Sheet =
   | { kind: 'field'; field: ProductSheetField }
-  | { kind: 'photos' | 'archive' | 'delete' };
+  | { kind: 'archive' | 'delete' };
 
 export default function ProductScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -96,7 +94,7 @@ function ProductDetail({ product }: { product: Product }) {
             formatDate,
             formatTime,
           )}
-          onPhotosPress={() => setSheet({ kind: 'photos' })}
+          onPhotosPress={() => router.push(`/products/${product.id}/photos`)}
           onNamePress={() => editField('name')}
           onCategoryPress={() => editField('category')}
         />
@@ -134,6 +132,16 @@ function ProductDetail({ product }: { product: Product }) {
           currency={currency}
           locale={i18n.language}
           onEdit={editField}
+          onFastingChange={(fasting) =>
+            runThenCloseSheet(
+              () =>
+                editProduct(
+                  product.id,
+                  editedProductInput(product, { fasting }),
+                ),
+              'products.errorSave',
+            )
+          }
         />
         <ProductActions
           status={product.status}
@@ -171,16 +179,6 @@ function ProductDetail({ product }: { product: Product }) {
           }
           onClose={() => setSheet(null)}
         />
-      ) : null}
-
-      {sheet?.kind === 'photos' ? (
-        <BottomSheet
-          visible
-          title={t('images.title')}
-          onClose={() => setSheet(null)}
-        >
-          <ProductImages productId={product.id} />
-        </BottomSheet>
       ) : null}
 
       {sheet?.kind === 'archive' ? (
