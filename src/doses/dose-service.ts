@@ -37,6 +37,22 @@ import {
 } from './dose-repository';
 import { isDueInFuture, isPending } from './dose-validator';
 
+export {
+  ARC_HEIGHT,
+  ARC_HORIZON_Y,
+  ARC_WIDTH,
+  arcPath,
+  type ArcPoint,
+  arcPoint,
+  axisTicks,
+  type DaySymbol,
+  daySymbol,
+  pieSlicePath,
+  skyPath,
+  type SkyTone,
+  skyTone,
+} from './day-arc';
+export { type DayPhases, dayPhases } from './day-phases';
 export type { CorrectionTarget } from './dose-correction';
 export { correctionStockDelta } from './dose-correction';
 export type { DayStatus } from './dose-day';

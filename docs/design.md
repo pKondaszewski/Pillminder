@@ -103,11 +103,20 @@ Build these once and reuse them; every screen below is made of them.
   - past day: gray `surface` card "Podsumowanie dnia" + counts, no action.
     The card always contains the DayTimeline and a count line ("1 z 5 wzięta · 1 pominięta ·
     1 zaległa · 2 później"). There is no progress ring and no streak.
-- **DayTimeline** - axis 06-24 with ticks 06/12/18/24 in mono. A "teraz" marker (word only, no
-  clock time) on today; the axis before it is darker. One dot per dose in its status color;
-  planned doses are hollow rings. Doses less than an hour apart merge into one bigger dot split
-  into pie slices, one per dose, each in its status color; more than 4 doses in one dot show the
-  count and the most urgent color (overdue > skipped > taken).
+- **DayTimeline** - the day as a half circle over a horizon line: arc from 06:00 (left end)
+  through 15:00 (top) to 24:00 (right end), ticks 06/12/18/24 in mono. The track is dashed; the
+  part already travelled (06 → now) is solid. On today a "now" symbol sits on the arc at the
+  current hour, by phase of the day: rising sun (sunrise → noon), sun (noon → sunset), moon
+  (sunset → sunrise). The phases come from the saved location when there is one, otherwise
+  they are fixed at 06 / 12 / 18 (also on polar day and night). The axis stays 06-24. The sky under the travelled part (down to the horizon) is filled with the
+  day state: `accentSoft` calm by day, `nightSoft` calm after sunset, `overdueSoft` when
+  something is overdue, `takenSoft` when everything is handled. Past and future days: arc and
+  dots only, no symbol and no sky. The card title and the next-dose line sit inside the half
+  circle; the counts line stays below. One dot per dose on the arc in its status color; planned
+  doses are hollow rings. Doses less than an hour apart merge into one bigger dot split into pie
+  slices, one per dose, each in its status color; more than 4 doses in one dot show the count and
+  the most urgent color (overdue > skipped > taken). Phases come from `dayPhases(date, coords)`
+  (fixed 06/12/18 without a location).
 - **DoseRow** - time (mono) · avatar · name + quantity line (+ "· na czczo" when the product has
   it) · trailing part by state:
   - pending: outlined "Weź";
@@ -157,7 +166,8 @@ Tabs: **Dziś, Produkty, Plan, Ustawienia**. There is no History tab.
 
 ### 3.1 Dziś (day view)
 
-- DayPager + TodayCard + doses grouped by TimeSlotSection.
+- DayPager + TodayCard (title and next dose inside the DayTimeline half circle) + doses grouped
+  by TimeSlotSection.
 - Past day: summary card, rows read-only with `›`, tap → correction sheet ("Co się stało z tą
   dawką?" with Wzięta / Pominięta tiles showing the stock effect, Anuluj / Zapisz). The sheet does
   not ask for the time taken.

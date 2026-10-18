@@ -1,129 +1,134 @@
-import { useTranslation } from 'react-i18next';
+import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Svg, { Path, Text as SvgText } from 'react-native-svg';
 
-import { type TimelineMark } from '@/doses/dose-service';
+import {
+  ARC_HEIGHT,
+  ARC_HORIZON_Y,
+  ARC_WIDTH,
+  arcPath,
+  arcPoint,
+  axisTicks,
+  type DaySymbol,
+  skyPath,
+  type SkyTone,
+  type TimelineMark,
+} from '@/doses/dose-service';
 import { FontFamily } from '@/ui/commons/constants/fonts';
-import { Spacing } from '@/ui/commons/constants/theme';
-import { ThemedText } from '@/ui/components/commons/themed-text';
-import { ThemedView } from '@/ui/components/commons/themed-view';
+import type { ThemeColor } from '@/ui/commons/constants/theme';
+import { DaySymbolMark } from '@/ui/components/today/day-symbol';
 import { TimelineDot } from '@/ui/components/today/timeline-dot';
+import { useTheme } from '@/ui/hooks/use-theme';
 
-const AXIS_TICKS = ['06', '12', '18', '24'];
-const TRACK_HEIGHT = 28;
-const LINE_HEIGHT = 2;
-const NOW_MARKER_WIDTH = 2;
-const NOW_LABEL_WIDTH = 48;
+const SKY_COLORS: Record<SkyTone, ThemeColor> = {
+  day: 'accentSoft',
+  night: 'nightSoft',
+  overdue: 'overdueSoft',
+  done: 'takenSoft',
+};
+const TRACK_WIDTH = 1.5;
+const PASSED_WIDTH = 2;
+const TRACK_DASH = '3 5';
+const TICK_FONT_SIZE = 11;
+const TEXT_INSET_X = 49;
+const TEXT_TOP_Y = 84;
+const TEXT_GAP = 2;
+const TEXT_INSET = `${(TEXT_INSET_X / ARC_WIDTH) * 100}%` as const;
+const TEXT_TOP = `${(TEXT_TOP_Y / ARC_HEIGHT) * 100}%` as const;
 
 type Props = {
   marks: TimelineMark[];
   nowPosition: number | null;
+  symbol: DaySymbol | null;
+  skyTone: SkyTone | null;
+  children: ReactNode;
 };
 
-export function DayTimeline({ marks, nowPosition }: Props) {
-  const { t } = useTranslation();
+export function DayTimeline({
+  marks,
+  nowPosition,
+  symbol,
+  skyTone,
+  children,
+}: Props) {
+  const theme = useTheme();
+  const now = nowPosition === null ? null : arcPoint(nowPosition);
 
   return (
     <View style={styles.container}>
-      {nowPosition !== null ? (
-        <View style={styles.nowLabelRow}>
-          <ThemedText
-            type="caption"
-            themeColor="accent"
-            style={[styles.nowLabel, { left: percent(nowPosition) }]}
+      <Svg
+        width="100%"
+        style={styles.arc}
+        viewBox={`0 0 ${ARC_WIDTH} ${ARC_HEIGHT}`}
+      >
+        {nowPosition !== null && skyTone !== null ? (
+          <Path d={skyPath(nowPosition)} fill={theme[SKY_COLORS[skyTone]]} />
+        ) : null}
+        <Path
+          d={arcPath(0, 1)}
+          fill="none"
+          stroke={theme.borderStrong}
+          strokeWidth={TRACK_WIDTH}
+          strokeDasharray={TRACK_DASH}
+          strokeLinecap="round"
+        />
+        {nowPosition !== null ? (
+          <Path
+            d={arcPath(0, nowPosition)}
+            fill="none"
+            stroke={theme.textTertiary}
+            strokeWidth={PASSED_WIDTH}
+            strokeLinecap="round"
+          />
+        ) : null}
+        <Path
+          d={`M0 ${ARC_HORIZON_Y}H${ARC_WIDTH}`}
+          stroke={theme.borderStrong}
+          strokeWidth={TRACK_WIDTH}
+        />
+        {axisTicks().map(({ label, x, y, anchor }) => (
+          <SvgText
+            key={label}
+            x={x}
+            y={y}
+            textAnchor={anchor}
+            fontFamily={FontFamily.mono}
+            fontSize={TICK_FONT_SIZE}
+            fill={theme.textTertiary}
           >
-            {t('home.timeline.now')}
-          </ThemedText>
-        </View>
-      ) : null}
-      <View style={styles.track}>
-        <ThemedView type="divider" style={styles.line} />
-        {nowPosition !== null ? (
-          <ThemedView
-            type="borderStrong"
-            style={[styles.elapsedLine, { width: percent(nowPosition) }]}
-          />
-        ) : null}
-        {nowPosition !== null ? (
-          <ThemedView
-            type="accent"
-            style={[styles.nowMarker, { left: percent(nowPosition) }]}
-          />
-        ) : null}
+            {label}
+          </SvgText>
+        ))}
         {marks.map((mark) => (
-          <View
+          <TimelineDot
             key={mark.id}
-            style={[styles.mark, { left: percent(mark.position) }]}
-          >
-            <TimelineDot statuses={mark.statuses} count={mark.count} />
-          </View>
+            statuses={mark.statuses}
+            count={mark.count}
+            center={arcPoint(mark.position)}
+          />
         ))}
-      </View>
-      <View style={styles.ticks}>
-        {AXIS_TICKS.map((tick) => (
-          <ThemedText key={tick} type="caption" style={styles.tick}>
-            {tick}
-          </ThemedText>
-        ))}
-      </View>
+        {now !== null && symbol !== null ? (
+          <DaySymbolMark symbol={symbol} x={now.x} y={now.y} />
+        ) : null}
+      </Svg>
+      <View style={styles.center}>{children}</View>
     </View>
   );
 }
 
-function percent(position: number): `${number}%` {
-  return `${position * 100}%`;
-}
-
 const styles = StyleSheet.create({
   container: {
-    gap: Spacing.four,
+    width: '100%',
   },
-  nowLabelRow: {
-    height: 16,
+  arc: {
+    aspectRatio: ARC_WIDTH / ARC_HEIGHT,
   },
-  nowLabel: {
+  center: {
     position: 'absolute',
-    width: NOW_LABEL_WIDTH,
-    marginLeft: -NOW_LABEL_WIDTH / 2,
-    textAlign: 'center',
-  },
-  track: {
-    height: TRACK_HEIGHT,
-    justifyContent: 'center',
-  },
-  line: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: (TRACK_HEIGHT - LINE_HEIGHT) / 2,
-    height: LINE_HEIGHT,
-  },
-  elapsedLine: {
-    position: 'absolute',
-    left: 0,
-    top: (TRACK_HEIGHT - LINE_HEIGHT) / 2,
-    height: LINE_HEIGHT,
-  },
-  nowMarker: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: NOW_MARKER_WIDTH,
-    marginLeft: -NOW_MARKER_WIDTH / 2,
-  },
-  mark: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: 0,
+    left: TEXT_INSET,
+    right: TEXT_INSET,
+    top: TEXT_TOP,
     alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'visible',
-  },
-  ticks: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  tick: {
-    fontFamily: FontFamily.mono,
+    gap: TEXT_GAP,
   },
 });

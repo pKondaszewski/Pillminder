@@ -1,20 +1,23 @@
 import type { TFunction } from 'i18next';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import {
   BULK_TAKE_MIN_OVERDUE,
   dayCountsText,
+  type DaySymbol,
   durationText,
   handledCountsText,
+  skyTone,
   type TimelineMark,
   type TodayCardState,
   type TodayDose,
 } from '@/doses/dose-service';
 import { Radius, Spacing, type ThemeColor } from '@/ui/commons/constants/theme';
 import { PrimaryButton } from '@/ui/components/commons/button';
+import { Icon } from '@/ui/components/commons/icon';
 import { ThemedText } from '@/ui/components/commons/themed-text';
-import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DayTimeline } from '@/ui/components/today/day-timeline';
 import { useFormatTime } from '@/ui/hooks/use-format-date';
 import { useTheme } from '@/ui/hooks/use-theme';
@@ -23,57 +26,73 @@ type Props = {
   state: TodayCardState;
   marks: TimelineMark[];
   nowPosition: number | null;
+  symbol: DaySymbol | null;
   onTake: (dose: TodayDose) => void;
   onTakeOverdue: (doses: TodayDose[]) => void;
 };
 
-const CARD_COLORS: Record<
-  TodayCardState['kind'],
-  { background: ThemeColor; border: ThemeColor; title: ThemeColor }
-> = {
-  calm: { background: 'background', border: 'border', title: 'text' },
-  overdue: {
-    background: 'overdueCard',
-    border: 'overdueCardBorder',
-    title: 'overdueText',
-  },
-  done: {
-    background: 'takenCard',
-    border: 'takenCardBorder',
-    title: 'takenText',
-  },
-  pastSummary: { background: 'surface', border: 'surface', title: 'text' },
-  futureSummary: { background: 'surface', border: 'surface', title: 'text' },
+const TITLE_COLORS: Record<TodayCardState['kind'], ThemeColor> = {
+  calm: 'text',
+  overdue: 'overdueText',
+  done: 'takenText',
+  pastSummary: 'text',
+  futureSummary: 'text',
 };
 
 export function TodayCard({
   state,
   marks,
   nowPosition,
+  symbol,
   onTake,
   onTakeOverdue,
 }: Props) {
   const { t } = useTranslation();
   const { formatTime } = useFormatTime();
   const theme = useTheme();
-  const colors = CARD_COLORS[state.kind];
   const { title, lines } = cardCopy(state, t, formatTime);
+  const sky = skyTone(state, symbol);
+  const [expanded, setExpanded] = useState(false);
 
   return (
-    <ThemedView
-      type={colors.background}
-      style={[styles.card, { borderColor: theme[colors.border] }]}
+    <Pressable
+      onPress={() => setExpanded(!expanded)}
+      accessibilityRole="button"
+      accessibilityState={{ expanded }}
+      accessibilityLabel={t(
+        expanded ? 'home.card.hideDetails' : 'home.card.showDetails',
+      )}
+      style={[
+        styles.card,
+        { backgroundColor: theme.background, borderColor: theme.border },
+      ]}
     >
-      <View style={styles.text}>
-        <ThemedText type="headline" themeColor={colors.title}>
-          {title}
-        </ThemedText>
-        {lines.map((line) => (
-          <ThemedText key={line} type="small" themeColor="textSecondary">
-            {line}
+      <DayTimeline
+        marks={marks}
+        nowPosition={nowPosition}
+        symbol={symbol}
+        skyTone={sky}
+      >
+        <View style={styles.text}>
+          <ThemedText
+            type="headline"
+            themeColor={TITLE_COLORS[state.kind]}
+            style={styles.centered}
+          >
+            {title}
           </ThemedText>
-        ))}
-      </View>
+          {lines.map((line) => (
+            <ThemedText
+              key={line}
+              type="small"
+              themeColor="textSecondary"
+              style={styles.centered}
+            >
+              {line}
+            </ThemedText>
+          ))}
+        </View>
+      </DayTimeline>
       {state.kind === 'overdue' ? (
         <View style={styles.action}>
           <PrimaryButton
@@ -86,11 +105,19 @@ export function TodayCard({
           />
         </View>
       ) : null}
-      <DayTimeline marks={marks} nowPosition={nowPosition} />
-      <ThemedText type="small" themeColor="textSecondary">
-        {countLine(state, t)}
-      </ThemedText>
-    </ThemedView>
+      <View style={styles.details}>
+        {expanded ? (
+          <ThemedText type="small" themeColor="textSecondary">
+            {countLine(state, t)}
+          </ThemedText>
+        ) : null}
+        <Icon
+          name={expanded ? 'expand_less' : 'expand_more'}
+          size={20}
+          color={theme.textTertiary}
+        />
+      </View>
+    </Pressable>
   );
 }
 
@@ -185,8 +212,17 @@ const styles = StyleSheet.create({
   text: {
     gap: Spacing.four,
     backgroundColor: 'transparent',
+    alignItems: 'center',
+  },
+  centered: {
+    textAlign: 'center',
   },
   action: {
     flexDirection: 'row',
+  },
+  details: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 });

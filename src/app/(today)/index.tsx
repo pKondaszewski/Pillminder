@@ -14,6 +14,8 @@ import type { SupportedLanguage } from '@/config/i18n';
 import {
   buildTimeline,
   type CorrectionTarget,
+  dayPhases,
+  daySymbol,
   groupDosesByTimeSlot,
   lastPlannedDay,
   nowPosition,
@@ -38,6 +40,7 @@ import { useDosesBetween } from '@/ui/hooks/use-doses-between';
 import { useFormatDate } from '@/ui/hooks/use-format-date';
 import { useNow } from '@/ui/hooks/use-now';
 import { useProducts } from '@/ui/hooks/use-products';
+import { useSunCoords } from '@/ui/hooks/use-sun-coords';
 import {
   type UndoableKind,
   useUndoableDoseAction,
@@ -47,6 +50,7 @@ export default function HomeScreen() {
   const { t, i18n } = useTranslation();
   const formatDate = useFormatDate();
   const now = useNow();
+  const coords = useSunCoords();
   const today = startOfDay(now);
   const { products, loaded } = useProducts();
 
@@ -150,6 +154,10 @@ export default function HomeScreen() {
     }
   };
 
+  const isToday = mode === 'today';
+  const currentPosition = isToday ? nowPosition(now) : null;
+  const currentSymbol = isToday ? daySymbol(now, dayPhases(day, coords)) : null;
+
   return (
     <TabSwipe>
       <ThemedView style={styles.container}>
@@ -189,9 +197,11 @@ export default function HomeScreen() {
             {doses.length > 0 ? (
               <>
                 <TodayCard
+                  key={isoDay(day)}
                   state={todayCardState(doses, day, now)}
                   marks={buildTimeline(doses, now)}
-                  nowPosition={mode === 'today' ? nowPosition(now) : null}
+                  nowPosition={currentPosition}
+                  symbol={currentSymbol}
                   onTake={(dose) => applyWithUndo('taken', dose)}
                   onTakeOverdue={takeOverdueConfirmation.request}
                 />
