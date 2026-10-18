@@ -26,6 +26,14 @@ export type ScheduleField =
   | 'period'
   | 'pause';
 
+export const SCHEDULE_FIELD_LABEL_KEYS: Record<ScheduleField, string> = {
+  rhythm: 'schedule.intervalDays',
+  times: 'schedule.timesOfDay',
+  quantity: 'schedule.quantity',
+  period: 'schedule.periodLabel',
+  pause: 'schedule.pauseAction',
+};
+
 type Props = {
   field: ScheduleField;
   schedule: Schedule;

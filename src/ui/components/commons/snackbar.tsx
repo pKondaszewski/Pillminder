@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 
@@ -22,11 +22,16 @@ export function Snackbar({
   onDismiss: () => void;
 }) {
   const theme = useTheme();
+  const onDismissRef = useRef(onDismiss);
 
   useEffect(() => {
-    const timer = setTimeout(onDismiss, AUTO_DISMISS_MS);
+    onDismissRef.current = onDismiss;
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(() => onDismissRef.current(), AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
-  }, [onDismiss]);
+  }, []);
 
   return (
     <Animated.View

@@ -23,8 +23,8 @@ import {
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ConfirmDialog } from '@/ui/components/commons/confirm-dialog';
 import { EmptyState } from '@/ui/components/commons/empty-state';
-import { Snackbar } from '@/ui/components/commons/snackbar';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { DayPager } from '@/ui/components/today/day-pager';
 import { DoseCorrectionSheet } from '@/ui/components/today/dose-correction-sheet';
@@ -71,11 +71,10 @@ export default function HomeScreen() {
     unskipDose,
     correctDoseState,
   } = useDayDoses(day);
-  const { undoable, applyWithUndo, takeAll, revert, undoLast, dismissUndo } =
-    useUndoableDoseAction({
-      taken: { apply: takeDose, revert: untakeDose },
-      skipped: { apply: skipDose, revert: unskipDose },
-    });
+  const { snackbar, applyWithUndo, takeAll, revert } = useUndoableDoseAction({
+    taken: { apply: takeDose, revert: untakeDose },
+    skipped: { apply: skipDose, revert: unskipDose },
+  });
   const revertConfirmation = useConfirmation<TodayDose>((dose) =>
     revert(undoableKindOf(dose), dose.id),
   );
@@ -217,17 +216,7 @@ export default function HomeScreen() {
             ) : null}
           </ScrollView>
         </SafeAreaView>
-        {undoable ? (
-          <Snackbar
-            key={undoable.id}
-            message={t(DOSE_ACTION_TOAST_KEYS[undoable.kind], {
-              name: undoable.name,
-            })}
-            actionLabel={t('home.undo')}
-            onAction={undoLast}
-            onDismiss={dismissUndo}
-          />
-        ) : null}
+        <UndoSnackbar snackbar={snackbar} />
         {correcting ? (
           <DoseCorrectionSheet
             key={correcting.id}
@@ -304,11 +293,6 @@ const DOSE_ACTION_TEXT_KEYS: Record<
 > = {
   taken: { title: 'home.undoTitle', message: 'home.undoConfirm' },
   skipped: { title: 'home.unskipTitle', message: 'home.unskipConfirm' },
-};
-
-const DOSE_ACTION_TOAST_KEYS: Record<UndoableKind, string> = {
-  taken: 'home.takenToast',
-  skipped: 'home.skippedToast',
 };
 
 const styles = StyleSheet.create({

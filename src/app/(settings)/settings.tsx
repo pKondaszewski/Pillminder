@@ -26,6 +26,7 @@ import { ScreenTitle } from '@/ui/components/commons/screen-title';
 import { SegmentedControl } from '@/ui/components/commons/segmented-control';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { AboutLine } from '@/ui/components/settings/about-line';
 import { BackupSection } from '@/ui/components/settings/backup-section';
@@ -41,6 +42,7 @@ import { useBackup } from '@/ui/hooks/use-backup';
 import { useBatteryOptimization } from '@/ui/hooks/use-battery-optimization';
 import { useNotificationPermission } from '@/ui/hooks/use-notification-permission';
 import { useSettings } from '@/ui/hooks/use-settings';
+import { useUndoSnackbar } from '@/ui/hooks/use-undo-snackbar';
 
 type Sheet = 'snooze' | 'currency';
 
@@ -51,6 +53,7 @@ export default function SettingsScreen() {
   const battery = useBatteryOptimization();
   const backup = useBackup();
   const [sheet, setSheet] = useState<Sheet | null>(null);
+  const { snackbar, runWithUndo } = useUndoSnackbar();
 
   const notifications = permission
     ? notificationCardState(permissionStep(permission))
@@ -155,8 +158,16 @@ export default function SettingsScreen() {
         <SnoozeSheet
           minutes={settings.snoozeMinutes}
           onSave={(minutes) => {
-            setSnoozeMinutes(minutes);
-            closeSheet();
+            const previous = settings.snoozeMinutes;
+            void runWithUndo(
+              {
+                message: t('editor.saved', { field: t('settings.snooze') }),
+                apply: () => setSnoozeMinutes(minutes),
+                revert: () => setSnoozeMinutes(previous),
+              },
+              'settings.errorSave',
+              closeSheet,
+            );
           }}
           onClose={closeSheet}
         />
@@ -166,12 +177,21 @@ export default function SettingsScreen() {
           currency={settings.currency}
           locale={i18n.language}
           onSave={(currency) => {
-            setCurrency(currency);
-            closeSheet();
+            const previous = settings.currency;
+            void runWithUndo(
+              {
+                message: t('editor.saved', { field: t('settings.currency') }),
+                apply: () => setCurrency(currency),
+                revert: () => setCurrency(previous),
+              },
+              'settings.errorSave',
+              closeSheet,
+            );
           }}
           onClose={closeSheet}
         />
       ) : null}
+      <UndoSnackbar snackbar={snackbar} />
     </TabSwipe>
   );
 }

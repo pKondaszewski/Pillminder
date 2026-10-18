@@ -1,54 +1,43 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert } from 'react-native';
 
 import type { Product } from '@/products/product-service';
 import { stockAmountText } from '@/products/product-text';
 
 import { useProducts } from './use-products';
+import type { RunWithUndo } from './use-undo-snackbar';
 
-type StockUndo = { id: number; previousStock: number; message: string };
-
-export function useStockActions({ id, stock, packSize, unit }: Product) {
+export function useStockActions(
+  { id, stock, packSize, unit }: Product,
+  runWithUndo: RunWithUndo,
+) {
   const { t } = useTranslation();
   const { setStock, restockPack } = useProducts();
-  const [undoable, setUndoable] = useState<StockUndo | null>(null);
-
-  const run = async (change: () => Promise<void>) => {
-    try {
-      await change();
-    } catch {
-      Alert.alert(t('products.errorTitle'), t('products.errorStock'));
-    }
-  };
 
   const step = (delta: number) => {
     if (stock === null) return;
-    void run(() => setStock(id, Math.max(0, stock + delta)));
+    void runWithUndo(
+      {
+        message: t('editor.saved', { field: t('editor.stock') }),
+        apply: () => setStock(id, Math.max(0, stock + delta)),
+        revert: () => setStock(id, stock),
+      },
+      'products.errorStock',
+    );
   };
 
   const addPack = () => {
     if (stock === null || packSize === null) return;
-    void run(async () => {
-      await restockPack(id);
-      setUndoable({
-        id: Date.now(),
-        previousStock: stock,
+    void runWithUndo(
+      {
         message: t('products.detail.packAdded', {
           amount: stockAmountText(packSize, unit, t),
         }),
-      });
-    });
+        apply: () => restockPack(id),
+        revert: () => setStock(id, stock),
+      },
+      'products.errorStock',
+    );
   };
 
-  const undo = () => {
-    if (!undoable) return;
-    const { previousStock } = undoable;
-    setUndoable(null);
-    void run(() => setStock(id, previousStock));
-  };
-
-  const dismissUndo = () => setUndoable(null);
-
-  return { undoable, step, addPack, undo, dismissUndo };
+  return { step, addPack };
 }

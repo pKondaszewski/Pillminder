@@ -20,6 +20,20 @@ import { UnitChips } from '@/ui/components/products/unit-chips';
 
 export type ProductSheetField = TextProductField | 'category' | 'unit';
 
+export type ProductEditedField = ProductSheetField | 'fasting';
+
+export const PRODUCT_FIELD_LABEL_KEYS: Record<ProductEditedField, string> = {
+  name: 'editor.name',
+  category: 'editor.category',
+  strength: 'editor.strength',
+  unit: 'editor.unit',
+  packSize: 'editor.packSize',
+  stock: 'editor.stock',
+  price: 'products.detail.price',
+  storeLink: 'products.detail.store',
+  fasting: 'editor.fasting',
+};
+
 type SheetProps = {
   product: Product;
   currency: Currency;
