@@ -1,6 +1,6 @@
 import { addDays, startOfDay } from '@/config/date-utils';
 
-import { calculateAdherence } from './dose-adherence';
+import { type AdherenceDose, calculateAdherence } from './dose-adherence';
 import type { TodayDose } from './dto/today-dose-output';
 
 export type DayStatus = 'none' | 'upcoming' | 'missed' | 'skipped' | 'allTaken';
@@ -11,7 +11,11 @@ export interface ProductDoses {
   doses: TodayDose[];
 }
 
-export function dayStatus(day: Date, doses: TodayDose[], now: Date): DayStatus {
+export function dayStatus(
+  day: Date,
+  doses: AdherenceDose[],
+  now: Date,
+): DayStatus {
   const from = startOfDay(day);
   const { total } = calculateAdherence(doses, from, addDays(from, 1), now);
 

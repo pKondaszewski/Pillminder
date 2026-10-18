@@ -1,11 +1,26 @@
+import { BUILT_IN_CATEGORIES, isBuiltInCategory } from './category';
+import type { ReorderStatus } from './dto/reorder-status';
 import type { Product, ProductStatus } from './product-service';
 
 export const PRODUCT_SEARCH_THRESHOLD = 8;
 
+export type ProductStatusFilter = ProductStatus | 'all';
+
 export type ProductListFilters = {
   query: string;
   category: string | null;
-  status: ProductStatus | null;
+  status: ProductStatusFilter;
+};
+
+export type LowStockProduct = {
+  product: Product;
+  daysLeft: number;
+};
+
+export const DEFAULT_PRODUCT_FILTERS: ProductListFilters = {
+  query: '',
+  category: null,
+  status: 'active',
 };
 
 export function sortProductsByName(
@@ -41,12 +56,15 @@ export function filterProducts(
   return filterProductsByName(products, query).filter(
     (p) =>
       (category === null || p.category === category) &&
-      (status === null || p.status === status),
+      (status === 'all' || p.status === status),
   );
 }
 
-export function listedCategories(products: Product[]): string[] {
-  return [...new Set(products.map((p) => p.category))];
+export function filterableCategories(products: Product[]): string[] {
+  const custom = products
+    .map((p) => p.category)
+    .filter((category) => !isBuiltInCategory(category));
+  return [...BUILT_IN_CATEGORIES, ...new Set(custom)];
 }
 
 export function categoryFilterIfListed(
@@ -54,6 +72,24 @@ export function categoryFilterIfListed(
   listed: string[],
 ): string | null {
   return category !== null && listed.includes(category) ? category : null;
+}
+
+export function mostUrgentLowStock(
+  products: Product[],
+  statuses: Record<string, ReorderStatus>,
+): LowStockProduct | null {
+  const low = products.flatMap((product) => {
+    const status = statuses[product.id];
+    return status?.isLow && status.daysLeft !== null
+      ? [{ product, daysLeft: status.daysLeft }]
+      : [];
+  });
+  return (
+    low.sort(
+      (a, b) =>
+        a.daysLeft - b.daysLeft || a.product.id.localeCompare(b.product.id),
+    )[0] ?? null
+  );
 }
 
 function statusRank(status: ProductStatus): number {

@@ -83,6 +83,16 @@ export async function updateProductRow(
   return updated;
 }
 
+export async function setStockRow(
+  id: string,
+  stock: number | null,
+): Promise<void> {
+  await db
+    .update(products)
+    .set({ stock, updatedAt: new Date() })
+    .where(eq(products.id, id));
+}
+
 export async function addPackToStockRow(id: string): Promise<void> {
   await db
     .update(products)

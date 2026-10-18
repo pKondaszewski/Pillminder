@@ -36,7 +36,7 @@ The user configures a product once. After that, they just tap "taken". The rest 
 ### History
 
 - when you took it, when you skipped
-- what was active during a given period (useful at the doctor's)
+- month summary in the calendar
 
 ---
 

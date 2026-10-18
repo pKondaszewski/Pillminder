@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, lt, max, ne, or } from 'drizzle-orm';
+import { and, eq, gte, inArray, lt, max } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
@@ -8,8 +8,6 @@ import { type DoseState, planDoseTransition } from './dose-transition';
 import type { ReplaceDosesQueryResult } from './dto/replace-doses-query-result';
 
 export type Dose = typeof doses.$inferSelect;
-
-const HISTORY_LIMIT = 30;
 
 export interface NewDoseSlot {
   productId: string;
@@ -38,20 +36,25 @@ export function dosesBetweenQuery(from: Date, to: Date) {
     .orderBy(doses.plannedAt);
 }
 
-export function productHistoryQuery(productId: string) {
-  const now = new Date();
-
+export function productDosesBetweenQuery(
+  productId: string,
+  from: Date,
+  to: Date,
+) {
   return db
-    .select()
+    .select({
+      productId: doses.productId,
+      plannedAt: doses.plannedAt,
+      state: doses.state,
+    })
     .from(doses)
     .where(
       and(
         eq(doses.productId, productId),
-        or(ne(doses.state, 'pending'), lt(doses.plannedAt, now)),
+        gte(doses.plannedAt, from),
+        lt(doses.plannedAt, to),
       ),
-    )
-    .orderBy(desc(doses.plannedAt))
-    .limit(HISTORY_LIMIT);
+    );
 }
 
 export async function getDosesPlannedBetween(

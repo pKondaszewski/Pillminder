@@ -12,14 +12,10 @@ import {
   productsQuery,
   type ProductStatus,
   setProductStatusRow,
+  setStockRow,
   updateProductRow,
 } from './product-repository';
 
-export type { PeriodReportEntry } from './dto/period-report-output';
-export type {
-  ProductOverview,
-  ProductOverviewEntry,
-} from './dto/product-overview-output';
 export type { TravelPlanEntry } from './dto/travel-plan-output';
 export type { Product, ProductStatus } from './product-repository';
 
@@ -73,6 +69,19 @@ export async function addPackToStock(id: string): Promise<void> {
     await addPackToStockRow(id);
   } catch (err) {
     log.error(`Failed to add a pack to the stock of product ${id}`, err);
+    throw err;
+  }
+}
+
+export async function setStock(
+  id: string,
+  stock: number | null,
+): Promise<void> {
+  log.info(`Setting stock of product ${id} to ${stock}`);
+  try {
+    await setStockRow(id, stock);
+  } catch (err) {
+    log.error(`Failed to set stock of product ${id}`, err);
     throw err;
   }
 }

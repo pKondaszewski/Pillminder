@@ -8,11 +8,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { addDays, startOfDay } from '@/config/date-utils';
 import type { TravelPlanEntry } from '@/products/product-service';
-import { Spacing } from '@/ui/commons/constants/theme';
-import { SecondaryButton } from '@/ui/components/commons/button';
+import { Radius, Spacing } from '@/ui/commons/constants/theme';
+import { PrimaryButton } from '@/ui/components/commons/button';
 import { DateButton } from '@/ui/components/commons/date-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { useTheme } from '@/ui/hooks/use-theme';
 import { useTravelPlan } from '@/ui/hooks/use-travel-plan';
 
 const DEFAULT_TRIP_LENGTH_DAYS = 7;
@@ -89,7 +90,7 @@ function TravelContent({ onClose }: Pick<Props, 'onClose'>) {
             <TravelResults entries={plan} />
           )}
           <ThemedView style={styles.actions}>
-            <SecondaryButton label={t('editor.close')} onPress={onClose} />
+            <PrimaryButton label={t('editor.close')} onPress={onClose} />
           </ThemedView>
         </ScrollView>
       </SafeAreaView>
@@ -102,7 +103,7 @@ function TravelResults({ entries }: { entries: TravelPlanEntry[] }) {
   if (entries.length === 0) {
     return (
       <ThemedView style={styles.empty}>
-        <ThemedText>{t('travel.empty')}</ThemedText>
+        <ThemedText type="headline">{t('travel.empty')}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           {t('travel.emptyHint')}
         </ThemedText>
@@ -120,12 +121,13 @@ function TravelResults({ entries }: { entries: TravelPlanEntry[] }) {
 
 function ProductBlock({ entry }: { entry: TravelPlanEntry }) {
   const { t } = useTranslation();
+  const theme = useTheme();
   const { verdict } = entry;
   const needsRefill = verdict !== null && verdict !== 'enough';
   return (
-    <ThemedView type="surface" style={styles.block}>
-      <ThemedText type="smallBold">{entry.title}</ThemedText>
-      <ThemedText type="small">
+    <ThemedView style={[styles.block, { borderColor: theme.border }]}>
+      <ThemedText type="headline">{entry.title}</ThemedText>
+      <ThemedText type="small" themeColor="textSecondary">
         {t('travel.pack', { amount: entry.pack })}
       </ThemedText>
       {verdict ? (
@@ -142,13 +144,14 @@ function ProductBlock({ entry }: { entry: TravelPlanEntry }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  safeArea: { flex: 1, paddingHorizontal: Spacing.twentyFour },
-  content: { gap: Spacing.eight, paddingVertical: Spacing.sixteen },
-  range: { flexDirection: 'row', gap: Spacing.eight },
+  safeArea: { flex: 1, paddingHorizontal: Spacing.twenty },
+  content: { gap: Spacing.twelve, paddingVertical: Spacing.twenty },
+  range: { flexDirection: 'row', gap: Spacing.twelve },
   empty: { gap: Spacing.four, paddingVertical: Spacing.sixteen },
   block: {
     padding: Spacing.sixteen,
-    borderRadius: Spacing.sixteen,
+    borderWidth: 1,
+    borderRadius: Radius.card,
     gap: Spacing.four,
   },
   actions: { flexDirection: 'row' },
