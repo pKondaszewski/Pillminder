@@ -385,7 +385,6 @@
   "schedule": {
     "add": "Add schedule",
     "addProduct": "Add product",
-    "addShort": "Add",
     "addTime": "Add time",
     "amountValue": "{{amount}} per dose",
     "changeNote": "The change applies to doses from now on. Doses already taken or skipped today stay in the history",

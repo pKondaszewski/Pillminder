@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, SectionList, StyleSheet } from 'react-native';
+import { SectionList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { categoryLabel } from '@/products/category';
@@ -10,8 +10,12 @@ import {
   listedScheduleCategories,
   type ScheduleListFilters,
 } from '@/schedules/schedule-list';
-import { MIN_TOUCH_SIZE, Spacing } from '@/ui/commons/constants/theme';
+import { Spacing } from '@/ui/commons/constants/theme';
 import { EmptyState } from '@/ui/components/commons/empty-state';
+import {
+  FLOATING_ADD_BUTTON_CLEARANCE,
+  FloatingAddButton,
+} from '@/ui/components/commons/floating-add-button';
 import { ScreenTitle } from '@/ui/components/commons/screen-title';
 import {
   type FilterToken,
@@ -49,24 +53,12 @@ export default function ScheduleListScreen() {
     (sum, group) => sum + group.items.length,
     0,
   );
+  const showAddButton = items.length > 0;
   const tokens = filterTokens(filters, setFilters, t);
 
   const header = (
     <ThemedView style={styles.header}>
-      <ScreenTitle
-        title={t('tabs.plan')}
-        action={
-          <Pressable
-            onPress={() => router.push('/schedules/new')}
-            accessibilityRole="button"
-            style={({ pressed }) => [styles.add, pressed && styles.pressed]}
-          >
-            <ThemedText type="smallBold" themeColor="accent">
-              {t('schedule.addShort')}
-            </ThemedText>
-          </Pressable>
-        }
-      />
+      <ScreenTitle title={t('tabs.plan')} />
       {items.length > 0 ? (
         <SearchField
           value={filters.query}
@@ -134,6 +126,12 @@ export default function ScheduleListScreen() {
               />
             )}
           />
+          {showAddButton ? (
+            <FloatingAddButton
+              accessibilityLabel={t('schedule.add')}
+              onPress={() => router.push('/schedules/new')}
+            />
+          ) : null}
         </SafeAreaView>
 
         <ScheduleListFilterSheet
@@ -183,20 +181,12 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: Spacing.eight,
-    paddingBottom: Spacing.sixteen,
+    paddingBottom: FLOATING_ADD_BUTTON_CLEARANCE,
   },
   header: {
     gap: Spacing.eight,
   },
-  add: {
-    minHeight: MIN_TOUCH_SIZE,
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.eight,
-  },
   sectionLabel: {
     marginTop: Spacing.eight,
-  },
-  pressed: {
-    opacity: 0.7,
   },
 });

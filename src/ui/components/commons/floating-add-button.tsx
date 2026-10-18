@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet } from 'react-native';
 
 import { Spacing } from '@/ui/commons/constants/theme';
@@ -7,15 +6,20 @@ import { useTheme } from '@/ui/hooks/use-theme';
 
 const BUTTON_SIZE = 56;
 
-export function AddProductButton({ onPress }: { onPress: () => void }) {
-  const { t } = useTranslation();
+export function FloatingAddButton({
+  accessibilityLabel,
+  onPress,
+}: {
+  accessibilityLabel: string;
+  onPress: () => void;
+}) {
   const theme = useTheme();
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={t('products.add')}
+      accessibilityLabel={accessibilityLabel}
       style={({ pressed }) => [
         styles.button,
         { backgroundColor: theme.accent },
@@ -27,7 +31,7 @@ export function AddProductButton({ onPress }: { onPress: () => void }) {
   );
 }
 
-export const ADD_PRODUCT_BUTTON_CLEARANCE =
+export const FLOATING_ADD_BUTTON_CLEARANCE =
   BUTTON_SIZE + Spacing.twentyFour * 2;
 
 const styles = StyleSheet.create({

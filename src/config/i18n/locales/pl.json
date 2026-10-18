@@ -413,7 +413,6 @@
   "schedule": {
     "add": "Dodaj harmonogram",
     "addProduct": "Dodaj produkt",
-    "addShort": "Dodaj",
     "addTime": "Dodaj godzinę",
     "amountValue": "{{amount}} na dawkę",
     "changeNote": "Zmiana dotyczy dawek od teraz. Dzisiejsze wzięte i pominięte zostają w historii",
