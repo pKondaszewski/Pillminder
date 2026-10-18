@@ -45,22 +45,20 @@ export function PhotoGrid({
           />
         </ThemedView>
       ))}
-      <Pressable
-        onPress={onAdd}
-        disabled={addDisabled}
-        accessibilityRole="button"
-        accessibilityLabel={t('images.add')}
-        style={[
-          styles.cell,
-          styles.addTile,
-          { borderColor: theme.borderStrong },
-        ]}
-      >
-        <Icon name="add_a_photo" size={28} color={theme.textSecondary} />
-        <ThemedText type="small" themeColor="textSecondary">
-          {t('images.add')}
-        </ThemedText>
-      </Pressable>
+      <ThemedView style={styles.cell}>
+        <Pressable
+          onPress={onAdd}
+          disabled={addDisabled}
+          accessibilityRole="button"
+          accessibilityLabel={t('images.add')}
+          style={[styles.addTile, { borderColor: theme.borderStrong }]}
+        >
+          <Icon name="add_a_photo" size={28} color={theme.textSecondary} />
+          <ThemedText type="small" themeColor="textSecondary">
+            {t('images.add')}
+          </ThemedText>
+        </Pressable>
+      </ThemedView>
 
       <Modal
         visible={previewed !== null}

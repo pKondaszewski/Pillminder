@@ -237,11 +237,10 @@
   },
   "images": {
     "add": "Dodaj zdjęcie",
+    "added": "Dodano zdjęcie",
     "camera": "Zrób zdjęcie",
     "cameraDenied": "Brak dostępu do aparatu. Zezwól na niego w ustawieniach systemu albo dodaj zdjęcie z galerii.",
     "delete": "Usuń zdjęcie",
-    "deleteConfirm": "Usunąć to zdjęcie?",
-    "deleteTitle": "Usunąć zdjęcie?",
     "errorDelete": "Nie udało się usunąć zdjęcia. Spróbuj ponownie.",
     "errorProfile": "Nie udało się zmienić zdjęcia profilowego. Spróbuj ponownie.",
     "errorSave": "Nie udało się dodać zdjęcia. Spróbuj ponownie.",
@@ -249,6 +248,7 @@
     "preview": "Pokaż zdjęcie",
     "profile": "Zdjęcie profilowe",
     "profileChanged": "Ustawiono zdjęcie profilowe",
+    "removed": "Usunięto zdjęcie",
     "setProfile": "Ustaw jako profilowe",
     "title": "Zdjęcia"
   },
