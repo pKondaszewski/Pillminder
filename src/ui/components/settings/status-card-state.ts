@@ -38,3 +38,42 @@ export function batteryCardState(
     ? { ok: false, statusKey: 'settings.batteryRestricted' }
     : { ok: true, statusKey: 'settings.batteryUnrestricted' };
 }
+
+export type LocationCardState = {
+  ok: boolean;
+  neutral: boolean;
+  statusKey: string;
+  actionKey: string;
+  action: 'enable' | 'disable' | 'openSettings';
+};
+
+export function locationCardState(
+  step: PermissionStep,
+  hasCoords: boolean,
+): LocationCardState {
+  if (step === 'granted' && hasCoords) {
+    return {
+      ok: true,
+      neutral: false,
+      statusKey: 'settings.locationOn',
+      actionKey: 'settings.locationDisable',
+      action: 'disable',
+    };
+  }
+  if (step === 'blocked') {
+    return {
+      ok: false,
+      neutral: false,
+      statusKey: 'settings.locationBlocked',
+      actionKey: 'settings.locationOpenSettings',
+      action: 'openSettings',
+    };
+  }
+  return {
+    ok: false,
+    neutral: true,
+    statusKey: 'settings.locationOff',
+    actionKey: 'settings.locationEnable',
+    action: 'enable',
+  };
+}

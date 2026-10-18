@@ -8,44 +8,77 @@ import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
   ok: boolean;
+  neutral?: boolean;
   title: string;
   status: string;
-  fixLabel: string;
-  onFix: () => void;
+  fixLabel?: string;
+  onFix?: () => void;
 };
 
-export function StatusCard({ ok, title, status, fixLabel, onFix }: Props) {
+export function StatusCard({
+  ok,
+  neutral = false,
+  title,
+  status,
+  fixLabel,
+  onFix,
+}: Props) {
   const theme = useTheme();
+  const palette = cardPalette(theme, ok, neutral);
 
   return (
     <ThemedView
       style={[
         styles.card,
         {
-          backgroundColor: ok ? theme.takenCard : theme.overdueCard,
-          borderColor: ok ? theme.takenCardBorder : theme.overdueCardBorder,
+          backgroundColor: palette.card,
+          borderColor: palette.border,
         },
       ]}
     >
-      <ThemedView
-        style={[
-          styles.dot,
-          { backgroundColor: ok ? theme.taken : theme.overdue },
-        ]}
-      />
+      <ThemedView style={[styles.dot, { backgroundColor: palette.dot }]} />
       <ThemedView style={styles.texts}>
         <ThemedText type="headline">{title}</ThemedText>
-        <ThemedText type="small" themeColor={ok ? 'takenText' : 'overdueText'}>
+        <ThemedText type="small" themeColor={palette.text}>
           {status}
         </ThemedText>
       </ThemedView>
-      {ok ? null : (
+      {onFix && fixLabel ? (
         <ThemedView style={styles.fix}>
           <SecondaryButton label={fixLabel} onPress={onFix} />
         </ThemedView>
-      )}
+      ) : null}
     </ThemedView>
   );
+}
+
+function cardPalette(
+  theme: ReturnType<typeof useTheme>,
+  ok: boolean,
+  neutral: boolean,
+) {
+  if (neutral) {
+    return {
+      card: theme.surface,
+      border: theme.border,
+      dot: theme.skipped,
+      text: 'textSecondary' as const,
+    };
+  }
+  if (ok) {
+    return {
+      card: theme.takenCard,
+      border: theme.takenCardBorder,
+      dot: theme.taken,
+      text: 'takenText' as const,
+    };
+  }
+  return {
+    card: theme.overdueCard,
+    border: theme.overdueCardBorder,
+    dot: theme.overdue,
+    text: 'overdueText' as const,
+  };
 }
 
 const styles = StyleSheet.create({

@@ -6,6 +6,7 @@ import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 
 import { BatteryStep } from './battery-step';
+import { LocationStep } from './location-step';
 import { NotificationsStep } from './notifications-step';
 import type { OnboardingProgress } from './onboarding-step-layout';
 
@@ -29,8 +30,10 @@ export function OnboardingScreen({
             onGranted={onAdvance}
             onDismissed={onDismiss}
           />
-        ) : (
+        ) : step === 'battery' ? (
           <BatteryStep progress={progress} onDone={onDismiss} />
+        ) : (
+          <LocationStep progress={progress} onDone={onDismiss} />
         )}
       </SafeAreaView>
     </ThemedView>

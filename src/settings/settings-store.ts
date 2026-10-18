@@ -1,6 +1,10 @@
 import { getLocales } from 'expo-localization';
 import Storage from 'expo-sqlite/kv-store';
 
+import type { StoredLocation } from '@/location/dto/coords';
+
+import { isValidStoredLocation } from './stored-location-validation';
+
 export const LANGUAGE_OPTIONS = ['system', 'pl', 'en'] as const;
 export const THEME_OPTIONS = ['system', 'light', 'dark'] as const;
 export const SNOOZE_MINUTES_MIN = 1;
@@ -19,6 +23,8 @@ export interface Settings {
   currency: Currency;
   notificationsPromptDismissed: boolean;
   batteryPromptDismissed: boolean;
+  locationPromptDismissed: boolean;
+  location: StoredLocation | null;
 }
 
 const STORAGE_KEY = 'settings';
@@ -32,6 +38,8 @@ const DEFAULT_SETTINGS: Settings = {
   currency: resolveDeviceCurrency(),
   notificationsPromptDismissed: false,
   batteryPromptDismissed: false,
+  locationPromptDismissed: false,
+  location: null,
 };
 
 const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
@@ -41,6 +49,8 @@ const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
   currency: (value) => CURRENCY_OPTIONS.some((option) => option === value),
   notificationsPromptDismissed: (value) => typeof value === 'boolean',
   batteryPromptDismissed: (value) => typeof value === 'boolean',
+  locationPromptDismissed: (value) => typeof value === 'boolean',
+  location: isValidStoredLocation,
 };
 
 const listeners = new Set<() => void>();
@@ -83,6 +93,8 @@ function readStoredSettings(): Settings {
         stored,
       ),
       batteryPromptDismissed: pick('batteryPromptDismissed', stored),
+      locationPromptDismissed: pick('locationPromptDismissed', stored),
+      location: pick('location', stored),
     };
   } catch {
     return DEFAULT_SETTINGS;
