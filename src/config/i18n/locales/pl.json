@@ -512,6 +512,7 @@
     "shopping": "Zakupy",
     "snooze": "Czas drzemki",
     "snoozeInvalid": "Podaj liczbę minut od {{min}} do {{max}}",
+    "snoozeSheetTitle": "Czas drzemki ({{unit}})",
     "theme": "Motyw",
     "themeDark": "Ciemny",
     "themeLight": "Jasny",
