@@ -4,14 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { isoDay } from '@/config/date-utils';
-import { editedProductInput } from '@/products/product-form';
 import type { Product } from '@/products/product-service';
 import { lastUsedText } from '@/products/product-text';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatTime } from '@/ui/commons/format-date';
 import { openStore } from '@/ui/commons/open-store';
-import { Snackbar } from '@/ui/components/commons/snackbar';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
 import { DetailsSection } from '@/ui/components/products/details-section';
 import {
   ProductFieldSheet,
@@ -28,6 +27,7 @@ import { RecentDaysSection } from '@/ui/components/products/recent-days';
 import { ScheduleSection } from '@/ui/components/products/schedule-section';
 import { StockCard } from '@/ui/components/products/stock-card';
 import { useFormatDate } from '@/ui/hooks/use-format-date';
+import { useProductEditActions } from '@/ui/hooks/use-product-edit-actions';
 import { useProductImages } from '@/ui/hooks/use-product-images';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useRecentDays } from '@/ui/hooks/use-recent-days';
@@ -36,6 +36,7 @@ import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 import { useSettings } from '@/ui/hooks/use-settings';
 import { useStockActions } from '@/ui/hooks/use-stock-actions';
+import { useUndoSnackbar } from '@/ui/hooks/use-undo-snackbar';
 
 type Sheet =
   | { kind: 'field'; field: ProductSheetField }
@@ -53,18 +54,17 @@ function ProductDetail({ product }: { product: Product }) {
   const { t, i18n } = useTranslation();
   const formatDate = useFormatDate();
   const { currency } = useSettings();
-  const { editProduct, removeProduct, archiveProduct, restoreProduct } =
-    useProducts();
+  const { removeProduct } = useProducts();
   const { schedules } = useSchedules();
   const reorderStatuses = useReorderStatuses();
   const { images } = useProductImages(product.id);
   const recent = useRecentDays(product.id);
-  const stock = useStockActions(product);
+  const { snackbar, runWithUndo } = useUndoSnackbar();
+  const stock = useStockActions(product, runWithUndo);
+  const edit = useProductEditActions(product, runWithUndo);
 
   const [sheet, setSheet] = useState<Sheet | null>(null);
-  const runThenCloseSheet = useRunWithErrorAlert(() => setSheet(null));
   const runThenGoBack = useRunWithErrorAlert(() => router.back());
-  const runWithAlert = useRunWithErrorAlert();
 
   const now = new Date();
   const productSchedules = schedules.filter((s) => s.productId === product.id);
@@ -135,39 +135,17 @@ function ProductDetail({ product }: { product: Product }) {
           currency={currency}
           locale={i18n.language}
           onEdit={editField}
-          onFastingChange={(fasting) =>
-            runWithAlert(
-              () =>
-                editProduct(
-                  product.id,
-                  editedProductInput(product, { fasting }),
-                ),
-              'products.errorSave',
-            )
-          }
+          onFastingChange={(fasting) => edit.saveField('fasting', { fasting })}
         />
         <ProductActions
           status={product.status}
           onArchive={() => setSheet({ kind: 'archive' })}
-          onRestore={() =>
-            runWithAlert(
-              () => restoreProduct(product.id),
-              'products.errorRestore',
-            )
-          }
+          onRestore={edit.restore}
           onDelete={() => setSheet({ kind: 'delete' })}
         />
       </ScrollView>
 
-      {stock.undoable ? (
-        <Snackbar
-          key={stock.undoable.id}
-          message={stock.undoable.message}
-          actionLabel={t('products.detail.undo')}
-          onAction={stock.undo}
-          onDismiss={stock.dismissUndo}
-        />
-      ) : null}
+      <UndoSnackbar snackbar={snackbar} />
 
       {sheet?.kind === 'field' ? (
         <ProductFieldSheet
@@ -175,10 +153,7 @@ function ProductDetail({ product }: { product: Product }) {
           product={product}
           currency={currency}
           onSave={(patch) =>
-            runThenCloseSheet(
-              () => editProduct(product.id, editedProductInput(product, patch)),
-              'products.errorSave',
-            )
+            edit.saveField(sheet.field, patch, () => setSheet(null))
           }
           onClose={() => setSheet(null)}
         />
@@ -188,10 +163,7 @@ function ProductDetail({ product }: { product: Product }) {
         <ArchiveProductDialog
           productName={product.name}
           onConfirm={(completionNote) =>
-            runThenCloseSheet(
-              () => archiveProduct(product.id, completionNote),
-              'products.errorArchive',
-            )
+            edit.archive(completionNote, () => setSheet(null))
           }
           onCancel={() => setSheet(null)}
         />

@@ -1,18 +1,18 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert } from 'react-native';
 
 import { createLogger } from '@/config/logger';
 import type { TodayDose } from '@/doses/dose-service';
 
+import { useUndoSnackbar } from './use-undo-snackbar';
+
 type DoseFn = (id: string) => Promise<void>;
 export type UndoableKind = 'taken' | 'skipped';
 
-interface Undoable {
-  id: string;
-  name: string;
-  kind: UndoableKind;
-}
+const DOSE_ACTION_TOAST_KEYS: Record<UndoableKind, string> = {
+  taken: 'home.takenToast',
+  skipped: 'home.skippedToast',
+};
 
 const log = createLogger('use-undoable-dose-action');
 
@@ -20,7 +20,7 @@ export function useUndoableDoseAction(
   actions: Record<UndoableKind, { apply: DoseFn; revert: DoseFn }>,
 ) {
   const { t } = useTranslation();
-  const [undoable, setUndoable] = useState<Undoable | null>(null);
+  const { snackbar, showUndo, dismissUndo } = useUndoSnackbar();
 
   const reportFailure = (what: string, err: unknown) => {
     log.error(`Failed to ${what}`, err);
@@ -37,11 +37,13 @@ export function useUndoableDoseAction(
       reportFailure(`mark dose ${id} as ${kind}`, err);
       return;
     }
-    setUndoable({ id, name: productName, kind });
+    showUndo(t(DOSE_ACTION_TOAST_KEYS[kind], { name: productName }), () =>
+      revert(kind, id),
+    );
   };
 
   const takeAll = async (ids: string[]) => {
-    setUndoable(null);
+    dismissUndo();
     let failed = 0;
     for (const id of ids) {
       try {
@@ -64,13 +66,5 @@ export function useUndoableDoseAction(
     }
   };
 
-  const undoLast = async () => {
-    if (!undoable) return;
-    setUndoable(null);
-    await revert(undoable.kind, undoable.id);
-  };
-
-  const dismissUndo = () => setUndoable(null);
-
-  return { undoable, applyWithUndo, takeAll, revert, undoLast, dismissUndo };
+  return { snackbar, applyWithUndo, takeAll, revert };
 }

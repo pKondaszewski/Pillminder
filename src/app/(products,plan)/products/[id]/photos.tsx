@@ -6,8 +6,8 @@ import { Alert, ScrollView, StyleSheet } from 'react-native';
 import type { ProductImage } from '@/images/image-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ConfirmDialog } from '@/ui/components/commons/confirm-dialog';
-import { Snackbar } from '@/ui/components/commons/snackbar';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
 import { ImageSourceSheet } from '@/ui/components/products/image-source-sheet';
 import { PhotoGrid } from '@/ui/components/products/photo-grid';
 import { useConfirmation } from '@/ui/hooks/use-confirmation';
@@ -22,8 +22,7 @@ export default function ProductPhotosScreen() {
   const profileImageId =
     products.find((p) => p.id === id)?.profileImageId ?? null;
   const { images, busy, pickAndAddImage, removeImage } = useProductImages(id);
-  const { undoable, setProfileWithUndo, undoProfile, dismissUndo } =
-    useProfileUndo(id, profileImageId);
+  const { snackbar, setProfileWithUndo } = useProfileUndo(id, profileImageId);
   const deletion = useConfirmation<ProductImage>(async (image) => {
     try {
       await removeImage(image);
@@ -46,15 +45,7 @@ export default function ProductPhotosScreen() {
           onDelete={deletion.request}
         />
       </ScrollView>
-      {undoable ? (
-        <Snackbar
-          key={undoable.key}
-          message={t('images.profileChanged')}
-          actionLabel={t('home.undo')}
-          onAction={undoProfile}
-          onDismiss={dismissUndo}
-        />
-      ) : null}
+      <UndoSnackbar snackbar={snackbar} />
       <ConfirmDialog
         visible={deletion.pending !== null}
         destructive

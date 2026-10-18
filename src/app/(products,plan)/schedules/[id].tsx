@@ -7,7 +7,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Product } from '@/products/product-service';
 import { formatAmount, type ProductUnit } from '@/products/product-unit';
 import { reorderStatus } from '@/products/reorder';
-import { toScheduleInput } from '@/schedules/schedule-draft';
 import { courseProgress } from '@/schedules/schedule-list';
 import type { Translate } from '@/schedules/schedule-rhythm';
 import {
@@ -28,6 +27,7 @@ import { ConfirmDialog } from '@/ui/components/commons/confirm-dialog';
 import { FieldRow } from '@/ui/components/commons/field-row';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
 import { CourseProgressBar } from '@/ui/components/schedules/course-progress';
 import { DosePreview } from '@/ui/components/schedules/dose-preview';
 import {
@@ -38,24 +38,21 @@ import { ScheduleProductCard } from '@/ui/components/schedules/product-card';
 import { useFormatDate } from '@/ui/hooks/use-format-date';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
+import { useScheduleEditActions } from '@/ui/hooks/use-schedule-edit-actions';
 import { useSchedules } from '@/ui/hooks/use-schedules';
+import { useUndoSnackbar } from '@/ui/hooks/use-undo-snackbar';
 
 export default function ScheduleScreen() {
   const { t } = useTranslation();
   const formatDate = useFormatDate();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { products, restoreProduct } = useProducts();
-  const {
-    schedules,
-    editSchedule,
-    removeSchedule,
-    pauseSchedule,
-    resumeSchedule,
-  } = useSchedules();
+  const { schedules, removeSchedule } = useSchedules();
   const [field, setField] = useState<ScheduleField | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-  const runThenCloseSheet = useRunWithErrorAlert(() => setField(null));
+  const { snackbar, runWithUndo } = useUndoSnackbar();
+  const edit = useScheduleEditActions(runWithUndo);
   const runThenGoBack = useRunWithErrorAlert(() => router.back());
   const runWithAlert = useRunWithErrorAlert();
 
@@ -95,11 +92,7 @@ export default function ScheduleScreen() {
     : paused
       ? {
           labelKey: 'schedule.resume',
-          onPress: () =>
-            runWithAlert(
-              () => resumeSchedule(schedule.id),
-              'schedule.errorResume',
-            ),
+          onPress: () => edit.resume(schedule),
         }
       : {
           labelKey: 'schedule.pauseAction',
@@ -200,6 +193,8 @@ export default function ScheduleScreen() {
           </ScrollView>
         </SafeAreaView>
 
+        <UndoSnackbar snackbar={snackbar} />
+
         {field ? (
           <ScheduleFieldSheet
             field={field}
@@ -207,20 +202,10 @@ export default function ScheduleScreen() {
             unit={product.unit}
             now={now}
             onSave={(change) =>
-              runThenCloseSheet(
-                () =>
-                  editSchedule(schedule.id, {
-                    ...toScheduleInput(schedule),
-                    ...change,
-                  }),
-                'schedule.errorSave',
-              )
+              edit.saveChange(schedule, field, change, () => setField(null))
             }
             onPause={(resumeAt) =>
-              runThenCloseSheet(
-                () => pauseSchedule(schedule.id, resumeAt),
-                'schedule.errorPause',
-              )
+              edit.pause(schedule, resumeAt, () => setField(null))
             }
             onClose={() => setField(null)}
           />
