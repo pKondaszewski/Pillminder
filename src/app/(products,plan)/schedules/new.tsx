@@ -1,7 +1,7 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { ScheduleEditorForm } from '@/ui/components/schedules/editor-form';
+import { NewScheduleForm } from '@/ui/components/schedules/new-form';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
 import { useSchedules } from '@/ui/hooks/use-schedules';
@@ -13,7 +13,7 @@ export default function NewScheduleScreen() {
     locked?: string;
   }>();
   const { products, loaded } = useProducts();
-  const { addSchedule } = useSchedules();
+  const { schedules, addSchedule } = useSchedules();
 
   const runThenGoBack = useRunThenCloseEditor(() => router.back());
 
@@ -28,13 +28,12 @@ export default function NewScheduleScreen() {
       <Stack.Screen
         options={{ headerShown: true, title: t('schedule.newTitle') }}
       />
-      <ScheduleEditorForm
-        schedule={null}
+      <NewScheduleForm
         products={lockedProduct ? [lockedProduct] : products}
+        schedules={schedules}
         selectedProductId={productId}
         productLocked={lockedProduct !== undefined}
-        onClose={() => router.back()}
-        onSave={(input) =>
+        onSubmit={(input) =>
           runThenGoBack(() => addSchedule(input), 'schedule.errorSave')
         }
         onNewProduct={() =>

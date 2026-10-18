@@ -8,6 +8,7 @@ import {
   getScheduleById,
   getSchedulesByProductId,
   type Schedule,
+  scheduleListQuery,
   schedulesQuery,
   setSchedulePauseRow,
   updateScheduleRow,
@@ -16,13 +17,23 @@ import { assertValidScheduleInput } from './schedule-validator';
 
 export { occurrencesWithin, previewOccurrences } from './schedule-helper';
 export { isPaused } from './schedule-pause';
-export type { Schedule } from './schedule-repository';
-export { describePause, describeRhythm } from './schedule-rhythm';
+export type { Schedule, ScheduleListItem } from './schedule-repository';
+export {
+  describeCourse,
+  describeInterval,
+  describePause,
+  describePeriod,
+  describeRhythm,
+} from './schedule-rhythm';
 
 const log = createLogger('schedule-service');
 
 export function getSchedulesQuery() {
   return schedulesQuery();
+}
+
+export function getScheduleListQuery() {
+  return scheduleListQuery();
 }
 
 export function getSchedulesByProduct(productId: string): Promise<Schedule[]> {
