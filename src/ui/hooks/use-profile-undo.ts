@@ -2,14 +2,14 @@ import { useTranslation } from 'react-i18next';
 
 import { setProfileImage } from '@/images/image-service';
 
-import { useUndoSnackbar } from './use-undo-snackbar';
+import type { RunWithUndo } from './use-undo-snackbar';
 
 export function useProfileUndo(
   productId: string,
   profileImageId: string | null,
+  runWithUndo: RunWithUndo,
 ) {
   const { t } = useTranslation();
-  const { snackbar, runWithUndo } = useUndoSnackbar();
 
   const setProfileWithUndo = async (imageId: string) => {
     if (imageId === profileImageId) return;
@@ -23,5 +23,5 @@ export function useProfileUndo(
     );
   };
 
-  return { snackbar, setProfileWithUndo };
+  return { setProfileWithUndo };
 }

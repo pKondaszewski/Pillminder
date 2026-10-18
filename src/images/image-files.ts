@@ -25,6 +25,14 @@ export function deleteImageFiles(fileNames: string[]): void {
     .forEach((file) => file.delete());
 }
 
+export function listImageFileNames(): string[] {
+  if (!imagesDirectory.exists) return [];
+  return imagesDirectory
+    .list()
+    .filter((entry): entry is File => entry instanceof File)
+    .map((file) => file.name);
+}
+
 export function deleteAllImageFiles(): void {
   if (imagesDirectory.exists) imagesDirectory.delete();
 }

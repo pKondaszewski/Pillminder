@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
@@ -12,8 +12,7 @@ export function imagesByProductQuery(productId: string) {
   return db
     .select()
     .from(productImages)
-    .where(eq(productImages.productId, productId))
-    .orderBy(desc(productImages.createdAt));
+    .where(eq(productImages.productId, productId));
 }
 
 export async function getImageFileNamesByProduct(
@@ -26,20 +25,47 @@ export async function getImageFileNamesByProduct(
   return rows.map((row) => row.fileName);
 }
 
+export async function getAllImageFileNames(): Promise<string[]> {
+  const rows = await db
+    .select({ fileName: productImages.fileName })
+    .from(productImages);
+  return rows.map((row) => row.fileName);
+}
+
 export async function createImageRow(
   productId: string,
   fileName: string,
   role: ImageRole,
-): Promise<void> {
-  const id = Crypto.randomUUID();
+): Promise<ProductImage> {
+  const image: ProductImage = {
+    id: Crypto.randomUUID(),
+    productId,
+    fileName,
+    role,
+    createdAt: new Date(),
+  };
   db.transaction((tx) => {
-    tx.insert(productImages)
-      .values({ id, productId, fileName, role, createdAt: new Date() })
-      .run();
+    tx.insert(productImages).values(image).run();
     tx.update(products)
-      .set({ profileImageId: id })
+      .set({ profileImageId: image.id })
       .where(and(eq(products.id, productId), isNull(products.profileImageId)))
       .run();
+  });
+  return image;
+}
+
+export async function restoreImageRow(
+  image: ProductImage,
+  asProfile: boolean,
+): Promise<void> {
+  db.transaction((tx) => {
+    tx.insert(productImages).values(image).run();
+    if (asProfile) {
+      tx.update(products)
+        .set({ profileImageId: image.id })
+        .where(eq(products.id, image.productId))
+        .run();
+    }
   });
 }
 

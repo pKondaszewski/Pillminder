@@ -217,11 +217,10 @@
   },
   "images": {
     "add": "Add photo",
+    "added": "Photo added",
     "camera": "Take photo",
     "cameraDenied": "Camera access is denied. Allow it in the system settings or add the photo from the gallery.",
     "delete": "Delete photo",
-    "deleteConfirm": "Delete this photo?",
-    "deleteTitle": "Delete photo?",
     "errorDelete": "Could not delete the photo. Try again.",
     "errorProfile": "Could not change the profile photo. Try again.",
     "errorSave": "Could not add the photo. Try again.",
@@ -229,6 +228,7 @@
     "preview": "Show photo",
     "profile": "Profile photo",
     "profileChanged": "Profile photo changed",
+    "removed": "Photo removed",
     "setProfile": "Set as profile photo",
     "title": "Photos"
   },

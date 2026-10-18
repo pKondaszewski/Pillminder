@@ -21,6 +21,7 @@ import {
   useReminderResponses,
 } from '@/ui/hooks/use-notifications';
 import { useOnboarding } from '@/ui/hooks/use-onboarding';
+import { useOrphanedImageCleanup } from '@/ui/hooks/use-orphaned-image-cleanup';
 import { useReorderNotifications } from '@/ui/hooks/use-reorder-notifications';
 
 import migrations from '../../drizzle/migrations';
@@ -88,5 +89,6 @@ function DatabaseBoundEffects() {
   useReorderNotifications();
   useDoseSync();
   useLocationRefresh();
+  useOrphanedImageCleanup();
   return null;
 }
