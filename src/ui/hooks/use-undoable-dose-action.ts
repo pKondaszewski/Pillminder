@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Alert } from 'react-native';
 
 import { createLogger } from '@/config/logger';
+import type { TodayDose } from '@/doses/dose-service';
 
 type DoseFn = (id: string) => Promise<void>;
 export type UndoableKind = 'taken' | 'skipped';
 
 interface Undoable {
   id: string;
+  name: string;
   kind: UndoableKind;
 }
 
@@ -25,14 +27,17 @@ export function useUndoableDoseAction(
     Alert.alert(t('products.errorTitle'), t('history.errorCorrect'));
   };
 
-  const applyWithUndo = async (kind: UndoableKind, id: string) => {
+  const applyWithUndo = async (
+    kind: UndoableKind,
+    { id, productName }: TodayDose,
+  ) => {
     try {
       await actions[kind].apply(id);
     } catch (err) {
       reportFailure(`mark dose ${id} as ${kind}`, err);
       return;
     }
-    setUndoable({ id, kind });
+    setUndoable({ id, name: productName, kind });
   };
 
   const takeAll = async (ids: string[]) => {

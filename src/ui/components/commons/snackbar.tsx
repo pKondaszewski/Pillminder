@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 
-import { Spacing } from '@/ui/commons/constants/theme';
+import { Radius, Spacing } from '@/ui/commons/constants/theme';
+import { Icon } from '@/ui/components/commons/icon';
 import { ThemedText } from '@/ui/components/commons/themed-text';
-import { ThemedView } from '@/ui/components/commons/themed-view';
+import { useTheme } from '@/ui/hooks/use-theme';
 
 const AUTO_DISMISS_MS = 5000;
 
@@ -21,7 +21,7 @@ export function Snackbar({
   onAction: () => void;
   onDismiss: () => void;
 }) {
-  const { t } = useTranslation();
+  const theme = useTheme();
 
   useEffect(() => {
     const timer = setTimeout(onDismiss, AUTO_DISMISS_MS);
@@ -34,30 +34,26 @@ export function Snackbar({
       exiting={FadeOutDown}
       style={styles.wrapper}
     >
-      <ThemedView type="surface" style={styles.bar}>
-        <ThemedText type="small" style={styles.message}>
+      <View style={[styles.pill, { backgroundColor: theme.snackbar }]}>
+        <Icon name="check_circle" size={20} color={theme.snackbarIcon} />
+        <ThemedText
+          type="small"
+          style={[styles.message, { color: theme.onSnackbar }]}
+          numberOfLines={1}
+        >
           {message}
         </ThemedText>
         <Pressable
           onPress={onAction}
           hitSlop={Spacing.eight}
+          accessibilityRole="button"
           style={({ pressed }) => pressed && styles.pressed}
         >
-          <ThemedText type="smallBold" themeColor="accent">
+          <ThemedText type="smallBold" style={{ color: theme.snackbarAction }}>
             {actionLabel}
           </ThemedText>
         </Pressable>
-        <Pressable
-          onPress={onDismiss}
-          hitSlop={Spacing.eight}
-          accessibilityLabel={t('editor.close')}
-          style={({ pressed }) => pressed && styles.pressed}
-        >
-          <ThemedText type="small" themeColor="textSecondary">
-            ✕
-          </ThemedText>
-        </Pressable>
-      </ThemedView>
+      </View>
     </Animated.View>
   );
 }
@@ -65,17 +61,17 @@ export function Snackbar({
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    left: Spacing.twentyFour,
-    right: Spacing.twentyFour,
-    bottom: Spacing.twentyFour,
+    left: Spacing.twenty,
+    right: Spacing.twenty,
+    bottom: Spacing.sixteen,
   },
-  bar: {
+  pill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sixteen,
-    paddingVertical: Spacing.sixteen,
+    gap: Spacing.twelve,
+    paddingVertical: Spacing.twelve,
     paddingHorizontal: Spacing.sixteen,
-    borderRadius: Spacing.sixteen,
+    borderRadius: Radius.pill,
   },
   message: {
     flex: 1,

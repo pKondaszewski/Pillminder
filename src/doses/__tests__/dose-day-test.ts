@@ -1,4 +1,4 @@
-import { dayStatus, groupDosesByProduct } from '../dose-day';
+import { dayStatus, lastPlannedDay } from '../dose-day';
 import type { TodayDose } from '../dto/today-dose-output';
 
 const NOW = new Date(2026, 9, 10, 12, 0);
@@ -19,7 +19,12 @@ function dose(
     plannedAt,
     state,
     takenAt: null,
+    takenQuantity: null,
     snoozedUntil: null,
+    category: 'medication',
+    fasting: false,
+    profileImageFileName: null,
+    stockTracked: true,
   };
 }
 
@@ -104,20 +109,12 @@ describe('dayStatus', () => {
   });
 });
 
-describe('groupDosesByProduct', () => {
-  it('groups doses per product in order of the first dose', () => {
-    // given
-    const doses = [
-      dose('a', new Date(2026, 9, 10, 8), 'taken', 'vitamin-d'),
-      dose('b', new Date(2026, 9, 10, 9), 'taken', 'ibuprofen'),
-      dose('c', new Date(2026, 9, 10, 20), 'pending', 'vitamin-d'),
-    ];
-
+describe('lastPlannedDay', () => {
+  it('is the last day that ends before the dose horizon', () => {
     // when
-    const groups = groupDosesByProduct(doses);
+    const day = lastPlannedDay(NOW);
 
     // then
-    expect(groups.map((g) => g.productId)).toEqual(['vitamin-d', 'ibuprofen']);
-    expect(groups[0].doses.map((d) => d.id)).toEqual(['a', 'c']);
+    expect(day).toEqual(new Date(2026, 10, 8));
   });
 });

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { splitIntoWeeks } from '@/config/calendar-grid';
 import { isoDay } from '@/config/date-utils';
@@ -8,7 +8,7 @@ import {
   dayStatus,
   type TodayDose,
 } from '@/doses/dose-service';
-import { Spacing, type ThemeColor } from '@/ui/commons/constants/theme';
+import { Radius, Spacing, type ThemeColor } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { useTheme } from '@/ui/hooks/use-theme';
@@ -17,51 +17,36 @@ const MARKER_SIZE = 8;
 
 const MARKER_COLORS: Partial<Record<DayStatus, ThemeColor>> = {
   allTaken: 'taken',
-  skipped: 'textSecondary',
-  missed: 'danger',
-  upcoming: 'accent',
+  skipped: 'skipped',
+  missed: 'overdue',
 };
 
-export function StatusMarker({ status }: { status: DayStatus }) {
-  const theme = useTheme();
-  const color = MARKER_COLORS[status];
-  if (!color) return <ThemedView style={styles.marker} />;
-
-  const hollow = status === 'upcoming';
-  return (
-    <ThemedView
-      style={[
-        styles.marker,
-        { backgroundColor: hollow ? 'transparent' : theme[color] },
-        hollow && { borderWidth: 1.5, borderColor: theme[color] },
-      ]}
-    />
-  );
-}
+type Props = {
+  days: Date[];
+  month: Date;
+  doses: TodayDose[];
+  selectedDay: Date;
+  lastDay: Date;
+  weekdayKeys: string[];
+  now: Date;
+  onSelectDay: (day: Date) => void;
+};
 
 export function MonthGrid({
   days,
   month,
   doses,
   selectedDay,
+  lastDay,
   weekdayKeys,
   now,
   onSelectDay,
-}: {
-  days: Date[];
-  month: Date;
-  doses: TodayDose[];
-  selectedDay: Date;
-  weekdayKeys: string[];
-  now: Date;
-  onSelectDay: (day: Date) => void;
-}) {
+}: Props) {
   const { t } = useTranslation();
-  const weeks = splitIntoWeeks(days);
 
   return (
-    <ThemedView style={styles.grid}>
-      <ThemedView style={styles.week}>
+    <View style={styles.grid}>
+      <View style={styles.week}>
         {weekdayKeys.map((key) => (
           <ThemedText
             key={key}
@@ -69,12 +54,12 @@ export function MonthGrid({
             themeColor="textSecondary"
             style={styles.weekdayLabel}
           >
-            {t(`history.weekday.${key}`)}
+            {t(`calendar.weekday.${key}`)}
           </ThemedText>
         ))}
-      </ThemedView>
-      {weeks.map((week) => (
-        <ThemedView key={isoDay(week[0])} style={styles.week}>
+      </View>
+      {splitIntoWeeks(days).map((week) => (
+        <View key={isoDay(week[0])} style={styles.week}>
           {week.map((day) => (
             <DayCell
               key={isoDay(day)}
@@ -82,13 +67,14 @@ export function MonthGrid({
               inMonth={day.getMonth() === month.getMonth()}
               selected={isoDay(day) === isoDay(selectedDay)}
               isToday={isoDay(day) === isoDay(now)}
+              disabled={isoDay(day) > isoDay(lastDay)}
               status={dayStatus(day, doses, now)}
               onPress={() => onSelectDay(day)}
             />
           ))}
-        </ThemedView>
+        </View>
       ))}
-    </ThemedView>
+    </View>
   );
 }
 
@@ -97,6 +83,7 @@ function DayCell({
   inMonth,
   selected,
   isToday,
+  disabled,
   status,
   onPress,
 }: {
@@ -104,36 +91,49 @@ function DayCell({
   inMonth: boolean;
   selected: boolean;
   isToday: boolean;
+  disabled: boolean;
   status: DayStatus;
   onPress: () => void;
 }) {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const markerColor = MARKER_COLORS[status];
   const statusLabel =
-    status === 'none' ? t('history.emptyDay') : t(`history.status.${status}`);
-  const numberColor: ThemeColor = inMonth ? 'text' : 'textSecondary';
+    status === 'none' ? t('calendar.emptyDay') : t(`calendar.status.${status}`);
 
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={`${day.getDate()}, ${statusLabel}`}
-      accessibilityState={{ selected }}
-      style={styles.cellPressable}
+      accessibilityState={{ selected, disabled }}
+      style={[styles.cellPressable, disabled && styles.disabled]}
     >
       <ThemedView
         type={selected ? 'surface' : 'background'}
-        style={styles.cell}
+        style={[styles.cell, isToday && { borderColor: theme.accent }]}
       >
         <ThemedText
           type={isToday ? 'smallBold' : 'small'}
-          themeColor={isToday ? 'accent' : numberColor}
+          themeColor={dayNumberColor(inMonth, isToday)}
         >
           {day.getDate()}
         </ThemedText>
-        <StatusMarker status={status} />
+        <View
+          style={[
+            styles.marker,
+            markerColor && { backgroundColor: theme[markerColor] },
+          ]}
+        />
       </ThemedView>
     </Pressable>
   );
+}
+
+function dayNumberColor(inMonth: boolean, isToday: boolean): ThemeColor {
+  if (isToday) return 'accent';
+  return inMonth ? 'text' : 'textTertiary';
 }
 
 const styles = StyleSheet.create({
@@ -154,11 +154,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.four,
     paddingVertical: Spacing.eight,
-    borderRadius: Spacing.eight,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+    borderRadius: Radius.button,
   },
   marker: {
     width: MARKER_SIZE,
     height: MARKER_SIZE,
     borderRadius: MARKER_SIZE / 2,
+  },
+  disabled: {
+    opacity: 0.4,
   },
 });

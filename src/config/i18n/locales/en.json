@@ -24,6 +24,52 @@
       "productMismatch": "A dose belongs to a different product than its schedule."
     }
   },
+  "calendar": {
+    "allProducts": "All products",
+    "backToProduct": "Back to product",
+    "backToToday": "Back to today",
+    "emptyDay": "No doses",
+    "month": {
+      "april": "April",
+      "august": "August",
+      "december": "December",
+      "february": "February",
+      "january": "January",
+      "july": "July",
+      "june": "June",
+      "march": "March",
+      "may": "May",
+      "november": "November",
+      "october": "October",
+      "september": "September"
+    },
+    "nextMonth": "Next month",
+    "previousMonth": "Previous month",
+    "status": {
+      "allTaken": "All taken",
+      "missed": "Not ticked",
+      "skipped": "Skipped",
+      "upcoming": "Planned"
+    },
+    "summary": {
+      "empty": "{{month}}: no doses to summarize",
+      "taken_one": "{{month}}: {{taken}} of {{count}} dose taken",
+      "taken_other": "{{month}}: {{taken}} of {{count}} doses taken",
+      "unticked_one": "{{count}} not ticked",
+      "unticked_other": "{{count}} not ticked",
+      "untilToday": "so far"
+    },
+    "title": "Calendar",
+    "weekday": {
+      "fri": "Fri",
+      "mon": "Mon",
+      "sat": "Sat",
+      "sun": "Sun",
+      "thu": "Thu",
+      "tue": "Tue",
+      "wed": "Wed"
+    }
+  },
   "category": {
     "care": "Care",
     "medication": "Medication",
@@ -76,41 +122,9 @@
     "change": "Change",
     "confirmSkipped": "Mark this dose as not taken? Stock will be restored.",
     "confirmTaken": "Mark this dose as taken? Stock will be reduced.",
-    "emptyDay": "Nothing planned this day",
     "errorCorrect": "Could not change the dose. Try again.",
-    "month": {
-      "april": "April",
-      "august": "August",
-      "december": "December",
-      "february": "February",
-      "january": "January",
-      "july": "July",
-      "june": "June",
-      "march": "March",
-      "may": "May",
-      "november": "November",
-      "october": "October",
-      "september": "September"
-    },
-    "nextMonth": "Next month",
-    "previousMonth": "Previous month",
     "skipped": "Missed",
-    "status": {
-      "allTaken": "All taken",
-      "missed": "Missed",
-      "skipped": "Skipped",
-      "upcoming": "Planned"
-    },
-    "taken": "Taken",
-    "weekday": {
-      "fri": "Fri",
-      "mon": "Mon",
-      "sat": "Sat",
-      "sun": "Sun",
-      "thu": "Thu",
-      "tue": "Tue",
-      "wed": "Wed"
-    }
+    "taken": "Taken"
   },
   "home": {
     "bulkTake": "Take overdue ({{count}})",
@@ -118,30 +132,93 @@
     "bulkTakeConfirm_other": "Mark {{count}} overdue doses as taken?",
     "bulkTakeError": "Some doses could not be saved. The rest were marked.",
     "bulkTakeTitle": "Mark overdue as taken?",
-    "empty": "Nothing today, you're free 🎉",
-    "openHistory": "History",
+    "card": {
+      "allTaken_one": "Today's dose taken",
+      "allTaken_other": "All {{count}} doses for today taken",
+      "calm": {
+        "next": "Next in {{duration}}",
+        "title": "On schedule"
+      },
+      "done": {
+        "closedTitle": "Done for today",
+        "title": "Well done!"
+      },
+      "futureCount": "Planned doses: {{count}}",
+      "futureTitle": "Day plan",
+      "nextDose": "{{name}} · {{time}}",
+      "others_one": "and {{count}} other",
+      "others_other": "and {{count}} others",
+      "overdueMany_one": "{{count}} overdue · oldest {{duration}}",
+      "overdueMany_other": "{{count}} overdue · oldest {{duration}}",
+      "overdueOne": "Overdue {{duration}}",
+      "pastTitle": "Day summary"
+    },
+    "correction": {
+      "skipped": "Skipped",
+      "stockLess": "Stock will decrease by {{amount}}",
+      "stockMore": "Stock will increase by {{amount}}",
+      "stockSame": "Stock unchanged",
+      "taken": "Taken",
+      "title": "What happened to this dose?"
+    },
+    "counts": {
+      "later": "{{count}} later",
+      "overdue_one": "{{count}} overdue",
+      "overdue_other": "{{count}} overdue",
+      "skipped_one": "{{count}} skipped",
+      "skipped_other": "{{count}} skipped",
+      "takenOf_one": "{{count}} of {{total}} taken",
+      "takenOf_other": "{{count}} of {{total}} taken",
+      "taken_one": "{{count}} taken",
+      "taken_other": "{{count}} taken"
+    },
+    "duration": {
+      "hours": "{{hours}} h",
+      "hoursMinutes": "{{hours}} h {{minutes}} min",
+      "minutes": "{{minutes}} min"
+    },
+    "emptyDay": {
+      "action": "See Plan",
+      "message": "Nothing is planned for this day",
+      "title": "No doses",
+      "todayTitle": "No doses today"
+    },
+    "emptyProducts": {
+      "action": "Add product",
+      "message": "Add a medication or supplement and set a schedule, the app handles the rest.",
+      "title": "Start with your first product"
+    },
+    "pager": {
+      "backToToday": "Back to today",
+      "nextDay": "Next day",
+      "openCalendar": "Open calendar",
+      "previousDay": "Previous day"
+    },
     "quantity": "× {{count}}",
+    "showAll": "Show all ({{count}})",
     "skip": "Skip",
     "skipped": "Skipped",
-    "skippedToast": "Marked as skipped",
+    "skippedToast": "Skipped: {{name}}",
     "slot": {
       "afternoon": "Afternoon",
       "evening": "Evening",
       "morning": "Morning",
       "night": "Night"
     },
+    "slotSummary": "{{slot}} · {{counts}}",
     "snoozed": "snoozed → {{time}}",
-    "statsMonth": "{{taken}}/{{due}} this month",
-    "statsStreak_one": "{{count}} day in a row",
-    "statsStreak_other": "{{count}} days in a row",
     "take": "Take",
     "taken": "✓ {{time}}",
-    "takenToast": "✓ Marked as taken",
+    "takenToast": "Taken: {{name}}",
+    "timeline": {
+      "now": "now"
+    },
     "undo": "Undo",
     "undoConfirm": "Undo taking “{{name}}”?",
     "undoTitle": "Undo taken?",
     "unskipConfirm": "Undo skipping “{{name}}”?",
-    "unskipTitle": "Undo skipped?"
+    "unskipTitle": "Undo skipped?",
+    "unticked": "Not ticked"
   },
   "images": {
     "camera": "Take photo",
@@ -391,7 +468,6 @@
     "title": "Medication summary"
   },
   "tabs": {
-    "history": "History",
     "home": "Today",
     "plan": "Plan",
     "products": "Products",
