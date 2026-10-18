@@ -346,10 +346,10 @@
         "upcoming": "Zaplanowane"
       },
       "decreaseStock": "Zmniejsz zapas",
-      "deleteForever": "Usuń na zawsze",
+      "deleteForever": "Usuń",
       "deleteInstead": "Zarchiwizuj zamiast tego",
       "deleteProduct": "Usuń produkt",
-      "deleteTitle": "Usunąć {{name}} na zawsze?",
+      "deleteTitle": "Usunąć {{name}}?",
       "deleteWarning": "Harmonogram, pełna historia dawek, zdjęcia i notatki zostaną usunięte.",
       "details": "Szczegóły",
       "editStock": "Zmień zapas",

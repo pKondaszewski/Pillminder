@@ -200,6 +200,7 @@ function ProductDetail({ product }: { product: Product }) {
       {sheet?.kind === 'delete' ? (
         <DeleteProductDialog
           productName={product.name}
+          status={product.status}
           onConfirm={() =>
             runThenGoBack(
               () => removeProduct(product.id),

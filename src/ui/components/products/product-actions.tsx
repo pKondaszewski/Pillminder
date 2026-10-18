@@ -28,6 +28,7 @@ type ArchiveDialogProps = {
 
 type DeleteDialogProps = {
   productName: string;
+  status: Product['status'];
   onConfirm: () => void;
   onArchiveInstead: () => void;
   onCancel: () => void;
@@ -90,11 +91,13 @@ export function ArchiveProductDialog({
 
 export function DeleteProductDialog({
   productName,
+  status,
   onConfirm,
   onArchiveInstead,
   onCancel,
 }: DeleteDialogProps) {
   const { t } = useTranslation();
+  const offersArchiving = status === 'active';
 
   return (
     <ConfirmDialog
@@ -106,16 +109,18 @@ export function DeleteProductDialog({
       onConfirm={onConfirm}
       onCancel={onCancel}
     >
-      <Pressable
-        onPress={onArchiveInstead}
-        accessibilityRole="button"
-        hitSlop={Spacing.eight}
-        style={({ pressed }) => pressed && styles.pressed}
-      >
-        <ThemedText type="smallBold" themeColor="accent">
-          {t('products.detail.deleteInstead')}
-        </ThemedText>
-      </Pressable>
+      {offersArchiving ? (
+        <Pressable
+          onPress={onArchiveInstead}
+          accessibilityRole="button"
+          hitSlop={Spacing.eight}
+          style={({ pressed }) => pressed && styles.pressed}
+        >
+          <ThemedText type="smallBold" themeColor="accent">
+            {t('products.detail.deleteInstead')}
+          </ThemedText>
+        </Pressable>
+      ) : null}
     </ConfirmDialog>
   );
 }
