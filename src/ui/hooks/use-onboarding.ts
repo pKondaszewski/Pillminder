@@ -11,22 +11,28 @@ import {
 const log = createLogger('use-onboarding');
 
 export function useOnboarding(enabled: boolean) {
-  const [steps, setSteps] = useState<OnboardingStep[] | null>(null);
+  const [flow, setFlow] = useState<{
+    steps: OnboardingStep[];
+    index: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
     getOnboardingSteps()
-      .then(setSteps)
+      .then((steps) => setFlow({ steps, index: 0 }))
       .catch((err) => {
         // Never block the app on a failed permission check
         log.error('Onboarding check failed', err);
-        setSteps([]);
+        setFlow({ steps: [], index: 0 });
       });
   }, [enabled]);
 
-  const step = steps?.[0] ?? null;
+  const step = flow?.steps[flow.index] ?? null;
 
-  const advance = () => setSteps((current) => current?.slice(1) ?? []);
+  const advance = () =>
+    setFlow((current) =>
+      current ? { ...current, index: current.index + 1 } : current,
+    );
 
   const dismiss = () => {
     if (step === 'notifications') dismissNotificationsPrompt();
@@ -35,8 +41,12 @@ export function useOnboarding(enabled: boolean) {
   };
 
   return {
-    ready: steps !== null,
+    ready: flow !== null,
     step,
+    progress: {
+      current: (flow?.index ?? 0) + 1,
+      total: flow?.steps.length ?? 0,
+    },
     advance,
     dismiss,
   };

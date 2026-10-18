@@ -7,13 +7,16 @@ import { ThemedView } from '@/ui/components/commons/themed-view';
 
 import { BatteryStep } from './battery-step';
 import { NotificationsStep } from './notifications-step';
+import type { OnboardingProgress } from './onboarding-step-layout';
 
 export function OnboardingScreen({
   step,
+  progress,
   onAdvance,
   onDismiss,
 }: {
   step: OnboardingStep;
+  progress: OnboardingProgress;
   onAdvance: () => void;
   onDismiss: () => void;
 }) {
@@ -21,9 +24,13 @@ export function OnboardingScreen({
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         {step === 'notifications' ? (
-          <NotificationsStep onGranted={onAdvance} onDismissed={onDismiss} />
+          <NotificationsStep
+            progress={progress}
+            onGranted={onAdvance}
+            onDismissed={onDismiss}
+          />
         ) : (
-          <BatteryStep onDone={onDismiss} />
+          <BatteryStep progress={progress} onDone={onDismiss} />
         )}
       </SafeAreaView>
     </ThemedView>

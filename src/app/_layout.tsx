@@ -70,6 +70,7 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
         {onboarding.step ? (
           <OnboardingScreen
             step={onboarding.step}
+            progress={onboarding.progress}
             onAdvance={onboarding.advance}
             onDismiss={onboarding.dismiss}
           />
