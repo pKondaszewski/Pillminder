@@ -6,14 +6,14 @@ import { addImage, DEFAULT_IMAGE_ROLE } from '@/images/image-service';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import { NewProductForm } from '@/ui/components/products/new-product-form';
 import { useProducts } from '@/ui/hooks/use-products';
-import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
+import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
 
 export default function NewProductScreen() {
   const { t } = useTranslation();
   const { forSchedule } = useLocalSearchParams<{ forSchedule?: string }>();
   const { addProduct } = useProducts();
 
-  const runThenLeave = useRunThenCloseEditor((createdId: string) =>
+  const runThenLeave = useRunWithErrorAlert((createdId: string) =>
     forSchedule
       ? router.dismissTo({
           pathname: '/schedules/new',

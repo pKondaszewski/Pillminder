@@ -37,7 +37,7 @@ import {
 } from '@/ui/components/schedules/field-sheets';
 import { ScheduleProductCard } from '@/ui/components/schedules/product-card';
 import { useProducts } from '@/ui/hooks/use-products';
-import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
+import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 
 export default function ScheduleScreen() {
@@ -54,8 +54,9 @@ export default function ScheduleScreen() {
   const [field, setField] = useState<ScheduleField | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-  const runThenCloseSheet = useRunThenCloseEditor(() => setField(null));
-  const runThenGoBack = useRunThenCloseEditor(() => router.back());
+  const runThenCloseSheet = useRunWithErrorAlert(() => setField(null));
+  const runThenGoBack = useRunWithErrorAlert(() => router.back());
+  const runWithAlert = useRunWithErrorAlert();
 
   const schedule = schedules.find((s) => s.id === id);
   const product = products.find((p) => p.id === schedule?.productId);
@@ -152,7 +153,7 @@ export default function ScheduleScreen() {
                 <SecondaryButton
                   label={t('schedule.resume')}
                   onPress={() =>
-                    runThenCloseSheet(
+                    runWithAlert(
                       () => resumeSchedule(schedule.id),
                       'schedule.errorResume',
                     )
