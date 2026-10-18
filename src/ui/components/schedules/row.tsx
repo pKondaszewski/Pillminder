@@ -20,13 +20,25 @@ type Props = {
   now: Date;
   onPress: () => void;
   onResume: () => void;
+  onRestoreProduct: () => void;
 };
 
-export function ScheduleRow({ item, kind, now, onPress, onResume }: Props) {
+export function ScheduleRow({
+  item,
+  kind,
+  now,
+  onPress,
+  onResume,
+  onRestoreProduct,
+}: Props) {
   const { t } = useTranslation();
   const formatDate = useFormatDate();
   const progress = courseProgress(item, now);
+  const productArchived = item.productStatus === 'archived';
   const dimmed = kind === 'paused' || kind === 'ended';
+  const pausedAction = productArchived
+    ? { labelKey: 'schedule.restoreProduct', onPress: onRestoreProduct }
+    : { labelKey: 'schedule.resume', onPress: onResume };
 
   return (
     <ThemedView type="surface" style={styles.card}>
@@ -46,6 +58,11 @@ export function ScheduleRow({ item, kind, now, onPress, onResume }: Props) {
             <ThemedText type="small" themeColor="textSecondary">
               {describeRhythm(item, t, formatDate, item.productUnit, now)}
             </ThemedText>
+            {productArchived ? (
+              <ThemedText type="small" themeColor="textSecondary">
+                {t('schedule.productArchived')}
+              </ThemedText>
+            ) : null}
             {kind === 'timed' && item.endDate ? (
               <CourseProgressBar
                 progress={progress}
@@ -57,12 +74,12 @@ export function ScheduleRow({ item, kind, now, onPress, onResume }: Props) {
       </Pressable>
       {kind === 'paused' ? (
         <Pressable
-          onPress={onResume}
+          onPress={pausedAction.onPress}
           accessibilityRole="button"
           style={({ pressed }) => [styles.resume, pressed && styles.pressed]}
         >
           <ThemedText type="smallBold" themeColor="accent">
-            {t('schedule.resume')}
+            {t(pausedAction.labelKey)}
           </ThemedText>
         </Pressable>
       ) : null}

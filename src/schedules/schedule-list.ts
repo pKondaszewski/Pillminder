@@ -32,9 +32,10 @@ export const SCHEDULE_KINDS: readonly ScheduleKind[] = [
 const DEFAULT_KINDS: readonly ScheduleKind[] = ['ongoing', 'timed', 'paused'];
 
 export function scheduleKind(
-  { endDate, pausedAt, resumeAt }: Schedule,
+  { endDate, pausedAt, resumeAt, productStatus }: ScheduleListItem,
   now: Date,
 ): ScheduleKind {
+  if (productStatus === 'archived') return 'paused';
   if (endDate && startOfDay(endDate) < startOfDay(now)) return 'ended';
   if (isPaused({ pausedAt, resumeAt }, now)) return 'paused';
   return endDate ? 'timed' : 'ongoing';

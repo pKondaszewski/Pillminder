@@ -44,7 +44,7 @@ export default function ScheduleScreen() {
   const { t } = useTranslation();
   const formatDate = useFormatDate();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { products } = useProducts();
+  const { products, restoreProduct } = useProducts();
   const {
     schedules,
     editSchedule,
@@ -64,18 +64,47 @@ export default function ScheduleScreen() {
   if (!schedule || !product) return null;
 
   const now = new Date();
+  const productArchived = product.status === 'archived';
   const paused = isPaused(schedule, now);
   const progress = courseProgress(schedule, now);
-  const stock = paused
-    ? null
-    : scheduleStockSufficiency(
-        schedule,
-        schedules,
-        product,
-        now,
-        t,
-        formatDate,
-      );
+  const stock =
+    paused || productArchived
+      ? null
+      : scheduleStockSufficiency(
+          schedule,
+          schedules,
+          product,
+          now,
+          t,
+          formatDate,
+        );
+  const statusMessageKey = productArchived
+    ? 'schedule.productArchivedPaused'
+    : paused
+      ? 'schedule.paused'
+      : null;
+  const stateAction = productArchived
+    ? {
+        labelKey: 'schedule.restoreProduct',
+        onPress: () =>
+          runWithAlert(
+            () => restoreProduct(product.id),
+            'schedule.errorRestoreProduct',
+          ),
+      }
+    : paused
+      ? {
+          labelKey: 'schedule.resume',
+          onPress: () =>
+            runWithAlert(
+              () => resumeSchedule(schedule.id),
+              'schedule.errorResume',
+            ),
+        }
+      : {
+          labelKey: 'schedule.pauseAction',
+          onPress: () => setField('pause'),
+        };
   const doses = previewOccurrences(
     schedule.intervalDays,
     schedule.timesOfDay,
@@ -96,9 +125,9 @@ export default function ScheduleScreen() {
               onPress={() => router.push(`/products/${product.id}`)}
             />
 
-            {paused ? (
+            {statusMessageKey ? (
               <ThemedText type="small" themeColor="textSecondary">
-                {t('schedule.paused')}
+                {t(statusMessageKey)}
               </ThemedText>
             ) : null}
             {schedule.endDate ? (
@@ -148,31 +177,21 @@ export default function ScheduleScreen() {
               />
             </View>
 
-            <View style={styles.section}>
-              <ThemedText type="label">{t('schedule.preview')}</ThemedText>
-              <DosePreview
-                hasTimes={schedule.timesOfDay.length > 0}
-                doses={doses}
-              />
-            </View>
+            {productArchived ? null : (
+              <View style={styles.section}>
+                <ThemedText type="label">{t('schedule.preview')}</ThemedText>
+                <DosePreview
+                  hasTimes={schedule.timesOfDay.length > 0}
+                  doses={doses}
+                />
+              </View>
+            )}
 
             <View style={styles.actions}>
-              {paused ? (
-                <SecondaryButton
-                  label={t('schedule.resume')}
-                  onPress={() =>
-                    runWithAlert(
-                      () => resumeSchedule(schedule.id),
-                      'schedule.errorResume',
-                    )
-                  }
-                />
-              ) : (
-                <SecondaryButton
-                  label={t('schedule.pauseAction')}
-                  onPress={() => setField('pause')}
-                />
-              )}
+              <SecondaryButton
+                label={t(stateAction.labelKey)}
+                onPress={stateAction.onPress}
+              />
               <DestructiveButton
                 label={t('editor.delete')}
                 onPress={() => setConfirmingDelete(true)}
