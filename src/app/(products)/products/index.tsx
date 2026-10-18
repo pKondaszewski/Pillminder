@@ -35,7 +35,6 @@ import { ProductFilterSheet } from '@/ui/components/products/list-filters';
 import { ProductListHeader } from '@/ui/components/products/list-header';
 import { LowStockBanner } from '@/ui/components/products/low-stock-banner';
 import { ProductRow } from '@/ui/components/products/row';
-import { TravelPlanModal } from '@/ui/components/products/travel-plan-modal';
 import { useFormatTime } from '@/ui/hooks/use-format-date';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
@@ -50,7 +49,6 @@ export default function ProductListScreen() {
 
   const [filters, setFilters] = useState(DEFAULT_PRODUCT_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [travelOpen, setTravelOpen] = useState(false);
 
   const categories = filterableCategories(products);
   const effectiveFilters = {
@@ -81,7 +79,9 @@ export default function ProductListScreen() {
     <TabSwipe>
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <ProductListHeader onTravelPress={() => setTravelOpen(true)} />
+          <ProductListHeader
+            onTravelPress={() => router.push('/products/trip')}
+          />
           {products.length === 0 ? (
             <EmptyState
               icon="medication"
@@ -139,11 +139,6 @@ export default function ProductListScreen() {
           resultCount={matching.length}
           onChange={setFilters}
           onClose={() => setFiltersOpen(false)}
-        />
-
-        <TravelPlanModal
-          visible={travelOpen}
-          onClose={() => setTravelOpen(false)}
         />
       </ThemedView>
     </TabSwipe>

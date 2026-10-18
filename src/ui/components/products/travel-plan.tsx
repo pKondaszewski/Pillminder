@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { addDays, type DateRange, startOfDay } from '@/config/date-utils';
 import type { TravelPlanEntry } from '@/products/product-service';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
 import { formatDateRange } from '@/ui/commons/format-date';
-import { PrimaryButton } from '@/ui/components/commons/button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TripRangeSheet } from '@/ui/components/products/trip-range-sheet';
@@ -17,25 +16,7 @@ import { useTravelPlan } from '@/ui/hooks/use-travel-plan';
 
 const DEFAULT_TRIP_LENGTH_DAYS = 7;
 
-type Props = {
-  visible: boolean;
-  onClose: () => void;
-};
-
-export function TravelPlanModal({ visible, onClose }: Props) {
-  return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-    >
-      {visible ? <TravelContent onClose={onClose} /> : null}
-    </Modal>
-  );
-}
-
-function TravelContent({ onClose }: Pick<Props, 'onClose'>) {
+export function TravelPlan() {
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
   const [range, setRange] = useState<DateRange>(() => ({
@@ -52,9 +33,8 @@ function TravelContent({ onClose }: Pick<Props, 'onClose'>) {
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.safeArea} edges={['bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
-          <ThemedText type="subtitle">{t('travel.title')}</ThemedText>
           <Pressable
             onPress={() => setPickingRange(true)}
             accessibilityRole="button"
@@ -70,9 +50,6 @@ function TravelContent({ onClose }: Pick<Props, 'onClose'>) {
             </ThemedView>
           </Pressable>
           <TravelResults entries={plan} />
-          <ThemedView style={styles.actions}>
-            <PrimaryButton label={t('editor.close')} onPress={onClose} />
-          </ThemedView>
         </ScrollView>
       </SafeAreaView>
       <TripRangeSheet
@@ -146,5 +123,4 @@ const styles = StyleSheet.create({
     borderRadius: Radius.card,
     gap: Spacing.four,
   },
-  actions: { flexDirection: 'row' },
 });
