@@ -1,5 +1,9 @@
 import type { Schedule } from '../schedule-repository';
-import { describeRhythm, type Translate } from '../schedule-rhythm';
+import {
+  describeCourse,
+  describeRhythm,
+  type Translate,
+} from '../schedule-rhythm';
 
 const PL: Record<string, string> = {
   'schedule.daily': 'Codziennie',
@@ -8,6 +12,7 @@ const PL: Record<string, string> = {
   'schedule.periodRange': '{{from}} – {{to}}',
   'schedule.periodFrom': 'od {{date}}',
   'schedule.periodUntil': 'do {{date}}',
+  'schedule.courseDay': 'Dzień {{day}} z {{total}}',
   'schedule.paused': 'Wstrzymany',
   'schedule.pausedUntil': 'Wstrzymany do {{date}}',
 };
@@ -118,5 +123,30 @@ describe('describeRhythm', () => {
 
     // then
     expect(text).toBe('Codziennie · 08:00');
+  });
+});
+
+describe('describeCourse', () => {
+  it('combines the day of the course with the end date', () => {
+    // given
+    const progress = { day: 3, total: 7 };
+    const endDate = new Date(2026, 0, 16);
+
+    // when
+    const result = describeCourse(progress, endDate, t, formatDate);
+
+    // then
+    expect(result).toBe(`Dzień 3 z 7 · do ${formatDate(endDate)}`);
+  });
+
+  it('shows only the end date before the course starts', () => {
+    // given
+    const endDate = new Date(2026, 0, 16);
+
+    // when
+    const result = describeCourse(null, endDate, t, formatDate);
+
+    // then
+    expect(result).toBe(`do ${formatDate(endDate)}`);
   });
 });

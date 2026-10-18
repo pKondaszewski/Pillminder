@@ -1,15 +1,32 @@
-import { eq } from 'drizzle-orm';
+import { eq, getTableColumns } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
-import { schedules } from '@/config/db/schema';
+import { productImages, products, schedules } from '@/config/db/schema';
 
 import type { NewScheduleInput } from './dto/new-schedule-input';
 
 export type Schedule = typeof schedules.$inferSelect;
+export type ScheduleListItem = Awaited<
+  ReturnType<typeof scheduleListQuery>
+>[number];
 
 export function schedulesQuery() {
   return db.select().from(schedules);
+}
+
+export function scheduleListQuery() {
+  return db
+    .select({
+      ...getTableColumns(schedules),
+      productName: products.name,
+      productCategory: products.category,
+      productUnit: products.unit,
+      profileImageFileName: productImages.fileName,
+    })
+    .from(schedules)
+    .innerJoin(products, eq(schedules.productId, products.id))
+    .leftJoin(productImages, eq(products.profileImageId, productImages.id));
 }
 
 export async function getAllSchedules(): Promise<Schedule[]> {

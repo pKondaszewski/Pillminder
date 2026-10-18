@@ -1,4 +1,3 @@
-import { addDays, startOfDay } from '@/config/date-utils';
 import i18n from '@/config/i18n';
 import { createLogger } from '@/config/logger';
 import {
@@ -24,7 +23,8 @@ import {
 } from '@/schedules/schedule-service';
 import { getSnoozeMinutes } from '@/settings/settings-service';
 
-import { calculateAdherence, calculateStreak } from './dose-adherence';
+import { calculateAdherence } from './dose-adherence';
+import { DOSE_HORIZON_DAYS } from './dose-day';
 import { reminderBody } from './dose-label';
 import {
   deleteFuturePendingDoseRowsForSchedules,
@@ -38,29 +38,40 @@ import {
   setDoseStateRow,
 } from './dose-repository';
 import { isDueInFuture, isPending } from './dose-validator';
-import type {
-  AdherenceReport,
-  AdherenceStats,
-} from './dto/adherence-report-output';
+import type { AdherenceReport } from './dto/adherence-report-output';
 
-export type { DayStatus, ProductDoses } from './dose-day';
-export { dayStatus, groupDosesByProduct } from './dose-day';
-export { doseQuantityText } from './dose-label';
-export { BULK_TAKE_MIN_OVERDUE, overdueDoses } from './dose-overdue';
+export type { CorrectionTarget } from './dose-correction';
+export { correctionStockDelta } from './dose-correction';
+export type { DayStatus } from './dose-day';
+export { dayStatus, lastPlannedDay } from './dose-day';
+export {
+  dayCountsText,
+  doseDetailsText,
+  doseQuantityText,
+  durationText,
+  handledCountsText,
+  monthSummaryText,
+  stockEffectText,
+} from './dose-label';
+export { monthSummary } from './dose-month';
+export type { DoseStatus } from './dose-status';
+export { doseStatus } from './dose-status';
 export type { RecentDays, StripDay } from './dose-strip';
 export { buildRecentDays, recentDaysRange } from './dose-strip';
-export { groupDosesByTimeSlot } from './dose-time-slot';
+export type { TimeSlotGroup, TimeSlotLayout } from './dose-time-slot';
+export { groupDosesByTimeSlot, timeSlotLayout } from './dose-time-slot';
+export type { TimelineMark } from './dose-timeline';
+export { buildTimeline, nowPosition } from './dose-timeline';
 export { toTodayDose } from './dose-today';
+export type { DayCounts, TodayCardState } from './dose-today-card';
+export { BULK_TAKE_MIN_OVERDUE, todayCardState } from './dose-today-card';
 export type {
   AdherenceCounts,
   AdherenceReport,
-  AdherenceStats,
 } from './dto/adherence-report-output';
 export type { TodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');
-
-const HORIZON_DAYS = 30;
 
 function reminderTexts(product: Product, quantity: number) {
   const name = productLabel(product.name, product.strength);
@@ -96,22 +107,6 @@ export async function getAdherence(
 ): Promise<AdherenceReport> {
   const doses = await getDosesPlannedBetween(from, to);
   return calculateAdherence(doses, from, to, now);
-}
-
-export async function getAdherenceStats(now: Date): Promise<AdherenceStats> {
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  const loaded = await getDosesPlannedBetween(new Date(0), monthEnd);
-  const untilToday = loaded.filter(
-    ({ plannedAt }) => plannedAt < addDays(startOfDay(now), 1),
-  );
-  const { taken, due } = calculateAdherence(
-    loaded,
-    monthStart,
-    monthEnd,
-    now,
-  ).total;
-  return { taken, due, streak: calculateStreak(untilToday, now) };
 }
 
 export async function cancelFutureDosesForSchedules(
@@ -231,7 +226,7 @@ export async function syncDosesForSchedules(
         : occurrencesWithin(
             schedule.intervalDays,
             schedule.timesOfDay,
-            HORIZON_DAYS,
+            DOSE_HORIZON_DAYS,
             schedule,
             from,
           );

@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 
+import { startOfDay } from '@/config/date-utils';
 import {
   buildRecentDays,
   getProductDosesBetweenQuery,
@@ -7,15 +8,16 @@ import {
   recentDaysRange,
 } from '@/doses/dose-service';
 
-import { useCurrentDay } from './use-current-day';
+import { useNow } from './use-now';
 
 export function useRecentDays(productId: string): RecentDays {
-  const today = useCurrentDay();
-  const { from, to } = recentDaysRange(new Date(today));
+  const now = useNow();
+  const today = startOfDay(now).getTime();
+  const { from, to } = recentDaysRange(now);
   const { data } = useLiveQuery(
     getProductDosesBetweenQuery(productId, from, to),
     [productId, today],
   );
 
-  return buildRecentDays(data, new Date());
+  return buildRecentDays(data, now);
 }

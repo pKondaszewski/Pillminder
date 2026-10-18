@@ -2,7 +2,7 @@ import { and, eq, gte, inArray, lt, max } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
-import { doses, products, schedules } from '@/config/db/schema';
+import { doses, productImages, products, schedules } from '@/config/db/schema';
 
 import { type DoseState, planDoseTransition } from './dose-transition';
 import type { ReplaceDosesQueryResult } from './dto/replace-doses-query-result';
@@ -23,14 +23,20 @@ export function dosesBetweenQuery(from: Date, to: Date) {
       plannedAt: doses.plannedAt,
       state: doses.state,
       takenAt: doses.takenAt,
+      takenQuantity: doses.takenQuantity,
       snoozedUntil: doses.snoozedUntil,
       productName: products.name,
       productStrength: products.strength,
+      category: products.category,
       unit: products.unit,
+      fasting: products.fasting,
+      stock: products.stock,
+      profileImageFileName: productImages.fileName,
       quantity: schedules.quantity,
     })
     .from(doses)
     .innerJoin(products, eq(doses.productId, products.id))
+    .leftJoin(productImages, eq(products.profileImageId, productImages.id))
     .innerJoin(schedules, eq(doses.scheduleId, schedules.id))
     .where(and(gte(doses.plannedAt, from), lt(doses.plannedAt, to)))
     .orderBy(doses.plannedAt);

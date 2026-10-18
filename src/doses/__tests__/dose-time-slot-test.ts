@@ -1,4 +1,4 @@
-import { groupDosesByTimeSlot } from '../dose-time-slot';
+import { groupDosesByTimeSlot, timeSlotLayout } from '../dose-time-slot';
 import type { TodayDose } from '../dto/today-dose-output';
 
 function at(hours: number, minutes = 0): Date {
@@ -15,7 +15,12 @@ function doseAt(id: string, plannedAt: Date): TodayDose {
     plannedAt,
     state: 'pending',
     takenAt: null,
+    takenQuantity: null,
     snoozedUntil: null,
+    category: 'medication',
+    fasting: false,
+    profileImageFileName: null,
+    stockTracked: true,
   };
 }
 
@@ -82,5 +87,108 @@ describe('groupDosesByTimeSlot', () => {
 
     // then
     expect(sections).toEqual([]);
+  });
+});
+
+describe('timeSlotLayout', () => {
+  function withState(id: string, state: TodayDose['state']): TodayDose {
+    return { ...doseAt(id, at(8)), state };
+  }
+
+  it('collapses a slot where every dose is handled', () => {
+    // given
+    const doses = [
+      withState('a', 'taken'),
+      withState('b', 'taken'),
+      withState('c', 'skipped'),
+    ];
+
+    // when
+    const layout = timeSlotLayout(doses, false);
+
+    // then
+    expect(layout).toEqual({ kind: 'collapsed', taken: 2, skipped: 1 });
+  });
+
+  it('lists a collapsed slot after it is expanded', () => {
+    // given
+    const doses = [withState('a', 'taken')];
+
+    // when
+    const layout = timeSlotLayout(doses, true);
+
+    // then
+    expect(layout).toEqual({
+      kind: 'list',
+      visible: doses,
+      showAllCount: null,
+    });
+  });
+
+  it('lists every dose while one is still pending', () => {
+    // given
+    const doses = [withState('a', 'taken'), withState('b', 'pending')];
+
+    // when
+    const layout = timeSlotLayout(doses, false);
+
+    // then
+    expect(layout).toEqual({
+      kind: 'list',
+      visible: doses,
+      showAllCount: null,
+    });
+  });
+
+  it('lists five active doses in full', () => {
+    // given
+    const doses = ['a', 'b', 'c', 'd', 'e'].map((id) =>
+      withState(id, 'pending'),
+    );
+
+    // when
+    const layout = timeSlotLayout(doses, false);
+
+    // then
+    expect(layout).toEqual({
+      kind: 'list',
+      visible: doses,
+      showAllCount: null,
+    });
+  });
+
+  it('shows four active doses and the total above five', () => {
+    // given
+    const handled = withState('done', 'taken');
+    const active = ['a', 'b', 'c', 'd', 'e', 'f'].map((id) =>
+      withState(id, 'pending'),
+    );
+
+    // when
+    const layout = timeSlotLayout([handled, ...active], false);
+
+    // then
+    expect(layout).toEqual({
+      kind: 'list',
+      visible: active.slice(0, 4),
+      showAllCount: 7,
+    });
+  });
+
+  it('shows everything once expanded', () => {
+    // given
+    const doses = ['a', 'b', 'c', 'd', 'e', 'f'].map((id) =>
+      withState(id, 'pending'),
+    );
+
+    // when
+    const layout = timeSlotLayout(doses, true);
+
+    // then
+    expect(layout).toEqual({
+      kind: 'list',
+      visible: doses,
+      showAllCount: null,
+    });
   });
 });

@@ -1,15 +1,10 @@
 import { addDays, startOfDay } from '@/config/date-utils';
 
 import { type AdherenceDose, calculateAdherence } from './dose-adherence';
-import type { TodayDose } from './dto/today-dose-output';
 
 export type DayStatus = 'none' | 'upcoming' | 'missed' | 'skipped' | 'allTaken';
 
-export interface ProductDoses {
-  productId: string;
-  productName: string;
-  doses: TodayDose[];
-}
+export const DOSE_HORIZON_DAYS = 30;
 
 export function dayStatus(
   day: Date,
@@ -25,18 +20,7 @@ export function dayStatus(
   return total.taken > 0 ? 'allTaken' : 'none';
 }
 
-export function groupDosesByProduct(doses: TodayDose[]): ProductDoses[] {
-  const groups = new Map<string, ProductDoses>();
-  for (const dose of doses) {
-    const group = groups.get(dose.productId) ?? {
-      productId: dose.productId,
-      productName: dose.productName,
-      doses: [],
-    };
-    groups.set(dose.productId, {
-      ...group,
-      doses: [...group.doses, dose],
-    });
-  }
-  return [...groups.values()];
+// Doses are generated from now, so only the days that end before now + horizon are complete.
+export function lastPlannedDay(now: Date): Date {
+  return addDays(startOfDay(now), DOSE_HORIZON_DAYS - 1);
 }
