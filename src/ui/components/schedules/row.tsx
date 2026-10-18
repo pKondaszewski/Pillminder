@@ -12,7 +12,7 @@ import { ProductAvatar } from '@/ui/components/commons/product-avatar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { CourseProgressBar } from '@/ui/components/schedules/course-progress';
-import { useFormatDate } from '@/ui/hooks/use-format-date';
+import { useFormatDate, useFormatTime } from '@/ui/hooks/use-format-date';
 
 type Props = {
   item: ScheduleListItem;
@@ -33,6 +33,7 @@ export function ScheduleRow({
 }: Props) {
   const { t } = useTranslation();
   const formatDate = useFormatDate();
+  const { formatTimes } = useFormatTime();
   const progress = courseProgress(item, now);
   const productArchived = item.productStatus === 'archived';
   const dimmed = kind === 'paused' || kind === 'ended';
@@ -56,7 +57,14 @@ export function ScheduleRow({
           <View style={styles.text}>
             <ThemedText numberOfLines={1}>{item.productName}</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
-              {describeRhythm(item, t, formatDate, item.productUnit, now)}
+              {describeRhythm(
+                item,
+                t,
+                formatDate,
+                item.productUnit,
+                now,
+                formatTimes,
+              )}
             </ThemedText>
             {productArchived ? (
               <ThemedText type="small" themeColor="textSecondary">

@@ -12,11 +12,11 @@ import {
   type TodayDose,
 } from '@/doses/dose-service';
 import { Radius, Spacing, type ThemeColor } from '@/ui/commons/constants/theme';
-import { formatTime } from '@/ui/commons/format-date';
 import { PrimaryButton } from '@/ui/components/commons/button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DayTimeline } from '@/ui/components/today/day-timeline';
+import { useFormatTime } from '@/ui/hooks/use-format-date';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
@@ -54,9 +54,10 @@ export function TodayCard({
   onTakeOverdue,
 }: Props) {
   const { t } = useTranslation();
+  const { formatTime } = useFormatTime();
   const theme = useTheme();
   const colors = CARD_COLORS[state.kind];
-  const { title, lines } = cardCopy(state, t);
+  const { title, lines } = cardCopy(state, t, formatTime);
 
   return (
     <ThemedView
@@ -100,6 +101,7 @@ function isBulk(overdue: TodayDose[]): boolean {
 function cardCopy(
   state: TodayCardState,
   t: TFunction,
+  formatTime: (date: Date) => string,
 ): { title: string; lines: string[] } {
   switch (state.kind) {
     case 'calm':

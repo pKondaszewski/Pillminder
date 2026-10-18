@@ -15,11 +15,12 @@ export function describeRhythm(
   formatDate: (date: Date) => string,
   unit: ProductUnit | null,
   now: Date,
+  formatTimes: (times: string[]) => string,
 ): string {
   const { intervalDays, timesOfDay, quantity } = schedule;
   const quantityText = describeQuantity(quantity, unit, t);
   const period = describePeriod(schedule, t, formatDate);
-  const rhythm = `${describeInterval(intervalDays, t)} · ${timesOfDay.join(', ')}${quantityText}${period && ` · ${period}`}`;
+  const rhythm = `${describeInterval(intervalDays, t)} · ${formatTimes(timesOfDay)}${quantityText}${period && ` · ${period}`}`;
   return isPaused(schedule, now)
     ? `${describePause(schedule, t, formatDate)} · ${rhythm}`
     : rhythm;

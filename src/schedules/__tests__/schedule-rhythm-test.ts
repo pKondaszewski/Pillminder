@@ -23,6 +23,7 @@ const t: Translate = (key, options = {}) =>
     PL[key] ?? key,
   );
 const NOW = new Date(2026, 0, 10, 12, 0);
+const joinTimes = (times: string[]) => times.join(', ');
 const formatDate = (date: Date) => date.toISOString().slice(0, 10);
 
 function schedule(overrides: Partial<Schedule>): Schedule {
@@ -46,7 +47,7 @@ describe('describeRhythm', () => {
     const input = schedule({ timesOfDay: ['08:00', '20:00'] });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, NOW);
+    const text = describeRhythm(input, t, formatDate, null, NOW, joinTimes);
 
     // then
     expect(text).toBe('Codziennie · 08:00, 20:00');
@@ -61,7 +62,7 @@ describe('describeRhythm', () => {
     });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, NOW);
+    const text = describeRhythm(input, t, formatDate, null, NOW, joinTimes);
 
     // then
     expect(text).toBe('Co 3 dni · 09:00 · 2 na dawkę');
@@ -76,7 +77,7 @@ describe('describeRhythm', () => {
     const input = schedule({ startDate, endDate });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, NOW);
+    const text = describeRhythm(input, t, formatDate, null, NOW, joinTimes);
 
     // then
     expect(text).toBe(`Codziennie · 08:00 · ${period}`);
@@ -91,7 +92,7 @@ describe('describeRhythm', () => {
     });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, now);
+    const text = describeRhythm(input, t, formatDate, null, now, joinTimes);
 
     // then
     expect(text).toBe('Wstrzymany · Codziennie · 08:00');
@@ -104,7 +105,7 @@ describe('describeRhythm', () => {
     const input = schedule({ pausedAt: new Date(2026, 4, 8, 9), resumeAt });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, now);
+    const text = describeRhythm(input, t, formatDate, null, now, joinTimes);
 
     // then
     expect(text).toBe('Wstrzymany do 2026-05-20 · Codziennie · 08:00');
@@ -119,7 +120,7 @@ describe('describeRhythm', () => {
     });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, now);
+    const text = describeRhythm(input, t, formatDate, null, now, joinTimes);
 
     // then
     expect(text).toBe('Codziennie · 08:00');

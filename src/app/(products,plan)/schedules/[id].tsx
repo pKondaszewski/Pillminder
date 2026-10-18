@@ -35,7 +35,7 @@ import {
   ScheduleFieldSheet,
 } from '@/ui/components/schedules/field-sheets';
 import { ScheduleProductCard } from '@/ui/components/schedules/product-card';
-import { useFormatDate } from '@/ui/hooks/use-format-date';
+import { useFormatDate, useFormatTime } from '@/ui/hooks/use-format-date';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
 import { useScheduleEditActions } from '@/ui/hooks/use-schedule-edit-actions';
@@ -45,6 +45,7 @@ import { useUndoSnackbar } from '@/ui/hooks/use-undo-snackbar';
 export default function ScheduleScreen() {
   const { t } = useTranslation();
   const formatDate = useFormatDate();
+  const { formatTimes } = useFormatTime();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { products, restoreProduct } = useProducts();
   const { schedules, removeSchedule } = useSchedules();
@@ -152,7 +153,7 @@ export default function ScheduleScreen() {
               />
               <FieldRow
                 label={t('schedule.timesOfDay')}
-                value={schedule.timesOfDay.join(', ')}
+                value={formatTimes(schedule.timesOfDay)}
                 onPress={() => setField('times')}
               />
               <FieldRow

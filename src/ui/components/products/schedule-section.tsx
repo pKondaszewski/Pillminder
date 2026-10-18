@@ -8,7 +8,7 @@ import { Icon } from '@/ui/components/commons/icon';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductSection } from '@/ui/components/products/section';
-import { useFormatDate } from '@/ui/hooks/use-format-date';
+import { useFormatDate, useFormatTime } from '@/ui/hooks/use-format-date';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
@@ -30,6 +30,7 @@ export function ScheduleSection({
 }: Props) {
   const { t } = useTranslation();
   const formatDate = useFormatDate();
+  const { formatTimes } = useFormatTime();
   const theme = useTheme();
 
   return (
@@ -68,7 +69,14 @@ export function ScheduleSection({
           >
             <ThemedView style={styles.text}>
               <ThemedText type="small">
-                {describeRhythm(schedule, t, formatDate, unit, now)}
+                {describeRhythm(
+                  schedule,
+                  t,
+                  formatDate,
+                  unit,
+                  now,
+                  formatTimes,
+                )}
               </ThemedText>
             </ThemedView>
             <Icon name="chevron_right" size={20} color={theme.textTertiary} />

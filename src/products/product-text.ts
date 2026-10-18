@@ -64,7 +64,11 @@ export function supplyHint(
   return `${lasts} · ${order}`;
 }
 
-export function rhythmSummary(schedules: Schedule[], t: Translate): string {
+export function rhythmSummary(
+  schedules: Schedule[],
+  t: Translate,
+  formatTimes: (times: string[]) => string,
+): string {
   if (schedules.length === 0) return t('products.noSchedule');
   if (schedules.length > 1) {
     return t('products.schedulesCount', { count: schedules.length });
@@ -74,7 +78,7 @@ export function rhythmSummary(schedules: Schedule[], t: Translate): string {
     intervalDays === 1
       ? t('schedule.daily')
       : t('schedule.everyXDays', { days: intervalDays });
-  return `${base} · ${timesOfDay.join(', ')}`;
+  return `${base} · ${formatTimes(timesOfDay)}`;
 }
 
 export function lastUsedText(

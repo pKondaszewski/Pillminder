@@ -36,12 +36,14 @@ import { ProductListHeader } from '@/ui/components/products/list-header';
 import { LowStockBanner } from '@/ui/components/products/low-stock-banner';
 import { ProductRow } from '@/ui/components/products/row';
 import { TravelPlanModal } from '@/ui/components/products/travel-plan-modal';
+import { useFormatTime } from '@/ui/hooks/use-format-date';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useReorderStatuses } from '@/ui/hooks/use-reorder';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 
 export default function ProductListScreen() {
   const { t, i18n } = useTranslation();
+  const { formatTimes } = useFormatTime();
   const { products } = useProducts();
   const { schedules } = useSchedules();
   const reorderStatuses = useReorderStatuses();
@@ -68,6 +70,7 @@ export default function ProductListScreen() {
       rhythm={rhythmSummary(
         schedules.filter((schedule) => schedule.productId === item.id),
         t,
+        formatTimes,
       )}
       stock={stockSummary(item, reorderStatuses[item.id], t)}
       onPress={() => openProduct(item.id)}

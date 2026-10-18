@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
-import { formatDateTime } from '@/ui/commons/format-date';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { useFormatTime } from '@/ui/hooks/use-format-date';
 
 type Props = {
   hasTimes: boolean;
@@ -13,6 +13,7 @@ type Props = {
 
 export function DosePreview({ hasTimes, doses }: Props) {
   const { t } = useTranslation();
+  const { formatDateTime } = useFormatTime();
 
   if (!hasTimes || doses.length === 0) {
     return (
