@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { ProductOverviewEntry } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { ActionButton } from '@/ui/components/commons/action-button';
+import { SecondaryButton } from '@/ui/components/commons/button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { useProductOverview } from '@/ui/hooks/use-product-overview';
@@ -49,11 +49,7 @@ function OverviewContent({ onClose }: Pick<Props, 'onClose'>) {
             ))
           )}
           <ThemedView style={styles.actions}>
-            <ActionButton
-              label={t('editor.close')}
-              onPress={onClose}
-              themeColor="accent"
-            />
+            <SecondaryButton label={t('editor.close')} onPress={onClose} />
           </ThemedView>
         </ScrollView>
       </SafeAreaView>
@@ -63,7 +59,7 @@ function OverviewContent({ onClose }: Pick<Props, 'onClose'>) {
 
 function ProductBlock({ product }: { product: ProductOverviewEntry }) {
   return (
-    <ThemedView type="backgroundElement" style={styles.block}>
+    <ThemedView type="surface" style={styles.block}>
       <ThemedText type="smallBold">{product.title}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
         {product.category}
@@ -75,7 +71,7 @@ function ProductBlock({ product }: { product: ProductOverviewEntry }) {
       ))}
       <ThemedText
         type={product.stock.isLow ? 'smallBold' : 'small'}
-        themeColor={product.stock.isLow ? 'warning' : undefined}
+        themeColor={product.stock.isLow ? 'overdueText' : undefined}
       >
         {product.stock.text}
       </ThemedText>
@@ -89,20 +85,20 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
+    paddingHorizontal: Spacing.twentyFour,
   },
   content: {
-    gap: Spacing.two,
-    paddingVertical: Spacing.three,
+    gap: Spacing.eight,
+    paddingVertical: Spacing.sixteen,
   },
   empty: {
-    gap: Spacing.one,
-    paddingVertical: Spacing.three,
+    gap: Spacing.four,
+    paddingVertical: Spacing.sixteen,
   },
   block: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    gap: Spacing.one,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
+    gap: Spacing.four,
   },
   actions: {
     flexDirection: 'row',

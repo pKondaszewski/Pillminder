@@ -1,6 +1,7 @@
 import '@/config/i18n';
 
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
+import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
 import { useState } from 'react';
 import { useColorScheme } from 'react-native';
@@ -8,6 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { db } from '@/config/db/database';
 import { applyStoredTheme } from '@/settings/settings-service';
+import { FONT_ASSETS } from '@/ui/commons/constants/fonts';
 import { AnimatedSplashOverlay } from '@/ui/components/commons/animated-splash-overlay';
 import { MigrationErrorScreen } from '@/ui/components/commons/migration-error-screen';
 import AppTabs from '@/ui/components/navigation/app-tabs';
@@ -42,6 +44,7 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
     db,
     migrations,
   );
+  const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
   useNotificationSetup();
   const onboarding = useOnboarding(migrationsReady);
 
@@ -54,7 +57,8 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
     );
   }
 
-  if (!migrationsReady || !onboarding.ready) {
+  // A failed font load falls back to the system font instead of blocking the app
+  if (!migrationsReady || !onboarding.ready || !(fontsLoaded || fontError)) {
     return null;
   }
 

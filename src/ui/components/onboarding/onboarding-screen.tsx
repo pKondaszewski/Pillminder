@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.four,
+    paddingHorizontal: Spacing.twentyFour,
+    paddingVertical: Spacing.twentyFour,
   },
 });

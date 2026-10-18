@@ -18,7 +18,7 @@ export function DoseStatusDot({ state }: { state: DoseState }) {
   const pending = state === 'pending';
   const dotColors = {
     pending: theme.accent,
-    taken: theme.success,
+    taken: theme.taken,
     skipped: theme.textSecondary,
   };
 

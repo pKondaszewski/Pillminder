@@ -69,6 +69,9 @@
     "unitNone": "None",
     "wholeNumberInvalid": "Enter a whole number, 0 or more"
   },
+  "filters": {
+    "clear": "Clear"
+  },
   "history": {
     "change": "Change",
     "confirmSkipped": "Mark this dose as not taken? Stock will be restored.",
@@ -304,13 +307,6 @@
   },
   "settings": {
     "about": "About",
-    "accent": "Accent color",
-    "accentBlue": "Blue",
-    "accentGreen": "Green",
-    "accentOrange": "Orange",
-    "accentPink": "Pink",
-    "accentPurple": "Purple",
-    "accentTeal": "Teal",
     "appearance": "Appearance",
     "author": "Author",
     "batteryOptimization": "Battery optimization",

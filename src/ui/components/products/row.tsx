@@ -26,7 +26,7 @@ export function ProductRow({ product, reorder, onPress }: Props) {
       style={({ pressed }) => pressed && styles.pressed}
     >
       <ThemedView
-        type="backgroundElement"
+        type="surface"
         style={[styles.row, isArchived && styles.archived]}
       >
         <ThemedText>{productLabel(product.name, product.strength)}</ThemedText>
@@ -39,7 +39,7 @@ export function ProductRow({ product, reorder, onPress }: Props) {
           </ThemedText>
         )}
         {isLow && (
-          <ThemedText type="smallBold" themeColor="warning">
+          <ThemedText type="smallBold" themeColor="overdueText">
             {t('products.lowStock')} ·{' '}
             {t('products.lowStockDays', {
               days: Math.ceil(reorder.daysLeft as number),
@@ -53,9 +53,9 @@ export function ProductRow({ product, reorder, onPress }: Props) {
 
 const styles = StyleSheet.create({
   row: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    gap: Spacing.one,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
+    gap: Spacing.four,
   },
   archived: {
     opacity: 0.5,

@@ -1,44 +1,96 @@
-import type { AccentPreference } from '@/settings/settings-store';
-
-export const ACCENT_COLORS: Record<AccentPreference, string> = {
-  blue: '#3c87f7',
-  green: '#279c58',
-  purple: '#a76cea',
-  orange: '#e0640c',
-  pink: '#eb4d8f',
-  teal: '#1b9894',
-};
-
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-    danger: '#D9534F',
-    success: '#3aa76d',
-    warning: '#d97706',
-    accent: ACCENT_COLORS.blue,
+    background: '#FFFFFF',
+    surface: '#F4F6F8',
+    border: '#E3E8EE',
+    divider: '#EEF2F5',
+    borderStrong: '#D5DEE7',
+    text: '#0F1B2A',
+    textSecondary: '#5B6675',
+    textTertiary: '#8A94A1',
+    accent: '#0B6E99',
+    onAccent: '#FFFFFF',
+    accentSoft: '#E3F1F8',
+    danger: '#C2410C',
+    overlay: 'rgba(15,27,42,0.42)',
+    taken: '#1F7A4D',
+    takenText: '#1F7A4D',
+    takenSoft: '#E9F4EE',
+    takenCard: '#EEF8F2',
+    takenCardBorder: '#CBE7D6',
+    overdue: '#D9822B',
+    overdueText: '#B4540A',
+    overdueSoft: '#FFF6EC',
+    overdueCard: '#FFFAF4',
+    overdueCardBorder: '#F1DCC6',
+    skipped: '#9AA4AF',
+    skippedText: '#5F6873',
+    planned: '#B9C2CC',
+    category: {
+      medication: { tile: '#E3F1F8', icon: '#0B6E99' },
+      supplement: { tile: '#E9F4EE', icon: '#1F7A4D' },
+      care: { tile: '#F1EEF8', icon: '#5B3FC4' },
+      custom: { tile: '#F1F3F5', icon: '#4A5562' },
+    },
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-    danger: '#FF6B66',
-    success: '#3aa76d',
-    warning: '#d97706',
-    accent: ACCENT_COLORS.blue,
+    background: '#0E141B',
+    surface: '#18212B',
+    border: '#26303B',
+    divider: '#1E2731',
+    borderStrong: '#34404C',
+    text: '#E6EBF0',
+    textSecondary: '#9AA6B3',
+    textTertiary: '#7D8894',
+    accent: '#3A9AD0',
+    onAccent: '#0E141B',
+    accentSoft: '#12293A',
+    danger: '#FF8A5C',
+    overlay: 'rgba(15,27,42,0.42)',
+    taken: '#5FC28E',
+    takenText: '#5FC28E',
+    takenSoft: '#16291F',
+    takenCard: '#14261C',
+    takenCardBorder: '#24402F',
+    overdue: '#E39448',
+    overdueText: '#F0A060',
+    overdueSoft: '#2B2016',
+    overdueCard: '#261C13',
+    overdueCardBorder: '#46331F',
+    skipped: '#6E7A86',
+    skippedText: '#A3ADB8',
+    planned: '#4A5663',
+    category: {
+      medication: { tile: '#12293A', icon: '#3A9AD0' },
+      supplement: { tile: '#16291F', icon: '#5FC28E' },
+      care: { tile: '#231D38', icon: '#A592EB' },
+      custom: { tile: '#212A33', icon: '#9AA6B3' },
+    },
   },
 } as const;
 
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+export type ThemeColor = {
+  [K in keyof typeof Colors.light]: (typeof Colors.light)[K] extends string
+    ? K
+    : never;
+}[keyof typeof Colors.light];
 
 export const Spacing = {
-  one: 4,
-  two: 8,
-  three: 16,
-  four: 24,
+  four: 4,
+  eight: 8,
+  ten: 10,
+  twelve: 12,
+  fourteen: 14,
+  sixteen: 16,
+  twenty: 20,
+  twentyFour: 24,
 } as const;
+
+export const Radius = {
+  button: 12,
+  card: 16,
+  sheet: 24,
+  pill: 999,
+} as const;
+
+export const MIN_TOUCH_SIZE = 44;

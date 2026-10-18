@@ -69,11 +69,11 @@ export function ProductListFilterBar({ filters, categories, onChange }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    gap: Spacing.two,
+    gap: Spacing.eight,
   },
   row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.two,
+    gap: Spacing.eight,
   },
 });

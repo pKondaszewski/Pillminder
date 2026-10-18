@@ -127,7 +127,7 @@ function MonthButton({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      hitSlop={Spacing.two}
+      hitSlop={Spacing.eight}
       style={({ pressed }) => pressed && styles.pressed}
     >
       <ThemedText type="subtitle" themeColor="accent">
@@ -143,11 +143,11 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
+    paddingHorizontal: Spacing.twentyFour,
   },
   content: {
-    gap: Spacing.three,
-    paddingVertical: Spacing.three,
+    gap: Spacing.sixteen,
+    paddingVertical: Spacing.sixteen,
   },
   header: {
     flexDirection: 'row',
@@ -157,12 +157,12 @@ const styles = StyleSheet.create({
   legend: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.three,
+    gap: Spacing.sixteen,
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.one,
+    gap: Spacing.four,
   },
   pressed: {
     opacity: 0.7,

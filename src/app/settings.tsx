@@ -16,15 +16,12 @@ import {
   permissionStep,
 } from '@/onboarding/onboarding-service';
 import {
-  setAccent,
   setCurrency,
   setLanguage,
   setSnoozeMinutes,
   setTheme,
 } from '@/settings/settings-service';
 import {
-  ACCENT_OPTIONS,
-  type AccentPreference,
   CURRENCY_OPTIONS,
   isValidSnoozeMinutes,
   LANGUAGE_OPTIONS,
@@ -36,7 +33,7 @@ import {
 } from '@/settings/settings-store';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { Chip } from '@/ui/components/commons/chip';
-import { StepperButton } from '@/ui/components/commons/stepper-button';
+import { Stepper } from '@/ui/components/commons/stepper';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
@@ -69,13 +66,6 @@ export default function SettingsScreen() {
                 selected={settings.theme}
                 optionLabel={(o) => t(THEME_LABEL_KEYS[o])}
                 onSelect={setTheme}
-              />
-              <OptionRow
-                label={t('settings.accent')}
-                options={ACCENT_OPTIONS}
-                selected={settings.accent}
-                optionLabel={(o) => t(ACCENT_LABEL_KEYS[o])}
-                onSelect={setAccent}
               />
             </Section>
 
@@ -132,15 +122,6 @@ const PERMISSION_STATUS_KEYS: Record<PermissionStep, string> = {
   granted: 'settings.notificationsGranted',
   askable: 'settings.notificationsAskable',
   blocked: 'settings.notificationsBlocked',
-};
-
-const ACCENT_LABEL_KEYS: Record<AccentPreference, string> = {
-  blue: 'settings.accentBlue',
-  green: 'settings.accentGreen',
-  purple: 'settings.accentPurple',
-  orange: 'settings.accentOrange',
-  pink: 'settings.accentPink',
-  teal: 'settings.accentTeal',
 };
 
 function Section({
@@ -247,7 +228,7 @@ function SettingsActionButton({
       accessibilityRole="button"
       style={({ pressed }) => (pressed || disabled) && styles.pressed}
     >
-      <ThemedView type="backgroundElement" style={styles.chip}>
+      <ThemedView type="surface" style={styles.chip}>
         <ThemedText type="small">{label}</ThemedText>
       </ThemedView>
     </Pressable>
@@ -312,12 +293,12 @@ function MinutesStepper({
   return (
     <ThemedView style={styles.optionRow}>
       <ThemedText type="small">{label}</ThemedText>
-      <ThemedView style={styles.stepperRow}>
-        <StepperButton
-          sign="−"
-          accessibilityLabel={t('settings.snoozeLess')}
-          onPress={() => commit(value - 1)}
-        />
+      <Stepper
+        decrementLabel={t('settings.snoozeLess')}
+        incrementLabel={t('settings.snoozeMore')}
+        onDecrement={() => commit(value - 1)}
+        onIncrement={() => commit(value + 1)}
+      >
         <TextInput
           value={draft}
           onChangeText={handleChangeText}
@@ -326,18 +307,13 @@ function MinutesStepper({
           maxLength={String(SNOOZE_MINUTES_MAX).length}
           style={[
             styles.stepperInput,
-            { color: theme.text, borderColor: theme.backgroundSelected },
+            { color: theme.text, borderColor: theme.borderStrong },
           ]}
         />
         <ThemedText type="small" themeColor="textSecondary">
           {t('settings.minutesUnit')}
         </ThemedText>
-        <StepperButton
-          sign="+"
-          accessibilityLabel={t('settings.snoozeMore')}
-          onPress={() => commit(value + 1)}
-        />
-      </ThemedView>
+      </Stepper>
     </ThemedView>
   );
 }
@@ -378,39 +354,34 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
+    paddingHorizontal: Spacing.twentyFour,
   },
   content: {
-    gap: Spacing.four,
-    paddingVertical: Spacing.three,
+    gap: Spacing.twentyFour,
+    paddingVertical: Spacing.sixteen,
   },
   section: {
-    gap: Spacing.two,
+    gap: Spacing.eight,
   },
   optionRow: {
-    gap: Spacing.one,
+    gap: Spacing.four,
   },
   chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.two,
+    gap: Spacing.eight,
   },
   chip: {
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.three,
-  },
-  stepperRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.two,
+    paddingVertical: Spacing.eight,
+    paddingHorizontal: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
   },
   stepperInput: {
     minWidth: 72,
     borderWidth: 1,
-    borderRadius: Spacing.two,
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
+    borderRadius: Spacing.eight,
+    paddingVertical: Spacing.eight,
+    paddingHorizontal: Spacing.sixteen,
     fontSize: 16,
     textAlign: 'center',
   },

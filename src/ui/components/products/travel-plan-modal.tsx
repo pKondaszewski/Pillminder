@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { addDays, startOfDay } from '@/config/date-utils';
 import type { TravelPlanEntry } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { ActionButton } from '@/ui/components/commons/action-button';
+import { SecondaryButton } from '@/ui/components/commons/button';
 import { DateButton } from '@/ui/components/commons/date-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
@@ -89,11 +89,7 @@ function TravelContent({ onClose }: Pick<Props, 'onClose'>) {
             <TravelResults entries={plan} />
           )}
           <ThemedView style={styles.actions}>
-            <ActionButton
-              label={t('editor.close')}
-              onPress={onClose}
-              themeColor="accent"
-            />
+            <SecondaryButton label={t('editor.close')} onPress={onClose} />
           </ThemedView>
         </ScrollView>
       </SafeAreaView>
@@ -127,7 +123,7 @@ function ProductBlock({ entry }: { entry: TravelPlanEntry }) {
   const { verdict } = entry;
   const needsRefill = verdict !== null && verdict !== 'enough';
   return (
-    <ThemedView type="backgroundElement" style={styles.block}>
+    <ThemedView type="surface" style={styles.block}>
       <ThemedText type="smallBold">{entry.title}</ThemedText>
       <ThemedText type="small">
         {t('travel.pack', { amount: entry.pack })}
@@ -135,7 +131,7 @@ function ProductBlock({ entry }: { entry: TravelPlanEntry }) {
       {verdict ? (
         <ThemedText
           type={needsRefill ? 'smallBold' : 'small'}
-          themeColor={needsRefill ? 'warning' : 'textSecondary'}
+          themeColor={needsRefill ? 'overdueText' : 'textSecondary'}
         >
           {t(`travel.${verdict}`)}
         </ThemedText>
@@ -146,14 +142,14 @@ function ProductBlock({ entry }: { entry: TravelPlanEntry }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  safeArea: { flex: 1, paddingHorizontal: Spacing.four },
-  content: { gap: Spacing.two, paddingVertical: Spacing.three },
-  range: { flexDirection: 'row', gap: Spacing.two },
-  empty: { gap: Spacing.one, paddingVertical: Spacing.three },
+  safeArea: { flex: 1, paddingHorizontal: Spacing.twentyFour },
+  content: { gap: Spacing.eight, paddingVertical: Spacing.sixteen },
+  range: { flexDirection: 'row', gap: Spacing.eight },
+  empty: { gap: Spacing.four, paddingVertical: Spacing.sixteen },
   block: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    gap: Spacing.one,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
+    gap: Spacing.four,
   },
   actions: { flexDirection: 'row' },
 });

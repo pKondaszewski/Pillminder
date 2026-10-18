@@ -3,14 +3,6 @@ import Storage from 'expo-sqlite/kv-store';
 
 export const LANGUAGE_OPTIONS = ['system', 'pl', 'en'] as const;
 export const THEME_OPTIONS = ['system', 'light', 'dark'] as const;
-export const ACCENT_OPTIONS = [
-  'blue',
-  'green',
-  'purple',
-  'orange',
-  'pink',
-  'teal',
-] as const;
 export const SNOOZE_MINUTES_MIN = 1;
 export const SNOOZE_MINUTES_MAX = 180;
 export const SNOOZE_MINUTES_DEFAULT = 15;
@@ -18,13 +10,11 @@ export const CURRENCY_OPTIONS = ['USD', 'EUR', 'PLN', 'GBP'] as const;
 
 export type LanguagePreference = (typeof LANGUAGE_OPTIONS)[number];
 export type ThemePreference = (typeof THEME_OPTIONS)[number];
-export type AccentPreference = (typeof ACCENT_OPTIONS)[number];
 export type Currency = (typeof CURRENCY_OPTIONS)[number];
 
 export interface Settings {
   language: LanguagePreference;
   theme: ThemePreference;
-  accent: AccentPreference;
   snoozeMinutes: number;
   currency: Currency;
   notificationsPromptDismissed: boolean;
@@ -38,7 +28,6 @@ const FALLBACK_CURRENCY: Currency = 'USD';
 const DEFAULT_SETTINGS: Settings = {
   language: 'system',
   theme: 'system',
-  accent: 'blue',
   snoozeMinutes: SNOOZE_MINUTES_DEFAULT,
   currency: resolveDeviceCurrency(),
   notificationsPromptDismissed: false,
@@ -48,7 +37,6 @@ const DEFAULT_SETTINGS: Settings = {
 const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
   language: (value) => LANGUAGE_OPTIONS.some((option) => option === value),
   theme: (value) => THEME_OPTIONS.some((option) => option === value),
-  accent: (value) => ACCENT_OPTIONS.some((option) => option === value),
   snoozeMinutes: isValidSnoozeMinutes,
   currency: (value) => CURRENCY_OPTIONS.some((option) => option === value),
   notificationsPromptDismissed: (value) => typeof value === 'boolean',
@@ -88,7 +76,6 @@ function readStoredSettings(): Settings {
     return {
       language: pick('language', stored),
       theme: pick('theme', stored),
-      accent: pick('accent', stored),
       snoozeMinutes: pick('snoozeMinutes', stored),
       currency: pick('currency', stored),
       notificationsPromptDismissed: pick(

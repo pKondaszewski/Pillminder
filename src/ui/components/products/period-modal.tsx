@@ -10,7 +10,7 @@ import { addDays, startOfDay } from '@/config/date-utils';
 import { describeAdherence } from '@/products/period-report';
 import type { PeriodReportEntry } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { ActionButton } from '@/ui/components/commons/action-button';
+import { PrimaryButton, SecondaryButton } from '@/ui/components/commons/button';
 import { DateButton } from '@/ui/components/commons/date-button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
@@ -98,20 +98,15 @@ function PeriodContent({ onClose }: Pick<Props, 'onClose'>) {
             <PeriodResults entries={report} />
           )}
           <ThemedView style={styles.actions}>
-            <ActionButton
+            <PrimaryButton
               label={t('summary.sharePdf')}
               onPress={() => void share()}
-              themeColor="accent"
               disabled={!canShare}
               busy={busy}
             />
           </ThemedView>
           <ThemedView style={styles.actions}>
-            <ActionButton
-              label={t('editor.close')}
-              onPress={onClose}
-              themeColor="accent"
-            />
+            <SecondaryButton label={t('editor.close')} onPress={onClose} />
           </ThemedView>
         </ScrollView>
       </SafeAreaView>
@@ -144,7 +139,7 @@ function PeriodResults({ entries }: { entries: PeriodReportEntry[] | null }) {
 function ProductBlock({ product }: { product: PeriodReportEntry }) {
   const { t } = useTranslation();
   return (
-    <ThemedView type="backgroundElement" style={styles.block}>
+    <ThemedView type="surface" style={styles.block}>
       <ThemedText type="smallBold">{product.title}</ThemedText>
       {product.isArchived ? (
         <ThemedText type="small" themeColor="textSecondary">
@@ -158,14 +153,14 @@ function ProductBlock({ product }: { product: PeriodReportEntry }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  safeArea: { flex: 1, paddingHorizontal: Spacing.four },
-  content: { gap: Spacing.two, paddingVertical: Spacing.three },
-  range: { flexDirection: 'row', gap: Spacing.two },
-  empty: { gap: Spacing.one, paddingVertical: Spacing.three },
+  safeArea: { flex: 1, paddingHorizontal: Spacing.twentyFour },
+  content: { gap: Spacing.eight, paddingVertical: Spacing.sixteen },
+  range: { flexDirection: 'row', gap: Spacing.eight },
+  empty: { gap: Spacing.four, paddingVertical: Spacing.sixteen },
   block: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    gap: Spacing.one,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
+    gap: Spacing.four,
   },
   actions: { flexDirection: 'row' },
 });
