@@ -113,12 +113,7 @@
     "clear": "Clear"
   },
   "history": {
-    "change": "Change",
-    "confirmSkipped": "Mark this dose as not taken? Stock will be restored.",
-    "confirmTaken": "Mark this dose as taken? Stock will be reduced.",
-    "errorCorrect": "Could not change the dose. Try again.",
-    "skipped": "Missed",
-    "taken": "Taken"
+    "errorCorrect": "Could not change the dose. Try again."
   },
   "home": {
     "bulkTake": "Take overdue ({{count}})",

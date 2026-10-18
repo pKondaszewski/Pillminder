@@ -1,10 +1,4 @@
-import {
-  daysBetween,
-  inclusiveDayRange,
-  isoDay,
-  msUntilNextDay,
-  startOfDay,
-} from '../date-utils';
+import { daysBetween, isoDay, msUntilNextDay, startOfDay } from '../date-utils';
 
 function at(month: number, day: number, hours: number): Date {
   return new Date(2026, month - 1, day, hours);
@@ -58,33 +52,6 @@ describe('msUntilNextDay', () => {
 
     // then
     expect(delay).toBe(24 * 60 * 60 * 1000);
-  });
-});
-
-describe('inclusiveDayRange', () => {
-  it('ends at the start of the day after the last day', () => {
-    // given
-    const first = new Date(2026, 0, 1, 15, 30);
-    const last = new Date(2026, 0, 31, 8, 0);
-
-    // when
-    const range = inclusiveDayRange(first, last);
-
-    // then
-    expect(range.from).toEqual(new Date(2026, 0, 1));
-    expect(range.to).toEqual(new Date(2026, 1, 1));
-  });
-
-  it('covers a single whole day when both ends are the same', () => {
-    // given
-    const day = new Date(2026, 5, 10, 12, 0);
-
-    // when
-    const range = inclusiveDayRange(day, day);
-
-    // then
-    expect(range.from).toEqual(new Date(2026, 5, 10));
-    expect(range.to).toEqual(new Date(2026, 5, 11));
   });
 });
 

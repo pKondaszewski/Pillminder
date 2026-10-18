@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Linking } from 'react-native';
 
 import i18n from '@/config/i18n';
 import { createLogger } from '@/config/logger';
@@ -14,7 +13,7 @@ import {
   subscribeToReminderResponses,
 } from '@/notifications/notification-service';
 import { restockPack } from '@/products/product-orchestrator';
-import { resolveStoreUrl } from '@/products/store-link';
+import { openStore } from '@/ui/commons/open-store';
 
 const log = createLogger('use-notifications');
 
@@ -62,13 +61,7 @@ const responseHandlers: ReminderResponseHandlers = {
     snoozeDose(doseId).catch((err) =>
       log.error('Snooze from notification failed', err),
     ),
-  onReorder: (storeLink) => {
-    const url = resolveStoreUrl(storeLink);
-    if (!url) return;
-    Linking.openURL(url).catch((err) =>
-      log.error('Open store link from notification failed', err),
-    );
-  },
+  onReorder: openStore,
   onAddPack: (productId) =>
     restockPack(productId).catch((err) =>
       log.error('Add pack from notification failed', err),

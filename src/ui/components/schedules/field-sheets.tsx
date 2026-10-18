@@ -149,7 +149,11 @@ function PauseSheet({
   now,
   onClose,
   onPause,
-}: Pick<Props, 'now' | 'onClose' | 'onPause'>) {
+}: {
+  now: Date;
+  onClose: () => void;
+  onPause: (resumeAt: Date | null) => void;
+}) {
   const { t } = useTranslation();
   const [resumeAt, setResumeAt] = useState<Date | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
