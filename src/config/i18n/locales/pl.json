@@ -69,6 +69,9 @@
     "unitNone": "Brak",
     "wholeNumberInvalid": "Podaj liczbę całkowitą, 0 lub więcej"
   },
+  "filters": {
+    "clear": "Wyczyść"
+  },
   "history": {
     "change": "Zmień",
     "confirmSkipped": "Oznaczyć dawkę jako niewziętą? Zapas zostanie przywrócony.",
@@ -309,13 +312,6 @@
   },
   "settings": {
     "about": "O aplikacji",
-    "accent": "Kolor akcentu",
-    "accentBlue": "Niebieski",
-    "accentGreen": "Zielony",
-    "accentOrange": "Pomarańczowy",
-    "accentPink": "Różowy",
-    "accentPurple": "Fioletowy",
-    "accentTeal": "Morski",
     "appearance": "Wygląd",
     "author": "Autor",
     "batteryOptimization": "Optymalizacja baterii",

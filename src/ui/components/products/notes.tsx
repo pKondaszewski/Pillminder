@@ -41,20 +41,16 @@ export function ProductNotes({
         </ThemedText>
       ) : (
         notes.map((note) => (
-          <ThemedView
-            key={note.id}
-            type="backgroundElement"
-            style={styles.note}
-          >
+          <ThemedView key={note.id} type="surface" style={styles.note}>
             <ThemedText type="small" themeColor="textSecondary">
               {formatDateTime(note.createdAt)}
               {note.updatedAt > note.createdAt ? ` · ${t('notes.edited')}` : ''}
             </ThemedText>
             <ThemedText>{note.body}</ThemedText>
-            <ThemedView type="backgroundElement" style={styles.noteActions}>
+            <ThemedView type="surface" style={styles.noteActions}>
               <Pressable
                 onPress={() => startEditing(note)}
-                hitSlop={Spacing.two}
+                hitSlop={Spacing.eight}
                 style={({ pressed }) => pressed && styles.pressed}
               >
                 <ThemedText type="smallBold" themeColor="accent">
@@ -65,7 +61,7 @@ export function ProductNotes({
                 onPress={() =>
                   confirmDeleteNote(note, editingId, t, removeNote, reset)
                 }
-                hitSlop={Spacing.two}
+                hitSlop={Spacing.eight}
                 style={({ pressed }) => pressed && styles.pressed}
               >
                 <ThemedText type="smallBold" themeColor="danger">
@@ -84,7 +80,7 @@ export function ProductNotes({
         placeholderTextColor={theme.textSecondary}
         style={[
           styles.input,
-          { color: theme.text, borderColor: theme.backgroundSelected },
+          { color: theme.text, borderColor: theme.borderStrong },
         ]}
       />
       <ThemedView style={styles.noteActions}>
@@ -141,24 +137,24 @@ function confirmDeleteNote(
 
 const styles = StyleSheet.create({
   section: {
-    gap: Spacing.two,
-    marginTop: Spacing.three,
+    gap: Spacing.eight,
+    marginTop: Spacing.sixteen,
   },
   note: {
-    gap: Spacing.one,
-    padding: Spacing.three,
-    borderRadius: Spacing.two,
+    gap: Spacing.four,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.eight,
   },
   noteActions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: Spacing.four,
+    gap: Spacing.twentyFour,
   },
   input: {
     borderWidth: 1,
-    borderRadius: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
+    borderRadius: Spacing.eight,
+    paddingHorizontal: Spacing.sixteen,
+    paddingVertical: Spacing.eight,
     fontSize: 16,
     minHeight: 80,
     textAlignVertical: 'top',

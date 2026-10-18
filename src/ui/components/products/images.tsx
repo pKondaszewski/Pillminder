@@ -11,7 +11,7 @@ import {
   type ProductImage,
 } from '@/images/image-service';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { ActionButton } from '@/ui/components/commons/action-button';
+import { SecondaryButton } from '@/ui/components/commons/button';
 import { Chip } from '@/ui/components/commons/chip';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
@@ -51,7 +51,7 @@ export function ProductImages({ productId }: { productId: string }) {
               </ThemedText>
               <Pressable
                 onPress={() => confirmDeleteImage(image, t, removeImage)}
-                hitSlop={Spacing.two}
+                hitSlop={Spacing.eight}
                 style={({ pressed }) => pressed && styles.pressed}
               >
                 <ThemedText type="smallBold" themeColor="danger">
@@ -74,12 +74,12 @@ export function ProductImages({ productId }: { productId: string }) {
         ))}
       </ThemedView>
       <ThemedView style={styles.actions}>
-        <ActionButton
+        <SecondaryButton
           label={t('images.camera')}
           onPress={() => pickAndAddImage('camera', role)}
           disabled={busy}
         />
-        <ActionButton
+        <SecondaryButton
           label={t('images.gallery')}
           onPress={() => pickAndAddImage('gallery', role)}
           disabled={busy}
@@ -129,31 +129,31 @@ function confirmDeleteImage(
 
 const styles = StyleSheet.create({
   section: {
-    gap: Spacing.two,
-    marginTop: Spacing.three,
+    gap: Spacing.eight,
+    marginTop: Spacing.sixteen,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.three,
+    gap: Spacing.sixteen,
   },
   item: {
-    gap: Spacing.one,
+    gap: Spacing.four,
     alignItems: 'center',
   },
   thumbnail: {
     width: 96,
     height: 96,
-    borderRadius: Spacing.two,
+    borderRadius: Spacing.eight,
   },
   chipRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.two,
+    gap: Spacing.eight,
   },
   actions: {
     flexDirection: 'row',
-    gap: Spacing.two,
+    gap: Spacing.eight,
   },
   pressed: {
     opacity: 0.7,

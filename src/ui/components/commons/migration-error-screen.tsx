@@ -4,7 +4,11 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Spacing } from '@/ui/commons/constants/theme';
-import { ActionButton } from '@/ui/components/commons/action-button';
+import {
+  DestructiveButton,
+  PrimaryButton,
+  SecondaryButton,
+} from '@/ui/components/commons/button';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { useMigrationRecovery } from '@/ui/hooks/use-migration-recovery';
@@ -30,16 +34,15 @@ export function MigrationErrorScreen({ error, onRerunMigrations }: Props) {
           </ThemedText>
 
           <ActionRow>
-            <ActionButton
+            <PrimaryButton
               label={t('migrationError.retry')}
               onPress={retry}
-              themeColor="accent"
               disabled={busy}
               busy={busy}
             />
           </ActionRow>
           <ActionRow>
-            <ActionButton
+            <SecondaryButton
               label={t('migrationError.restore')}
               onPress={restore}
               disabled={busy}
@@ -47,10 +50,9 @@ export function MigrationErrorScreen({ error, onRerunMigrations }: Props) {
             />
           </ActionRow>
           <ActionRow>
-            <ActionButton
+            <DestructiveButton
               label={t('migrationError.reset')}
               onPress={reset}
-              themeColor="danger"
               disabled={busy}
               busy={busy}
             />
@@ -89,8 +91,8 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     justifyContent: 'center',
-    gap: Spacing.three,
-    padding: Spacing.four,
+    gap: Spacing.sixteen,
+    padding: Spacing.twentyFour,
   },
   row: {
     flexDirection: 'row',

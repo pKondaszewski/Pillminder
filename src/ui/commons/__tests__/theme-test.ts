@@ -1,8 +1,6 @@
-import { ACCENT_COLORS, Colors } from '@/ui/commons/constants/theme';
+import { Colors } from '@/ui/commons/constants/theme';
 
-const WHITE = '#ffffff';
-// Matching blue on both white and black needs equal luminance, so allow rounding slack.
-const TOLERANCE = 0.05;
+const MIN_TEXT_CONTRAST = 4.5;
 
 function contrastRatio(foreground: string, background: string): number {
   const [lighter, darker] = [luminance(foreground), luminance(background)].sort(
@@ -18,34 +16,23 @@ function luminance(hex: string): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-describe('accent colors', () => {
-  it.each(Object.entries(ACCENT_COLORS))(
-    '%s is as readable as blue',
-    (_name, accent) => {
-      // given
-      const blueContrasts = contrastsOf(ACCENT_COLORS.blue);
+describe.each(['light', 'dark'] as const)('%s theme', (scheme) => {
+  it.each([
+    ['onAccent', 'accent'],
+    ['accent', 'background'],
+    ['text', 'background'],
+    ['textSecondary', 'background'],
+    ['danger', 'background'],
+    ['onAccent', 'danger'],
+    ['textSecondary', 'surface'],
+  ] as const)('%s is readable on %s', (foreground, background) => {
+    // given
+    const colors = Colors[scheme];
 
-      // when
-      const contrasts = contrastsOf(accent);
+    // when
+    const ratio = contrastRatio(colors[foreground], colors[background]);
 
-      // then
-      expect(contrasts.onWhiteText).toBeGreaterThanOrEqual(
-        blueContrasts.onWhiteText - TOLERANCE,
-      );
-      expect(contrasts.onLightBackground).toBeGreaterThanOrEqual(
-        blueContrasts.onLightBackground - TOLERANCE,
-      );
-      expect(contrasts.onDarkBackground).toBeGreaterThanOrEqual(
-        blueContrasts.onDarkBackground - TOLERANCE,
-      );
-    },
-  );
+    // then
+    expect(ratio).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
+  });
 });
-
-function contrastsOf(accent: string) {
-  return {
-    onWhiteText: contrastRatio(WHITE, accent),
-    onLightBackground: contrastRatio(accent, Colors.light.background),
-    onDarkBackground: contrastRatio(accent, Colors.dark.background),
-  };
-}

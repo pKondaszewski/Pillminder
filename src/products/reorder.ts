@@ -4,7 +4,7 @@ import type { Schedule } from '@/schedules/schedule-service';
 
 import type { ReorderStatus } from './dto/reorder-status';
 
-const REORDER_THRESHOLD_DAYS = 7;
+export const REORDER_THRESHOLD_DAYS = 7;
 const MAX_SIMULATED_DAYS = 3660;
 
 export function reorderStatus(

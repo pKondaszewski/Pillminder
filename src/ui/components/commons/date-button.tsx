@@ -19,7 +19,7 @@ export function DateButton({ label, value, onPress }: Props) {
       accessibilityRole="button"
       style={({ pressed }) => [styles.button, pressed && styles.pressed]}
     >
-      <ThemedView type="backgroundElement" style={styles.box}>
+      <ThemedView type="surface" style={styles.box}>
         <ThemedText type="small" themeColor="textSecondary">
           {label}
         </ThemedText>
@@ -32,9 +32,9 @@ export function DateButton({ label, value, onPress }: Props) {
 const styles = StyleSheet.create({
   button: { flex: 1 },
   box: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    gap: Spacing.one,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
+    gap: Spacing.four,
   },
   pressed: { opacity: 0.7 },
 });

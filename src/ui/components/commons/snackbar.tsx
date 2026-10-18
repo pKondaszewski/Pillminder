@@ -34,13 +34,13 @@ export function Snackbar({
       exiting={FadeOutDown}
       style={styles.wrapper}
     >
-      <ThemedView type="backgroundSelected" style={styles.bar}>
+      <ThemedView type="surface" style={styles.bar}>
         <ThemedText type="small" style={styles.message}>
           {message}
         </ThemedText>
         <Pressable
           onPress={onAction}
-          hitSlop={Spacing.two}
+          hitSlop={Spacing.eight}
           style={({ pressed }) => pressed && styles.pressed}
         >
           <ThemedText type="smallBold" themeColor="accent">
@@ -49,7 +49,7 @@ export function Snackbar({
         </Pressable>
         <Pressable
           onPress={onDismiss}
-          hitSlop={Spacing.two}
+          hitSlop={Spacing.eight}
           accessibilityLabel={t('editor.close')}
           style={({ pressed }) => pressed && styles.pressed}
         >
@@ -65,17 +65,17 @@ export function Snackbar({
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    left: Spacing.four,
-    right: Spacing.four,
-    bottom: Spacing.four,
+    left: Spacing.twentyFour,
+    right: Spacing.twentyFour,
+    bottom: Spacing.twentyFour,
   },
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingVertical: Spacing.three,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.three,
+    gap: Spacing.sixteen,
+    paddingVertical: Spacing.sixteen,
+    paddingHorizontal: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
   },
   message: {
     flex: 1,

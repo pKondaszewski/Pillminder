@@ -73,21 +73,21 @@ const styles = StyleSheet.create({
   texts: {
     flex: 1,
     justifyContent: 'center',
-    gap: Spacing.three,
+    gap: Spacing.sixteen,
   },
   actions: {
-    gap: Spacing.two,
+    gap: Spacing.eight,
   },
   primary: {
-    paddingVertical: Spacing.three,
-    borderRadius: Spacing.three,
+    paddingVertical: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
     alignItems: 'center',
   },
   primaryLabel: {
     color: '#ffffff',
   },
   skip: {
-    paddingVertical: Spacing.two,
+    paddingVertical: Spacing.eight,
     alignItems: 'center',
   },
   pressed: {

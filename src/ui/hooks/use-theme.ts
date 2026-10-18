@@ -1,12 +1,10 @@
 import { useColorScheme } from 'react-native';
 
-import { ACCENT_COLORS, Colors } from '@/ui/commons/constants/theme';
-import { useSettings } from '@/ui/hooks/use-settings';
+import { Colors } from '@/ui/commons/constants/theme';
 
 export function useTheme() {
   const scheme = useColorScheme();
-  const { accent } = useSettings();
   const theme = scheme === 'unspecified' ? 'light' : scheme;
 
-  return { ...Colors[theme], accent: ACCENT_COLORS[accent] };
+  return Colors[theme];
 }

@@ -163,8 +163,8 @@ export default function ProductListScreen() {
                     accessibilityRole="button"
                     style={({ pressed }) => pressed && styles.pressed}
                   >
-                    <ThemedView type="backgroundElement" style={styles.addRow}>
-                      <ThemedText themeColor="accent" style={styles.addText}>
+                    <ThemedView type="surface" style={styles.addRow}>
+                      <ThemedText type="smallBold" themeColor="accent">
                         {label}
                       </ThemedText>
                     </ThemedView>
@@ -222,23 +222,20 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.three,
+    paddingHorizontal: Spacing.twentyFour,
+    gap: Spacing.sixteen,
   },
   list: {
-    gap: Spacing.two,
-    paddingVertical: Spacing.three,
+    gap: Spacing.eight,
+    paddingVertical: Spacing.sixteen,
   },
   footer: {
-    gap: Spacing.two,
+    gap: Spacing.eight,
   },
   addRow: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
     alignItems: 'center',
-  },
-  addText: {
-    fontWeight: '600',
   },
   pressed: {
     opacity: 0.7,

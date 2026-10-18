@@ -49,7 +49,7 @@ function DoseRow({ dose, now }: { dose: TodayDose; now: Date }) {
   };
 
   return (
-    <ThemedView type="backgroundElement" style={styles.row}>
+    <ThemedView type="surface" style={styles.row}>
       <ThemedView style={styles.rowLeading}>
         <DoseStatusDot state={dose.state} />
         <ThemedText type="smallBold">{formatTime(dose.plannedAt)}</ThemedText>
@@ -68,23 +68,23 @@ function DoseRow({ dose, now }: { dose: TodayDose; now: Date }) {
 
 const styles = StyleSheet.create({
   groups: {
-    gap: Spacing.three,
+    gap: Spacing.sixteen,
   },
   group: {
-    gap: Spacing.one,
+    gap: Spacing.four,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.two,
+    paddingVertical: Spacing.eight,
+    paddingHorizontal: Spacing.sixteen,
+    borderRadius: Spacing.eight,
   },
   rowLeading: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.two,
+    gap: Spacing.eight,
     backgroundColor: 'transparent',
   },
 });

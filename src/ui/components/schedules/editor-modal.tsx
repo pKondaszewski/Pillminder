@@ -28,10 +28,14 @@ import {
   formatDateTime,
   formatTime,
 } from '@/ui/commons/format-date';
-import { ActionButton } from '@/ui/components/commons/action-button';
+import {
+  DestructiveButton,
+  PrimaryButton,
+  SecondaryButton,
+} from '@/ui/components/commons/button';
 import { Chip } from '@/ui/components/commons/chip';
 import { SearchField } from '@/ui/components/commons/search-field';
-import { StepperButton } from '@/ui/components/commons/stepper-button';
+import { Stepper } from '@/ui/components/commons/stepper';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 
@@ -203,53 +207,39 @@ function EditorForm({
           />
 
           <ThemedText type="small">{t('schedule.intervalDays')}</ThemedText>
-          <ThemedView style={styles.stepper}>
-            <StepperButton
-              sign="−"
-              accessibilityLabel={t('schedule.intervalLess')}
-              onPress={() => setIntervalDays(Math.max(1, intervalDays - 1))}
-            />
+          <Stepper
+            decrementLabel={t('schedule.intervalLess')}
+            incrementLabel={t('schedule.intervalMore')}
+            onDecrement={() => setIntervalDays(Math.max(1, intervalDays - 1))}
+            onIncrement={() => setIntervalDays(intervalDays + 1)}
+          >
             <ThemedText style={styles.stepperValue}>
               {intervalDays === 1
                 ? t('schedule.daily')
                 : t('schedule.everyXDays', { days: intervalDays })}
             </ThemedText>
-            <StepperButton
-              sign="+"
-              accessibilityLabel={t('schedule.intervalMore')}
-              onPress={() => setIntervalDays(intervalDays + 1)}
-            />
-          </ThemedView>
+          </Stepper>
 
           <ThemedText type="small">{t('schedule.quantity')}</ThemedText>
-          <ThemedView style={styles.stepper}>
-            <StepperButton
-              sign="−"
-              accessibilityLabel={t('schedule.quantityLess')}
-              onPress={() => setQuantity(Math.max(1, quantity - 1))}
-            />
+          <Stepper
+            decrementLabel={t('schedule.quantityLess')}
+            incrementLabel={t('schedule.quantityMore')}
+            onDecrement={() => setQuantity(Math.max(1, quantity - 1))}
+            onIncrement={() => setQuantity(quantity + 1)}
+          >
             <ThemedText style={styles.stepperValue}>
               {unit ? formatAmount(quantity, unit, t) : quantity}
             </ThemedText>
-            <StepperButton
-              sign="+"
-              accessibilityLabel={t('schedule.quantityMore')}
-              onPress={() => setQuantity(quantity + 1)}
-            />
-          </ThemedView>
+          </Stepper>
 
           <ThemedText type="small">{t('schedule.timesOfDay')}</ThemedText>
           <ThemedView style={styles.chipsRow}>
             {times.map((time) => (
-              <ThemedView
-                key={time}
-                type="backgroundSelected"
-                style={styles.timeChip}
-              >
+              <ThemedView key={time} type="surface" style={styles.timeChip}>
                 <ThemedText type="small">{time}</ThemedText>
                 <Pressable
                   onPress={() => removeTime(time)}
-                  hitSlop={Spacing.two}
+                  hitSlop={Spacing.eight}
                   accessibilityLabel={t('schedule.removeTime', { time })}
                   style={({ pressed }) => pressed && styles.pressed}
                 >
@@ -263,12 +253,8 @@ function EditorForm({
               onPress={() => setPickerOpen(true)}
               style={({ pressed }) => pressed && styles.pressed}
             >
-              <ThemedView type="backgroundElement" style={styles.timeChip}>
-                <ThemedText
-                  type="small"
-                  themeColor="accent"
-                  style={styles.addText}
-                >
+              <ThemedView type="surface" style={styles.timeChip}>
+                <ThemedText type="smallBold" themeColor="accent">
                   + {t('schedule.addTime')}
                 </ThemedText>
               </ThemedView>
@@ -320,10 +306,9 @@ function EditorForm({
                   <ThemedText type="small" themeColor="textSecondary">
                     {describePause(schedule, t, formatDate)}
                   </ThemedText>
-                  <ActionButton
+                  <SecondaryButton
                     label={t('schedule.resume')}
                     onPress={handleResume}
-                    themeColor="accent"
                   />
                 </ThemedView>
               ) : (
@@ -336,7 +321,7 @@ function EditorForm({
                     onPick={() => setDatePickerFor('resume')}
                     onClear={() => setResumeDate(null)}
                   />
-                  <ActionButton
+                  <SecondaryButton
                     label={t('schedule.pauseAction')}
                     onPress={handlePause}
                   />
@@ -350,19 +335,14 @@ function EditorForm({
         </ScrollView>
 
         <ThemedView style={styles.actions}>
-          <ActionButton label={t('editor.close')} onPress={onClose} />
+          <SecondaryButton label={t('editor.close')} onPress={onClose} />
           {schedule ? (
-            <ActionButton
+            <DestructiveButton
               label={t('editor.delete')}
               onPress={() => confirmDeleteSchedule(schedule, t, onDelete)}
-              themeColor="danger"
             />
           ) : null}
-          <ActionButton
-            label={t('editor.save')}
-            onPress={handleSave}
-            themeColor="accent"
-          />
+          <PrimaryButton label={t('editor.save')} onPress={handleSave} />
         </ThemedView>
       </SafeAreaView>
     </ThemedView>
@@ -456,7 +436,7 @@ function PreviewBox({ times, preview }: { times: string[]; preview: Date[] }) {
     );
   }
   return (
-    <ThemedView type="backgroundElement" style={styles.previewBox}>
+    <ThemedView type="surface" style={styles.previewBox}>
       {preview.map((occurrence) => (
         <ThemedText
           key={occurrence.toISOString()}
@@ -501,7 +481,7 @@ function DateField({
         onPress={onPick}
         style={({ pressed }) => pressed && styles.pressed}
       >
-        <ThemedView type="backgroundElement" style={styles.timeChip}>
+        <ThemedView type="surface" style={styles.timeChip}>
           <ThemedText
             type="small"
             themeColor={value ? 'text' : 'textSecondary'}
@@ -513,7 +493,7 @@ function DateField({
       {value ? (
         <Pressable
           onPress={onClear}
-          hitSlop={Spacing.two}
+          hitSlop={Spacing.eight}
           accessibilityLabel={t('schedule.periodClear')}
           style={({ pressed }) => pressed && styles.pressed}
         >
@@ -532,18 +512,13 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.four,
-    paddingBottom: Spacing.three,
+    paddingHorizontal: Spacing.twentyFour,
+    paddingTop: Spacing.twentyFour,
+    paddingBottom: Spacing.sixteen,
   },
   scrollContent: {
-    gap: Spacing.two,
-    paddingBottom: Spacing.four,
-  },
-  stepper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.three,
+    gap: Spacing.eight,
+    paddingBottom: Spacing.twentyFour,
   },
   stepperValue: {
     minWidth: 110,
@@ -553,35 +528,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    gap: Spacing.two,
+    gap: Spacing.eight,
   },
   timeChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.two,
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.three,
+    gap: Spacing.eight,
+    paddingVertical: Spacing.eight,
+    paddingHorizontal: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
   },
   dateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.three,
-  },
-  addText: {
-    fontWeight: '600',
+    gap: Spacing.sixteen,
   },
   previewBox: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    gap: Spacing.one,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
+    gap: Spacing.four,
   },
   pressed: {
     opacity: 0.7,
   },
   actions: {
     flexDirection: 'row',
-    gap: Spacing.two,
-    marginTop: Spacing.three,
+    gap: Spacing.eight,
+    marginTop: Spacing.sixteen,
   },
 });

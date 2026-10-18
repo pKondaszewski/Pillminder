@@ -53,7 +53,7 @@ export default function ScheduleListScreen() {
         onPress={() => openEdit(item)}
         style={({ pressed }) => pressed && styles.pressed}
       >
-        <ThemedView type="backgroundElement" style={styles.row}>
+        <ThemedView type="surface" style={styles.row}>
           <ThemedText>
             {product?.name ?? t('schedule.unknownProduct')}
           </ThemedText>
@@ -99,8 +99,8 @@ export default function ScheduleListScreen() {
                 onPress={openCreate}
                 style={({ pressed }) => pressed && styles.pressed}
               >
-                <ThemedView type="backgroundElement" style={styles.addRow}>
-                  <ThemedText themeColor="accent" style={styles.addText}>
+                <ThemedView type="surface" style={styles.addRow}>
+                  <ThemedText type="smallBold" themeColor="accent">
                     {t('schedule.add')}
                   </ThemedText>
                 </ThemedView>
@@ -130,25 +130,22 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.three,
+    paddingHorizontal: Spacing.twentyFour,
+    gap: Spacing.sixteen,
   },
   list: {
-    gap: Spacing.two,
-    paddingVertical: Spacing.three,
+    gap: Spacing.eight,
+    paddingVertical: Spacing.sixteen,
   },
   row: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    gap: Spacing.one,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
+    gap: Spacing.four,
   },
   addRow: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
     alignItems: 'center',
-  },
-  addText: {
-    fontWeight: '600',
   },
   pressed: {
     opacity: 0.7,

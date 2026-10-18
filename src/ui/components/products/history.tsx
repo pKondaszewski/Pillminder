@@ -57,9 +57,12 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
       onPress={() => confirmCorrection(entry, t)}
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <ThemedView type="backgroundElement" style={styles.row}>
+      <ThemedView type="surface" style={styles.row}>
         <ThemedText type="small">{formatDateTime(entry.occurredAt)}</ThemedText>
-        <ThemedText type="smallBold" themeColor={taken ? 'success' : 'danger'}>
+        <ThemedText
+          type="smallBold"
+          themeColor={taken ? 'takenText' : 'danger'}
+        >
           {taken ? t('history.taken') : t('history.skipped')}
         </ThemedText>
       </ThemedView>
@@ -97,19 +100,19 @@ async function correctDose(
 
 const styles = StyleSheet.create({
   section: {
-    gap: Spacing.two,
-    marginTop: Spacing.three,
+    gap: Spacing.eight,
+    marginTop: Spacing.sixteen,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.two,
+    paddingVertical: Spacing.eight,
+    paddingHorizontal: Spacing.sixteen,
+    borderRadius: Spacing.eight,
   },
   toggle: {
-    paddingVertical: Spacing.one,
+    paddingVertical: Spacing.four,
     textAlign: 'center',
   },
   pressed: {

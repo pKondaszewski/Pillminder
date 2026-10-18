@@ -16,7 +16,7 @@ import { useTheme } from '@/ui/hooks/use-theme';
 const MARKER_SIZE = 8;
 
 const MARKER_COLORS: Partial<Record<DayStatus, ThemeColor>> = {
-  allTaken: 'success',
+  allTaken: 'taken',
   skipped: 'textSecondary',
   missed: 'danger',
   upcoming: 'accent',
@@ -121,7 +121,7 @@ function DayCell({
       style={styles.cellPressable}
     >
       <ThemedView
-        type={selected ? 'backgroundSelected' : 'background'}
+        type={selected ? 'surface' : 'background'}
         style={styles.cell}
       >
         <ThemedText
@@ -138,7 +138,7 @@ function DayCell({
 
 const styles = StyleSheet.create({
   grid: {
-    gap: Spacing.one,
+    gap: Spacing.four,
   },
   week: {
     flexDirection: 'row',
@@ -152,9 +152,9 @@ const styles = StyleSheet.create({
   },
   cell: {
     alignItems: 'center',
-    gap: Spacing.one,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.two,
+    gap: Spacing.four,
+    paddingVertical: Spacing.eight,
+    borderRadius: Spacing.eight,
   },
   marker: {
     width: MARKER_SIZE,

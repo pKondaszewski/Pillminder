@@ -25,9 +25,13 @@ import { PRODUCT_UNITS, type ProductUnit } from '@/products/product-unit';
 import { parseWholeNumber } from '@/products/whole-number-input';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { formatDateTime } from '@/ui/commons/format-date';
-import { ActionButton } from '@/ui/components/commons/action-button';
+import {
+  DestructiveButton,
+  PrimaryButton,
+  SecondaryButton,
+} from '@/ui/components/commons/button';
 import { Chip } from '@/ui/components/commons/chip';
-import { StepperButton } from '@/ui/components/commons/stepper-button';
+import { Stepper } from '@/ui/components/commons/stepper';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductHistory } from '@/ui/components/products/history';
@@ -198,7 +202,7 @@ function EditorForm({
 
   const inputStyle = [
     styles.input,
-    { color: theme.text, borderColor: theme.backgroundSelected },
+    { color: theme.text, borderColor: theme.borderStrong },
   ];
   const numberInputStyle = (showError: boolean) => [
     inputStyle,
@@ -304,12 +308,12 @@ function EditorForm({
           )}
 
           <ThemedText type="small">{t('editor.stock')}</ThemedText>
-          <ThemedView style={styles.stepperRow}>
-            <StepperButton
-              sign="−"
-              accessibilityLabel={t('editor.stockLess')}
-              onPress={decreaseStock}
-            />
+          <Stepper
+            decrementLabel={t('editor.stockLess')}
+            incrementLabel={t('editor.stockMore')}
+            onDecrement={decreaseStock}
+            onIncrement={increaseStock}
+          >
             <TextInput
               value={stockText}
               onChangeText={setStockText}
@@ -318,18 +322,13 @@ function EditorForm({
               placeholderTextColor={theme.textSecondary}
               style={[numberInputStyle(showStockError), styles.stepperInput]}
             />
-            <StepperButton
-              sign="+"
-              accessibilityLabel={t('editor.stockMore')}
-              onPress={increaseStock}
-            />
-          </ThemedView>
+          </Stepper>
           {showStockError && (
             <FieldError message={t('editor.wholeNumberInvalid')} />
           )}
           {packSize !== null && (
             <ThemedView style={styles.actions}>
-              <ActionButton
+              <SecondaryButton
                 label={t('editor.addPack', { count: packSize })}
                 onPress={() => addPack(packSize)}
               />
@@ -385,14 +384,13 @@ function EditorForm({
                 style={[inputStyle, styles.noteInput]}
               />
               <ThemedView style={styles.actions}>
-                <ActionButton
+                <SecondaryButton
                   label={t('editor.cancel')}
                   onPress={() => setArchiving(false)}
                 />
-                <ActionButton
+                <PrimaryButton
                   label={t('editor.archive')}
                   onPress={handleConfirmArchive}
-                  themeColor="accent"
                 />
               </ThemedView>
             </ThemedView>
@@ -400,7 +398,10 @@ function EditorForm({
 
           {product && product.status !== 'archived' && !archiving ? (
             <ThemedView style={styles.actions}>
-              <ActionButton label={t('schedule.add')} onPress={onAddSchedule} />
+              <SecondaryButton
+                label={t('schedule.add')}
+                onPress={onAddSchedule}
+              />
             </ThemedView>
           ) : null}
 
@@ -409,7 +410,7 @@ function EditorForm({
               onPress={handleToggleStatus}
               style={({ pressed }) => pressed && styles.pressed}
             >
-              <ThemedView type="backgroundElement" style={styles.statusButton}>
+              <ThemedView type="surface" style={styles.statusButton}>
                 <ThemedText type="smallBold">
                   {product.status === 'archived'
                     ? t('editor.restore')
@@ -437,19 +438,14 @@ function EditorForm({
         </ScrollView>
 
         <ThemedView style={styles.actions}>
-          <ActionButton label={t('editor.close')} onPress={onClose} />
+          <SecondaryButton label={t('editor.close')} onPress={onClose} />
           {product ? (
-            <ActionButton
+            <DestructiveButton
               label={t('editor.delete')}
               onPress={() => confirmDeleteProduct(product, t, onDelete)}
-              themeColor="danger"
             />
           ) : null}
-          <ActionButton
-            label={t('editor.save')}
-            onPress={handleSave}
-            themeColor="accent"
-          />
+          <PrimaryButton label={t('editor.save')} onPress={handleSave} />
         </ThemedView>
       </SafeAreaView>
     </ThemedView>
@@ -493,44 +489,39 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.four,
-    paddingBottom: Spacing.three,
+    paddingHorizontal: Spacing.twentyFour,
+    paddingTop: Spacing.twentyFour,
+    paddingBottom: Spacing.sixteen,
   },
   scrollContent: {
-    gap: Spacing.two,
-    paddingBottom: Spacing.four,
+    gap: Spacing.eight,
+    paddingBottom: Spacing.twentyFour,
   },
   input: {
     borderWidth: 1,
-    borderRadius: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
+    borderRadius: Spacing.eight,
+    paddingHorizontal: Spacing.sixteen,
+    paddingVertical: Spacing.eight,
     fontSize: 16,
   },
   chipRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.two,
-  },
-  stepperRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.two,
+    gap: Spacing.eight,
   },
   stepperInput: {
     flex: 1,
     textAlign: 'center',
   },
   statusButton: {
-    marginTop: Spacing.three,
-    paddingVertical: Spacing.three,
-    borderRadius: Spacing.three,
+    marginTop: Spacing.sixteen,
+    paddingVertical: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
     alignItems: 'center',
   },
   archivePrompt: {
-    gap: Spacing.two,
-    marginTop: Spacing.three,
+    gap: Spacing.eight,
+    marginTop: Spacing.sixteen,
   },
   noteInput: {
     minHeight: 80,
@@ -541,7 +532,7 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: 'row',
-    gap: Spacing.two,
-    marginTop: Spacing.three,
+    gap: Spacing.eight,
+    marginTop: Spacing.sixteen,
   },
 });

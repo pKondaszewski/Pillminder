@@ -44,7 +44,7 @@ export default function HomeScreen() {
   const renderItem = ({ item }: { item: TodayDose }) => {
     const quantityText = doseQuantityText(item.quantity, item.unit, t);
     return (
-      <ThemedView type="backgroundElement" style={styles.row}>
+      <ThemedView type="surface" style={styles.row}>
         <ThemedView style={styles.rowLeading}>
           <DoseStatusDot state={item.state} />
           <ThemedView style={styles.rowInfo}>
@@ -106,7 +106,7 @@ export default function HomeScreen() {
                     style={({ pressed }) => pressed && styles.pressed}
                   >
                     <ThemedView
-                      type="backgroundSelected"
+                      type="accentSoft"
                       style={[styles.takeButton, styles.bulkTake]}
                     >
                       <ThemedText type="smallBold" themeColor="accent">
@@ -224,7 +224,7 @@ function DoseActionButton({
     <ThemedView style={styles.actions}>
       <Pressable
         onPress={onSkip}
-        hitSlop={Spacing.two}
+        hitSlop={Spacing.eight}
         style={({ pressed }) => pressed && styles.pressed}
       >
         <ThemedText type="small" themeColor="textSecondary">
@@ -235,7 +235,7 @@ function DoseActionButton({
         onPress={onTake}
         style={({ pressed }) => pressed && styles.pressed}
       >
-        <ThemedView type="backgroundSelected" style={styles.takeButton}>
+        <ThemedView type="accentSoft" style={styles.takeButton}>
           <ThemedText type="smallBold" themeColor="accent">
             {t('home.take')}
           </ThemedText>
@@ -267,40 +267,40 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.three,
+    paddingHorizontal: Spacing.twentyFour,
+    gap: Spacing.sixteen,
   },
   list: {
-    gap: Spacing.two,
-    paddingVertical: Spacing.three,
+    gap: Spacing.eight,
+    paddingVertical: Spacing.sixteen,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
+    padding: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
   },
   rowLeading: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.three,
+    gap: Spacing.sixteen,
     backgroundColor: 'transparent',
   },
   rowInfo: {
-    gap: Spacing.one,
+    gap: Spacing.four,
     backgroundColor: 'transparent',
   },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.three,
+    gap: Spacing.sixteen,
     backgroundColor: 'transparent',
   },
   takeButton: {
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.three,
+    paddingVertical: Spacing.eight,
+    paddingHorizontal: Spacing.sixteen,
+    borderRadius: Spacing.sixteen,
   },
   bulkTake: {
     alignItems: 'center',

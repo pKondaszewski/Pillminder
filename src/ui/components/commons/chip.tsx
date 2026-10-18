@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet } from 'react-native';
 
-import { Spacing } from '@/ui/commons/constants/theme';
+import { Radius, Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
-import { ThemedView } from '@/ui/components/commons/themed-view';
+import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
   label: string;
@@ -11,33 +11,39 @@ type Props = {
 };
 
 export function Chip({ label, selected, onPress }: Props) {
+  const theme = useTheme();
+
   return (
     <Pressable
       onPress={onPress}
+      hitSlop={Spacing.four}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      style={({ pressed }) => pressed && styles.pressed}
+      style={({ pressed }) => [
+        styles.chip,
+        {
+          backgroundColor: selected ? theme.accentSoft : theme.background,
+          borderColor: selected ? theme.accent : theme.borderStrong,
+        },
+        pressed && styles.pressed,
+      ]}
     >
-      <ThemedView
-        type={selected ? 'backgroundSelected' : 'backgroundElement'}
-        style={styles.chip}
-      >
-        <ThemedText
-          type="small"
-          themeColor={selected ? 'text' : 'textSecondary'}
-        >
-          {label}
-        </ThemedText>
-      </ThemedView>
+      <ThemedText type="smallBold" themeColor={selected ? 'accent' : 'text'}>
+        {label}
+      </ThemedText>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   chip: {
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.three,
+    // 36 px plus the hit slop gives the 44 px touch target
+    minHeight: 36,
+    paddingHorizontal: Spacing.fourteen,
+    borderWidth: 1,
+    borderRadius: Radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   pressed: {
     opacity: 0.7,
