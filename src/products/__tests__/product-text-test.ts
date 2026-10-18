@@ -1,5 +1,5 @@
 import type { Schedule } from '@/schedules/schedule-service';
-import { formatDate, formatTime } from '@/ui/commons/format-date';
+import { formatTime } from '@/ui/commons/format-date';
 
 import type { ReorderStatus } from '../dto/reorder-status';
 import {
@@ -10,6 +10,8 @@ import {
   supplyHint,
   wholeDaysLeft,
 } from '../product-text';
+
+const formatDate = (date: Date) => date.toLocaleDateString('sv');
 
 const NOW = new Date(2026, 9, 18, 12, 0);
 
@@ -131,7 +133,7 @@ describe('supplyHint', () => {
 
     // then
     expect(hint).toBe(
-      'products.supplyLastsUntil {"date":"04.11.2026"} · products.supplyOrderBy {"date":"28.10.2026"}',
+      'products.supplyLastsUntil {"date":"2026-11-04"} · products.supplyOrderBy {"date":"2026-10-28"}',
     );
   });
 
@@ -146,7 +148,7 @@ describe('supplyHint', () => {
 
     // then
     expect(hint).toBe(
-      'products.supplyLastsUntil {"date":"04.11.2026"} · products.supplyOrderNow',
+      'products.supplyLastsUntil {"date":"2026-11-04"} · products.supplyOrderNow',
     );
   });
 
@@ -208,7 +210,7 @@ describe('lastUsedText', () => {
     ],
     [
       new Date(2026, 9, 10, 9, 0),
-      'products.lastUsedOn {"date":"10.10.2026","time":"09:00"}',
+      'products.lastUsedOn {"date":"2026-10-10","time":"09:00"}',
     ],
   ])('describes %s', (lastUsedAt, expected) => {
     // when

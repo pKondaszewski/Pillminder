@@ -10,13 +10,13 @@ import {
   wholeDaysLeft,
 } from '@/products/product-text';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
-import { formatDate } from '@/ui/commons/format-date';
 import { SecondaryButton } from '@/ui/components/commons/button';
 import { FieldRow } from '@/ui/components/commons/field-row';
 import { Stepper } from '@/ui/components/commons/stepper';
 import { StockBar } from '@/ui/components/commons/stock-bar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
@@ -41,6 +41,7 @@ export function StockCard({
   onOrder,
 }: Props) {
   const { t } = useTranslation();
+  const formatDate = useFormatDate();
   const theme = useTheme();
   const { stock, unit, packSize, storeLink } = product;
   const summary = stockSummary(product, reorder, t);

@@ -8,7 +8,7 @@ import { editedProductInput } from '@/products/product-form';
 import type { Product } from '@/products/product-service';
 import { lastUsedText } from '@/products/product-text';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { formatDate, formatTime } from '@/ui/commons/format-date';
+import { formatTime } from '@/ui/commons/format-date';
 import { openStore } from '@/ui/commons/open-store';
 import { Snackbar } from '@/ui/components/commons/snackbar';
 import { ThemedView } from '@/ui/components/commons/themed-view';
@@ -27,6 +27,7 @@ import { ProductHeader } from '@/ui/components/products/product-header';
 import { RecentDaysSection } from '@/ui/components/products/recent-days';
 import { ScheduleSection } from '@/ui/components/products/schedule-section';
 import { StockCard } from '@/ui/components/products/stock-card';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 import { useProductImages } from '@/ui/hooks/use-product-images';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useRecentDays } from '@/ui/hooks/use-recent-days';
@@ -50,6 +51,7 @@ export default function ProductScreen() {
 
 function ProductDetail({ product }: { product: Product }) {
   const { t, i18n } = useTranslation();
+  const formatDate = useFormatDate();
   const { currency } = useSettings();
   const { editProduct, removeProduct, archiveProduct, restoreProduct } =
     useProducts();

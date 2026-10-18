@@ -21,7 +21,6 @@ import {
 } from '@/schedules/schedule-service';
 import { describeStockSufficiency } from '@/schedules/stock-sufficiency';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { formatDate } from '@/ui/commons/format-date';
 import { PrimaryButton } from '@/ui/components/commons/button';
 import { ProductAvatar } from '@/ui/components/commons/product-avatar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
@@ -35,6 +34,7 @@ import { ProductPicker } from '@/ui/components/schedules/product-picker';
 import { QuantityStepper } from '@/ui/components/schedules/quantity-stepper';
 import { RhythmPicker } from '@/ui/components/schedules/rhythm-picker';
 import { TimeChips } from '@/ui/components/schedules/time-chips';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 
 type Props = {
   products: Product[];
@@ -58,6 +58,7 @@ export function NewScheduleForm({
   onNewProduct,
 }: Props) {
   const { t } = useTranslation();
+  const formatDate = useFormatDate();
   const now = new Date();
 
   const [productId, setProductId] = useState(
@@ -97,7 +98,7 @@ export function NewScheduleForm({
     : previewOccurrences(intervalDays, timesOfDay, period, now);
   const stockLine = errors.period
     ? null
-    : describeStock(input, product, schedules, now, t);
+    : describeStock(input, product, schedules, now, t, formatDate);
 
   const submit = () => {
     setSubmitted(true);
@@ -231,6 +232,7 @@ function describeStock(
   schedules: Schedule[],
   now: Date,
   t: Translate,
+  formatDate: (date: Date) => string,
 ) {
   if (!product || input.timesOfDay.length === 0) return null;
   const productSchedules = schedules.filter((s) => s.productId === product.id);

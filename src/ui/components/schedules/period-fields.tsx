@@ -8,11 +8,11 @@ import { StyleSheet } from 'react-native';
 import { startOfDay } from '@/config/date-utils';
 import { COURSE_PRESET_DAYS, courseEndDate } from '@/schedules/schedule-period';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { formatDate } from '@/ui/commons/format-date';
 import { Chip } from '@/ui/components/commons/chip';
 import { FieldRow } from '@/ui/components/commons/field-row';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 
 export type Period = {
   startDate: Date | null;
@@ -33,6 +33,7 @@ export function PeriodFields({
   onChange,
 }: Props) {
   const { t } = useTranslation();
+  const formatDate = useFormatDate();
   const [pickerFor, setPickerFor] = useState<keyof Period | null>(null);
 
   const onPicked = (_event: DateTimePickerChangeEvent, date: Date) => {

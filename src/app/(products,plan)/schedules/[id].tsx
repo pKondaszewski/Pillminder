@@ -20,7 +20,6 @@ import {
 } from '@/schedules/schedule-service';
 import { describeStockSufficiency } from '@/schedules/stock-sufficiency';
 import { Spacing } from '@/ui/commons/constants/theme';
-import { formatDate } from '@/ui/commons/format-date';
 import {
   DestructiveButton,
   SecondaryButton,
@@ -36,12 +35,14 @@ import {
   ScheduleFieldSheet,
 } from '@/ui/components/schedules/field-sheets';
 import { ScheduleProductCard } from '@/ui/components/schedules/product-card';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 import { useProducts } from '@/ui/hooks/use-products';
 import { useRunThenCloseEditor } from '@/ui/hooks/use-run-then-close-editor';
 import { useSchedules } from '@/ui/hooks/use-schedules';
 
 export default function ScheduleScreen() {
   const { t } = useTranslation();
+  const formatDate = useFormatDate();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { products } = useProducts();
   const {
@@ -66,7 +67,14 @@ export default function ScheduleScreen() {
   const progress = courseProgress(schedule, now);
   const stock = paused
     ? null
-    : scheduleStockSufficiency(schedule, schedules, product, now, t);
+    : scheduleStockSufficiency(
+        schedule,
+        schedules,
+        product,
+        now,
+        t,
+        formatDate,
+      );
   const doses = previewOccurrences(
     schedule.intervalDays,
     schedule.timesOfDay,
@@ -224,6 +232,7 @@ function scheduleStockSufficiency(
   product: Product,
   now: Date,
   t: Translate,
+  formatDate: (date: Date) => string,
 ) {
   return describeStockSufficiency(
     {

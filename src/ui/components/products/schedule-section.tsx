@@ -4,11 +4,11 @@ import { Pressable, StyleSheet } from 'react-native';
 import type { Product } from '@/products/product-service';
 import { describeRhythm, type Schedule } from '@/schedules/schedule-service';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
-import { formatDate } from '@/ui/commons/format-date';
 import { Icon } from '@/ui/components/commons/icon';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { ProductSection } from '@/ui/components/products/section';
+import { useFormatDate } from '@/ui/hooks/use-format-date';
 import { useTheme } from '@/ui/hooks/use-theme';
 
 type Props = {
@@ -29,6 +29,7 @@ export function ScheduleSection({
   onAdd,
 }: Props) {
   const { t } = useTranslation();
+  const formatDate = useFormatDate();
   const theme = useTheme();
 
   return (
