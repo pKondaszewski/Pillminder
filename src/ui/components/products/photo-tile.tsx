@@ -67,13 +67,13 @@ export function PhotoTile({
         style={[
           styles.badge,
           styles.topRight,
-          { backgroundColor: theme.background },
+          { backgroundColor: profile ? theme.accent : theme.background },
         ]}
       >
         <Icon
           name={profile ? 'star' : 'star_border'}
           size={18}
-          color={profile ? theme.accent : theme.textSecondary}
+          color={profile ? theme.onAccent : theme.textSecondary}
         />
       </Pressable>
     </ThemedView>

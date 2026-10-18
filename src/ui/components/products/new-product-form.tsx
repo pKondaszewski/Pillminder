@@ -29,8 +29,8 @@ import { TextField } from '@/ui/components/commons/text-field';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { CategoryPicker } from '@/ui/components/products/category-picker';
-import { chooseImageSource } from '@/ui/components/products/choose-image-source';
 import { FastingRow } from '@/ui/components/products/fasting-row';
+import { ImageSourceSheet } from '@/ui/components/products/image-source-sheet';
 import { StoreSuggestions } from '@/ui/components/products/store-suggestions';
 import { UnitChips } from '@/ui/components/products/unit-chips';
 import { usePickImage } from '@/ui/hooks/use-pick-image';
@@ -64,6 +64,7 @@ export function NewProductForm({ onSubmit }: Props) {
   });
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [sourceSheetVisible, setSourceSheetVisible] = useState(false);
 
   const errors = submitted ? validateProductForm(values) : {};
   const errorText = (field: ProductFormField) => {
@@ -112,7 +113,7 @@ export function NewProductForm({ onSubmit }: Props) {
           <PhotoPickerTile
             uri={photoUri}
             label={t('images.add')}
-            onPress={() => chooseImageSource(t, pickPhoto)}
+            onPress={() => setSourceSheetVisible(true)}
           />
 
           <FormField field="name" onOffset={recordOffset}>
@@ -226,6 +227,11 @@ export function NewProductForm({ onSubmit }: Props) {
           <PrimaryButton label={t('products.add')} onPress={submit} />
         </ThemedView>
       </SafeAreaView>
+      <ImageSourceSheet
+        visible={sourceSheetVisible}
+        onClose={() => setSourceSheetVisible(false)}
+        onSelect={pickPhoto}
+      />
     </ThemedView>
   );
 }

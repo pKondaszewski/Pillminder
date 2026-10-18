@@ -223,9 +223,10 @@
     "errorDelete": "Could not delete the photo. Try again.",
     "errorProfile": "Could not change the profile photo. Try again.",
     "errorSave": "Could not add the photo. Try again.",
-    "gallery": "From gallery",
+    "gallery": "Choose from gallery",
     "preview": "Show photo",
     "profile": "Profile photo",
+    "profileChanged": "Profile photo changed",
     "setProfile": "Set as profile photo",
     "title": "Photos"
   },
@@ -385,7 +386,6 @@
   "schedule": {
     "add": "Add schedule",
     "addProduct": "Add product",
-    "addShort": "Add",
     "addTime": "Add time",
     "amountValue": "{{amount}} per dose",
     "changeNote": "The change applies to doses from now on. Doses already taken or skipped today stay in the history",
@@ -482,6 +482,7 @@
     "shopping": "Shopping",
     "snooze": "Snooze duration",
     "snoozeInvalid": "Enter a number of minutes from {{min}} to {{max}}",
+    "snoozeSheetTitle": "Snooze duration ({{unit}})",
     "theme": "Theme",
     "themeDark": "Dark",
     "themeLight": "Light",
@@ -494,7 +495,7 @@
     "rossmann": "Rossmann"
   },
   "tabs": {
-    "home": "Today",
+    "home": "Home",
     "plan": "Plan",
     "products": "Products",
     "settings": "Settings"

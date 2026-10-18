@@ -21,16 +21,16 @@ import { Spacing } from '@/ui/commons/constants/theme';
 import { openStore } from '@/ui/commons/open-store';
 import { EmptyState } from '@/ui/components/commons/empty-state';
 import {
+  FLOATING_ADD_BUTTON_CLEARANCE,
+  FloatingAddButton,
+} from '@/ui/components/commons/floating-add-button';
+import {
   type FilterToken,
   SearchField,
 } from '@/ui/components/commons/search-field';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
-import {
-  ADD_PRODUCT_BUTTON_CLEARANCE,
-  AddProductButton,
-} from '@/ui/components/products/add-product-button';
 import { ProductFilterSheet } from '@/ui/components/products/list-filters';
 import { ProductListHeader } from '@/ui/components/products/list-header';
 import { LowStockBanner } from '@/ui/components/products/low-stock-banner';
@@ -121,7 +121,10 @@ export default function ProductListScreen() {
                   </ThemedText>
                 }
               />
-              <AddProductButton onPress={openNewProduct} />
+              <FloatingAddButton
+                accessibilityLabel={t('products.add')}
+                onPress={openNewProduct}
+              />
             </>
           )}
         </SafeAreaView>
@@ -183,6 +186,6 @@ const styles = StyleSheet.create({
     gap: Spacing.twelve,
   },
   list: {
-    paddingBottom: ADD_PRODUCT_BUTTON_CLEARANCE,
+    paddingBottom: FLOATING_ADD_BUTTON_CLEARANCE,
   },
 });
