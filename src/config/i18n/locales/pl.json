@@ -243,9 +243,10 @@
     "errorDelete": "Nie udało się usunąć zdjęcia. Spróbuj ponownie.",
     "errorProfile": "Nie udało się zmienić zdjęcia profilowego. Spróbuj ponownie.",
     "errorSave": "Nie udało się dodać zdjęcia. Spróbuj ponownie.",
-    "gallery": "Z galerii",
+    "gallery": "Wybierz z galerii",
     "preview": "Pokaż zdjęcie",
     "profile": "Zdjęcie profilowe",
+    "profileChanged": "Ustawiono zdjęcie profilowe",
     "setProfile": "Ustaw jako profilowe",
     "title": "Zdjęcia"
   },

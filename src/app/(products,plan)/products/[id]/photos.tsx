@@ -1,23 +1,29 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
 import type { TFunction } from 'i18next';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, StyleSheet } from 'react-native';
 
 import type { ProductImage } from '@/images/image-service';
 import { Spacing } from '@/ui/commons/constants/theme';
+import { Snackbar } from '@/ui/components/commons/snackbar';
 import { ThemedView } from '@/ui/components/commons/themed-view';
-import { chooseImageSource } from '@/ui/components/products/choose-image-source';
+import { ImageSourceSheet } from '@/ui/components/products/image-source-sheet';
 import { PhotoGrid } from '@/ui/components/products/photo-grid';
 import { useProductImages } from '@/ui/hooks/use-product-images';
 import { useProducts } from '@/ui/hooks/use-products';
+import { useProfileUndo } from '@/ui/hooks/use-profile-undo';
 
 export default function ProductPhotosScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { products } = useProducts();
-  const { images, busy, pickAndAddImage, removeImage, setProfile } =
-    useProductImages(id);
-  const profileImageId = products.find((p) => p.id === id)?.profileImageId;
+  const profileImageId =
+    products.find((p) => p.id === id)?.profileImageId ?? null;
+  const { images, busy, pickAndAddImage, removeImage } = useProductImages(id);
+  const { undoable, setProfileWithUndo, undoProfile, dismissUndo } =
+    useProfileUndo(id, profileImageId);
+  const [sourceSheetVisible, setSourceSheetVisible] = useState(false);
 
   return (
     <ThemedView style={styles.container}>
@@ -25,13 +31,27 @@ export default function ProductPhotosScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <PhotoGrid
           images={images}
-          profileImageId={profileImageId ?? null}
+          profileImageId={profileImageId}
           addDisabled={busy}
-          onAdd={() => chooseImageSource(t, pickAndAddImage)}
-          onSetProfile={(image) => setProfile(image.id)}
+          onAdd={() => setSourceSheetVisible(true)}
+          onSetProfile={(image) => setProfileWithUndo(image.id)}
           onDelete={(image) => confirmDeleteImage(image, t, removeImage)}
         />
       </ScrollView>
+      {undoable ? (
+        <Snackbar
+          key={undoable.key}
+          message={t('images.profileChanged')}
+          actionLabel={t('home.undo')}
+          onAction={undoProfile}
+          onDismiss={dismissUndo}
+        />
+      ) : null}
+      <ImageSourceSheet
+        visible={sourceSheetVisible}
+        onClose={() => setSourceSheetVisible(false)}
+        onSelect={pickAndAddImage}
+      />
     </ThemedView>
   );
 }

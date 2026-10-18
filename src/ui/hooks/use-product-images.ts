@@ -9,7 +9,6 @@ import {
   getImagesQuery,
   type ImageSource,
   removeImage,
-  setProfileImage,
 } from '@/images/image-service';
 import { usePickImage } from '@/ui/hooks/use-pick-image';
 
@@ -31,13 +30,5 @@ export function useProductImages(productId: string) {
     }
   };
 
-  const setProfile = async (imageId: string) => {
-    try {
-      await setProfileImage(productId, imageId);
-    } catch {
-      Alert.alert(t('products.errorTitle'), t('images.errorProfile'));
-    }
-  };
-
-  return { images: data, busy, pickAndAddImage, removeImage, setProfile };
+  return { images: data, busy, pickAndAddImage, removeImage };
 }
