@@ -12,7 +12,7 @@ import type { Product } from '../product-service';
 const VALID_VALUES: ProductFormValues = {
   name: ' Vitamin D ',
   category: 'supplement',
-  strength: ' 2000 IU ',
+  strength: ' 2000iu ',
   unit: 'capsule',
   price: '25',
   stock: '60',
@@ -189,6 +189,7 @@ describe('textFieldPatch', () => {
   it.each([
     ['name', ' Iron ', { name: 'Iron' }],
     ['strength', '', { strength: null }],
+    ['strength', '50ug', { strength: '50 µg' }],
     ['price', '12', { price: 12 }],
     ['price', '', { price: null }],
     ['stock', '7', { stock: 7 }],

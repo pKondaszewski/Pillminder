@@ -2,6 +2,7 @@ import { supportsFasting, supportsStrength } from './category';
 import type { NewProductInput } from './dto/new-product-input';
 import type { Product } from './product-service';
 import type { ProductUnit } from './product-unit';
+import { normalizeStrength } from './strength-text';
 import { parseWholeNumber } from './whole-number-input';
 
 export type TextProductField =
@@ -85,7 +86,7 @@ export function textFieldPatch(
     case 'name':
       return { name: text.trim() };
     case 'strength':
-      return { strength: text.trim() || null };
+      return { strength: normalizeStrength(text) || null };
     case 'storeLink':
       return { storeLink: text.trim() || null };
     case 'price':
@@ -102,7 +103,7 @@ export function newProductInput(values: ProductFormValues): NewProductInput {
     name: values.name.trim(),
     category: values.category,
     strength: supportsStrength(values.category)
-      ? values.strength.trim() || null
+      ? normalizeStrength(values.strength) || null
       : null,
     unit: values.unit,
     price: wholeNumberOrNull(values.price, 0),
