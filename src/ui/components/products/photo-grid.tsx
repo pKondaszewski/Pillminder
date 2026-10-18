@@ -1,13 +1,13 @@
-import { Image } from 'expo-image';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 
-import { imageFileUri, type ProductImage } from '@/images/image-service';
+import { type ProductImage } from '@/images/image-service';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
 import { Icon } from '@/ui/components/commons/icon';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
+import { PhotoGallery } from '@/ui/components/products/photo-gallery';
 import { PhotoTile } from '@/ui/components/products/photo-tile';
 import { useTheme } from '@/ui/hooks/use-theme';
 
@@ -30,16 +30,16 @@ export function PhotoGrid({
 }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [previewed, setPreviewed] = useState<ProductImage | null>(null);
+  const [previewedIndex, setPreviewedIndex] = useState<number | null>(null);
 
   return (
     <ThemedView style={styles.grid}>
-      {images.map((image) => (
+      {images.map((image, index) => (
         <ThemedView key={image.id} style={styles.cell}>
           <PhotoTile
             fileName={image.fileName}
             profile={image.id === profileImageId}
-            onPress={() => setPreviewed(image)}
+            onPress={() => setPreviewedIndex(index)}
             onSetProfile={() => onSetProfile(image)}
             onDelete={() => onDelete(image)}
           />
@@ -60,25 +60,11 @@ export function PhotoGrid({
         </Pressable>
       </ThemedView>
 
-      <Modal
-        visible={previewed !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setPreviewed(null)}
-      >
-        <Pressable
-          style={[styles.preview, { backgroundColor: theme.scrim }]}
-          onPress={() => setPreviewed(null)}
-        >
-          {previewed ? (
-            <Image
-              source={{ uri: imageFileUri(previewed.fileName) }}
-              style={styles.previewImage}
-              contentFit="contain"
-            />
-          ) : null}
-        </Pressable>
-      </Modal>
+      <PhotoGallery
+        images={images}
+        startIndex={previewedIndex}
+        onClose={() => setPreviewedIndex(null)}
+      />
     </ThemedView>
   );
 }
@@ -101,12 +87,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'dashed',
     borderRadius: Radius.card,
-  },
-  preview: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  previewImage: {
-    flex: 1,
   },
 });
