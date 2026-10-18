@@ -23,14 +23,12 @@ import {
 } from '@/schedules/schedule-service';
 import { getSnoozeMinutes } from '@/settings/settings-service';
 
-import { calculateAdherence } from './dose-adherence';
 import { DOSE_HORIZON_DAYS } from './dose-day';
 import { reminderBody } from './dose-label';
 import {
   deleteFuturePendingDoseRowsForSchedules,
   dosesBetweenQuery,
   getDoseById,
-  getDosesPlannedBetween,
   getFuturePendingDosesByProduct,
   productDosesBetweenQuery,
   replaceFuturePendingDoseRows,
@@ -38,7 +36,6 @@ import {
   setDoseStateRow,
 } from './dose-repository';
 import { isDueInFuture, isPending } from './dose-validator';
-import type { AdherenceReport } from './dto/adherence-report-output';
 
 export type { CorrectionTarget } from './dose-correction';
 export { correctionStockDelta } from './dose-correction';
@@ -65,10 +62,6 @@ export { buildTimeline, nowPosition } from './dose-timeline';
 export { toTodayDose } from './dose-today';
 export type { DayCounts, TodayCardState } from './dose-today-card';
 export { BULK_TAKE_MIN_OVERDUE, todayCardState } from './dose-today-card';
-export type {
-  AdherenceCounts,
-  AdherenceReport,
-} from './dto/adherence-report-output';
 export type { TodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');
@@ -98,15 +91,6 @@ export function getProductDosesBetweenQuery(
   to: Date,
 ) {
   return productDosesBetweenQuery(productId, from, to);
-}
-
-export async function getAdherence(
-  from: Date,
-  to: Date,
-  now: Date,
-): Promise<AdherenceReport> {
-  const doses = await getDosesPlannedBetween(from, to);
-  return calculateAdherence(doses, from, to, now);
 }
 
 export async function cancelFutureDosesForSchedules(

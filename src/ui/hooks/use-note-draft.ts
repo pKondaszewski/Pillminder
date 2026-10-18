@@ -38,5 +38,3 @@ export function useNoteDraft(productId: string | undefined) {
     submit,
   };
 }
-
-export type NoteDraft = ReturnType<typeof useNoteDraft>;

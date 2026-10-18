@@ -25,15 +25,6 @@ export interface DateRange {
   to: Date;
 }
 
-// `lastDay` is a calendar day the user sees as inclusive; the returned `to` is
-// the start of the following day, matching the half-open ranges of getAdherence.
-export function inclusiveDayRange(firstDay: Date, lastDay: Date): DateRange {
-  return {
-    from: startOfDay(firstDay),
-    to: addDays(startOfDay(lastDay), 1),
-  };
-}
-
 export function isoDay(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
