@@ -5,6 +5,8 @@ export const CHANNEL_ID = 'dose-reminders-v2';
 export const CATEGORY_ID = 'dose-reminder';
 export const TAKE_ACTION = 'TAKE_ACTION';
 export const SNOOZE_ACTION = 'SNOOZE_ACTION';
+// Read by the expo-notifications patch: notifications sharing this tag replace each other on Android.
+export const ANDROID_TAG_KEY = 'androidTag';
 
 export const REORDER_CHANNEL_ID = 'reorder-alerts-v1';
 export const REORDER_CATEGORY_ID = 'reorder-alert';
