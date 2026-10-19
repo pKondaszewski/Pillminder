@@ -7,7 +7,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmDialog } from '@/commons/ui/confirm-dialog';
 import { Spacing } from '@/commons/ui/constants/theme';
 import { EmptyState } from '@/commons/ui/empty-state';
-import { TabSwipe } from '@/commons/ui/navigation/tab-swipe';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
 import { useConfirmation } from '@/commons/ui/use-confirmation';
@@ -162,125 +161,123 @@ export default function HomeScreen() {
   const currentSymbol = isToday ? daySymbol(now, dayPhases(day, coords)) : null;
 
   return (
-    <TabSwipe>
-      <ThemedView style={styles.container}>
-        <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <ScrollView contentContainerStyle={styles.content}>
-            <DayPager
-              label={formatDate(day, true)}
-              canGoNext={isoDay(day) < isoDay(lastDay)}
-              showBackToToday={mode !== 'today'}
-              onPrevious={() => selectDay(addDays(day, -1))}
-              onNext={() => selectDay(addDays(day, 1))}
-              onOpenCalendar={openCalendar}
-              onBackToToday={() => selectDay(today)}
-            />
-            {loaded && products.length === 0 ? (
-              <EmptyState
-                icon="medication"
-                title={t('home.emptyProducts.title')}
-                message={t('home.emptyProducts.message')}
-                actionLabel={t('home.emptyProducts.action')}
-                onAction={() => router.push('/products/new')}
-              />
-            ) : null}
-            {products.length > 0 && doses.length === 0 ? (
-              <EmptyState
-                icon="event_available"
-                title={t(
-                  mode === 'today'
-                    ? 'home.emptyDay.todayTitle'
-                    : 'home.emptyDay.title',
-                )}
-                message={t('home.emptyDay.message')}
-                actionLabel={t('home.emptyDay.action')}
-                onAction={() => router.navigate('/schedules')}
-              />
-            ) : null}
-            {doses.length > 0 ? (
-              <>
-                <TodayCard
-                  key={isoDay(day)}
-                  state={todayCardState(doses, day, now)}
-                  marks={buildTimeline(doses, now)}
-                  nowPosition={currentPosition}
-                  symbol={currentSymbol}
-                  onTake={(dose) => applyWithUndo('taken', dose)}
-                  onTakeOverdue={takeOverdueConfirmation.request}
-                />
-                {groupDosesByTimeSlot(doses).map((group) => (
-                  <TimeSlotSection
-                    key={`${isoDay(day)}-${group.slot}`}
-                    group={group}
-                    renderDose={(dose) => (
-                      <DoseRow
-                        dose={dose}
-                        mode={mode}
-                        now={now}
-                        onTake={(taken) => applyWithUndo('taken', taken)}
-                        onSkip={(skipped) => applyWithUndo('skipped', skipped)}
-                        onRevert={revertConfirmation.request}
-                        onCorrect={setCorrecting}
-                        onOpenProduct={openProduct}
-                      />
-                    )}
-                  />
-                ))}
-              </>
-            ) : null}
-          </ScrollView>
-        </SafeAreaView>
-        <UndoSnackbar snackbar={snackbar} />
-        {correcting ? (
-          <DoseCorrectionSheet
-            key={correcting.id}
-            dose={correcting}
-            onClose={() => setCorrecting(null)}
-            onSave={saveCorrection}
+    <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <DayPager
+            label={formatDate(day, true)}
+            canGoNext={isoDay(day) < isoDay(lastDay)}
+            showBackToToday={mode !== 'today'}
+            onPrevious={() => selectDay(addDays(day, -1))}
+            onNext={() => selectDay(addDays(day, 1))}
+            onOpenCalendar={openCalendar}
+            onBackToToday={() => selectDay(today)}
           />
-        ) : null}
-        <ConfirmDialog
-          visible={revertConfirmation.pending !== null}
-          title={revertTexts ? t(revertTexts.title) : ''}
-          message={
-            revertTexts
-              ? t(revertTexts.message, { name: revertedDose?.productName })
-              : ''
-          }
-          confirmLabel={t('home.undo')}
-          onConfirm={revertConfirmation.confirm}
-          onCancel={revertConfirmation.cancel}
+          {loaded && products.length === 0 ? (
+            <EmptyState
+              icon="medication"
+              title={t('home.emptyProducts.title')}
+              message={t('home.emptyProducts.message')}
+              actionLabel={t('home.emptyProducts.action')}
+              onAction={() => router.push('/products/new')}
+            />
+          ) : null}
+          {products.length > 0 && doses.length === 0 ? (
+            <EmptyState
+              icon="event_available"
+              title={t(
+                mode === 'today'
+                  ? 'home.emptyDay.todayTitle'
+                  : 'home.emptyDay.title',
+              )}
+              message={t('home.emptyDay.message')}
+              actionLabel={t('home.emptyDay.action')}
+              onAction={() => router.navigate('/schedules')}
+            />
+          ) : null}
+          {doses.length > 0 ? (
+            <>
+              <TodayCard
+                key={isoDay(day)}
+                state={todayCardState(doses, day, now)}
+                marks={buildTimeline(doses, now)}
+                nowPosition={currentPosition}
+                symbol={currentSymbol}
+                onTake={(dose) => applyWithUndo('taken', dose)}
+                onTakeOverdue={takeOverdueConfirmation.request}
+              />
+              {groupDosesByTimeSlot(doses).map((group) => (
+                <TimeSlotSection
+                  key={`${isoDay(day)}-${group.slot}`}
+                  group={group}
+                  renderDose={(dose) => (
+                    <DoseRow
+                      dose={dose}
+                      mode={mode}
+                      now={now}
+                      onTake={(taken) => applyWithUndo('taken', taken)}
+                      onSkip={(skipped) => applyWithUndo('skipped', skipped)}
+                      onRevert={revertConfirmation.request}
+                      onCorrect={setCorrecting}
+                      onOpenProduct={openProduct}
+                    />
+                  )}
+                />
+              ))}
+            </>
+          ) : null}
+        </ScrollView>
+      </SafeAreaView>
+      <UndoSnackbar snackbar={snackbar} />
+      {correcting ? (
+        <DoseCorrectionSheet
+          key={correcting.id}
+          dose={correcting}
+          onClose={() => setCorrecting(null)}
+          onSave={saveCorrection}
         />
-        <ConfirmDialog
-          visible={takeOverdueConfirmation.pending !== null}
-          title={t('home.bulkTakeTitle')}
-          message={t('home.bulkTakeConfirm', {
-            count: takeOverdueConfirmation.pending?.value.length ?? 0,
-          })}
-          confirmLabel={t('home.take')}
-          onConfirm={takeOverdueConfirmation.confirm}
-          onCancel={takeOverdueConfirmation.cancel}
-        />
-        <MonthCalendarSheet
-          visible={calendarOpen}
-          month={calendarMonth}
-          days={calendarDays}
-          weekdayKeys={weekdayKeysFrom(firstWeekday)}
-          doses={monthDoses}
-          selectedDay={day}
-          lastDay={lastDay}
-          now={now}
-          products={products}
-          filterProduct={filterProduct ?? null}
-          onClose={closeCalendar}
-          onChangeMonth={changeMonth}
-          onSelectDay={selectDay}
-          onFilterProduct={setFilterProductId}
-          onBackToToday={() => selectDay(today)}
-          onBackToProduct={returnProductId ? backToProduct : null}
-        />
-      </ThemedView>
-    </TabSwipe>
+      ) : null}
+      <ConfirmDialog
+        visible={revertConfirmation.pending !== null}
+        title={revertTexts ? t(revertTexts.title) : ''}
+        message={
+          revertTexts
+            ? t(revertTexts.message, { name: revertedDose?.productName })
+            : ''
+        }
+        confirmLabel={t('home.undo')}
+        onConfirm={revertConfirmation.confirm}
+        onCancel={revertConfirmation.cancel}
+      />
+      <ConfirmDialog
+        visible={takeOverdueConfirmation.pending !== null}
+        title={t('home.bulkTakeTitle')}
+        message={t('home.bulkTakeConfirm', {
+          count: takeOverdueConfirmation.pending?.value.length ?? 0,
+        })}
+        confirmLabel={t('home.take')}
+        onConfirm={takeOverdueConfirmation.confirm}
+        onCancel={takeOverdueConfirmation.cancel}
+      />
+      <MonthCalendarSheet
+        visible={calendarOpen}
+        month={calendarMonth}
+        days={calendarDays}
+        weekdayKeys={weekdayKeysFrom(firstWeekday)}
+        doses={monthDoses}
+        selectedDay={day}
+        lastDay={lastDay}
+        now={now}
+        products={products}
+        filterProduct={filterProduct ?? null}
+        onClose={closeCalendar}
+        onChangeMonth={changeMonth}
+        onSelectDay={selectDay}
+        onFilterProduct={setFilterProductId}
+        onBackToToday={() => selectDay(today)}
+        onBackToProduct={returnProductId ? backToProduct : null}
+      />
+    </ThemedView>
   );
 }
 

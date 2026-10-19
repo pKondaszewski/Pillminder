@@ -9,7 +9,6 @@ import { useBackup } from '@/backup/ui/use-backup';
 import { useBatteryOptimization } from '@/battery/ui/use-battery-optimization';
 import { Spacing } from '@/commons/ui/constants/theme';
 import { FieldRow } from '@/commons/ui/field-row';
-import { TabSwipe } from '@/commons/ui/navigation/tab-swipe';
 import { ScreenTitle } from '@/commons/ui/screen-title';
 import { SegmentedControl } from '@/commons/ui/segmented-control';
 import { ThemedText } from '@/commons/ui/themed-text';
@@ -83,7 +82,7 @@ export default function SettingsScreen() {
   const closeSheet = () => setSheet(null);
 
   return (
-    <TabSwipe>
+    <>
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
           <ScrollView contentContainerStyle={styles.content}>
@@ -222,7 +221,7 @@ export default function SettingsScreen() {
         />
       ) : null}
       <UndoSnackbar snackbar={snackbar} />
-    </TabSwipe>
+    </>
   );
 }
 
