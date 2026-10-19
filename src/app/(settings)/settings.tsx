@@ -4,7 +4,21 @@ import { useTranslation } from 'react-i18next';
 import { Linking, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { BackupImportDialog } from '@/backup/ui/backup-import-dialog';
+import { useBackup } from '@/backup/ui/use-backup';
+import { useBatteryOptimization } from '@/battery/ui/use-battery-optimization';
+import { Spacing } from '@/commons/ui/constants/theme';
+import { FieldRow } from '@/commons/ui/field-row';
+import { TabSwipe } from '@/commons/ui/navigation/tab-swipe';
+import { ScreenTitle } from '@/commons/ui/screen-title';
+import { SegmentedControl } from '@/commons/ui/segmented-control';
+import { ThemedText } from '@/commons/ui/themed-text';
+import { ThemedView } from '@/commons/ui/themed-view';
+import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
+import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import { AUTHOR_NAME } from '@/config/app-info';
+import { useLocationPermission } from '@/location/ui/use-location-permission';
+import { useNotificationPermission } from '@/notifications/ui/use-notification-permission';
 import { permissionStep } from '@/onboarding/onboarding-service';
 import { currencyLabel } from '@/settings/format-price';
 import {
@@ -19,32 +33,18 @@ import {
   setSnoozeMinutes,
   setTheme,
 } from '@/settings/settings-service';
-import { Spacing } from '@/ui/commons/constants/theme';
-import { BackupImportDialog } from '@/ui/components/commons/backup-import-dialog';
-import { FieldRow } from '@/ui/components/commons/field-row';
-import { ScreenTitle } from '@/ui/components/commons/screen-title';
-import { SegmentedControl } from '@/ui/components/commons/segmented-control';
-import { ThemedText } from '@/ui/components/commons/themed-text';
-import { ThemedView } from '@/ui/components/commons/themed-view';
-import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
-import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
-import { AboutLine } from '@/ui/components/settings/about-line';
-import { BackupSection } from '@/ui/components/settings/backup-section';
-import { CurrencySheet } from '@/ui/components/settings/currency-sheet';
-import { SettingsSection } from '@/ui/components/settings/settings-section';
-import { SnoozeSheet } from '@/ui/components/settings/snooze-sheet';
-import { StatusCard } from '@/ui/components/settings/status-card';
+import { AboutLine } from '@/settings/ui/about-line';
+import { BackupSection } from '@/settings/ui/backup-section';
+import { CurrencySheet } from '@/settings/ui/currency-sheet';
+import { SettingsSection } from '@/settings/ui/settings-section';
+import { SnoozeSheet } from '@/settings/ui/snooze-sheet';
+import { StatusCard } from '@/settings/ui/status-card';
 import {
   batteryCardState,
   locationCardState,
   notificationCardState,
-} from '@/ui/components/settings/status-card-state';
-import { useBackup } from '@/ui/hooks/use-backup';
-import { useBatteryOptimization } from '@/ui/hooks/use-battery-optimization';
-import { useLocationPermission } from '@/ui/hooks/use-location-permission';
-import { useNotificationPermission } from '@/ui/hooks/use-notification-permission';
-import { useSettings } from '@/ui/hooks/use-settings';
-import { useUndoSnackbar } from '@/ui/hooks/use-undo-snackbar';
+} from '@/settings/ui/status-card-state';
+import { useSettings } from '@/settings/ui/use-settings';
 
 type Sheet = 'snooze' | 'currency';
 

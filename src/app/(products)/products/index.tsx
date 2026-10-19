@@ -5,6 +5,18 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Spacing } from '@/commons/ui/constants/theme';
+import { EmptyState } from '@/commons/ui/empty-state';
+import {
+  FLOATING_ADD_BUTTON_CLEARANCE,
+  FloatingAddButton,
+} from '@/commons/ui/floating-add-button';
+import { TabSwipe } from '@/commons/ui/navigation/tab-swipe';
+import { openStore } from '@/commons/ui/open-store';
+import { type FilterToken, SearchField } from '@/commons/ui/search-field';
+import { ThemedText } from '@/commons/ui/themed-text';
+import { ThemedView } from '@/commons/ui/themed-view';
+import { useFormatTime } from '@/commons/ui/use-format-date';
 import { categoryLabel } from '@/products/category';
 import {
   categoryFilterIfListed,
@@ -16,28 +28,13 @@ import {
 } from '@/products/product-list';
 import type { Product, ProductListFilters } from '@/products/product-service';
 import { rhythmSummary, stockSummary } from '@/products/product-text';
-import { Spacing } from '@/ui/commons/constants/theme';
-import { openStore } from '@/ui/commons/open-store';
-import { EmptyState } from '@/ui/components/commons/empty-state';
-import {
-  FLOATING_ADD_BUTTON_CLEARANCE,
-  FloatingAddButton,
-} from '@/ui/components/commons/floating-add-button';
-import {
-  type FilterToken,
-  SearchField,
-} from '@/ui/components/commons/search-field';
-import { ThemedText } from '@/ui/components/commons/themed-text';
-import { ThemedView } from '@/ui/components/commons/themed-view';
-import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
-import { ProductFilterSheet } from '@/ui/components/products/list-filters';
-import { ProductListHeader } from '@/ui/components/products/list-header';
-import { LowStockBanner } from '@/ui/components/products/low-stock-banner';
-import { ProductRow } from '@/ui/components/products/row';
-import { useFormatTime } from '@/ui/hooks/use-format-date';
-import { useProducts } from '@/ui/hooks/use-products';
-import { useReorderStatuses } from '@/ui/hooks/use-reorder';
-import { useSchedules } from '@/ui/hooks/use-schedules';
+import { ProductFilterSheet } from '@/products/ui/list-filters';
+import { ProductListHeader } from '@/products/ui/list-header';
+import { LowStockBanner } from '@/products/ui/low-stock-banner';
+import { ProductRow } from '@/products/ui/row';
+import { useProducts } from '@/products/ui/use-products';
+import { useReorderStatuses } from '@/products/ui/use-reorder';
+import { useSchedules } from '@/schedules/ui/use-schedules';
 
 export default function ProductListScreen() {
   const { t, i18n } = useTranslation();

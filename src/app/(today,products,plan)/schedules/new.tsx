@@ -1,10 +1,10 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { NewScheduleForm } from '@/ui/components/schedules/new-form';
-import { useProducts } from '@/ui/hooks/use-products';
-import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
-import { useSchedules } from '@/ui/hooks/use-schedules';
+import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
+import { useProducts } from '@/products/ui/use-products';
+import { NewScheduleForm } from '@/schedules/ui/new-form';
+import { useSchedules } from '@/schedules/ui/use-schedules';
 
 export default function NewScheduleScreen() {
   const { t } = useTranslation();

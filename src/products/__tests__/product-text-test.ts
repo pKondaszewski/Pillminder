@@ -1,5 +1,5 @@
+import { formatTime } from '@/config/format-date';
 import type { Schedule } from '@/schedules/schedule-service';
-import { formatTime } from '@/ui/commons/format-date';
 
 import type { ReorderStatus } from '../dto/reorder-status';
 import {

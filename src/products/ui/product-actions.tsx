@@ -1,0 +1,133 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet } from 'react-native';
+
+import { DestructiveButton, SecondaryButton } from '@/commons/ui/button';
+import { ConfirmDialog } from '@/commons/ui/confirm-dialog';
+import { Spacing } from '@/commons/ui/constants/theme';
+import { TextField } from '@/commons/ui/text-field';
+import { ThemedText } from '@/commons/ui/themed-text';
+import { ThemedView } from '@/commons/ui/themed-view';
+import type { Product } from '@/products/product-service';
+
+type ActionsProps = {
+  status: Product['status'];
+  onArchive: () => void;
+  onRestore: () => void;
+  onDelete: () => void;
+};
+
+type ArchiveDialogProps = {
+  productName: string;
+  onConfirm: (completionNote?: string) => void;
+  onCancel: () => void;
+};
+
+type DeleteDialogProps = {
+  productName: string;
+  status: Product['status'];
+  onConfirm: () => void;
+  onArchiveInstead: () => void;
+  onCancel: () => void;
+};
+
+export function ProductActions({
+  status,
+  onArchive,
+  onRestore,
+  onDelete,
+}: ActionsProps) {
+  const { t } = useTranslation();
+  const archived = status === 'archived';
+
+  return (
+    <ThemedView style={styles.actions}>
+      <SecondaryButton
+        label={archived ? t('editor.restore') : t('editor.archive')}
+        onPress={archived ? onRestore : onArchive}
+      />
+      <DestructiveButton
+        label={t('products.detail.deleteProduct')}
+        onPress={onDelete}
+      />
+    </ThemedView>
+  );
+}
+
+export function ArchiveProductDialog({
+  productName,
+  onConfirm,
+  onCancel,
+}: ArchiveDialogProps) {
+  const { t } = useTranslation();
+  const [completionNote, setCompletionNote] = useState('');
+
+  return (
+    <ConfirmDialog
+      visible
+      title={t('products.detail.archiveTitle', { name: productName })}
+      bullets={[
+        t('products.detail.archiveReminders'),
+        t('products.detail.archiveKept'),
+        t('products.detail.archiveRestore'),
+      ]}
+      confirmLabel={t('editor.archive')}
+      onConfirm={() => onConfirm(completionNote.trim() || undefined)}
+      onCancel={onCancel}
+    >
+      <TextField
+        value={completionNote}
+        onChangeText={setCompletionNote}
+        multiline
+        accessibilityLabel={t('notes.completionPrompt')}
+        placeholder={t('notes.completionPlaceholder')}
+      />
+    </ConfirmDialog>
+  );
+}
+
+export function DeleteProductDialog({
+  productName,
+  status,
+  onConfirm,
+  onArchiveInstead,
+  onCancel,
+}: DeleteDialogProps) {
+  const { t } = useTranslation();
+  const offersArchiving = status === 'active';
+
+  return (
+    <ConfirmDialog
+      visible
+      destructive
+      title={t('products.detail.deleteTitle', { name: productName })}
+      message={t('products.detail.deleteWarning')}
+      confirmLabel={t('products.detail.deleteForever')}
+      onConfirm={onConfirm}
+      onCancel={onCancel}
+    >
+      {offersArchiving ? (
+        <Pressable
+          onPress={onArchiveInstead}
+          accessibilityRole="button"
+          hitSlop={Spacing.eight}
+          style={({ pressed }) => pressed && styles.pressed}
+        >
+          <ThemedText type="smallBold" themeColor="accent">
+            {t('products.detail.deleteInstead')}
+          </ThemedText>
+        </Pressable>
+      ) : null}
+    </ConfirmDialog>
+  );
+}
+
+const styles = StyleSheet.create({
+  actions: {
+    flexDirection: 'row',
+    gap: Spacing.twelve,
+  },
+  pressed: {
+    opacity: 0.7,
+  },
+});

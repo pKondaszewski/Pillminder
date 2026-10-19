@@ -7,22 +7,22 @@ import { useState } from 'react';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { AnimatedSplashOverlay } from '@/commons/ui/animated-splash-overlay';
+import { FONT_ASSETS } from '@/commons/ui/constants/fonts';
+import AppTabs from '@/commons/ui/navigation/app-tabs';
 import { db } from '@/config/db/database';
-import { applyStoredTheme } from '@/settings/settings-service';
-import { FONT_ASSETS } from '@/ui/commons/constants/fonts';
-import { AnimatedSplashOverlay } from '@/ui/components/commons/animated-splash-overlay';
-import { MigrationErrorScreen } from '@/ui/components/commons/migration-error-screen';
-import AppTabs from '@/ui/components/navigation/app-tabs';
-import { OnboardingScreen } from '@/ui/components/onboarding/onboarding-screen';
-import { useDoseSync } from '@/ui/hooks/use-dose-sync';
-import { useLocationRefresh } from '@/ui/hooks/use-location-refresh';
+import { useDoseSync } from '@/doses/ui/use-dose-sync';
+import { useOrphanedImageCleanup } from '@/images/ui/use-orphaned-image-cleanup';
+import { useLocationRefresh } from '@/location/ui/use-location-refresh';
 import {
   useNotificationSetup,
   useReminderResponses,
-} from '@/ui/hooks/use-notifications';
-import { useOnboarding } from '@/ui/hooks/use-onboarding';
-import { useOrphanedImageCleanup } from '@/ui/hooks/use-orphaned-image-cleanup';
-import { useReorderNotifications } from '@/ui/hooks/use-reorder-notifications';
+} from '@/notifications/ui/use-notifications';
+import { useReorderNotifications } from '@/notifications/ui/use-reorder-notifications';
+import { OnboardingScreen } from '@/onboarding/ui/onboarding-screen';
+import { useOnboarding } from '@/onboarding/ui/use-onboarding';
+import { MigrationErrorScreen } from '@/recovery/ui/migration-error-screen';
+import { applyStoredTheme } from '@/settings/settings-service';
 
 import migrations from '../../drizzle/migrations';
 

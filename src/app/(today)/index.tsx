@@ -4,6 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ConfirmDialog } from '@/commons/ui/confirm-dialog';
+import { Spacing } from '@/commons/ui/constants/theme';
+import { EmptyState } from '@/commons/ui/empty-state';
+import { TabSwipe } from '@/commons/ui/navigation/tab-swipe';
+import { ThemedView } from '@/commons/ui/themed-view';
+import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
+import { useConfirmation } from '@/commons/ui/use-confirmation';
+import { useFormatDate } from '@/commons/ui/use-format-date';
+import { useNow } from '@/commons/ui/use-now';
 import {
   firstWeekdayOf,
   monthGridDays,
@@ -22,30 +31,21 @@ import {
   todayCardState,
   type TodayDose,
 } from '@/doses/dose-service';
-import { Spacing } from '@/ui/commons/constants/theme';
-import { ConfirmDialog } from '@/ui/components/commons/confirm-dialog';
-import { EmptyState } from '@/ui/components/commons/empty-state';
-import { ThemedView } from '@/ui/components/commons/themed-view';
-import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
-import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
-import { DayPager } from '@/ui/components/today/day-pager';
-import { DoseCorrectionSheet } from '@/ui/components/today/dose-correction-sheet';
-import { DoseRow } from '@/ui/components/today/dose-row';
-import type { DayMode } from '@/ui/components/today/dose-row-action';
-import { MonthCalendarSheet } from '@/ui/components/today/month-calendar-sheet';
-import { TimeSlotSection } from '@/ui/components/today/time-slot-section';
-import { TodayCard } from '@/ui/components/today/today-card';
-import { useConfirmation } from '@/ui/hooks/use-confirmation';
-import { useDayDoses } from '@/ui/hooks/use-day-doses';
-import { useDosesBetween } from '@/ui/hooks/use-doses-between';
-import { useFormatDate } from '@/ui/hooks/use-format-date';
-import { useNow } from '@/ui/hooks/use-now';
-import { useProducts } from '@/ui/hooks/use-products';
-import { useSunCoords } from '@/ui/hooks/use-sun-coords';
+import { DayPager } from '@/doses/ui/day-pager';
+import { DoseCorrectionSheet } from '@/doses/ui/dose-correction-sheet';
+import { DoseRow } from '@/doses/ui/dose-row';
+import type { DayMode } from '@/doses/ui/dose-row-action';
+import { MonthCalendarSheet } from '@/doses/ui/month-calendar-sheet';
+import { TimeSlotSection } from '@/doses/ui/time-slot-section';
+import { TodayCard } from '@/doses/ui/today-card';
+import { useDayDoses } from '@/doses/ui/use-day-doses';
+import { useDosesBetween } from '@/doses/ui/use-doses-between';
 import {
   type UndoableKind,
   useUndoableDoseAction,
-} from '@/ui/hooks/use-undoable-dose-action';
+} from '@/doses/ui/use-undoable-dose-action';
+import { useSunCoords } from '@/location/ui/use-sun-coords';
+import { useProducts } from '@/products/ui/use-products';
 
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();

@@ -4,10 +4,21 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { DestructiveButton, SecondaryButton } from '@/commons/ui/button';
+import { ConfirmDialog } from '@/commons/ui/confirm-dialog';
+import { Spacing } from '@/commons/ui/constants/theme';
+import { FieldRow } from '@/commons/ui/field-row';
+import { ThemedText } from '@/commons/ui/themed-text';
+import { ThemedView } from '@/commons/ui/themed-view';
+import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
+import { useFormatDate, useFormatTime } from '@/commons/ui/use-format-date';
+import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
+import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import type { Translate } from '@/config/translate';
 import type { Product, ProductUnit } from '@/products/product-service';
 import { formatAmount } from '@/products/product-unit';
 import { reorderStatus } from '@/products/reorder';
+import { useProducts } from '@/products/ui/use-products';
 import { courseProgress } from '@/schedules/schedule-list';
 import {
   describeCourse,
@@ -18,29 +29,15 @@ import {
   type Schedule,
 } from '@/schedules/schedule-service';
 import { describeStockSufficiency } from '@/schedules/stock-sufficiency';
-import { Spacing } from '@/ui/commons/constants/theme';
-import {
-  DestructiveButton,
-  SecondaryButton,
-} from '@/ui/components/commons/button';
-import { ConfirmDialog } from '@/ui/components/commons/confirm-dialog';
-import { FieldRow } from '@/ui/components/commons/field-row';
-import { ThemedText } from '@/ui/components/commons/themed-text';
-import { ThemedView } from '@/ui/components/commons/themed-view';
-import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
-import { CourseProgressBar } from '@/ui/components/schedules/course-progress';
-import { DosePreview } from '@/ui/components/schedules/dose-preview';
+import { CourseProgressBar } from '@/schedules/ui/course-progress';
+import { DosePreview } from '@/schedules/ui/dose-preview';
 import {
   type ScheduleField,
   ScheduleFieldSheet,
-} from '@/ui/components/schedules/field-sheets';
-import { ScheduleProductCard } from '@/ui/components/schedules/product-card';
-import { useFormatDate, useFormatTime } from '@/ui/hooks/use-format-date';
-import { useProducts } from '@/ui/hooks/use-products';
-import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
-import { useScheduleEditActions } from '@/ui/hooks/use-schedule-edit-actions';
-import { useSchedules } from '@/ui/hooks/use-schedules';
-import { useUndoSnackbar } from '@/ui/hooks/use-undo-snackbar';
+} from '@/schedules/ui/field-sheets';
+import { ScheduleProductCard } from '@/schedules/ui/product-card';
+import { useScheduleEditActions } from '@/schedules/ui/use-schedule-edit-actions';
+import { useSchedules } from '@/schedules/ui/use-schedules';
 
 export default function ScheduleScreen() {
   const { t } = useTranslation();
