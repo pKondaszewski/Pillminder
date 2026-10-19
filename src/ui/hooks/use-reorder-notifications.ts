@@ -12,7 +12,7 @@ import { reorderAlertAction } from '@/notifications/reorder-alert-action';
 import { reorderNotificationText } from '@/notifications/reorder-text';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
 import type { Product } from '@/products/product-service';
-import type { Currency } from '@/settings/settings-store';
+import type { Currency } from '@/settings/settings-service';
 
 import { useProducts } from './use-products';
 import { useReorderStatuses } from './use-reorder';

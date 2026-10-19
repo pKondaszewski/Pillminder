@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
-import { PRODUCT_UNITS, type ProductUnit } from '@/products/product-unit';
+import { PRODUCT_UNITS, type ProductUnit } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { Chip } from '@/ui/components/commons/chip';
 import { ThemedView } from '@/ui/components/commons/themed-view';

@@ -8,17 +8,17 @@ import { AUTHOR_NAME } from '@/config/app-info';
 import { permissionStep } from '@/onboarding/onboarding-service';
 import { currencyLabel } from '@/settings/format-price';
 import {
+  LANGUAGE_OPTIONS,
+  type LanguagePreference,
+  THEME_OPTIONS,
+  type ThemePreference,
+} from '@/settings/settings-service';
+import {
   setCurrency,
   setLanguage,
   setSnoozeMinutes,
   setTheme,
 } from '@/settings/settings-service';
-import {
-  LANGUAGE_OPTIONS,
-  type LanguagePreference,
-  THEME_OPTIONS,
-  type ThemePreference,
-} from '@/settings/settings-store';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { BackupImportDialog } from '@/ui/components/commons/backup-import-dialog';
 import { FieldRow } from '@/ui/components/commons/field-row';

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet } from 'react-native';
 
-import { type ProductImage } from '@/images/image-service';
+import type { ProductImage } from '@/images/image-service';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';
 import { Icon } from '@/ui/components/commons/icon';
 import { ThemedText } from '@/ui/components/commons/themed-text';

@@ -1,8 +1,6 @@
-import type { Translate } from '@/schedules/schedule-rhythm';
+import type { Translate } from '@/config/translate';
 
-export const PRODUCT_UNITS = ['tablet', 'capsule', 'drop', 'ml'] as const;
-
-export type ProductUnit = (typeof PRODUCT_UNITS)[number];
+import type { ProductUnit } from './dto/product-unit';
 
 export function formatAmount(count: number, unit: ProductUnit, t: Translate) {
   return t(`unit.${unit}`, { count });

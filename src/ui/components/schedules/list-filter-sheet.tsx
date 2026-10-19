@@ -2,10 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
 import { categoryLabel } from '@/products/category';
-import {
-  SCHEDULE_KINDS,
-  type ScheduleListFilters,
-} from '@/schedules/schedule-list';
+import { SCHEDULE_KINDS } from '@/schedules/schedule-list';
+import type { ScheduleListFilters } from '@/schedules/schedule-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { Chip } from '@/ui/components/commons/chip';
 import { FilterSheet } from '@/ui/components/commons/filter-sheet';

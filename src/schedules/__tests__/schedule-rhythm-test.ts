@@ -1,9 +1,7 @@
+import type { Translate } from '@/config/translate';
+
 import type { Schedule } from '../schedule-repository';
-import {
-  describeCourse,
-  describeRhythm,
-  type Translate,
-} from '../schedule-rhythm';
+import { describeCourse, describeRhythm } from '../schedule-rhythm';
 
 const PL: Record<string, string> = {
   'schedule.daily': 'Codziennie',

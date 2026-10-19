@@ -1,9 +1,11 @@
-import { formatAmount, type ProductUnit } from '@/products/product-unit';
-import type { Translate } from '@/schedules/schedule-rhythm';
+import type { Translate } from '@/config/translate';
+import type { ProductUnit } from '@/products/product-service';
+import { formatAmount } from '@/products/product-unit';
 
-import { correctionStockDelta, type CorrectionTarget } from './dose-correction';
+import { correctionStockDelta } from './dose-correction';
 import type { MonthSummary } from './dose-month';
-import type { DayCounts } from './dose-today-card';
+import type { CorrectionTarget } from './dto/correction-target';
+import type { DayCounts } from './dto/today-card-state';
 import type { TodayDose } from './dto/today-dose-output';
 
 const MS_PER_MINUTE = 60 * 1000;

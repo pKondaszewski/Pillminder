@@ -9,12 +9,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { startOfDay } from '@/config/date-utils';
+import type { Translate } from '@/config/translate';
 import { productLabel } from '@/products/product-label';
 import type { Product } from '@/products/product-service';
 import { reorderStatus } from '@/products/reorder';
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
 import { draftSchedule, scheduleDraftErrors } from '@/schedules/schedule-draft';
-import type { Translate } from '@/schedules/schedule-rhythm';
 import {
   previewOccurrences,
   type Schedule,

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { addDays, startOfDay } from '@/config/date-utils';
-import type { ProductUnit } from '@/products/product-unit';
+import type { ProductUnit } from '@/products/product-service';
 import type { ScheduleChange } from '@/schedules/dto/new-schedule-input';
 import { scheduleDraftErrors } from '@/schedules/schedule-draft';
 import type { Schedule } from '@/schedules/schedule-service';

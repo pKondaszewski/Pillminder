@@ -7,13 +7,10 @@ import {
   isNotificationsPromptDismissed,
 } from '@/settings/settings-service';
 
-import {
-  decideOnboardingSteps,
-  type OnboardingStep,
-  permissionStep,
-} from './onboarding-helper';
+import type { OnboardingStep } from './dto/onboarding-step';
+import { decideOnboardingSteps, permissionStep } from './onboarding-helper';
 
-export type { OnboardingStep, PermissionStep } from './onboarding-helper';
+export type { OnboardingStep, PermissionStep } from './dto/onboarding-step';
 export { permissionStep } from './onboarding-helper';
 export type { NotificationPermission } from '@/notifications/notification-service';
 export {
@@ -25,7 +22,6 @@ export {
   dismissLocationPrompt,
   dismissNotificationsPrompt,
 } from '@/settings/settings-service';
-
 export async function getOnboardingSteps(): Promise<OnboardingStep[]> {
   return decideOnboardingSteps({
     permission: await getNotificationPermission(),

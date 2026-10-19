@@ -1,11 +1,7 @@
 import type { Coords } from '@/location/dto/coords';
 import { sunTimes } from '@/location/sun-times';
 
-export interface DayPhases {
-  sunrise: Date;
-  noon: Date;
-  sunset: Date;
-}
+import type { DayPhases } from './dto/day-phases';
 
 const DEFAULT_SUNRISE_HOUR = 6;
 const DEFAULT_NOON_HOUR = 12;

@@ -1,21 +1,11 @@
-import type { DayPhases } from './day-phases';
-import type { TodayCardState } from './dose-today-card';
-
-export interface ArcPoint {
-  x: number;
-  y: number;
-}
-
-export type DaySymbol = 'risingSun' | 'sun' | 'moon';
-
-export interface AxisTick {
-  label: string;
-  x: number;
-  y: number;
-  anchor: 'start' | 'middle' | 'end';
-}
-
-export type SkyTone = 'day' | 'night' | 'overdue' | 'done';
+import type {
+  ArcPoint,
+  AxisTick,
+  DaySymbol,
+  SkyTone,
+} from './dto/day-arc-output';
+import type { DayPhases } from './dto/day-phases';
+import type { TodayCardState } from './dto/today-card-state';
 
 export const ARC_WIDTH = 318;
 export const ARC_HEIGHT = 176;

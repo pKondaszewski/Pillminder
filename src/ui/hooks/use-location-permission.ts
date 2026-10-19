@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { Alert, AppState } from 'react-native';
 
 import { createLogger } from '@/config/logger';
+import type { LocationPermission } from '@/location/location-service';
 import {
   enableLocation,
   getLocationPermission,
-  type LocationPermission,
 } from '@/location/location-service';
 import { clearLocation } from '@/settings/settings-service';
 

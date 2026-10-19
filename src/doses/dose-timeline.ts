@@ -1,4 +1,6 @@
-import { type DoseStatus, doseStatus } from './dose-status';
+import { doseStatus } from './dose-status';
+import type { DoseStatus } from './dto/dose-status';
+import type { TimelineMark } from './dto/timeline-mark';
 import type { TodayDose } from './dto/today-dose-output';
 
 const TIMELINE_START_HOUR = 6;
@@ -16,13 +18,6 @@ const URGENCY_ORDER: readonly DoseStatus[] = [
   'taken',
   'planned',
 ];
-
-export interface TimelineMark {
-  id: string;
-  position: number;
-  statuses: DoseStatus[];
-  count: number | null;
-}
 
 export function buildTimeline(doses: TodayDose[], now: Date): TimelineMark[] {
   return mergeNearby(doses).map((cluster) => {

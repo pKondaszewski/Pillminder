@@ -1,21 +1,13 @@
 import { supportsFasting, supportsStrength } from './category';
 import type { NewProductInput } from './dto/new-product-input';
+import type {
+  ProductFormField,
+  ProductFormValues,
+  TextProductField,
+} from './dto/product-form-values';
 import type { Product } from './product-service';
-import type { ProductUnit } from './product-unit';
 import { normalizeStrength } from './strength-text';
 import { parseWholeNumber } from './whole-number-input';
-
-export type TextProductField =
-  | 'name'
-  | 'strength'
-  | 'price'
-  | 'stock'
-  | 'packSize'
-  | 'storeLink';
-
-export type ValidatedProductField = 'name' | 'price' | 'stock' | 'packSize';
-
-export type ProductFormField = ValidatedProductField | 'category';
 
 export type ProductFormError =
   | 'editor.nameRequired'
@@ -26,12 +18,6 @@ export type ProductFormError =
 export type ProductFormErrors = Partial<
   Record<ProductFormField, ProductFormError>
 >;
-
-export type ProductFormValues = Record<TextProductField, string> & {
-  category: string;
-  unit: ProductUnit | null;
-  fasting: boolean;
-};
 
 const FORM_FIELD_ORDER: ProductFormField[] = [
   'name',

@@ -1,13 +1,10 @@
-import { formatAmount, type ProductUnit } from '@/products/product-unit';
+import type { Translate } from '@/config/translate';
+import type { ProductUnit } from '@/products/product-service';
+import { formatAmount } from '@/products/product-unit';
 
-import type { CourseProgress } from './schedule-list';
+import type { CourseProgress } from './dto/course-progress';
 import { isPaused } from './schedule-pause';
 import type { Schedule } from './schedule-repository';
-
-export type Translate = (
-  key: string,
-  options?: Record<string, string | number>,
-) => string;
 
 export function describeRhythm(
   schedule: Schedule,

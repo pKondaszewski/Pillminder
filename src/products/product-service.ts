@@ -16,6 +16,18 @@ import {
   updateProductRow,
 } from './product-repository';
 
+export type {
+  ProductFormField,
+  ProductFormValues,
+  TextProductField,
+} from './dto/product-form-values';
+export type {
+  ProductListFilters,
+  ProductStatusFilter,
+} from './dto/product-list-filters';
+export { PRODUCT_UNITS, type ProductUnit } from './dto/product-unit';
+export type { RangeDraft } from './dto/range-draft';
+export type { StockSummary } from './dto/stock-summary';
 export type { TravelPlanEntry } from './dto/travel-plan-output';
 export type { Product, ProductStatus } from './product-repository';
 

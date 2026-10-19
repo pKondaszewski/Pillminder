@@ -1,4 +1,4 @@
-import { type AndroidSymbol } from 'expo-symbols';
+import type { AndroidSymbol } from 'expo-symbols';
 import { StyleSheet } from 'react-native';
 
 import { Radius, Spacing } from '@/ui/commons/constants/theme';

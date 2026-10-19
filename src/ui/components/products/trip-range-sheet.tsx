@@ -8,12 +8,8 @@ import {
 } from '@/config/calendar-grid';
 import { addMonths, type DateRange } from '@/config/date-utils';
 import type { SupportedLanguage } from '@/config/i18n';
-import {
-  isEdgeOfRange,
-  isInsideRange,
-  type RangeDraft,
-  tapDay,
-} from '@/products/trip-range';
+import type { RangeDraft } from '@/products/product-service';
+import { isEdgeOfRange, isInsideRange, tapDay } from '@/products/trip-range';
 import type { ThemeColor } from '@/ui/commons/constants/theme';
 import { BottomSheet } from '@/ui/components/commons/bottom-sheet';
 import {

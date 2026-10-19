@@ -1,8 +1,8 @@
+import type { ScheduleListFilters } from '../dto/schedule-list-filters';
 import {
   courseProgress,
   groupSchedules,
   scheduleKind,
-  type ScheduleListFilters,
   scheduleProductLabel,
 } from '../schedule-list';
 import type { ScheduleListItem } from '../schedule-repository';

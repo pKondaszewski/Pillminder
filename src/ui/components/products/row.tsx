@@ -3,8 +3,7 @@ import { Pressable, StyleSheet } from 'react-native';
 
 import { categoryLabel } from '@/products/category';
 import { productLabel } from '@/products/product-label';
-import type { Product } from '@/products/product-service';
-import type { StockSummary } from '@/products/product-text';
+import type { Product, StockSummary } from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ProductAvatar } from '@/ui/components/commons/product-avatar';
 import { StockBar } from '@/ui/components/commons/stock-bar';

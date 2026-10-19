@@ -3,12 +3,12 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import {
   courseProgress,
-  type ScheduleKind,
   scheduleProductLabel,
 } from '@/schedules/schedule-list';
 import {
   describeCourse,
   describeRhythm,
+  type ScheduleKind,
   type ScheduleListItem,
 } from '@/schedules/schedule-service';
 import { MIN_TOUCH_SIZE, Radius, Spacing } from '@/ui/commons/constants/theme';

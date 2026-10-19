@@ -1,8 +1,7 @@
 import { addDays, startOfDay } from '@/config/date-utils';
 
 import { type AdherenceDose, calculateAdherence } from './dose-adherence';
-
-export type DayStatus = 'none' | 'upcoming' | 'missed' | 'skipped' | 'allTaken';
+import type { DayStatus } from './dto/day-status';
 
 export const DOSE_HORIZON_DAYS = 30;
 

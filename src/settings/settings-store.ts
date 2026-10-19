@@ -1,31 +1,18 @@
 import { getLocales } from 'expo-localization';
 import Storage from 'expo-sqlite/kv-store';
 
-import type { StoredLocation } from '@/location/dto/coords';
-
+import {
+  type Currency,
+  CURRENCY_OPTIONS,
+  LANGUAGE_OPTIONS,
+  type Settings,
+  THEME_OPTIONS,
+} from './dto/settings';
 import { isValidStoredLocation } from './stored-location-validation';
 
-export const LANGUAGE_OPTIONS = ['system', 'pl', 'en'] as const;
-export const THEME_OPTIONS = ['system', 'light', 'dark'] as const;
 export const SNOOZE_MINUTES_MIN = 1;
 export const SNOOZE_MINUTES_MAX = 180;
 export const SNOOZE_MINUTES_DEFAULT = 15;
-export const CURRENCY_OPTIONS = ['USD', 'EUR', 'PLN', 'GBP'] as const;
-
-export type LanguagePreference = (typeof LANGUAGE_OPTIONS)[number];
-export type ThemePreference = (typeof THEME_OPTIONS)[number];
-export type Currency = (typeof CURRENCY_OPTIONS)[number];
-
-export interface Settings {
-  language: LanguagePreference;
-  theme: ThemePreference;
-  snoozeMinutes: number;
-  currency: Currency;
-  notificationsPromptDismissed: boolean;
-  batteryPromptDismissed: boolean;
-  locationPromptDismissed: boolean;
-  location: StoredLocation | null;
-}
 
 const STORAGE_KEY = 'settings';
 

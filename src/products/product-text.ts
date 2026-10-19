@@ -1,13 +1,10 @@
 import { daysBetween, startOfDay } from '@/config/date-utils';
-import type { Translate } from '@/schedules/schedule-rhythm';
+import type { Translate } from '@/config/translate';
 import type { Schedule } from '@/schedules/schedule-service';
 
 import type { ReorderStatus } from './dto/reorder-status';
+import type { StockSummary } from './dto/stock-summary';
 import type { Product } from './product-service';
-
-export type StockSummary =
-  | { kind: 'bar'; daysLeft: number; label: string }
-  | { kind: 'caption'; label: string };
 
 export function wholeDaysLeft(daysLeft: number): number {
   return Math.ceil(daysLeft);

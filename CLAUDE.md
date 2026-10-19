@@ -146,6 +146,18 @@ Toolchain (Apple Silicon Mac): Temurin JDK 17, Android cmdline-tools, SDK at
 - **Code style** — order by importance, public first. In every file the
   exported (`export`) functions go above private helpers: the public API reads
   first, the implementation details below it.
+- **DTOs** — an interface or type passed between services, or from a service
+  to the UI, goes to the module's `dto/` folder and is re-exported from the
+  module service; other modules and the UI import it from the service. A constant
+  a type is derived from (an options list) goes to `dto/` together with it. A type
+  used only inside one file or one module stays next to the code. File names
+  in `dto/` are kebab-case after the concept, with `-input` for data a
+  service accepts (`new-product-input.ts`), `-output` for data it returns
+  (`today-dose-output.ts`), `-result` for a query result
+  (`replace-doses-query-result.ts`) and no suffix for a plain noun
+  (`coords.ts`, `reorder-status.ts`); closely related types share one file.
+  Types inferred from drizzle (`$inferSelect`) stay in the repository and are
+  only re-exported from the service.
 - **Migrations** — generate with a descriptive snake_case name, e.g.
   `npx drizzle-kit generate --name add_dose_note` (the file becomes
   `0005_add_dose_note.sql`; without `--name` drizzle picks a random one).

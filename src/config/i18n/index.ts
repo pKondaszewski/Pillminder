@@ -6,10 +6,8 @@ import { getLocales } from 'expo-localization';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import {
-  getSettings,
-  type LanguagePreference,
-} from '@/settings/settings-store';
+import type { LanguagePreference } from '@/settings/dto/settings';
+import { getSettings } from '@/settings/settings-store';
 
 import en from './locales/en.json';
 import pl from './locales/pl.json';

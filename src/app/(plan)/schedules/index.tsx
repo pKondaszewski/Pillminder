@@ -8,8 +8,8 @@ import { categoryLabel } from '@/products/category';
 import {
   groupSchedules,
   listedScheduleCategories,
-  type ScheduleListFilters,
 } from '@/schedules/schedule-list';
+import type { ScheduleListFilters } from '@/schedules/schedule-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { EmptyState } from '@/ui/components/commons/empty-state';
 import {

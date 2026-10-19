@@ -2,15 +2,14 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { NewProductInput } from '@/products/dto/new-product-input';
-import {
-  textFieldPatch,
-  type TextProductField,
-  validateProductField,
-} from '@/products/product-form';
-import type { Product } from '@/products/product-service';
-import type { ProductUnit } from '@/products/product-unit';
+import { textFieldPatch, validateProductField } from '@/products/product-form';
+import type {
+  Product,
+  ProductUnit,
+  TextProductField,
+} from '@/products/product-service';
 import { currencySymbol } from '@/settings/format-price';
-import type { Currency } from '@/settings/settings-store';
+import type { Currency } from '@/settings/settings-service';
 import { BottomSheet } from '@/ui/components/commons/bottom-sheet';
 import { TextField } from '@/ui/components/commons/text-field';
 import { ThemedText } from '@/ui/components/commons/themed-text';

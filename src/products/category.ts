@@ -1,4 +1,4 @@
-import type { Translate } from '@/schedules/schedule-rhythm';
+import type { Translate } from '@/config/translate';
 
 import type { BuiltInCategory } from './dto/new-product-input';
 

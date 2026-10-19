@@ -15,10 +15,12 @@ import type { NewProductInput } from '@/products/dto/new-product-input';
 import {
   firstErrorField,
   newProductInput,
-  type ProductFormField,
-  type ProductFormValues,
   validateProductForm,
 } from '@/products/product-form';
+import type {
+  ProductFormField,
+  ProductFormValues,
+} from '@/products/product-service';
 import { adjustWholeNumberText } from '@/products/whole-number-input';
 import { currencySymbol } from '@/settings/format-price';
 import { Radius, Spacing } from '@/ui/commons/constants/theme';

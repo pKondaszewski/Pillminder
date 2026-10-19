@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { Product } from '@/products/product-service';
-import { formatAmount, type ProductUnit } from '@/products/product-unit';
+import type { Translate } from '@/config/translate';
+import type { Product, ProductUnit } from '@/products/product-service';
+import { formatAmount } from '@/products/product-unit';
 import { reorderStatus } from '@/products/reorder';
 import { courseProgress } from '@/schedules/schedule-list';
-import type { Translate } from '@/schedules/schedule-rhythm';
 import {
   describeCourse,
   describeInterval,

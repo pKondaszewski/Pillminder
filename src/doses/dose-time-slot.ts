@@ -1,20 +1,9 @@
+import type {
+  TimeSlot,
+  TimeSlotGroup,
+  TimeSlotLayout,
+} from './dto/time-slot-output';
 import type { TodayDose } from './dto/today-dose-output';
-
-export type TimeSlot = 'morning' | 'afternoon' | 'evening' | 'night';
-
-export interface TimeSlotGroup {
-  slot: TimeSlot;
-  data: TodayDose[];
-}
-
-export type TimeSlotLayout =
-  | { kind: 'collapsed'; taken: number; skipped: number }
-  | {
-      kind: 'list';
-      visible: TodayDose[];
-      collapsible: boolean;
-      overflowCount: number | null;
-    };
 
 const SLOT_MAX_ACTIVE_DOSES = 5;
 const SLOT_ACTIVE_DOSES_SHOWN = 4;

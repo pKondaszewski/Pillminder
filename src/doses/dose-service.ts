@@ -42,20 +42,15 @@ export {
   ARC_HORIZON_Y,
   ARC_WIDTH,
   arcPath,
-  type ArcPoint,
   arcPoint,
   axisTicks,
-  type DaySymbol,
   daySymbol,
   pieSlicePath,
   skyPath,
-  type SkyTone,
   skyTone,
 } from './day-arc';
-export { type DayPhases, dayPhases } from './day-phases';
-export type { CorrectionTarget } from './dose-correction';
+export { dayPhases } from './day-phases';
 export { correctionStockDelta } from './dose-correction';
-export type { DayStatus } from './dose-day';
 export { dayStatus, lastPlannedDay } from './dose-day';
 export {
   dayCountsText,
@@ -67,17 +62,21 @@ export {
   stockEffectText,
 } from './dose-label';
 export { monthSummary } from './dose-month';
-export type { DoseStatus } from './dose-status';
 export { doseStatus } from './dose-status';
-export type { RecentDays, StripDay } from './dose-strip';
 export { buildRecentDays, recentDaysRange } from './dose-strip';
-export type { TimeSlotGroup, TimeSlotLayout } from './dose-time-slot';
 export { groupDosesByTimeSlot, timeSlotLayout } from './dose-time-slot';
-export type { TimelineMark } from './dose-timeline';
 export { buildTimeline, nowPosition } from './dose-timeline';
 export { toTodayDose } from './dose-today';
-export type { DayCounts, TodayCardState } from './dose-today-card';
 export { BULK_TAKE_MIN_OVERDUE, todayCardState } from './dose-today-card';
+export type { CorrectionTarget } from './dto/correction-target';
+export type { ArcPoint, DaySymbol, SkyTone } from './dto/day-arc-output';
+export type { DayPhases } from './dto/day-phases';
+export type { DayStatus } from './dto/day-status';
+export type { DoseStatus } from './dto/dose-status';
+export type { RecentDays, StripDay } from './dto/recent-days-output';
+export type { TimeSlotGroup, TimeSlotLayout } from './dto/time-slot-output';
+export type { TimelineMark } from './dto/timeline-mark';
+export type { DayCounts, TodayCardState } from './dto/today-card-state';
 export type { TodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');

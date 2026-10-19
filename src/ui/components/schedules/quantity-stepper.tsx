@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
-import { formatAmount, type ProductUnit } from '@/products/product-unit';
+import type { ProductUnit } from '@/products/product-service';
+import { formatAmount } from '@/products/product-unit';
 import { Stepper } from '@/ui/components/commons/stepper';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 

@@ -10,7 +10,7 @@ import {
   skyTone,
 } from '../day-arc';
 import { dayPhases } from '../day-phases';
-import type { DayCounts, TodayCardState } from '../dose-today-card';
+import type { DayCounts, TodayCardState } from '../dto/today-card-state';
 import type { TodayDose } from '../dto/today-dose-output';
 
 const PHASES = dayPhases(new Date(2026, 9, 10), null);

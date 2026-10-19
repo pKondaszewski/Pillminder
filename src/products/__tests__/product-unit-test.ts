@@ -2,7 +2,7 @@ import { createInstance } from 'i18next';
 
 import en from '@/config/i18n/locales/en.json';
 import pl from '@/config/i18n/locales/pl.json';
-import type { Translate } from '@/schedules/schedule-rhythm';
+import type { Translate } from '@/config/translate';
 
 import { formatAmount } from '../product-unit';
 

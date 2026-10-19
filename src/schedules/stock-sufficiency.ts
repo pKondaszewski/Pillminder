@@ -1,7 +1,7 @@
+import type { Translate } from '@/config/translate';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
-import { formatAmount, type ProductUnit } from '@/products/product-unit';
-
-import type { Translate } from './schedule-rhythm';
+import type { ProductUnit } from '@/products/product-service';
+import { formatAmount } from '@/products/product-unit';
 
 type StockSufficiency = {
   message: string;

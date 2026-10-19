@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import type { CourseProgress } from '@/schedules/schedule-list';
+import type { CourseProgress } from '@/schedules/schedule-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';

@@ -1,8 +1,8 @@
+import type { ProductFormValues } from '../dto/product-form-values';
 import {
   editedProductInput,
   firstErrorField,
   newProductInput,
-  type ProductFormValues,
   textFieldPatch,
   validateProductField,
   validateProductForm,

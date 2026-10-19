@@ -1,6 +1,5 @@
+import type { DoseStatus } from './dto/dose-status';
 import type { TodayDose } from './dto/today-dose-output';
-
-export type DoseStatus = 'taken' | 'overdue' | 'skipped' | 'planned';
 
 export function doseStatus(
   { state, plannedAt }: TodayDose,

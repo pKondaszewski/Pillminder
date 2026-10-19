@@ -1,20 +1,10 @@
 import { addDays, type DateRange, startOfDay } from '@/config/date-utils';
 
 import { type AdherenceDose, calculateAdherence } from './dose-adherence';
-import { type DayStatus, dayStatus } from './dose-day';
-import type { AdherenceCounts } from './dto/adherence-report-output';
+import { dayStatus } from './dose-day';
+import type { RecentDays } from './dto/recent-days-output';
 
 export const STRIP_DAYS = 14;
-
-export interface StripDay {
-  day: Date;
-  status: DayStatus;
-}
-
-export interface RecentDays {
-  days: StripDay[];
-  counts: AdherenceCounts;
-}
 
 export function recentDaysRange(now: Date): DateRange {
   const today = startOfDay(now);

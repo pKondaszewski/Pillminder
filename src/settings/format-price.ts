@@ -1,4 +1,4 @@
-import type { Currency } from './settings-store';
+import type { Currency } from './dto/settings';
 
 export function formatPrice(
   amount: number,
