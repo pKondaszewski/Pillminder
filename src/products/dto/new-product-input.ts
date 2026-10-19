@@ -1,4 +1,4 @@
-import type { ProductUnit } from '../product-unit';
+import type { ProductUnit } from './product-unit';
 
 export type BuiltInCategory = 'medication' | 'supplement' | 'care';
 

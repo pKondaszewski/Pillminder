@@ -1,5 +1,5 @@
 import { addDays, startOfDay } from '@/config/date-utils';
-import type { Translate } from '@/schedules/schedule-rhythm';
+import type { Translate } from '@/config/translate';
 import type { Schedule } from '@/schedules/schedule-service';
 
 import type {

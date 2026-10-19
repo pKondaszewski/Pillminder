@@ -1,4 +1,4 @@
-import type { ProductUnit } from '@/products/product-unit';
+import type { ProductUnit } from '@/products/product-service';
 
 import type { DoseState } from '../dose-transition';
 

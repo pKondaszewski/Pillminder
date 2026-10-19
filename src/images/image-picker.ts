@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 
-export type ImageSource = 'camera' | 'gallery';
+import type { ImageSource } from './dto/image-source';
 
 export type PickResult =
   | { status: 'picked'; uri: string }

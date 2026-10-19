@@ -16,12 +16,13 @@ import {
 } from './image-repository';
 import type { ImageRole } from './image-role';
 
+export type { ImageSource } from './dto/image-source';
 export {
   deleteAllImageFiles,
   deleteImageFiles,
   imageFileUri,
 } from './image-files';
-export { type ImageSource, pickImage } from './image-picker';
+export { pickImage } from './image-picker';
 export type { ProductImage } from './image-repository';
 export { getImageFileNamesByProduct } from './image-repository';
 export { DEFAULT_IMAGE_ROLE, IMAGE_ROLES, type ImageRole } from './image-role';

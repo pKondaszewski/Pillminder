@@ -1,9 +1,6 @@
 import { isoDay } from '@/config/date-utils';
 
-export interface RangeDraft {
-  from: Date;
-  to: Date | null;
-}
+import type { RangeDraft } from './dto/range-draft';
 
 export function tapDay(range: RangeDraft, day: Date): RangeDraft {
   const extendsRange = range.to === null && isoDay(day) >= isoDay(range.from);

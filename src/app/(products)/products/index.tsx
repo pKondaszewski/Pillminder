@@ -12,10 +12,9 @@ import {
   filterableCategories,
   filterProducts,
   mostUrgentLowStock,
-  type ProductListFilters,
   sortProductsByStatusThenName,
 } from '@/products/product-list';
-import type { Product } from '@/products/product-service';
+import type { Product, ProductListFilters } from '@/products/product-service';
 import { rhythmSummary, stockSummary } from '@/products/product-text';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { openStore } from '@/ui/commons/open-store';

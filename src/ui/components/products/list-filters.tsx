@@ -2,11 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
 import { categoryLabel } from '@/products/category';
-import {
-  DEFAULT_PRODUCT_FILTERS,
-  type ProductListFilters,
-  type ProductStatusFilter,
-} from '@/products/product-list';
+import { DEFAULT_PRODUCT_FILTERS } from '@/products/product-list';
+import type {
+  ProductListFilters,
+  ProductStatusFilter,
+} from '@/products/product-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { Chip } from '@/ui/components/commons/chip';
 import { FilterSheet } from '@/ui/components/commons/filter-sheet';

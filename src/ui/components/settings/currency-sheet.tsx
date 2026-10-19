@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
 import { currencyLabel } from '@/settings/format-price';
-import { type Currency, CURRENCY_OPTIONS } from '@/settings/settings-store';
+import { type Currency, CURRENCY_OPTIONS } from '@/settings/settings-service';
 import { Spacing } from '@/ui/commons/constants/theme';
 import { BottomSheet } from '@/ui/components/commons/bottom-sheet';
 import { Chip } from '@/ui/components/commons/chip';

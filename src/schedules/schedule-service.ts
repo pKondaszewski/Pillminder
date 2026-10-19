@@ -15,6 +15,11 @@ import {
 } from './schedule-repository';
 import { assertValidScheduleInput } from './schedule-validator';
 
+export type { CourseProgress } from './dto/course-progress';
+export type {
+  ScheduleKind,
+  ScheduleListFilters,
+} from './dto/schedule-list-filters';
 export { occurrencesWithin, previewOccurrences } from './schedule-helper';
 export { isPaused } from './schedule-pause';
 export type { Schedule, ScheduleListItem } from './schedule-repository';

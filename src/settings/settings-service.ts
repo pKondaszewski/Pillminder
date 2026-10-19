@@ -3,13 +3,22 @@ import { Appearance } from 'react-native';
 import i18n, { resolveLanguage } from '@/config/i18n';
 import type { Coords, StoredLocation } from '@/location/dto/coords';
 
-import {
+import type {
+  Currency,
+  LanguagePreference,
+  ThemePreference,
+} from './dto/settings';
+import { getSettings, updateSettings } from './settings-store';
+
+export {
   type Currency,
-  getSettings,
+  CURRENCY_OPTIONS,
+  LANGUAGE_OPTIONS,
   type LanguagePreference,
+  type Settings,
+  THEME_OPTIONS,
   type ThemePreference,
-  updateSettings,
-} from './settings-store';
+} from './dto/settings';
 
 export function applyStoredTheme(): void {
   applyTheme(getSettings().theme);

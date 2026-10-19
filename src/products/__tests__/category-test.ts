@@ -1,4 +1,4 @@
-import type { Translate } from '@/schedules/schedule-rhythm';
+import type { Translate } from '@/config/translate';
 
 import {
   categoryLabel,

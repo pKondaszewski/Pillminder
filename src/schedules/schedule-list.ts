@@ -2,25 +2,17 @@ import { daysBetween, startOfDay } from '@/config/date-utils';
 import { productLabel } from '@/products/product-label';
 import { categoryFilterIfListed } from '@/products/product-list';
 
+import type { CourseProgress } from './dto/course-progress';
+import type {
+  ScheduleKind,
+  ScheduleListFilters,
+} from './dto/schedule-list-filters';
 import { isPaused } from './schedule-pause';
 import type { Schedule, ScheduleListItem } from './schedule-repository';
-
-export type ScheduleKind = 'ongoing' | 'timed' | 'paused' | 'ended';
-
-export type ScheduleListFilters = {
-  query: string;
-  kind: ScheduleKind | null;
-  category: string | null;
-};
 
 export type ScheduleGroup = {
   kind: ScheduleKind;
   items: ScheduleListItem[];
-};
-
-export type CourseProgress = {
-  day: number;
-  total: number;
 };
 
 export const SCHEDULE_KINDS: readonly ScheduleKind[] = [

@@ -1,16 +1,9 @@
 import { BUILT_IN_CATEGORIES, isBuiltInCategory } from './category';
+import type { ProductListFilters } from './dto/product-list-filters';
 import type { ReorderStatus } from './dto/reorder-status';
 import type { Product, ProductStatus } from './product-service';
 
 export const PRODUCT_SEARCH_THRESHOLD = 8;
-
-export type ProductStatusFilter = ProductStatus | 'all';
-
-export type ProductListFilters = {
-  query: string;
-  category: string | null;
-  status: ProductStatusFilter;
-};
 
 export type LowStockProduct = {
   product: Product;

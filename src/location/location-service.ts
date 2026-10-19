@@ -8,14 +8,12 @@ import {
 } from '@/settings/settings-service';
 
 import type { Coords } from './dto/coords';
+import type { LocationPermission } from './dto/location-permission';
 import { isLocationStale, roundCoords } from './location-helper';
 
-const log = createLogger('location-service');
+export type { LocationPermission } from './dto/location-permission';
 
-export interface LocationPermission {
-  granted: boolean;
-  canAskAgain: boolean;
-}
+const log = createLogger('location-service');
 
 export async function getLocationPermission(): Promise<LocationPermission> {
   return toPermission(await Location.getForegroundPermissionsAsync());

@@ -10,7 +10,7 @@ import {
 // Relative on purpose: drizzle-kit loads this file without the @ alias.
 import { DOSE_STATES } from '../../doses/dose-transition';
 import { IMAGE_ROLES } from '../../images/image-role';
-import { PRODUCT_UNITS } from '../../products/product-unit';
+import { PRODUCT_UNITS } from '../../products/dto/product-unit';
 
 export const products = sqliteTable('products', {
   id: text('id').primaryKey(),

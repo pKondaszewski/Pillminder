@@ -1,11 +1,7 @@
 import { isoDay } from '@/config/date-utils';
 
-import {
-  isEdgeOfRange,
-  isInsideRange,
-  type RangeDraft,
-  tapDay,
-} from '../trip-range';
+import type { RangeDraft } from '../dto/range-draft';
+import { isEdgeOfRange, isInsideRange, tapDay } from '../trip-range';
 
 const OCT_24 = new Date(2026, 9, 24);
 const OCT_27 = new Date(2026, 9, 27);

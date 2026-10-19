@@ -1,7 +1,6 @@
 import { planDoseTransition } from './dose-transition';
+import type { CorrectionTarget } from './dto/correction-target';
 import type { TodayDose } from './dto/today-dose-output';
-
-export type CorrectionTarget = 'taken' | 'skipped';
 
 export function correctionStockDelta(
   dose: TodayDose,

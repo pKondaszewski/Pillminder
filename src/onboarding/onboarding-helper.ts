@@ -1,8 +1,6 @@
 import type { NotificationPermission } from '@/notifications/notification-service';
 
-export type OnboardingStep = 'notifications' | 'battery' | 'location';
-
-export type PermissionStep = 'askable' | 'blocked' | 'granted';
+import type { OnboardingStep, PermissionStep } from './dto/onboarding-step';
 
 export function decideOnboardingSteps({
   permission,
