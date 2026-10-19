@@ -212,6 +212,11 @@
       "previousDay": "Poprzedni dzień"
     },
     "quantity": "× {{count}}",
+    "rowHint": {
+      "correct": "Popraw tę dawkę",
+      "open": "Otwórz szczegóły produktu",
+      "revert": "Cofnij"
+    },
     "showAll": "Pokaż wszystkie ({{count}})",
     "showLess": "Pokaż mniej",
     "skip": "Pomiń",
