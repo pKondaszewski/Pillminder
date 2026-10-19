@@ -1,0 +1,38 @@
+diff --git a/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt b/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt
+index 38f6fba..7025a38 100644
+--- a/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt
++++ b/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt
+@@ -106,7 +106,7 @@ open class ExpoPresentationDelegate(
+       val androidNotification = createNotification(notification, behavior)
+ 
+       NotificationManagerCompat.from(context).notify(
+-        notification.notificationRequest.identifier,
++        getNotifyTag(notification.notificationRequest),
+         getNotifyId(notification.notificationRequest),
+         androidNotification
+       )
+@@ -124,6 +124,12 @@ open class ExpoPresentationDelegate(
+     }
+   }
+ 
++  // Pillminder: a shared `androidTag` in content.data makes a later notification replace the shown one
++  private fun getNotifyTag(request: NotificationRequest): String {
++    val sharedTag = request.content.body?.opt("androidTag") as? String
++    return if (sharedTag.isNullOrEmpty()) request.identifier else sharedTag
++  }
++
+   protected open fun getNotifyId(request: NotificationRequest?): Int {
+     return ANDROID_NOTIFICATION_ID
+   }
+@@ -149,7 +155,10 @@ open class ExpoPresentationDelegate(
+       } else {
+         // If the notification exists, let's assume it's ours, we have no reason to believe otherwise
+         val existingNotification = this.getAllPresentedNotifications().find { it.notificationRequest.identifier == identifier }
+-        NotificationManagerCompat.from(context).cancel(identifier, getNotifyId(existingNotification?.notificationRequest))
++        NotificationManagerCompat.from(context).cancel(
++          existingNotification?.notificationRequest?.let { getNotifyTag(it) } ?: identifier,
++          getNotifyId(existingNotification?.notificationRequest)
++        )
+       }
+     }
+   }

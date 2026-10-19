@@ -13,6 +13,7 @@ import type { ReminderResponseHandlers } from './dto/reminder-response-handlers'
 import type { ReorderAlert } from './dto/reorder-alert';
 import {
   ADD_PACK_ACTION,
+  ANDROID_TAG_KEY,
   BACKGROUND_RESPONSE_TASK,
   BUY_ACTION,
   CATEGORY_ID,
@@ -87,7 +88,7 @@ export async function scheduleDoseReminder(
             title: texts[kind].title,
             body: texts[kind].body,
             categoryIdentifier: CATEGORY_ID,
-            data: { doseId: reminder.id },
+            data: { doseId: reminder.id, [ANDROID_TAG_KEY]: reminder.id },
           },
           trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
