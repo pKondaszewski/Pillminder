@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { TravelPlan } from '@/ui/components/products/travel-plan';
+import { TravelPlan } from '@/products/ui/travel-plan';
 
 export default function TripScreen() {
   const { t } = useTranslation();

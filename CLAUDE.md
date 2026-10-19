@@ -143,6 +143,20 @@ Toolchain (Apple Silicon Mac): Temurin JDK 17, Android cmdline-tools, SDK at
   https://docs.expo.dev/versions/v57.0.0/ before writing any code.
 - **Commits** — follow Conventional Commits
   (https://www.conventionalcommits.org/en/v1.0.0/).
+- **Layout** — code is grouped by feature module (`src/products`,
+  `src/schedules`, `src/doses`, ...). Each module keeps its presentation code in
+  its own `ui/` folder (components and hooks, tests in `ui/__tests__`), next to
+  the service, DTOs and pure logic. Shared UI (theme, base components,
+  navigation, `use-theme`, ...) lives in `src/commons/ui`; `src/config` stays as
+  is. Routes stay in `src/app`. A hook lives in the module whose service it
+  wraps; a hook combining several modules lives in the module that owns the
+  effect (e.g. `notifications/ui`).
+- **UI boundary** — enforced by ESLint (`no-restricted-imports`):
+  `ui/` imports the service, DTOs and pure logic of modules, never a
+  repository, helper or the db (also not via a relative path like
+  `../product-repository`). Nothing outside `ui/` imports from `ui/`, except
+  the routes in `src/app`. Pure logic files must not import `ui/` or native
+  modules, so they stay testable in Jest.
 - **Code style** — order by importance, public first. In every file the
   exported (`export`) functions go above private helpers: the public API reads
   first, the implementation details below it.

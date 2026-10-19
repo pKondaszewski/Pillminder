@@ -3,6 +3,24 @@ const expoConfig = require('eslint-config-expo/flat');
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
 const simpleImportSort = require('eslint-plugin-simple-import-sort');
 
+const moduleFacadePattern = {
+  group: ['@/*/*-repository', '@/*/*-helper'],
+  message:
+    'Cross-module access goes through the module service (facade). Repositories and helpers are module-private — re-export what you need from the service.',
+};
+
+const uiNeverReachesData = {
+  group: ['**/*-repository', '**/*-helper', '@/config/db', '@/config/db/**'],
+  message:
+    'ui/ talks to the module service and DTOs only. Repositories, helpers and the db are data-layer code, also via a relative path.',
+};
+
+const nothingImportsUi = {
+  group: ['@/*/ui', '@/*/ui/**', '**/ui', '**/ui/**'],
+  message:
+    'ui/ is the presentation layer: only other ui/ code and the routes in src/app may import from it.',
+};
+
 module.exports = defineConfig([
   expoConfig,
   eslintPluginPrettierRecommended,
@@ -19,15 +37,26 @@ module.exports = defineConfig([
       'simple-import-sort/exports': 'error',
       '@typescript-eslint/no-restricted-imports': [
         'error',
-        {
-          patterns: [
-            {
-              group: ['@/*/*-repository', '@/*/*-helper'],
-              message:
-                'Cross-module access goes through the module service (facade). Repositories and helpers are module-private — re-export what you need from the service.',
-            },
-          ],
-        },
+        { patterns: [moduleFacadePattern] },
+      ],
+    },
+  },
+  {
+    files: ['src/*/ui/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        { patterns: [moduleFacadePattern, uiNeverReachesData] },
+      ],
+    },
+  },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/*/ui/**', 'src/app/**'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        { patterns: [moduleFacadePattern, nothingImportsUi] },
       ],
     },
   },

@@ -3,17 +3,17 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet } from 'react-native';
 
+import { Spacing } from '@/commons/ui/constants/theme';
+import { ThemedView } from '@/commons/ui/themed-view';
+import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
+import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import { orderPhotos } from '@/images/image-service';
-import { Spacing } from '@/ui/commons/constants/theme';
-import { ThemedView } from '@/ui/components/commons/themed-view';
-import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
-import { ImageSourceSheet } from '@/ui/components/products/image-source-sheet';
-import { PhotoGrid } from '@/ui/components/products/photo-grid';
-import { usePhotoUndo } from '@/ui/hooks/use-photo-undo';
-import { useProductImages } from '@/ui/hooks/use-product-images';
-import { useProducts } from '@/ui/hooks/use-products';
-import { useProfileUndo } from '@/ui/hooks/use-profile-undo';
-import { useUndoSnackbar } from '@/ui/hooks/use-undo-snackbar';
+import { ImageSourceSheet } from '@/products/ui/image-source-sheet';
+import { PhotoGrid } from '@/products/ui/photo-grid';
+import { usePhotoUndo } from '@/products/ui/use-photo-undo';
+import { useProductImages } from '@/products/ui/use-product-images';
+import { useProducts } from '@/products/ui/use-products';
+import { useProfileUndo } from '@/products/ui/use-profile-undo';
 
 export default function ProductPhotosScreen() {
   const { t } = useTranslation();

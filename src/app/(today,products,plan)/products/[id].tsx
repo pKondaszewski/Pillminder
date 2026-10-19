@@ -3,39 +3,39 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet } from 'react-native';
 
+import { Spacing } from '@/commons/ui/constants/theme';
+import { openStore } from '@/commons/ui/open-store';
+import { ThemedView } from '@/commons/ui/themed-view';
+import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
+import { useFormatDate, useFormatTime } from '@/commons/ui/use-format-date';
+import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
+import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import { isoDay } from '@/config/date-utils';
+import { useRecentDays } from '@/doses/ui/use-recent-days';
 import type { Product } from '@/products/product-service';
 import { lastUsedText } from '@/products/product-text';
-import { Spacing } from '@/ui/commons/constants/theme';
-import { openStore } from '@/ui/commons/open-store';
-import { ThemedView } from '@/ui/components/commons/themed-view';
-import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
-import { DetailsSection } from '@/ui/components/products/details-section';
+import { DetailsSection } from '@/products/ui/details-section';
 import {
   ProductFieldSheet,
   type ProductSheetField,
-} from '@/ui/components/products/field-sheets';
-import { ProductNotes } from '@/ui/components/products/notes';
+} from '@/products/ui/field-sheets';
+import { ProductNotes } from '@/products/ui/notes';
 import {
   ArchiveProductDialog,
   DeleteProductDialog,
   ProductActions,
-} from '@/ui/components/products/product-actions';
-import { ProductHeader } from '@/ui/components/products/product-header';
-import { RecentDaysSection } from '@/ui/components/products/recent-days';
-import { ScheduleSection } from '@/ui/components/products/schedule-section';
-import { StockCard } from '@/ui/components/products/stock-card';
-import { useFormatDate, useFormatTime } from '@/ui/hooks/use-format-date';
-import { useProductEditActions } from '@/ui/hooks/use-product-edit-actions';
-import { useProductImages } from '@/ui/hooks/use-product-images';
-import { useProducts } from '@/ui/hooks/use-products';
-import { useRecentDays } from '@/ui/hooks/use-recent-days';
-import { useReorderStatuses } from '@/ui/hooks/use-reorder';
-import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
-import { useSchedules } from '@/ui/hooks/use-schedules';
-import { useSettings } from '@/ui/hooks/use-settings';
-import { useStockActions } from '@/ui/hooks/use-stock-actions';
-import { useUndoSnackbar } from '@/ui/hooks/use-undo-snackbar';
+} from '@/products/ui/product-actions';
+import { ProductHeader } from '@/products/ui/product-header';
+import { RecentDaysSection } from '@/products/ui/recent-days';
+import { ScheduleSection } from '@/products/ui/schedule-section';
+import { StockCard } from '@/products/ui/stock-card';
+import { useProductEditActions } from '@/products/ui/use-product-edit-actions';
+import { useProductImages } from '@/products/ui/use-product-images';
+import { useProducts } from '@/products/ui/use-products';
+import { useReorderStatuses } from '@/products/ui/use-reorder';
+import { useStockActions } from '@/products/ui/use-stock-actions';
+import { useSchedules } from '@/schedules/ui/use-schedules';
+import { useSettings } from '@/settings/ui/use-settings';
 
 type Sheet =
   | { kind: 'field'; field: ProductSheetField }

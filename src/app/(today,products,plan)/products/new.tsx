@@ -2,11 +2,11 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Alert } from 'react-native';
 
+import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
 import { addImage, DEFAULT_IMAGE_ROLE } from '@/images/image-service';
 import type { NewProductInput } from '@/products/dto/new-product-input';
-import { NewProductForm } from '@/ui/components/products/new-product-form';
-import { useProducts } from '@/ui/hooks/use-products';
-import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
+import { NewProductForm } from '@/products/ui/new-product-form';
+import { useProducts } from '@/products/ui/use-products';
 
 export default function NewProductScreen() {
   const { t } = useTranslation();

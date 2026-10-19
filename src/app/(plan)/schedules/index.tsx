@@ -4,32 +4,29 @@ import { useTranslation } from 'react-i18next';
 import { SectionList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Spacing } from '@/commons/ui/constants/theme';
+import { EmptyState } from '@/commons/ui/empty-state';
+import {
+  FLOATING_ADD_BUTTON_CLEARANCE,
+  FloatingAddButton,
+} from '@/commons/ui/floating-add-button';
+import { TabSwipe } from '@/commons/ui/navigation/tab-swipe';
+import { ScreenTitle } from '@/commons/ui/screen-title';
+import { type FilterToken, SearchField } from '@/commons/ui/search-field';
+import { ThemedText } from '@/commons/ui/themed-text';
+import { ThemedView } from '@/commons/ui/themed-view';
+import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
 import { categoryLabel } from '@/products/category';
+import { useProducts } from '@/products/ui/use-products';
 import {
   groupSchedules,
   listedScheduleCategories,
 } from '@/schedules/schedule-list';
 import type { ScheduleListFilters } from '@/schedules/schedule-service';
-import { Spacing } from '@/ui/commons/constants/theme';
-import { EmptyState } from '@/ui/components/commons/empty-state';
-import {
-  FLOATING_ADD_BUTTON_CLEARANCE,
-  FloatingAddButton,
-} from '@/ui/components/commons/floating-add-button';
-import { ScreenTitle } from '@/ui/components/commons/screen-title';
-import {
-  type FilterToken,
-  SearchField,
-} from '@/ui/components/commons/search-field';
-import { ThemedText } from '@/ui/components/commons/themed-text';
-import { ThemedView } from '@/ui/components/commons/themed-view';
-import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
-import { ScheduleListFilterSheet } from '@/ui/components/schedules/list-filter-sheet';
-import { ScheduleRow } from '@/ui/components/schedules/row';
-import { useProducts } from '@/ui/hooks/use-products';
-import { useRunWithErrorAlert } from '@/ui/hooks/use-run-with-error-alert';
-import { useScheduleList } from '@/ui/hooks/use-schedule-list';
-import { useSchedules } from '@/ui/hooks/use-schedules';
+import { ScheduleListFilterSheet } from '@/schedules/ui/list-filter-sheet';
+import { ScheduleRow } from '@/schedules/ui/row';
+import { useScheduleList } from '@/schedules/ui/use-schedule-list';
+import { useSchedules } from '@/schedules/ui/use-schedules';
 
 const NO_FILTERS: ScheduleListFilters = {
   query: '',
