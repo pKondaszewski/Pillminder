@@ -30,7 +30,8 @@ import { UndoSnackbar } from '@/ui/components/commons/undo-snackbar';
 import { TabSwipe } from '@/ui/components/navigation/tab-swipe';
 import { DayPager } from '@/ui/components/today/day-pager';
 import { DoseCorrectionSheet } from '@/ui/components/today/dose-correction-sheet';
-import { type DayMode, DoseRow } from '@/ui/components/today/dose-row';
+import { DoseRow } from '@/ui/components/today/dose-row';
+import type { DayMode } from '@/ui/components/today/dose-row-action';
 import { MonthCalendarSheet } from '@/ui/components/today/month-calendar-sheet';
 import { TimeSlotSection } from '@/ui/components/today/time-slot-section';
 import { TodayCard } from '@/ui/components/today/today-card';
@@ -139,6 +140,8 @@ export default function HomeScreen() {
       params: { id: returnProductId },
     });
   };
+  const openProduct = ({ productId }: TodayDose) =>
+    router.push({ pathname: '/products/[id]', params: { id: productId } });
   const openCalendar = () => {
     setCalendarMonth(day);
     setCalendarOpen(true);
@@ -218,6 +221,7 @@ export default function HomeScreen() {
                         onSkip={(skipped) => applyWithUndo('skipped', skipped)}
                         onRevert={revertConfirmation.request}
                         onCorrect={setCorrecting}
+                        onOpenProduct={openProduct}
                       />
                     )}
                   />

@@ -14,10 +14,13 @@ import { ProductAvatar } from '@/ui/components/commons/product-avatar';
 import { ThemedText } from '@/ui/components/commons/themed-text';
 import { ThemedView } from '@/ui/components/commons/themed-view';
 import { DoseActionButton } from '@/ui/components/today/dose-action-button';
+import {
+  type DayMode,
+  type RowPressAction,
+  rowPressAction,
+} from '@/ui/components/today/dose-row-action';
 import { useFormatTime } from '@/ui/hooks/use-format-date';
 import { useTheme } from '@/ui/hooks/use-theme';
-
-export type DayMode = 'today' | 'past' | 'future';
 
 type Props = {
   dose: TodayDose;
@@ -25,6 +28,13 @@ type Props = {
   now: Date;
   onTake: (dose: TodayDose) => void;
   onSkip: (dose: TodayDose) => void;
+  onRevert: (dose: TodayDose) => void;
+  onCorrect: (dose: TodayDose) => void;
+  onOpenProduct: (dose: TodayDose) => void;
+};
+
+type RowPressHandlers = {
+  onOpenProduct: (dose: TodayDose) => void;
   onRevert: (dose: TodayDose) => void;
   onCorrect: (dose: TodayDose) => void;
 };
@@ -37,6 +47,7 @@ export function DoseRow({
   onSkip,
   onRevert,
   onCorrect,
+  onOpenProduct,
 }: Props) {
   const { t } = useTranslation();
   const { formatTime } = useFormatTime();
@@ -44,12 +55,23 @@ export function DoseRow({
   const details = doseDetailsText(dose, t);
   const tinted = mode === 'today' && status === 'overdue';
   const handled = status === 'taken' || status === 'skipped';
-  const onPress = rowPressHandler(mode, handled, dose, onRevert, onCorrect);
+  const action = rowPressAction(mode, handled);
+  const pressHandler = pressHandlerFor(action, {
+    onOpenProduct,
+    onRevert,
+    onCorrect,
+  });
+  const openProduct = () => onOpenProduct(dose);
 
   return (
     <Pressable
-      onPress={onPress}
-      disabled={!onPress}
+      onPress={() => pressHandler(dose)}
+      onLongPress={openProduct}
+      accessibilityHint={t(`home.rowHint.${action}`)}
+      accessibilityActions={[
+        { name: 'longpress', label: t('home.rowHint.open') },
+      ]}
+      onAccessibilityAction={openProduct}
       style={({ pressed }) => pressed && styles.pressed}
     >
       <ThemedView
@@ -95,6 +117,20 @@ export function DoseRow({
       </ThemedView>
     </Pressable>
   );
+}
+
+function pressHandlerFor(
+  action: RowPressAction,
+  handlers: RowPressHandlers,
+): (dose: TodayDose) => void {
+  switch (action) {
+    case 'open':
+      return handlers.onOpenProduct;
+    case 'revert':
+      return handlers.onRevert;
+    case 'correct':
+      return handlers.onCorrect;
+  }
 }
 
 function DoseTrailing({
@@ -143,18 +179,6 @@ function DoseTrailing({
       />
     </View>
   );
-}
-
-function rowPressHandler(
-  mode: DayMode,
-  handled: boolean,
-  dose: TodayDose,
-  onRevert: Props['onRevert'],
-  onCorrect: Props['onCorrect'],
-): (() => void) | undefined {
-  if (mode === 'past') return () => onCorrect(dose);
-  if (mode === 'today' && handled) return () => onRevert(dose);
-  return undefined;
 }
 
 function statusLabel(

@@ -192,6 +192,11 @@
       "previousDay": "Previous day"
     },
     "quantity": "× {{count}}",
+    "rowHint": {
+      "correct": "Edit this dose",
+      "open": "Open product details",
+      "revert": "Undo"
+    },
     "showAll": "Show all ({{count}})",
     "showLess": "Show less",
     "skip": "Skip",
