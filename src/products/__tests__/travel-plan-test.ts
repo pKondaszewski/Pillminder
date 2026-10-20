@@ -65,7 +65,14 @@ describe('buildTravelPlan', () => {
 
     // then
     expect(plan).toEqual([
-      { id: 'p1', title: 'Product', pack: '7 szt.', verdict: 'enough' },
+      {
+        id: 'p1',
+        name: 'Product',
+        title: 'Product',
+        pack: '7 szt.',
+        verdict: 'enough',
+        runOutOffsetDays: 29.5,
+      },
     ]);
   });
 
@@ -139,7 +146,50 @@ describe('buildTravelPlan', () => {
     );
 
     // then
-    expect(plan[0]).toMatchObject({ pack: '14 szt.', verdict: null });
+    expect(plan[0]).toMatchObject({
+      pack: '14 szt.',
+      verdict: null,
+      runOutOffsetDays: null,
+    });
+  });
+
+  it('gives the run-out moment in days since the morning of departure', () => {
+    // given
+    const products = [product({ id: 'p1', unit: 'tablet', stock: 5 })];
+
+    // when
+    const plan = buildTravelPlan(
+      products,
+      [schedule()],
+      DEPARTURE,
+      RETURN_DAY,
+      context,
+    );
+
+    // then
+    expect(plan[0].runOutOffsetDays).toBe(4.5);
+  });
+
+  it('keeps the product name without strength next to the full title', () => {
+    // given
+    const products = [
+      product({ id: 'p1', name: 'Euthyrox', strength: '50 µg' }),
+    ];
+
+    // when
+    const plan = buildTravelPlan(
+      products,
+      [schedule()],
+      DEPARTURE,
+      RETURN_DAY,
+      context,
+    );
+
+    // then
+    expect(plan[0]).toMatchObject({
+      name: 'Euthyrox',
+      title: 'Euthyrox 50 µg',
+    });
   });
 
   it('skips archived products and products without a schedule', () => {
