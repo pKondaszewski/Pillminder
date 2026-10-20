@@ -139,21 +139,20 @@
         "next": "Next in {{duration}}",
         "title": "On schedule"
       },
+      "collected": "Collected {{taken}} of {{total}}",
       "done": {
         "closedTitle": "Done for today",
         "title": "Well done!"
       },
       "futureCount": "Planned doses: {{count}}",
       "futureTitle": "Day plan",
-      "hideDetails": "Hide day details",
       "nextDose": "{{name}} · {{time}}",
       "others_one": "and {{count}} other",
       "others_other": "and {{count}} others",
       "overdueMany_one": "{{count}} overdue · oldest {{duration}}",
       "overdueMany_other": "{{count}} overdue · oldest {{duration}}",
       "overdueOne": "Overdue {{duration}}",
-      "pastTitle": "Day summary",
-      "showDetails": "Show day details"
+      "pastTitle": "Day summary"
     },
     "collapseSlot": "Collapse: {{slot}}",
     "correction": {
