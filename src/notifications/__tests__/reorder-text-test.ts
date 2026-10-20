@@ -17,43 +17,29 @@ function translator(lng: 'en' | 'pl'): Translate {
   return (key, options) => instance.t(key, options);
 }
 
-function normalizeSpaces(text: string): string {
-  return text.replace(/\s/g, ' ');
-}
-
 describe('reorderNotificationText', () => {
-  it('shows the price with the currency symbol in Polish', () => {
+  it('shows the typed price as is in Polish', () => {
     // given
-    const product = { name: 'Magnez + B6', price: 25 };
+    const product = { name: 'Magnez + B6', price: '12,99 zł' };
 
     // when
-    const text = reorderNotificationText(
-      product,
-      'PLN',
-      'pl',
-      translator('pl'),
-    );
+    const text = reorderNotificationText(product, translator('pl'));
 
     // then
-    expect(normalizeSpaces(text.body)).toBe(
-      'Magnez + B6 się kończy - czas dokupić (25 zł)',
-    );
+    expect(text.body).toBe('Magnez + B6 się kończy - czas dokupić (12,99 zł)');
   });
 
-  it('shows the price with the currency symbol in English', () => {
+  it('shows the typed price as is in English', () => {
     // given
-    const product = { name: 'Magnesium', price: 25 };
+    const product = { name: 'Magnesium', price: '15 euro' };
 
     // when
-    const text = reorderNotificationText(
-      product,
-      'USD',
-      'en',
-      translator('en'),
-    );
+    const text = reorderNotificationText(product, translator('en'));
 
     // then
-    expect(text.body).toBe('Magnesium is running low - time to reorder ($25)');
+    expect(text.body).toBe(
+      'Magnesium is running low - time to reorder (15 euro)',
+    );
   });
 
   it('omits the price when the product has none', () => {
@@ -61,12 +47,7 @@ describe('reorderNotificationText', () => {
     const product = { name: 'Magnez + B6', price: null };
 
     // when
-    const text = reorderNotificationText(
-      product,
-      'PLN',
-      'pl',
-      translator('pl'),
-    );
+    const text = reorderNotificationText(product, translator('pl'));
 
     // then
     expect(text.body).toBe('Magnez + B6 się kończy - czas dokupić');
@@ -77,12 +58,7 @@ describe('reorderNotificationText', () => {
     const product = { name: 'Magnez + B6', price: null };
 
     // when
-    const text = reorderNotificationText(
-      product,
-      'PLN',
-      'pl',
-      translator('pl'),
-    );
+    const text = reorderNotificationText(product, translator('pl'));
 
     // then
     expect(text.title).toBe(pl.notification.reorderTitle);

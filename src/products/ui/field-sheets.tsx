@@ -9,6 +9,7 @@ import type { NewProductInput } from '@/products/dto/new-product-input';
 import {
   packSizeEstimate,
   packSizeText,
+  PRICE_MAX_LENGTH,
   textFieldPatch,
   validateProductField,
 } from '@/products/product-form';
@@ -20,8 +21,6 @@ import type {
 import { CategoryPicker } from '@/products/ui/category-picker';
 import { StoreSuggestions } from '@/products/ui/store-suggestions';
 import { UnitChips } from '@/products/ui/unit-chips';
-import { currencySymbol } from '@/settings/format-price';
-import type { Currency } from '@/settings/settings-service';
 
 export type ProductSheetField = TextProductField | 'category' | 'unit';
 
@@ -41,7 +40,6 @@ export const PRODUCT_FIELD_LABEL_KEYS: Record<ProductEditedField, string> = {
 
 type SheetProps = {
   product: Product;
-  currency: Currency;
   onSave: (patch: Partial<NewProductInput>) => void;
   onClose: () => void;
 };
@@ -53,6 +51,7 @@ type TextSheetConfig = {
   placeholder?: string;
   hint?: string;
   numeric?: boolean;
+  maxLength?: number;
   suggestions?: boolean;
 };
 
@@ -63,7 +62,12 @@ const TEXT_SHEETS: Record<TextProductField, TextSheetConfig> = {
     placeholder: 'editor.strengthPlaceholder',
     hint: 'editor.strengthHint',
   },
-  price: { title: 'editor.price', hint: 'editor.priceHint', numeric: true },
+  price: {
+    title: 'editor.price',
+    placeholder: 'editor.pricePlaceholder',
+    hint: 'editor.priceHint',
+    maxLength: PRICE_MAX_LENGTH,
+  },
   stock: { title: 'editor.stock', numeric: true },
   packSize: {
     title: 'editor.packSize',
@@ -86,19 +90,16 @@ export function ProductFieldSheet({ field, ...sheet }: Props) {
 function TextSheet({
   field,
   product,
-  currency,
   onSave,
   onClose,
 }: SheetProps & { field: TextProductField }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const config = TEXT_SHEETS[field];
   const inMl = field === 'packSize' && packSizeInMl(product.category);
   const placeholderKey = inMl
     ? 'editor.packSizeMlPlaceholder'
     : config.placeholder;
-  const title = t(inMl ? 'editor.packSizeMl' : config.title, {
-    currency: currencySymbol(currency, i18n.language),
-  });
+  const title = t(inMl ? 'editor.packSizeMl' : config.title);
   const current =
     field === 'packSize'
       ? packSizeText(product.category, product.packSize)
@@ -122,6 +123,7 @@ function TextSheet({
         value={text}
         onChangeText={setText}
         keyboardType={config.numeric ? 'numeric' : 'default'}
+        maxLength={config.maxLength}
         placeholder={placeholderKey ? t(placeholderKey) : undefined}
         accessibilityLabel={title}
         error={error ? t(error) : undefined}

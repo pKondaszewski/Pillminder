@@ -1,13 +1,9 @@
 import type { Translate } from '@/config/translate';
-import { formatPrice } from '@/settings/format-price';
-import type { Currency } from '@/settings/settings-service';
 
 import type { NotificationText } from './dto/notification-text';
 
 export function reorderNotificationText(
-  product: { name: string; price: number | null },
-  currency: Currency,
-  locale: string,
+  product: { name: string; price: string | null },
   t: Translate,
 ): NotificationText {
   const { name, price } = product;
@@ -18,7 +14,7 @@ export function reorderNotificationText(
         ? t('notification.reorderBody', { name })
         : t('notification.reorderBodyWithPrice', {
             name,
-            price: formatPrice(price, currency, locale),
+            price,
           }),
   };
 }

@@ -85,6 +85,13 @@
       "when": 1792334026763,
       "tag": "0011_add_product_profile_image",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1792530269797,
+      "tag": "0012_price_as_text",
+      "breakpoints": true
     }
   ]
 }

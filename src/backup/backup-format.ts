@@ -20,7 +20,9 @@ export type { BackupRows } from './dto/backup-data';
 export type { BackupError } from './dto/backup-parse-result';
 export type { BackupParseResult } from './dto/backup-parse-result';
 
-export const BACKUP_FORMAT_VERSION = 1;
+export const BACKUP_FORMAT_VERSION = 2;
+
+const FIRST_TEXT_PRICE_VERSION = 2;
 
 const TABLES: Record<BackupTable, SQLiteTable> = {
   products,
@@ -53,13 +55,13 @@ export function parseBackup(text: string): BackupParseResult {
   }
 
   if (!isRecord(json) || json.app !== 'pillminder') return fail('notBackup');
-  const { version } = json;
-  if (!Number.isInteger(version) || (version as number) < 1) {
+  if (!Number.isInteger(json.version) || (json.version as number) < 1) {
     return fail('notBackup');
   }
+  const version = json.version as number;
   if (!Array.isArray(json.products)) return fail('notBackup');
-  if ((version as number) > BACKUP_FORMAT_VERSION) {
-    return fail('newerVersion', `v${String(version)}`);
+  if (version > BACKUP_FORMAT_VERSION) {
+    return fail('newerVersion', `v${version}`);
   }
 
   const rows = {} as BackupRows;
@@ -68,7 +70,11 @@ export function parseBackup(text: string): BackupParseResult {
     if (!Array.isArray(raw)) return fail('notBackup', table);
 
     const parsed: BackupRow[] = [];
-    for (const [index, rawRow] of raw.entries()) {
+    const rawRows =
+      table === 'products' && version < FIRST_TEXT_PRICE_VERSION
+        ? raw.map(withLegacyPrice)
+        : raw;
+    for (const [index, rawRow] of rawRows.entries()) {
       const field = firstInvalidField(table, rawRow);
       if (field) return fail('invalidRow', `${table}[${index}].${field}`);
       parsed.push(jsonToRow(table, rawRow as BackupRow));
@@ -77,6 +83,14 @@ export function parseBackup(text: string): BackupParseResult {
   }
 
   return validateRelations(rows);
+}
+
+function withLegacyPrice(raw: unknown): unknown {
+  if (!isRecord(raw)) return raw;
+  const { price } = raw;
+  return Number.isInteger(price) && (price as number) >= 0
+    ? { ...raw, price: String(price) }
+    : raw;
 }
 
 function fail(code: BackupErrorCode, detail?: string): BackupParseResult {

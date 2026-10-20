@@ -36,7 +36,6 @@ import { useProducts } from '@/products/ui/use-products';
 import { useReorderStatuses } from '@/products/ui/use-reorder';
 import { useStockActions } from '@/products/ui/use-stock-actions';
 import { useSchedules } from '@/schedules/ui/use-schedules';
-import { useSettings } from '@/settings/ui/use-settings';
 
 type Sheet =
   | { kind: 'field'; field: ProductSheetField }
@@ -51,10 +50,9 @@ export default function ProductScreen() {
 }
 
 function ProductDetail({ product }: { product: Product }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const formatDate = useFormatDate();
   const { formatTime } = useFormatTime();
-  const { currency } = useSettings();
   const { removeProduct } = useProducts();
   const { schedules } = useSchedules();
   const reorderStatuses = useReorderStatuses();
@@ -130,8 +128,6 @@ function ProductDetail({ product }: { product: Product }) {
         <ProductNotes productId={product.id} />
         <DetailsSection
           product={product}
-          currency={currency}
-          locale={i18n.language}
           onEdit={editField}
           onFastingChange={(fasting) => edit.saveField('fasting', { fasting })}
         />
@@ -149,7 +145,6 @@ function ProductDetail({ product }: { product: Product }) {
         <ProductFieldSheet
           field={sheet.field}
           product={product}
-          currency={currency}
           onSave={(patch) =>
             edit.saveField(sheet.field, patch, () => setSheet(null))
           }

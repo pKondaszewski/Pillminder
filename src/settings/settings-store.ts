@@ -1,13 +1,6 @@
-import { getLocales } from 'expo-localization';
 import Storage from 'expo-sqlite/kv-store';
 
-import {
-  type Currency,
-  CURRENCY_OPTIONS,
-  LANGUAGE_OPTIONS,
-  type Settings,
-  THEME_OPTIONS,
-} from './dto/settings';
+import { LANGUAGE_OPTIONS, type Settings, THEME_OPTIONS } from './dto/settings';
 import { isValidStoredLocation } from './stored-location-validation';
 
 export const SNOOZE_MINUTES_MIN = 1;
@@ -16,13 +9,10 @@ export const SNOOZE_MINUTES_DEFAULT = 15;
 
 const STORAGE_KEY = 'settings';
 
-const FALLBACK_CURRENCY: Currency = 'USD';
-
 const DEFAULT_SETTINGS: Settings = {
   language: 'system',
   theme: 'system',
   snoozeMinutes: SNOOZE_MINUTES_DEFAULT,
-  currency: resolveDeviceCurrency(),
   notificationsPromptDismissed: false,
   batteryPromptDismissed: false,
   locationPromptDismissed: false,
@@ -33,7 +23,6 @@ const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
   language: (value) => LANGUAGE_OPTIONS.some((option) => option === value),
   theme: (value) => THEME_OPTIONS.some((option) => option === value),
   snoozeMinutes: isValidSnoozeMinutes,
-  currency: (value) => CURRENCY_OPTIONS.some((option) => option === value),
   notificationsPromptDismissed: (value) => typeof value === 'boolean',
   batteryPromptDismissed: (value) => typeof value === 'boolean',
   locationPromptDismissed: (value) => typeof value === 'boolean',
@@ -74,7 +63,6 @@ function readStoredSettings(): Settings {
       language: pick('language', stored),
       theme: pick('theme', stored),
       snoozeMinutes: pick('snoozeMinutes', stored),
-      currency: pick('currency', stored),
       notificationsPromptDismissed: pick(
         'notificationsPromptDismissed',
         stored,
@@ -86,13 +74,6 @@ function readStoredSettings(): Settings {
   } catch {
     return DEFAULT_SETTINGS;
   }
-}
-
-function resolveDeviceCurrency(): Currency {
-  const code = getLocales()[0]?.currencyCode;
-  return (
-    CURRENCY_OPTIONS.find((option) => option === code) ?? FALLBACK_CURRENCY
-  );
 }
 
 function pick<K extends keyof Settings>(

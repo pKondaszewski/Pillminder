@@ -12,7 +12,7 @@ export interface NewProductInput {
   category: string;
   strength?: string | null;
   unit?: ProductUnit | null;
-  price?: number | null;
+  price?: string | null;
   storeLink?: string | null;
   stock?: number | null;
   packSize?: number | null;

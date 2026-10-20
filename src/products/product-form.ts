@@ -10,6 +10,8 @@ import type { Product } from './product-service';
 import { normalizeStrength } from './strength-text';
 import { parseWholeNumber } from './whole-number-input';
 
+export const PRICE_MAX_LENGTH = 30;
+
 export type ProductFormError =
   | 'editor.nameRequired'
   | 'editor.categoryRequired'
@@ -25,7 +27,6 @@ const FORM_FIELD_ORDER: ProductFormField[] = [
   'category',
   'stock',
   'packSize',
-  'price',
 ];
 
 export function validateProductField(
@@ -35,10 +36,10 @@ export function validateProductField(
   switch (field) {
     case 'strength':
     case 'storeLink':
+    case 'price':
       return null;
     case 'name':
       return text.trim() === '' ? 'editor.nameRequired' : null;
-    case 'price':
     case 'stock':
       return parseWholeNumber(text, 0).valid
         ? null
@@ -78,7 +79,7 @@ export function textFieldPatch(
     case 'storeLink':
       return { storeLink: text.trim() || null };
     case 'price':
-      return { price: wholeNumberOrNull(text, 0) };
+      return { price: text.trim() || null };
     case 'stock':
       return { stock: wholeNumberOrNull(text, 0) };
     case 'packSize':
@@ -96,7 +97,7 @@ export function newProductInput(values: ProductFormValues): NewProductInput {
       ? normalizeStrength(values.strength) || null
       : null,
     unit: values.unit,
-    price: wholeNumberOrNull(values.price, 0),
+    price: values.price.trim() || null,
     storeLink: values.storeLink.trim() || null,
     stock: stock === null && packSizeInMl(values.category) ? packSize : stock,
     packSize,

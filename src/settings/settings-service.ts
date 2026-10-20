@@ -3,16 +3,10 @@ import { Appearance } from 'react-native';
 import i18n, { resolveLanguage } from '@/config/i18n';
 import type { Coords, StoredLocation } from '@/location/dto/coords';
 
-import type {
-  Currency,
-  LanguagePreference,
-  ThemePreference,
-} from './dto/settings';
+import type { LanguagePreference, ThemePreference } from './dto/settings';
 import { getSettings, updateSettings } from './settings-store';
 
 export {
-  type Currency,
-  CURRENCY_OPTIONS,
   LANGUAGE_OPTIONS,
   type LanguagePreference,
   type Settings,
@@ -36,10 +30,6 @@ export function setLanguage(language: LanguagePreference): void {
 
 export function setSnoozeMinutes(snoozeMinutes: number): void {
   updateSettings({ snoozeMinutes });
-}
-
-export function setCurrency(currency: Currency): void {
-  updateSettings({ currency });
 }
 
 export function dismissNotificationsPrompt(): void {

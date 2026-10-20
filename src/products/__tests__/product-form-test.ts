@@ -16,7 +16,7 @@ const VALID_VALUES: ProductFormValues = {
   category: 'supplement',
   strength: ' 2000iu ',
   unit: 'capsule',
-  price: '25',
+  price: ' 25,50 zł ',
   stock: '60',
   packSize: '90',
   storeLink: ' rossmann ',
@@ -29,7 +29,7 @@ const PRODUCT = {
   category: 'medication',
   strength: '50 µg',
   unit: 'tablet',
-  price: 18,
+  price: '18 zł',
   storeLink: 'pharmacy',
   stock: 30,
   packSize: 60,
@@ -77,14 +77,12 @@ describe('validateProductForm', () => {
     // when
     const errors = validateProductForm({
       ...VALID_VALUES,
-      price: '2.5',
       stock: '-1',
       packSize: '0',
     });
 
     // then
     expect(errors).toEqual({
-      price: 'editor.wholeNumberInvalid',
       stock: 'editor.wholeNumberInvalid',
       packSize: 'editor.packSizeInvalid',
     });
@@ -96,7 +94,7 @@ describe('validateProductField', () => {
     ['name', 'Iron', null],
     ['name', '', 'editor.nameRequired'],
     ['price', '', null],
-    ['price', 'abc', 'editor.wholeNumberInvalid'],
+    ['price', '12,99 zł', null],
     ['stock', '0', null],
     ['packSize', '1', null],
     ['packSize', '0', 'editor.packSizeInvalid'],
@@ -113,7 +111,7 @@ describe('firstErrorField', () => {
   it('returns the field that comes first in the form', () => {
     // when
     const field = firstErrorField({
-      price: 'editor.wholeNumberInvalid',
+      stock: 'editor.wholeNumberInvalid',
       category: 'editor.categoryRequired',
     });
 
@@ -141,7 +139,7 @@ describe('newProductInput', () => {
       category: 'supplement',
       strength: '2000 IU',
       unit: 'capsule',
-      price: 25,
+      price: '25,50 zł',
       storeLink: 'rossmann',
       stock: 60,
       packSize: 90,
@@ -192,7 +190,9 @@ describe('textFieldPatch', () => {
     ['name', ' Iron ', { name: 'Iron' }],
     ['strength', '', { strength: null }],
     ['strength', '50ug', { strength: '50 µg' }],
-    ['price', '12', { price: 12 }],
+    ['price', ' 12,99 zł ', { price: '12,99 zł' }],
+    ['price', '15 euro', { price: '15 euro' }],
+    ['price', '   ', { price: null }],
     ['price', '', { price: null }],
     ['stock', '7', { stock: 7 }],
     ['packSize', '30', { packSize: 30 }],
