@@ -37,18 +37,6 @@ import {
 } from './dose-repository';
 import { isDueInFuture, isPending } from './dose-validator';
 
-export {
-  ARC_HEIGHT,
-  ARC_HORIZON_Y,
-  ARC_WIDTH,
-  arcPath,
-  arcPoint,
-  axisTicks,
-  daySymbol,
-  pieSlicePath,
-  skyPath,
-  skyTone,
-} from './day-arc';
 export { dayPhases } from './day-phases';
 export { correctionStockDelta } from './dose-correction';
 export { dayStatus, lastPlannedDay } from './dose-day';
@@ -69,7 +57,6 @@ export { buildTimeline, nowPosition } from './dose-timeline';
 export { toTodayDose } from './dose-today';
 export { BULK_TAKE_MIN_OVERDUE, todayCardState } from './dose-today-card';
 export type { CorrectionTarget } from './dto/correction-target';
-export type { ArcPoint, DaySymbol, SkyTone } from './dto/day-arc-output';
 export type { DayPhases } from './dto/day-phases';
 export type { DayStatus } from './dto/day-status';
 export type { DoseStatus } from './dto/dose-status';

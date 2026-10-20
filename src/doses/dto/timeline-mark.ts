@@ -1,8 +1,9 @@
 import type { DoseStatus } from './dose-status';
+import type { TodayDose } from './today-dose-output';
 
 export interface TimelineMark {
   id: string;
   position: number;
-  statuses: DoseStatus[];
-  count: number | null;
+  status: DoseStatus;
+  doses: TodayDose[];
 }

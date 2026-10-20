@@ -1,32 +1,23 @@
 import type { TFunction } from 'i18next';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { PrimaryButton } from '@/commons/ui/button';
 import { Radius, Spacing, type ThemeColor } from '@/commons/ui/constants/theme';
-import { Icon } from '@/commons/ui/icon';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { useFormatTime } from '@/commons/ui/use-format-date';
 import { useTheme } from '@/commons/ui/use-theme';
 import {
   BULK_TAKE_MIN_OVERDUE,
   dayCountsText,
-  type DaySymbol,
   durationText,
   handledCountsText,
-  skyTone,
-  type TimelineMark,
   type TodayCardState,
   type TodayDose,
 } from '@/doses/dose-service';
-import { DayTimeline } from '@/doses/ui/day-timeline';
 
 type Props = {
   state: TodayCardState;
-  marks: TimelineMark[];
-  nowPosition: number | null;
-  symbol: DaySymbol | null;
   onTake: (dose: TodayDose) => void;
   onTakeOverdue: (doses: TodayDose[]) => void;
 };
@@ -39,60 +30,38 @@ const TITLE_COLORS: Record<TodayCardState['kind'], ThemeColor> = {
   futureSummary: 'text',
 };
 
-export function TodayCard({
-  state,
-  marks,
-  nowPosition,
-  symbol,
-  onTake,
-  onTakeOverdue,
-}: Props) {
+export function TodayCard({ state, onTake, onTakeOverdue }: Props) {
   const { t } = useTranslation();
   const { formatTime } = useFormatTime();
   const theme = useTheme();
   const { title, lines } = cardCopy(state, t, formatTime);
-  const sky = skyTone(state, symbol);
-  const [expanded, setExpanded] = useState(false);
 
   return (
-    <Pressable
-      onPress={() => setExpanded(!expanded)}
-      accessibilityRole="button"
-      accessibilityState={{ expanded }}
-      accessibilityLabel={t(
-        expanded ? 'home.card.hideDetails' : 'home.card.showDetails',
-      )}
+    <View
       style={[
         styles.card,
-        { backgroundColor: theme.background, borderColor: theme.border },
+        { backgroundColor: theme.cardGlass, borderColor: theme.border },
       ]}
     >
-      <DayTimeline
-        marks={marks}
-        nowPosition={nowPosition}
-        symbol={symbol}
-        skyTone={sky}
-      >
-        <View style={styles.text}>
+      <View style={styles.text}>
+        <ThemedText
+          type="headline"
+          themeColor={TITLE_COLORS[state.kind]}
+          style={styles.centered}
+        >
+          {title}
+        </ThemedText>
+        {lines.map((line) => (
           <ThemedText
-            type="headline"
-            themeColor={TITLE_COLORS[state.kind]}
+            key={line}
+            type="small"
+            themeColor="textSecondary"
             style={styles.centered}
           >
-            {title}
+            {line}
           </ThemedText>
-          {lines.map((line) => (
-            <ThemedText
-              key={line}
-              type="small"
-              themeColor="textSecondary"
-              style={styles.centered}
-            >
-              {line}
-            </ThemedText>
-          ))}
-        </View>
-      </DayTimeline>
+        ))}
+      </View>
       {state.kind === 'overdue' ? (
         <View style={styles.action}>
           <PrimaryButton
@@ -105,19 +74,7 @@ export function TodayCard({
           />
         </View>
       ) : null}
-      <View style={styles.details}>
-        {expanded ? (
-          <ThemedText type="small" themeColor="textSecondary">
-            {countLine(state, t)}
-          </ThemedText>
-        ) : null}
-        <Icon
-          name={expanded ? 'expand_less' : 'expand_more'}
-          size={20}
-          color={theme.textTertiary}
-        />
-      </View>
-    </Pressable>
+    </View>
   );
 }
 
@@ -126,6 +83,20 @@ function isBulk(overdue: TodayDose[]): boolean {
 }
 
 function cardCopy(
+  state: TodayCardState,
+  t: TFunction,
+  formatTime: (date: Date) => string,
+): { title: string; lines: string[] } {
+  const { title, lines } = stateCopy(state, t, formatTime);
+  const collected = t('home.card.collected', {
+    taken: state.counts.taken,
+    total: state.counts.total,
+  });
+  const showsCollected = state.kind === 'calm' || state.kind === 'overdue';
+  return { title, lines: showsCollected ? [...lines, collected] : lines };
+}
+
+function stateCopy(
   state: TodayCardState,
   t: TFunction,
   formatTime: (date: Date) => string,
@@ -159,9 +130,15 @@ function cardCopy(
             ],
           };
     case 'pastSummary':
-      return { title: t('home.card.pastTitle'), lines: [] };
+      return {
+        title: t('home.card.pastTitle'),
+        lines: [dayCountsText(state.counts, t)],
+      };
     case 'futureSummary':
-      return { title: t('home.card.futureTitle'), lines: [] };
+      return {
+        title: t('home.card.futureTitle'),
+        lines: [t('home.card.futureCount', { count: state.counts.planned })],
+      };
   }
 }
 
@@ -196,12 +173,6 @@ function overdueActionLabel(overdue: TodayDose[], t: TFunction): string {
     : t('home.take');
 }
 
-function countLine(state: TodayCardState, t: TFunction): string {
-  return state.kind === 'futureSummary'
-    ? t('home.card.futureCount', { count: state.counts.planned })
-    : dayCountsText(state.counts, t);
-}
-
 const styles = StyleSheet.create({
   card: {
     gap: Spacing.twelve,
@@ -219,10 +190,5 @@ const styles = StyleSheet.create({
   },
   action: {
     flexDirection: 'row',
-  },
-  details: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
 });

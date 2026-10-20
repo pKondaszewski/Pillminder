@@ -1,8 +1,14 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ConfirmDialog } from '@/commons/ui/confirm-dialog';
 import { Spacing } from '@/commons/ui/constants/theme';
@@ -23,10 +29,10 @@ import {
   buildTimeline,
   type CorrectionTarget,
   dayPhases,
-  daySymbol,
   groupDosesByTimeSlot,
   lastPlannedDay,
   nowPosition,
+  type TodayCardState,
   todayCardState,
   type TodayDose,
 } from '@/doses/dose-service';
@@ -37,20 +43,33 @@ import type { DayMode } from '@/doses/ui/dose-row-action';
 import { MonthCalendarSheet } from '@/doses/ui/month-calendar-sheet';
 import { TimeSlotSection } from '@/doses/ui/time-slot-section';
 import { TodayCard } from '@/doses/ui/today-card';
+import { TodayMeadow } from '@/doses/ui/today-meadow';
 import { useDayDoses } from '@/doses/ui/use-day-doses';
 import { useDosesBetween } from '@/doses/ui/use-doses-between';
+import { useMeadowMarks } from '@/doses/ui/use-meadow-marks';
 import {
   type UndoableKind,
   useUndoableDoseAction,
 } from '@/doses/ui/use-undoable-dose-action';
 import { useSunCoords } from '@/location/ui/use-sun-coords';
 import { useProducts } from '@/products/ui/use-products';
+import {
+  markSpacing,
+  SCENE_WINDOW_HEIGHT,
+  type SceneMood,
+  seasonOf,
+  skyScene,
+} from '@/scene/scene-service';
+import { DayScene } from '@/scene/ui/day-scene';
+import { useCelebration } from '@/scene/ui/use-celebration';
 
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
   const formatDate = useFormatDate();
   const now = useNow();
   const coords = useSunCoords();
+  const { top: topInset } = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const today = startOfDay(now);
   const { products, loaded } = useProducts();
 
@@ -157,13 +176,32 @@ export default function HomeScreen() {
   };
 
   const isToday = mode === 'today';
-  const currentPosition = isToday ? nowPosition(now) : null;
-  const currentSymbol = isToday ? daySymbol(now, dayPhases(day, coords)) : null;
+  const phases = dayPhases(day, coords);
+  const cardState = doses.length > 0 ? todayCardState(doses, day, now) : null;
+  const mood = cardState ? moodOf(cardState.kind) : null;
+  const celebrationKey = useCelebration(mood, isoDay(day));
+  const timeline = buildTimeline(doses, now, markSpacing(width));
+  const meadowMarks = useMeadowMarks(timeline);
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <ScrollView contentContainerStyle={styles.content}>
+      <View style={styles.safeArea}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.content,
+            { paddingTop: topInset + Spacing.sixteen },
+          ]}
+        >
+          <DayScene
+            scene={skyScene(now, phases, isToday)}
+            mood={mood ?? 'calm'}
+            season={seasonOf(now, coords?.latitude ?? null)}
+            marks={meadowMarks}
+            nowPosition={isToday ? nowPosition(now) : null}
+            celebrationKey={celebrationKey}
+            replayKey={isoDay(day)}
+            topInset={topInset}
+          />
           <DayPager
             label={formatDate(day, true)}
             canGoNext={isoDay(day) < isoDay(lastDay)}
@@ -172,6 +210,15 @@ export default function HomeScreen() {
             onNext={() => selectDay(addDays(day, 1))}
             onOpenCalendar={openCalendar}
             onBackToToday={() => selectDay(today)}
+          />
+          <View pointerEvents="none" style={styles.sceneWindow} />
+          <TodayMeadow
+            key={isoDay(day)}
+            timeline={timeline}
+            marks={meadowMarks}
+            canTake={isToday}
+            topInset={topInset}
+            onTake={(dose) => applyWithUndo('taken', dose)}
           />
           {loaded && products.length === 0 ? (
             <EmptyState
@@ -195,14 +242,11 @@ export default function HomeScreen() {
               onAction={() => router.navigate('/schedules')}
             />
           ) : null}
-          {doses.length > 0 ? (
+          {cardState ? (
             <>
               <TodayCard
                 key={isoDay(day)}
-                state={todayCardState(doses, day, now)}
-                marks={buildTimeline(doses, now)}
-                nowPosition={currentPosition}
-                symbol={currentSymbol}
+                state={cardState}
                 onTake={(dose) => applyWithUndo('taken', dose)}
                 onTakeOverdue={takeOverdueConfirmation.request}
               />
@@ -227,7 +271,7 @@ export default function HomeScreen() {
             </>
           ) : null}
         </ScrollView>
-      </SafeAreaView>
+      </View>
       <UndoSnackbar snackbar={snackbar} />
       {correcting ? (
         <DoseCorrectionSheet
@@ -294,6 +338,11 @@ function dayMode(day: Date, today: Date): DayMode {
   return isoDay(day) > isoDay(today) ? 'future' : 'today';
 }
 
+function moodOf(kind: TodayCardState['kind']): SceneMood {
+  if (kind === 'overdue' || kind === 'done') return kind;
+  return 'calm';
+}
+
 function undoableKindOf(dose: TodayDose): UndoableKind {
   return dose.state === 'taken' ? 'taken' : 'skipped';
 }
@@ -312,6 +361,9 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
+  },
+  sceneWindow: {
+    height: SCENE_WINDOW_HEIGHT,
   },
   content: {
     gap: Spacing.sixteen,

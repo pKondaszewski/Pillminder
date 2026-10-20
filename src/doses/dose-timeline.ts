@@ -5,8 +5,6 @@ import type { TodayDose } from './dto/today-dose-output';
 
 const TIMELINE_START_HOUR = 6;
 const TIMELINE_END_HOUR = 24;
-const TIMELINE_MERGE_WINDOW_MS = 60 * 60 * 1000;
-const TIMELINE_MAX_SLICES = 4;
 
 const MINUTES_PER_HOUR = 60;
 const AXIS_MINUTES =
@@ -14,51 +12,51 @@ const AXIS_MINUTES =
 
 const URGENCY_ORDER: readonly DoseStatus[] = [
   'overdue',
+  'planned',
   'skipped',
   'taken',
-  'planned',
 ];
 
-export function buildTimeline(doses: TodayDose[], now: Date): TimelineMark[] {
-  return mergeNearby(doses).map((cluster) => {
-    const statuses = cluster.map((dose) => doseStatus(dose, now));
-    const tooMany = statuses.length > TIMELINE_MAX_SLICES;
-    return {
-      id: cluster[0].id,
-      position: axisPosition(averageTime(cluster)),
-      statuses: tooMany ? [mostUrgent(statuses)] : statuses,
-      count: tooMany ? statuses.length : null,
-    };
-  });
+interface Cluster {
+  doses: TodayDose[];
+  positionSum: number;
+}
+
+export function buildTimeline(
+  doses: TodayDose[],
+  now: Date,
+  minSpacing: number,
+): TimelineMark[] {
+  return clusterBySpacing(doses, minSpacing).map(({ doses, positionSum }) => ({
+    id: doses[0].id,
+    position: positionSum / doses.length,
+    status: mostUrgent(doses.map((dose) => doseStatus(dose, now))),
+    doses,
+  }));
 }
 
 export function nowPosition(now: Date): number {
   return axisPosition(now);
 }
 
-function mergeNearby(doses: TodayDose[]): TodayDose[][] {
+function clusterBySpacing(doses: TodayDose[], minSpacing: number): Cluster[] {
   const sorted = [...doses].sort(
     (a, b) => a.plannedAt.getTime() - b.plannedAt.getTime(),
   );
-  return sorted.reduce<TodayDose[][]>((clusters, dose) => {
+  return sorted.reduce<Cluster[]>((clusters, dose) => {
+    const position = axisPosition(dose.plannedAt);
     const last = clusters[clusters.length - 1];
-    const previous = last?.[last.length - 1];
     const isNear =
-      previous !== undefined &&
-      dose.plannedAt.getTime() - previous.plannedAt.getTime() <
-        TIMELINE_MERGE_WINDOW_MS;
-    if (isNear) last.push(dose);
-    else clusters.push([dose]);
+      last !== undefined &&
+      position - last.positionSum / last.doses.length < minSpacing;
+    if (isNear) {
+      last.doses.push(dose);
+      last.positionSum += position;
+    } else {
+      clusters.push({ doses: [dose], positionSum: position });
+    }
     return clusters;
   }, []);
-}
-
-function averageTime(cluster: TodayDose[]): Date {
-  const sum = cluster.reduce(
-    (total, dose) => total + dose.plannedAt.getTime(),
-    0,
-  );
-  return new Date(sum / cluster.length);
 }
 
 function axisPosition(time: Date): number {
