@@ -542,6 +542,8 @@
     "empty": "Nothing to pack for this trip",
     "emptyHint": "Active products with a schedule running during the trip will show up here.",
     "enough": "Your stock covers the trip",
+    "moreEnough": "+{{count}} enough",
+    "moreRibbons": "+{{count}} more",
     "pack": "Pack: {{amount}}",
     "pieces": "{{count}} pcs",
     "runsOutAfterReturn": "Buy a refill before you go: the stock runs out within a week after you return",

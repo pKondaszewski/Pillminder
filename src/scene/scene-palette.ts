@@ -42,6 +42,16 @@ export const SCENE_PALETTES = {
     petal: '#FFFFFF',
     petalEdge: '#C9D3DC',
     snow: '#FFFFFF',
+    road: '#E8DCC3',
+    roadEdge: '#CDBB98',
+    house: '#F3EEE6',
+    roof: '#B5523B',
+    car: '#D9822B',
+    suitcase: '#2F6E8E',
+    door: '#225068',
+    wheel: '#2A2420',
+    window: 'rgba(255,255,255,0.8)',
+    tentShade: 'rgba(0,0,0,0.25)',
   },
   dark: {
     sky: {
@@ -73,6 +83,16 @@ export const SCENE_PALETTES = {
     petal: '#EEF2F6',
     petalEdge: '#9AA6B3',
     snow: '#DDE6EE',
+    road: '#4A4030',
+    roadEdge: '#5E5240',
+    house: '#C9C2B6',
+    roof: '#9A4632',
+    car: '#E39448',
+    suitcase: '#3A86AC',
+    door: '#2A6584',
+    wheel: '#2A2420',
+    window: 'rgba(255,255,255,0.8)',
+    tentShade: 'rgba(0,0,0,0.25)',
   },
 } as const satisfies Record<'light' | 'dark', ScenePalette>;
 

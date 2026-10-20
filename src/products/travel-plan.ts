@@ -1,4 +1,4 @@
-import { addDays, startOfDay } from '@/config/date-utils';
+import { addDays, MS_PER_DAY, startOfDay } from '@/config/date-utils';
 import type { Translate } from '@/config/translate';
 import type { Schedule } from '@/schedules/schedule-service';
 
@@ -35,9 +35,10 @@ export function buildTravelPlan(
       return [
         {
           id: product.id,
+          name: product.name,
           title: productLabel(product.name, product.strength),
           pack: describePack(needed, product, t),
-          verdict: stockVerdict(product.stock, rhythm, returnDay, now),
+          ...stockOutlook(product.stock, rhythm, departure, returnDay, now),
         },
       ];
     })
@@ -54,16 +55,31 @@ function describePack(needed: number, product: Product, t: Translate): string {
     : t('travel.pieces', { count });
 }
 
-function stockVerdict(
+function stockOutlook(
   stock: number | null,
   schedules: Schedule[],
+  departure: Date,
   returnDay: Date,
   now: Date,
-): TravelStockVerdict | null {
-  if (stock == null) return null;
+): { verdict: TravelStockVerdict | null; runOutOffsetDays: number | null } {
+  if (stock == null) return { verdict: null, runOutOffsetDays: null };
   const { runOutAt, reorderAt } = reorderStatus(stock, schedules, now);
+  if (runOutAt === null || reorderAt === null) {
+    return { verdict: 'enough', runOutOffsetDays: null };
+  }
   const tripEnd = addDays(startOfDay(returnDay), 1);
-  if (runOutAt === null || reorderAt === null) return 'enough';
+  return {
+    verdict: verdictFor(runOutAt, reorderAt, tripEnd),
+    runOutOffsetDays:
+      (runOutAt.getTime() - startOfDay(departure).getTime()) / MS_PER_DAY,
+  };
+}
+
+function verdictFor(
+  runOutAt: Date,
+  reorderAt: Date,
+  tripEnd: Date,
+): TravelStockVerdict {
   if (runOutAt < tripEnd) return 'runsOutDuringTrip';
   if (reorderAt < tripEnd) return 'runsOutAfterReturn';
   return 'enough';

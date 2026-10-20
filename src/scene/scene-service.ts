@@ -24,6 +24,18 @@ export {
 } from './meadow';
 export { ellipsePath, ellipseRing, leafPath, spikePath } from './plant-shapes';
 export {
+  dayStoneDays,
+  ROAD_OVERRUN_DAYS,
+  ROAD_PANEL_MARGIN,
+  ROAD_PANEL_PADDING,
+  ROAD_PANEL_TOP,
+  type RoadAxis,
+  roadAxis,
+  roadPath,
+  roadX,
+  roadY,
+} from './road';
+export {
   GROUND_Y,
   rayPath,
   SCENE_BODY_TRAVEL,

@@ -23,4 +23,14 @@ export interface ScenePalette {
   petal: string;
   petalEdge: string;
   snow: string;
+  road: string;
+  roadEdge: string;
+  house: string;
+  roof: string;
+  car: string;
+  suitcase: string;
+  door: string;
+  wheel: string;
+  window: string;
+  tentShade: string;
 }

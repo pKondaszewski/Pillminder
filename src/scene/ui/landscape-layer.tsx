@@ -6,16 +6,17 @@ import {
   grassPath,
   GROUND_Y,
   hillPath,
-  type HillSpec,
   SCENE_HEIGHT,
   type Season,
 } from '@/scene/scene-service';
 import { useColorAt } from '@/scene/ui/use-blended-colors';
 
-const HILLS: HillSpec[] = [
-  { baseY: 150, amplitude: 9, phase: 0.5, bottomY: SCENE_HEIGHT },
-  { baseY: 168, amplitude: 8, phase: 2, bottomY: SCENE_HEIGHT },
-  { baseY: 186, amplitude: 6, phase: 4, bottomY: SCENE_HEIGHT },
+type HillShape = { baseY: number; amplitude: number; phase: number };
+
+const HILLS: HillShape[] = [
+  { baseY: 150, amplitude: 9, phase: 0.5 },
+  { baseY: 168, amplitude: 8, phase: 2 },
+  { baseY: 186, amplitude: 6, phase: 4 },
 ];
 const TUFTS = 3;
 const BLADES_PER_TUFT = 16;
@@ -34,17 +35,24 @@ type Props = {
   season: Season;
   time: SharedValue<number>;
   colors: SharedValue<string[]>;
+  height?: number;
 };
 
-export function LandscapeLayer({ width, season, time, colors }: Props) {
+export function LandscapeLayer({
+  width,
+  season,
+  time,
+  colors,
+  height = SCENE_HEIGHT,
+}: Props) {
   const far = useColorAt(colors, FAR_COLOR);
   const mid = useColorAt(colors, MID_COLOR);
   const near = useColorAt(colors, NEAR_COLOR);
   const grass = useColorAt(colors, GRASS_COLOR);
   const hills = [far, mid, near];
   const paths = useMemo(
-    () => HILLS.map((hill) => hillPath(width, hill)),
-    [width],
+    () => HILLS.map((hill) => hillPath(width, { ...hill, bottomY: height })),
+    [width, height],
   );
 
   return (
@@ -56,7 +64,7 @@ export function LandscapeLayer({ width, season, time, colors }: Props) {
         x={0}
         y={GROUND_Y}
         width={width}
-        height={SCENE_HEIGHT - GROUND_Y}
+        height={height - GROUND_Y}
         color={near}
       />
       {season === 'winter'
