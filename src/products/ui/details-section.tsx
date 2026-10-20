@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { FieldRow } from '@/commons/ui/field-row';
 import {
   categoryLabel,
+  packSizeInMl,
   supportsFasting,
   supportsStrength,
 } from '@/products/category';
+import { packSizeText } from '@/products/product-form';
 import type { Product } from '@/products/product-service';
 import { FastingRow } from '@/products/ui/fasting-row';
 import type { ProductSheetField } from '@/products/ui/field-sheets';
@@ -57,8 +59,16 @@ export function DetailsSection({
         onPress={() => onEdit('unit')}
       />
       <FieldRow
-        label={t('editor.packSize')}
-        value={product.packSize === null ? notSet : String(product.packSize)}
+        label={t(
+          packSizeInMl(product.category)
+            ? 'editor.packSizeMl'
+            : 'editor.packSize',
+        )}
+        value={
+          product.packSize === null
+            ? notSet
+            : packSizeText(product.category, product.packSize)
+        }
         onPress={() => onEdit('packSize')}
       />
       <FieldRow

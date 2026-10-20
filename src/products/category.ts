@@ -1,6 +1,7 @@
 import type { Translate } from '@/config/translate';
 
 import type { BuiltInCategory } from './dto/new-product-input';
+import type { ProductUnit } from './dto/product-unit';
 
 export const MAX_CUSTOM_CATEGORY_LENGTH = 30;
 
@@ -8,11 +9,20 @@ export const BUILT_IN_CATEGORIES: BuiltInCategory[] = [
   'medication',
   'supplement',
   'care',
+  'nasal-spray',
+  'eye-drops',
 ];
+
+const BUILT_IN_ALIASES: Record<string, BuiltInCategory> = {
+  'spray do nosa': 'nasal-spray',
+  'krople do oczu': 'eye-drops',
+};
 
 const BUILT_IN_STORE_SUGGESTIONS: Record<BuiltInCategory, string[]> = {
   care: ['rossmann', 'hebe', 'biedronka'],
+  'eye-drops': ['pharmacy'],
   medication: ['pharmacy'],
+  'nasal-spray': ['pharmacy'],
   supplement: ['rossmann', 'hebe', 'pharmacy'],
 };
 
@@ -23,7 +33,27 @@ export function isBuiltInCategory(
 }
 
 export function supportsStrength(category: string): boolean {
-  return category !== 'care';
+  return !['care', 'nasal-spray', 'eye-drops'].includes(category);
+}
+
+export function categoryUnit(category: string): ProductUnit | null {
+  if (category === 'nasal-spray') return 'spray';
+  if (category === 'eye-drops') return 'drop';
+  return null;
+}
+
+export function unitAfterCategoryChange(
+  previous: string,
+  next: string,
+  unit: ProductUnit | null,
+): ProductUnit | null {
+  const forced = categoryUnit(next);
+  if (forced) return forced;
+  return categoryUnit(previous) ? null : unit;
+}
+
+export function packSizeInMl(category: string): boolean {
+  return category === 'eye-drops';
 }
 
 export function supportsFasting(category: string): boolean {
@@ -43,7 +73,9 @@ export function normalizeCategory(
   const cleaned = raw.trim().replace(/\s+/g, ' ');
   if (cleaned === '') return null;
   const key = cleaned.toLowerCase();
-  const builtIn = BUILT_IN_CATEGORIES.find((c) => c === key);
+  const slug = key.replace(/ /g, '-');
+  const builtIn =
+    BUILT_IN_CATEGORIES.find((c) => c === slug) ?? BUILT_IN_ALIASES[key];
   if (builtIn) return builtIn;
   return (
     existingCustomCategories.find((c) => c.toLowerCase() === key) ?? cleaned

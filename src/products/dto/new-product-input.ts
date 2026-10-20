@@ -1,6 +1,11 @@
 import type { ProductUnit } from './product-unit';
 
-export type BuiltInCategory = 'medication' | 'supplement' | 'care';
+export type BuiltInCategory =
+  | 'medication'
+  | 'supplement'
+  | 'care'
+  | 'nasal-spray'
+  | 'eye-drops';
 
 export interface NewProductInput {
   name: string;

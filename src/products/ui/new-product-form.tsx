@@ -18,11 +18,17 @@ import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { useTheme } from '@/commons/ui/use-theme';
 import type { ImageSource } from '@/images/image-service';
-import { supportsFasting, supportsStrength } from '@/products/category';
+import {
+  packSizeInMl,
+  supportsFasting,
+  supportsStrength,
+  unitAfterCategoryChange,
+} from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import {
   firstErrorField,
   newProductInput,
+  packSizeEstimate,
   validateProductForm,
 } from '@/products/product-form';
 import type {
@@ -101,6 +107,8 @@ export function NewProductForm({ onSubmit }: Props) {
     if (uri) setPhotoUri(uri);
   };
 
+  const packSizeMl = packSizeInMl(values.category);
+  const estimate = packSizeEstimate(values.category, values.packSize);
   const showStrength =
     values.category !== '' && supportsStrength(values.category);
 
@@ -133,7 +141,16 @@ export function NewProductForm({ onSubmit }: Props) {
             <CategoryPicker
               value={values.category}
               error={errorText('category')}
-              onChange={(category) => change({ category })}
+              onChange={(category) =>
+                change({
+                  category,
+                  unit: unitAfterCategoryChange(
+                    values.category,
+                    category,
+                    values.unit,
+                  ),
+                })
+              }
             />
           </FormField>
 
@@ -189,16 +206,32 @@ export function NewProductForm({ onSubmit }: Props) {
                 />
               </ThemedView>
             </Stepper>
+            {packSizeMl ? (
+              <ThemedText type="caption">
+                {t('editor.stockEmptyIsFullPack')}
+              </ThemedText>
+            ) : null}
           </FormField>
           <FormField field="packSize" onOffset={recordOffset}>
-            <FieldLabel text={t('editor.packSize')} />
+            <FieldLabel
+              text={t(packSizeMl ? 'editor.packSizeMl' : 'editor.packSize')}
+            />
             <TextField
               value={values.packSize}
               onChangeText={(packSize) => change({ packSize })}
               keyboardType="numeric"
-              placeholder={t('editor.packSizePlaceholder')}
+              placeholder={t(
+                packSizeMl
+                  ? 'editor.packSizeMlPlaceholder'
+                  : 'editor.packSizePlaceholder',
+              )}
               error={errorText('packSize')}
             />
+            {estimate ? (
+              <ThemedText type="caption">
+                {t('editor.packSizeEstimate', estimate)}
+              </ThemedText>
+            ) : null}
           </FormField>
 
           <ThemedText type="label">{t('editor.sectionShopping')}</ThemedText>

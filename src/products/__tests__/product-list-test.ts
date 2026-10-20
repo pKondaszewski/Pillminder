@@ -165,7 +165,14 @@ describe('filterableCategories', () => {
     const result = filterableCategories(products);
 
     // then
-    expect(result).toEqual(['medication', 'supplement', 'care', 'Herbs']);
+    expect(result).toEqual([
+      'medication',
+      'supplement',
+      'care',
+      'nasal-spray',
+      'eye-drops',
+      'Herbs',
+    ]);
   });
 });
 
