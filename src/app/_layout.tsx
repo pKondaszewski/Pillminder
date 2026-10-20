@@ -6,6 +6,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
 import { useState } from 'react';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { AnimatedSplashOverlay } from '@/commons/ui/animated-splash-overlay';
 import { FONT_ASSETS } from '@/commons/ui/constants/fonts';
@@ -66,20 +67,24 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <DatabaseBoundEffects />
-        <AnimatedSplashOverlay />
-        {onboarding.step ? (
-          <OnboardingScreen
-            step={onboarding.step}
-            progress={onboarding.progress}
-            onAdvance={onboarding.advance}
-            onDismiss={onboarding.dismiss}
-          />
-        ) : (
-          <AppTabs />
-        )}
-      </ThemeProvider>
+      <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
+        <ThemeProvider
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        >
+          <DatabaseBoundEffects />
+          <AnimatedSplashOverlay />
+          {onboarding.step ? (
+            <OnboardingScreen
+              step={onboarding.step}
+              progress={onboarding.progress}
+              onAdvance={onboarding.advance}
+              onDismiss={onboarding.dismiss}
+            />
+          ) : (
+            <AppTabs />
+          )}
+        </ThemeProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }

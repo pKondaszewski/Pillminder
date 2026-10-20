@@ -1,17 +1,14 @@
 import { Image } from 'expo-image';
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  type LayoutChangeEvent,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
+import { type LayoutChangeEvent, Pressable, StyleSheet } from 'react-native';
+import { type KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/commons/ui/button';
 import { Radius, Spacing } from '@/commons/ui/constants/theme';
 import { Icon } from '@/commons/ui/icon';
+import { KeyboardAwareScrollView } from '@/commons/ui/keyboard-aware-scroll-view';
 import { Stepper } from '@/commons/ui/stepper';
 import { TextField } from '@/commons/ui/text-field';
 import { ThemedText } from '@/commons/ui/themed-text';
@@ -56,7 +53,7 @@ export function NewProductForm({ onSubmit }: Props) {
   const { t, i18n } = useTranslation();
   const { currency } = useSettings();
   const pickImageUri = usePickImage();
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);
   const fieldOffsets = useRef<Partial<Record<ProductFormField, number>>>({});
 
   const [values, setValues] = useState<ProductFormValues>({
@@ -115,10 +112,9 @@ export function NewProductForm({ onSubmit }: Props) {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['bottom']}>
-        <ScrollView
+        <KeyboardAwareScrollView
           ref={scrollRef}
           contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
         >
           <PhotoPickerTile
             uri={photoUri}
@@ -258,7 +254,7 @@ export function NewProductForm({ onSubmit }: Props) {
               onPick={(storeLink) => change({ storeLink })}
             />
           </ThemedView>
-        </ScrollView>
+        </KeyboardAwareScrollView>
 
         <ThemedView style={styles.footer}>
           <PrimaryButton label={t('products.add')} onPress={submit} />
