@@ -11,7 +11,6 @@ import {
   FLOATING_ADD_BUTTON_CLEARANCE,
   FloatingAddButton,
 } from '@/commons/ui/floating-add-button';
-import { TabSwipe } from '@/commons/ui/navigation/tab-swipe';
 import { openStore } from '@/commons/ui/open-store';
 import { type FilterToken, SearchField } from '@/commons/ui/search-field';
 import { ThemedText } from '@/commons/ui/themed-text';
@@ -72,72 +71,70 @@ export default function ProductListScreen() {
   );
 
   return (
-    <TabSwipe>
-      <ThemedView style={styles.container}>
-        <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <ProductListHeader
-            onTravelPress={() => router.push('/products/trip')}
+    <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <ProductListHeader
+          onTravelPress={() => router.push('/products/trip')}
+        />
+        {products.length === 0 ? (
+          <EmptyState
+            icon="medication"
+            title={t('products.emptyTitle')}
+            message={t('products.emptyMessage')}
+            actionLabel={t('products.add')}
+            onAction={openNewProduct}
           />
-          {products.length === 0 ? (
-            <EmptyState
-              icon="medication"
-              title={t('products.emptyTitle')}
-              message={t('products.emptyMessage')}
-              actionLabel={t('products.add')}
-              onAction={openNewProduct}
+        ) : (
+          <>
+            <SearchField
+              value={filters.query}
+              onChangeText={(query) => setFilters({ ...filters, query })}
+              label={t('products.search')}
+              tokens={filterTokens(effectiveFilters, setFilters, t)}
+              onFilterPress={() => setFiltersOpen(true)}
+              filterLabel={t('products.filters')}
             />
-          ) : (
-            <>
-              <SearchField
-                value={filters.query}
-                onChangeText={(query) => setFilters({ ...filters, query })}
-                label={t('products.search')}
-                tokens={filterTokens(effectiveFilters, setFilters, t)}
-                onFilterPress={() => setFiltersOpen(true)}
-                filterLabel={t('products.filters')}
-              />
-              {lowStock ? (
-                <LowStockBanner
-                  productName={lowStock.product.name}
-                  daysLeft={lowStock.daysLeft}
-                  onPress={() => openProduct(lowStock.product.id)}
-                  onOrder={() =>
-                    lowStock.product.storeLink
-                      ? openStore(lowStock.product.storeLink)
-                      : openProduct(lowStock.product.id)
-                  }
-                />
-              ) : null}
-              <FlatList
-                data={visibleProducts}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-                contentContainerStyle={styles.list}
-                keyboardShouldPersistTaps="handled"
-                ListEmptyComponent={
-                  <ThemedText type="small" themeColor="textSecondary">
-                    {t('products.noMatching')}
-                  </ThemedText>
+            {lowStock ? (
+              <LowStockBanner
+                productName={lowStock.product.name}
+                daysLeft={lowStock.daysLeft}
+                onPress={() => openProduct(lowStock.product.id)}
+                onOrder={() =>
+                  lowStock.product.storeLink
+                    ? openStore(lowStock.product.storeLink)
+                    : openProduct(lowStock.product.id)
                 }
               />
-              <FloatingAddButton
-                accessibilityLabel={t('products.add')}
-                onPress={openNewProduct}
-              />
-            </>
-          )}
-        </SafeAreaView>
+            ) : null}
+            <FlatList
+              data={visibleProducts}
+              keyExtractor={(item) => item.id}
+              renderItem={renderItem}
+              contentContainerStyle={styles.list}
+              keyboardShouldPersistTaps="handled"
+              ListEmptyComponent={
+                <ThemedText type="small" themeColor="textSecondary">
+                  {t('products.noMatching')}
+                </ThemedText>
+              }
+            />
+            <FloatingAddButton
+              accessibilityLabel={t('products.add')}
+              onPress={openNewProduct}
+            />
+          </>
+        )}
+      </SafeAreaView>
 
-        <ProductFilterSheet
-          visible={filtersOpen}
-          filters={effectiveFilters}
-          categories={categories}
-          resultCount={matching.length}
-          onChange={setFilters}
-          onClose={() => setFiltersOpen(false)}
-        />
-      </ThemedView>
-    </TabSwipe>
+      <ProductFilterSheet
+        visible={filtersOpen}
+        filters={effectiveFilters}
+        categories={categories}
+        resultCount={matching.length}
+        onChange={setFilters}
+        onClose={() => setFiltersOpen(false)}
+      />
+    </ThemedView>
   );
 }
 

@@ -1,38 +1,27 @@
-import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import { type MaterialTopTabBarProps, TopTabs } from 'expo-router/js-top-tabs';
 import { useTranslation } from 'react-i18next';
 
-import { useTheme } from '@/commons/ui/use-theme';
+import { AppTabBar } from '@/commons/ui/navigation/app-tab-bar';
 
 export default function AppTabs() {
   const { t } = useTranslation();
-  const theme = useTheme();
 
   return (
-    <NativeTabs
-      backgroundColor={theme.background}
-      indicatorColor={theme.surface}
-      labelStyle={{ selected: { color: theme.text } }}
+    <TopTabs
+      tabBarPosition="bottom"
+      tabBar={(props: MaterialTopTabBarProps) => <AppTabBar {...props} />}
+      screenOptions={{ swipeEnabled: true, lazy: true }}
     >
-      <NativeTabs.Trigger name="(today)">
-        <NativeTabs.Trigger.Label>{t('tabs.home')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon md="home" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(products)">
-        <NativeTabs.Trigger.Label>
-          {t('tabs.products')}
-        </NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon md="medication" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(plan)">
-        <NativeTabs.Trigger.Label>{t('tabs.plan')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon md="event" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(settings)">
-        <NativeTabs.Trigger.Label>
-          {t('tabs.settings')}
-        </NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon md="settings" />
-      </NativeTabs.Trigger>
-    </NativeTabs>
+      <TopTabs.Screen name="(today)" options={{ title: t('tabs.home') }} />
+      <TopTabs.Screen
+        name="(products)"
+        options={{ title: t('tabs.products') }}
+      />
+      <TopTabs.Screen name="(plan)" options={{ title: t('tabs.plan') }} />
+      <TopTabs.Screen
+        name="(settings)"
+        options={{ title: t('tabs.settings') }}
+      />
+    </TopTabs>
   );
 }

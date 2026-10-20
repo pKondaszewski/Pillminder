@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, useNavigation } from 'expo-router';
 
 export const unstable_settings = {
   today: { anchor: 'index' },
@@ -8,5 +8,17 @@ export const unstable_settings = {
 };
 
 export default function TabStackLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  const tab = useNavigation();
+
+  return (
+    <Stack
+      screenOptions={{ headerShown: false }}
+      screenListeners={{
+        state: ({ data }) => {
+          // Pages of the tab pager must not swipe while a pushed screen is on top
+          tab.setOptions({ swipeEnabled: data.state.routes.length === 1 });
+        },
+      }}
+    />
+  );
 }

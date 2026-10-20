@@ -10,7 +10,6 @@ import {
   FLOATING_ADD_BUTTON_CLEARANCE,
   FloatingAddButton,
 } from '@/commons/ui/floating-add-button';
-import { TabSwipe } from '@/commons/ui/navigation/tab-swipe';
 import { ScreenTitle } from '@/commons/ui/screen-title';
 import { type FilterToken, SearchField } from '@/commons/ui/search-field';
 import { ThemedText } from '@/commons/ui/themed-text';
@@ -92,61 +91,59 @@ export default function ScheduleListScreen() {
   );
 
   return (
-    <TabSwipe>
-      <ThemedView style={styles.container}>
-        <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <SectionList
-            sections={groups.map(({ kind, items: data }) => ({ kind, data }))}
-            keyExtractor={(item) => item.id}
-            keyboardShouldPersistTaps="handled"
-            stickySectionHeadersEnabled={false}
-            contentContainerStyle={styles.list}
-            ListHeaderComponent={header}
-            ListEmptyComponent={empty}
-            renderSectionHeader={({ section }) => (
-              <ThemedText type="label" style={styles.sectionLabel}>
-                {t(`schedule.kind.${section.kind}`)}
-              </ThemedText>
-            )}
-            renderItem={({ item, section }) => (
-              <ScheduleRow
-                item={item}
-                kind={section.kind}
-                now={now}
-                onPress={() => router.push(`/schedules/${item.id}`)}
-                onResume={() =>
-                  runWithAlert(
-                    () => resumeSchedule(item.id),
-                    'schedule.errorResume',
-                  )
-                }
-                onRestoreProduct={() =>
-                  runWithAlert(
-                    () => restoreProduct(item.productId),
-                    'schedule.errorRestoreProduct',
-                  )
-                }
-              />
-            )}
-          />
-          {showAddButton ? (
-            <FloatingAddButton
-              accessibilityLabel={t('schedule.add')}
-              onPress={() => router.push('/schedules/new')}
+    <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <SectionList
+          sections={groups.map(({ kind, items: data }) => ({ kind, data }))}
+          keyExtractor={(item) => item.id}
+          keyboardShouldPersistTaps="handled"
+          stickySectionHeadersEnabled={false}
+          contentContainerStyle={styles.list}
+          ListHeaderComponent={header}
+          ListEmptyComponent={empty}
+          renderSectionHeader={({ section }) => (
+            <ThemedText type="label" style={styles.sectionLabel}>
+              {t(`schedule.kind.${section.kind}`)}
+            </ThemedText>
+          )}
+          renderItem={({ item, section }) => (
+            <ScheduleRow
+              item={item}
+              kind={section.kind}
+              now={now}
+              onPress={() => router.push(`/schedules/${item.id}`)}
+              onResume={() =>
+                runWithAlert(
+                  () => resumeSchedule(item.id),
+                  'schedule.errorResume',
+                )
+              }
+              onRestoreProduct={() =>
+                runWithAlert(
+                  () => restoreProduct(item.productId),
+                  'schedule.errorRestoreProduct',
+                )
+              }
             />
-          ) : null}
-        </SafeAreaView>
-
-        <ScheduleListFilterSheet
-          visible={filtersOpen}
-          filters={filters}
-          categories={categories}
-          resultCount={resultCount}
-          onChange={setFilters}
-          onClose={() => setFiltersOpen(false)}
+          )}
         />
-      </ThemedView>
-    </TabSwipe>
+        {showAddButton ? (
+          <FloatingAddButton
+            accessibilityLabel={t('schedule.add')}
+            onPress={() => router.push('/schedules/new')}
+          />
+        ) : null}
+      </SafeAreaView>
+
+      <ScheduleListFilterSheet
+        visible={filtersOpen}
+        filters={filters}
+        categories={categories}
+        resultCount={resultCount}
+        onChange={setFilters}
+        onClose={() => setFiltersOpen(false)}
+      />
+    </ThemedView>
   );
 }
 
