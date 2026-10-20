@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/commons/ui/bottom-sheet';
 import { TextField } from '@/commons/ui/text-field';
+import { ThemedText } from '@/commons/ui/themed-text';
 import {
   isValidSnoozeMinutes,
   SNOOZE_MINUTES_MAX,
@@ -47,6 +48,7 @@ export function SnoozeSheet({ minutes, onSave, onClose }: Props) {
             : undefined
         }
       />
+      <ThemedText type="caption">{t('settings.snoozeExplanation')}</ThemedText>
     </BottomSheet>
   );
 }
