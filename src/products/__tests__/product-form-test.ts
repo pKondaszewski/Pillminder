@@ -3,6 +3,8 @@ import {
   editedProductInput,
   firstErrorField,
   newProductInput,
+  packSizeEstimate,
+  packSizeText,
   textFieldPatch,
   validateProductField,
   validateProductForm,
@@ -197,7 +199,7 @@ describe('textFieldPatch', () => {
     ['storeLink', ' hebe ', { storeLink: 'hebe' }],
   ] as const)('patches %s from "%s"', (field, text, expected) => {
     // when
-    const patch = textFieldPatch(field, text);
+    const patch = textFieldPatch(field, text, 'medication');
 
     // then
     expect(patch).toEqual(expected);
@@ -229,5 +231,92 @@ describe('editedProductInput', () => {
 
     // then
     expect(input.strength).toBeNull();
+  });
+});
+
+describe('eye drops pack size', () => {
+  it('stores the pack size entered in ml as drops', () => {
+    // when
+    const input = newProductInput({
+      ...VALID_VALUES,
+      category: 'eye-drops',
+      unit: 'drop',
+      packSize: '10',
+    });
+
+    // then
+    expect(input.packSize).toBe(200);
+  });
+
+  it('patches the pack size in drops from ml text', () => {
+    // when
+    const patch = textFieldPatch('packSize', '5', 'eye-drops');
+
+    // then
+    expect(patch).toEqual({ packSize: 100 });
+  });
+
+  it('keeps the pack size as a use count for a nasal spray', () => {
+    // when
+    const input = newProductInput({
+      ...VALID_VALUES,
+      category: 'nasal-spray',
+      packSize: '150',
+    });
+
+    // then
+    expect(input.packSize).toBe(150);
+  });
+
+  it.each([
+    ['eye-drops', '', '10', 200],
+    ['eye-drops', '5', '10', 5],
+    ['nasal-spray', '', '150', null],
+  ])(
+    '%s with stock "%s" and pack "%s" stores stock %s',
+    (category, stock, packSize, expected) => {
+      // when
+      const input = newProductInput({
+        ...VALID_VALUES,
+        category,
+        stock,
+        packSize,
+      });
+
+      // then
+      expect(input.stock).toBe(expected);
+    },
+  );
+
+  it('rejects zero ml', () => {
+    // when
+    const error = validateProductField('packSize', '0');
+
+    // then
+    expect(error).toBe('editor.packSizeInvalid');
+  });
+
+  it.each([
+    ['eye-drops', 200, '10'],
+    ['nasal-spray', 150, '150'],
+    ['eye-drops', null, ''],
+  ])('shows %s pack size %s as "%s"', (category, packSize, expected) => {
+    // when
+    const text = packSizeText(category, packSize);
+
+    // then
+    expect(text).toBe(expected);
+  });
+
+  it('estimates drops only for valid ml of eye drops', () => {
+    // when
+    const results = [
+      packSizeEstimate('eye-drops', '10'),
+      packSizeEstimate('eye-drops', 'x'),
+      packSizeEstimate('nasal-spray', '10'),
+    ];
+
+    // then
+    expect(results).toEqual([{ ml: 10, drops: 200 }, null, null]);
   });
 });

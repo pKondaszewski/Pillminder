@@ -73,7 +73,9 @@
   "category": {
     "care": "Care",
     "medication": "Medication",
-    "supplement": "Supplement"
+    "supplement": "Supplement",
+    "nasal-spray": "Nasal spray",
+    "eye-drops": "Eye drops"
   },
   "editor": {
     "addCategory": "+ New",
@@ -111,7 +113,11 @@
     "unit": "Form",
     "unitHint": "What you count in stock and per dose",
     "unitNone": "None",
-    "wholeNumberInvalid": "Enter a whole number, 0 or more"
+    "wholeNumberInvalid": "Enter a whole number, 0 or more",
+    "packSizeMl": "Pack volume (ml)",
+    "packSizeEstimate": "{{ml}} ml ≈ {{drops}} drops (on average 20 drops per ml)",
+    "packSizeMlPlaceholder": "e.g. 10",
+    "stockEmptyIsFullPack": "Empty = one full pack"
   },
   "filters": {
     "clear": "Clear"
@@ -394,7 +400,8 @@
       "capsule": "{{count}} caps.",
       "drop": "{{count}} drops",
       "ml": "{{count}} ml",
-      "tablet": "{{count}} tabs"
+      "tablet": "{{count}} tabs",
+      "spray": "{{count}} sprays"
     }
   },
   "schedule": {
@@ -551,12 +558,15 @@
     "ml_one": "{{count}} ml",
     "ml_other": "{{count}} ml",
     "tablet_one": "{{count}} tablet",
-    "tablet_other": "{{count}} tablets"
+    "tablet_other": "{{count}} tablets",
+    "spray_one": "{{count}} spray",
+    "spray_other": "{{count}} sprays"
   },
   "unitName": {
     "capsule": "Capsule",
     "drop": "Drop",
     "ml": "ml",
-    "tablet": "Tablet"
+    "tablet": "Tablet",
+    "spray": "Spray"
   }
 }

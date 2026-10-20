@@ -2,12 +2,16 @@ import type { Translate } from '@/config/translate';
 
 import {
   categoryLabel,
+  categoryUnit,
   isBuiltInCategory,
   normalizeCategory,
+  packSizeInMl,
   storeSuggestionKeys,
   supportsFasting,
   supportsStrength,
+  unitAfterCategoryChange,
 } from '../category';
+import type { ProductUnit } from '../dto/product-unit';
 
 describe('normalizeCategory', () => {
   it('returns null for a blank name', () => {
@@ -20,17 +24,17 @@ describe('normalizeCategory', () => {
 
   it('trims and collapses whitespace in a new custom name', () => {
     // when
-    const result = normalizeCategory('  Eye   drops ', []);
+    const result = normalizeCategory('  Vet   gel ', []);
 
     // then
-    expect(result).toBe('Eye drops');
+    expect(result).toBe('Vet gel');
   });
 
   it.each(['Medication', ' CARE ', 'supplement'])(
     'maps "%s" to the built-in key',
     (raw) => {
       // when
-      const result = normalizeCategory(raw, ['Eye drops']);
+      const result = normalizeCategory(raw, ['Vet gel']);
 
       // then
       expect(result).toBe(raw.trim().toLowerCase());
@@ -39,28 +43,28 @@ describe('normalizeCategory', () => {
 
   it('reuses the spelling of an existing custom category ignoring case', () => {
     // given
-    const existing = ['Eye drops', 'Vet'];
+    const existing = ['Vet gel', 'Vet'];
 
     // when
-    const result = normalizeCategory('eye DROPS', existing);
+    const result = normalizeCategory('vet GEL', existing);
 
     // then
-    expect(result).toBe('Eye drops');
+    expect(result).toBe('Vet gel');
   });
 
   it('keeps a distinct name distinct from existing ones', () => {
     // when
-    const result = normalizeCategory('Eye gel', ['Eye drops']);
+    const result = normalizeCategory('Vet cream', ['Vet gel']);
 
     // then
-    expect(result).toBe('Eye gel');
+    expect(result).toBe('Vet cream');
   });
 });
 
 describe('category-dependent behaviour', () => {
   it('recognizes built-in categories only by exact key', () => {
     // when
-    const results = ['care', 'Care', 'Eye drops'].map(isBuiltInCategory);
+    const results = ['care', 'Care', 'Vet gel'].map(isBuiltInCategory);
 
     // then
     expect(results).toEqual([true, false, false]);
@@ -70,7 +74,7 @@ describe('category-dependent behaviour', () => {
     ['medication', true],
     ['supplement', true],
     ['care', false],
-    ['Eye drops', true],
+    ['Vet gel', true],
   ])('supportsStrength(%s) is %s', (category, expected) => {
     // when
     const result = supportsStrength(category);
@@ -83,7 +87,7 @@ describe('category-dependent behaviour', () => {
     ['medication', true],
     ['supplement', false],
     ['care', false],
-    ['Eye drops', false],
+    ['Vet gel', false],
   ])('supportsFasting(%s) is %s', (category, expected) => {
     // when
     const result = supportsFasting(category);
@@ -95,7 +99,7 @@ describe('category-dependent behaviour', () => {
   it('suggests stores for built-in categories and none for a custom one', () => {
     // when
     const medication = storeSuggestionKeys('medication');
-    const custom = storeSuggestionKeys('Eye drops');
+    const custom = storeSuggestionKeys('Vet gel');
 
     // then
     expect(medication).toEqual(['pharmacy']);
@@ -109,9 +113,86 @@ describe('categoryLabel', () => {
     const t: Translate = (key) => `t:${key}`;
 
     // when
-    const labels = ['care', 'Eye drops'].map((c) => categoryLabel(c, t));
+    const labels = ['care', 'Vet gel'].map((c) => categoryLabel(c, t));
 
     // then
-    expect(labels).toEqual(['t:category.care', 'Eye drops']);
+    expect(labels).toEqual(['t:category.care', 'Vet gel']);
   });
+});
+
+describe('nasal spray and eye drops', () => {
+  it.each([
+    ['Nasal spray', 'nasal-spray'],
+    ['eye   drops', 'eye-drops'],
+    ['Spray do nosa', 'nasal-spray'],
+    ['KROPLE DO OCZU', 'eye-drops'],
+  ])(
+    'built-in wins over an existing custom "%s" and gives %s',
+    (raw, expected) => {
+      // given
+      const existingCustom = [raw];
+
+      // when
+      const result = normalizeCategory(raw, existingCustom);
+
+      // then
+      expect(result).toBe(expected);
+    },
+  );
+
+  it.each([
+    ['nasal-spray', 'spray'],
+    ['eye-drops', 'drop'],
+    ['medication', null],
+    ['Vet gel', null],
+  ])('categoryUnit(%s) is %s', (category, expected) => {
+    // when
+    const result = categoryUnit(category);
+
+    // then
+    expect(result).toBe(expected);
+  });
+
+  it.each(['nasal-spray', 'eye-drops'])(
+    'has no strength and no fasting for %s, but a pharmacy suggestion',
+    (category) => {
+      // when
+      const result = [
+        supportsStrength(category),
+        supportsFasting(category),
+        storeSuggestionKeys(category),
+      ];
+
+      // then
+      expect(result).toEqual([false, false, ['pharmacy']]);
+    },
+  );
+
+  it('takes the pack size in ml only for eye drops', () => {
+    // when
+    const result = ['eye-drops', 'nasal-spray', 'medication'].map(packSizeInMl);
+
+    // then
+    expect(result).toEqual([true, false, false]);
+  });
+
+  it.each([
+    ['eye-drops', 'medication', 'drop', null],
+    ['nasal-spray', 'eye-drops', 'spray', 'drop'],
+    ['medication', 'supplement', 'tablet', 'tablet'],
+    ['medication', 'nasal-spray', 'tablet', 'spray'],
+  ])(
+    'unit after %s -> %s with "%s" is %s',
+    (previous, next, unit, expected) => {
+      // when
+      const result = unitAfterCategoryChange(
+        previous,
+        next,
+        unit as ProductUnit,
+      );
+
+      // then
+      expect(result).toBe(expected);
+    },
+  );
 });

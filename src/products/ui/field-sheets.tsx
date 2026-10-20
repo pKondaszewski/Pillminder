@@ -4,8 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/commons/ui/bottom-sheet';
 import { TextField } from '@/commons/ui/text-field';
 import { ThemedText } from '@/commons/ui/themed-text';
+import { categoryUnit, packSizeInMl } from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
-import { textFieldPatch, validateProductField } from '@/products/product-form';
+import {
+  packSizeEstimate,
+  packSizeText,
+  textFieldPatch,
+  validateProductField,
+} from '@/products/product-form';
 import type {
   Product,
   ProductUnit,
@@ -86,11 +92,19 @@ function TextSheet({
 }: SheetProps & { field: TextProductField }) {
   const { t, i18n } = useTranslation();
   const config = TEXT_SHEETS[field];
-  const title = t(config.title, {
+  const inMl = field === 'packSize' && packSizeInMl(product.category);
+  const placeholderKey = inMl
+    ? 'editor.packSizeMlPlaceholder'
+    : config.placeholder;
+  const title = t(inMl ? 'editor.packSizeMl' : config.title, {
     currency: currencySymbol(currency, i18n.language),
   });
-  const current = product[field];
+  const current =
+    field === 'packSize'
+      ? packSizeText(product.category, product.packSize)
+      : product[field];
   const [text, setText] = useState(current == null ? '' : String(current));
+  const estimate = packSizeEstimate(product.category, text);
   const [submitted, setSubmitted] = useState(false);
   const error = submitted ? validateProductField(field, text) : null;
 
@@ -99,7 +113,7 @@ function TextSheet({
       setSubmitted(true);
       return;
     }
-    onSave(textFieldPatch(field, text));
+    onSave(textFieldPatch(field, text, product.category));
   };
 
   return (
@@ -108,11 +122,16 @@ function TextSheet({
         value={text}
         onChangeText={setText}
         keyboardType={config.numeric ? 'numeric' : 'default'}
-        placeholder={config.placeholder ? t(config.placeholder) : undefined}
+        placeholder={placeholderKey ? t(placeholderKey) : undefined}
         accessibilityLabel={title}
         error={error ? t(error) : undefined}
         autoFocus
       />
+      {estimate ? (
+        <ThemedText type="caption">
+          {t('editor.packSizeEstimate', estimate)}
+        </ThemedText>
+      ) : null}
       {config.hint ? (
         <ThemedText type="caption">{t(config.hint)}</ThemedText>
       ) : null}
@@ -134,7 +153,8 @@ function CategorySheet({ product, onSave, onClose }: SheetProps) {
       setSubmitted(true);
       return;
     }
-    onSave({ category });
+    const unit = categoryUnit(category);
+    onSave(unit ? { category, unit } : { category });
   };
 
   return (

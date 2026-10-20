@@ -77,7 +77,9 @@
   "category": {
     "care": "Pielęgnacja",
     "medication": "Lek",
-    "supplement": "Suplement"
+    "supplement": "Suplement",
+    "nasal-spray": "Spray do nosa",
+    "eye-drops": "Krople do oczu"
   },
   "editor": {
     "addCategory": "+ Nowa",
@@ -115,7 +117,11 @@
     "unit": "Postać",
     "unitHint": "Co liczysz w zapasie i w dawce",
     "unitNone": "Brak",
-    "wholeNumberInvalid": "Podaj liczbę całkowitą, 0 lub więcej"
+    "wholeNumberInvalid": "Podaj liczbę całkowitą, 0 lub więcej",
+    "packSizeMl": "Pojemność opakowania (ml)",
+    "packSizeEstimate": "{{ml}} ml ≈ {{drops}} kropli (średnio 20 kropli na ml)",
+    "packSizeMlPlaceholder": "np. 10",
+    "stockEmptyIsFullPack": "Puste = pełne opakowanie"
   },
   "filters": {
     "clear": "Wyczyść"
@@ -422,7 +428,8 @@
       "capsule": "{{count}} kaps.",
       "drop": "{{count}} kr.",
       "ml": "{{count}} ml",
-      "tablet": "{{count}} tabl."
+      "tablet": "{{count}} tabl.",
+      "spray": "{{count}} psikn."
     }
   },
   "schedule": {
@@ -589,12 +596,17 @@
     "tablet_few": "{{count}} tabletki",
     "tablet_many": "{{count}} tabletek",
     "tablet_one": "{{count}} tabletka",
-    "tablet_other": "{{count}} tabletki"
+    "tablet_other": "{{count}} tabletki",
+    "spray_few": "{{count}} psiknięcia",
+    "spray_many": "{{count}} psiknięć",
+    "spray_one": "{{count}} psiknięcie",
+    "spray_other": "{{count}} psiknięcia"
   },
   "unitName": {
     "capsule": "Kapsułka",
     "drop": "Kropla",
     "ml": "ml",
-    "tablet": "Tabletka"
+    "tablet": "Tabletka",
+    "spray": "Psiknięcie"
   }
 }

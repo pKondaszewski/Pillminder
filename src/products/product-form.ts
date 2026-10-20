@@ -1,10 +1,11 @@
-import { supportsFasting, supportsStrength } from './category';
+import { packSizeInMl, supportsFasting, supportsStrength } from './category';
 import type { NewProductInput } from './dto/new-product-input';
 import type {
   ProductFormField,
   ProductFormValues,
   TextProductField,
 } from './dto/product-form-values';
+import { dropsToMl, mlToDrops } from './eye-drops';
 import type { Product } from './product-service';
 import { normalizeStrength } from './strength-text';
 import { parseWholeNumber } from './whole-number-input';
@@ -67,6 +68,7 @@ export function firstErrorField(
 export function textFieldPatch(
   field: TextProductField,
   text: string,
+  category: string,
 ): Partial<NewProductInput> {
   switch (field) {
     case 'name':
@@ -80,11 +82,13 @@ export function textFieldPatch(
     case 'stock':
       return { stock: wholeNumberOrNull(text, 0) };
     case 'packSize':
-      return { packSize: wholeNumberOrNull(text, 1) };
+      return { packSize: packSizeOrNull(text, category) };
   }
 }
 
 export function newProductInput(values: ProductFormValues): NewProductInput {
+  const packSize = packSizeOrNull(values.packSize, values.category);
+  const stock = wholeNumberOrNull(values.stock, 0);
   return {
     name: values.name.trim(),
     category: values.category,
@@ -94,10 +98,29 @@ export function newProductInput(values: ProductFormValues): NewProductInput {
     unit: values.unit,
     price: wholeNumberOrNull(values.price, 0),
     storeLink: values.storeLink.trim() || null,
-    stock: wholeNumberOrNull(values.stock, 0),
-    packSize: wholeNumberOrNull(values.packSize, 1),
+    stock: stock === null && packSizeInMl(values.category) ? packSize : stock,
+    packSize,
     fasting: supportsFasting(values.category) && values.fasting,
   };
+}
+
+export function packSizeText(
+  category: string,
+  packSize: number | null,
+): string {
+  if (packSize === null) return '';
+  return String(packSizeInMl(category) ? dropsToMl(packSize) : packSize);
+}
+
+export function packSizeEstimate(
+  category: string,
+  text: string,
+): { ml: number; drops: number } | null {
+  if (!packSizeInMl(category)) return null;
+  const parsed = parseWholeNumber(text, 1);
+  return parsed.valid && parsed.value !== null
+    ? { ml: parsed.value, drops: mlToDrops(parsed.value) }
+    : null;
 }
 
 export function editedProductInput(
@@ -119,6 +142,11 @@ export function editedProductInput(
   return supportsStrength(edited.category)
     ? edited
     : { ...edited, strength: null };
+}
+
+function packSizeOrNull(text: string, category: string): number | null {
+  const size = wholeNumberOrNull(text, 1);
+  return size !== null && packSizeInMl(category) ? mlToDrops(size) : size;
 }
 
 function wholeNumberOrNull(text: string, min: number): number | null {
