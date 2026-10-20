@@ -1,9 +1,10 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { Spacing } from '@/commons/ui/constants/theme';
+import { KeyboardAwareScrollView } from '@/commons/ui/keyboard-aware-scroll-view';
 import { openStore } from '@/commons/ui/open-store';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
@@ -83,10 +84,7 @@ function ProductDetail({ product }: { product: Product }) {
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ headerShown: true, title: '' }} />
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
+      <KeyboardAwareScrollView contentContainerStyle={styles.content}>
         <ProductHeader
           product={product}
           photoCount={images.length}
@@ -143,7 +141,7 @@ function ProductDetail({ product }: { product: Product }) {
           onRestore={edit.restore}
           onDelete={() => setSheet({ kind: 'delete' })}
         />
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <UndoSnackbar snackbar={snackbar} />
 

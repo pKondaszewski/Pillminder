@@ -1,16 +1,12 @@
 import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  KeyboardAvoidingView,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
+import { Modal, Pressable, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PrimaryButton, SecondaryButton } from '@/commons/ui/button';
 import { Radius, Spacing } from '@/commons/ui/constants/theme';
+import { KeyboardAwareScrollView } from '@/commons/ui/keyboard-aware-scroll-view';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { useTheme } from '@/commons/ui/use-theme';
@@ -61,12 +57,9 @@ export function BottomSheet({
             accessibilityElementsHidden
           />
           <ThemedText type="subtitle">{title}</ThemedText>
-          <ScrollView
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={styles.content}
-          >
+          <KeyboardAwareScrollView contentContainerStyle={styles.content}>
             {children}
-          </ScrollView>
+          </KeyboardAwareScrollView>
           {onSave ? (
             <ThemedView style={styles.actions}>
               <SecondaryButton label={t('editor.cancel')} onPress={onClose} />
