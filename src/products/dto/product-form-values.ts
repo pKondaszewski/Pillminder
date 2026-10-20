@@ -8,7 +8,7 @@ export type TextProductField =
   | 'packSize'
   | 'storeLink';
 
-export type ValidatedProductField = 'name' | 'price' | 'stock' | 'packSize';
+export type ValidatedProductField = 'name' | 'stock' | 'packSize';
 
 export type ProductFormField = ValidatedProductField | 'category';
 

@@ -26,6 +26,7 @@ import {
   firstErrorField,
   newProductInput,
   packSizeEstimate,
+  PRICE_MAX_LENGTH,
   validateProductForm,
 } from '@/products/product-form';
 import type {
@@ -39,8 +40,6 @@ import { StoreSuggestions } from '@/products/ui/store-suggestions';
 import { UnitChips } from '@/products/ui/unit-chips';
 import { usePickImage } from '@/products/ui/use-pick-image';
 import { adjustWholeNumberText } from '@/products/whole-number-input';
-import { currencySymbol } from '@/settings/format-price';
-import { useSettings } from '@/settings/ui/use-settings';
 
 const SUBMIT_BUTTON_HEIGHT = 52;
 const PHOTO_TILE_SIZE = 96;
@@ -50,8 +49,7 @@ type Props = {
 };
 
 export function NewProductForm({ onSubmit }: Props) {
-  const { t, i18n } = useTranslation();
-  const { currency } = useSettings();
+  const { t } = useTranslation();
   const pickImageUri = usePickImage();
   const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);
   const fieldOffsets = useRef<Partial<Record<ProductFormField, number>>>({});
@@ -81,9 +79,6 @@ export function NewProductForm({ onSubmit }: Props) {
   const recordOffset = (field: ProductFormField, offset: number) => {
     fieldOffsets.current[field] = offset;
   };
-  const priceLabel = t('editor.price', {
-    currency: currencySymbol(currency, i18n.language),
-  });
 
   const submit = () => {
     const found = validateProductForm(values);
@@ -231,17 +226,16 @@ export function NewProductForm({ onSubmit }: Props) {
           </FormField>
 
           <ThemedText type="label">{t('editor.sectionShopping')}</ThemedText>
-          <FormField field="price" onOffset={recordOffset}>
-            <FieldLabel text={priceLabel} />
+          <ThemedView style={styles.field}>
+            <FieldLabel text={t('editor.price')} />
             <TextField
               value={values.price}
               onChangeText={(price) => change({ price })}
-              keyboardType="numeric"
-              placeholder="0"
-              error={errorText('price')}
+              maxLength={PRICE_MAX_LENGTH}
+              placeholder={t('editor.pricePlaceholder')}
             />
             <ThemedText type="caption">{t('editor.priceHint')}</ThemedText>
-          </FormField>
+          </ThemedView>
           <ThemedView style={styles.field}>
             <FieldLabel text={t('editor.storeLink')} />
             <TextField

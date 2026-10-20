@@ -18,7 +18,7 @@ export const products = sqliteTable('products', {
   category: text('category').notNull(),
   strength: text('strength'),
   unit: text('unit', { enum: PRODUCT_UNITS }),
-  price: integer('price'),
+  price: text('price'),
   storeLink: text('store_link'),
   status: text('status', { enum: ['active', 'archived'] })
     .notNull()

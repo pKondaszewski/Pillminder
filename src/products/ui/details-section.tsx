@@ -12,24 +12,14 @@ import type { Product } from '@/products/product-service';
 import { FastingRow } from '@/products/ui/fasting-row';
 import type { ProductSheetField } from '@/products/ui/field-sheets';
 import { ProductSection } from '@/products/ui/section';
-import { formatPrice } from '@/settings/format-price';
-import type { Currency } from '@/settings/settings-service';
 
 type Props = {
   product: Product;
-  currency: Currency;
-  locale: string;
   onEdit: (field: ProductSheetField) => void;
   onFastingChange: (fasting: boolean) => void;
 };
 
-export function DetailsSection({
-  product,
-  currency,
-  locale,
-  onEdit,
-  onFastingChange,
-}: Props) {
+export function DetailsSection({ product, onEdit, onFastingChange }: Props) {
   const { t } = useTranslation();
   const notSet = t('products.detail.notSet');
 
@@ -73,11 +63,7 @@ export function DetailsSection({
       />
       <FieldRow
         label={t('products.detail.price')}
-        value={
-          product.price === null
-            ? notSet
-            : formatPrice(product.price, currency, locale)
-        }
+        value={product.price ?? notSet}
         onPress={() => onEdit('price')}
       />
       <FieldRow

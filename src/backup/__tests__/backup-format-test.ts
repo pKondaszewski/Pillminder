@@ -88,7 +88,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           category: 'medication',
           strength: '200 mg',
           unit: 'tablet',
-          price: 1299,
+          price: '12,99 zł',
           storeLink: 'https://pharmacy.example/ibuprofen',
           status: 'archived',
           stock: 30,
@@ -215,7 +215,7 @@ describe('serializeBackup / parseBackup round trip', () => {
 
     // then
     expect(file.app).toBe('pillminder');
-    expect(file.version).toBe(1);
+    expect(file.version).toBe(BACKUP_FORMAT_VERSION);
     expect(file.exportedAt).toBe('2026-03-01T10:00:00.000Z');
     expect(file.products[0].createdAt).toBe('2026-01-01T00:00:00.000Z');
   });
@@ -417,12 +417,18 @@ describe('parseBackup: file level errors', () => {
     const error = errorOf(text);
 
     // then
-    expect(error).toEqual({ code: 'newerVersion', detail: 'v2' });
+    expect(error).toEqual({
+      code: 'newerVersion',
+      detail: `v${BACKUP_FORMAT_VERSION + 1}`,
+    });
   });
 
   it('reports a newer version before validating its rows', () => {
     // given
-    const text = backupText({ version: 2, products: [{ unknown: 'shape' }] });
+    const text = backupText({
+      version: BACKUP_FORMAT_VERSION + 1,
+      products: [{ unknown: 'shape' }],
+    });
 
     // when
     const error = errorOf(text);
@@ -574,15 +580,15 @@ describe('parseBackup: invalid rows', () => {
     ['a string', '5'],
     ['a fraction', 1.5],
     ['a boolean', true],
-  ])('rejects %s in an integer column', (_name, price) => {
+  ])('rejects %s in an integer column', (_name, stock) => {
     // given
-    const text = backupText({ products: [product({ price })] });
+    const text = backupText({ products: [product({ stock })] });
 
     // when
     const error = errorOf(text);
 
     // then
-    expect(error).toEqual({ code: 'invalidRow', detail: 'products[0].price' });
+    expect(error).toEqual({ code: 'invalidRow', detail: 'products[0].stock' });
   });
 
   it('rejects an unknown dose state', () => {
@@ -1110,5 +1116,73 @@ describe('parseBackup: product profile image', () => {
 
     // then
     expect(rows.products[0]).not.toHaveProperty('profileImageId');
+  });
+});
+
+describe('parseBackup: product price', () => {
+  it('keeps a text price as typed', () => {
+    // given
+    const text = backupText({
+      products: [product({ price: '15 euro' })],
+    });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.products[0].price).toBe('15 euro');
+  });
+
+  it('turns a numeric price from a version 1 backup into text', () => {
+    // given
+    const text = backupText({
+      version: 1,
+      products: [product({ price: 25 }), product({ id: 'p2', price: null })],
+    });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.products.map((row) => row.price)).toEqual(['25', null]);
+  });
+
+  it('keeps a text price in a version 1 backup', () => {
+    // given
+    const text = backupText({
+      version: 1,
+      products: [product({ price: '12,99 zł' })],
+    });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.products[0].price).toBe('12,99 zł');
+  });
+
+  it('rejects a numeric price in a current backup', () => {
+    // given
+    const text = backupText({ products: [product({ price: 25 })] });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({ code: 'invalidRow', detail: 'products[0].price' });
+  });
+
+  it('rejects a fractional price in a version 1 backup', () => {
+    // given
+    const text = backupText({
+      version: 1,
+      products: [product({ price: 1.5 })],
+    });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({ code: 'invalidRow', detail: 'products[0].price' });
   });
 });

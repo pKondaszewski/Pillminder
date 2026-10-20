@@ -19,7 +19,6 @@ import { AUTHOR_NAME } from '@/config/app-info';
 import { useLocationPermission } from '@/location/ui/use-location-permission';
 import { useNotificationPermission } from '@/notifications/ui/use-notification-permission';
 import { permissionStep } from '@/onboarding/onboarding-service';
-import { currencyLabel } from '@/settings/format-price';
 import {
   LANGUAGE_OPTIONS,
   type LanguagePreference,
@@ -27,14 +26,12 @@ import {
   type ThemePreference,
 } from '@/settings/settings-service';
 import {
-  setCurrency,
   setLanguage,
   setSnoozeMinutes,
   setTheme,
 } from '@/settings/settings-service';
 import { AboutLine } from '@/settings/ui/about-line';
 import { BackupSection } from '@/settings/ui/backup-section';
-import { CurrencySheet } from '@/settings/ui/currency-sheet';
 import { SettingsSection } from '@/settings/ui/settings-section';
 import { SnoozeSheet } from '@/settings/ui/snooze-sheet';
 import { StatusCard } from '@/settings/ui/status-card';
@@ -45,10 +42,10 @@ import {
 } from '@/settings/ui/status-card-state';
 import { useSettings } from '@/settings/ui/use-settings';
 
-type Sheet = 'snooze' | 'currency';
+type Sheet = 'snooze';
 
 export default function SettingsScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const settings = useSettings();
   const { permission, request } = useNotificationPermission();
   const battery = useBatteryOptimization();
@@ -156,14 +153,6 @@ export default function SettingsScreen() {
               />
             </SettingsSection>
 
-            <SettingsSection title={t('settings.shopping')}>
-              <FieldRow
-                label={t('settings.currency')}
-                value={currencyLabel(settings.currency, i18n.language)}
-                onPress={() => setSheet('currency')}
-              />
-            </SettingsSection>
-
             <BackupSection
               busy={backup.busy}
               onExport={backup.exportData}
@@ -193,25 +182,6 @@ export default function SettingsScreen() {
                 message: t('editor.saved', { field: t('settings.snooze') }),
                 apply: () => setSnoozeMinutes(minutes),
                 revert: () => setSnoozeMinutes(previous),
-              },
-              'settings.errorSave',
-              closeSheet,
-            );
-          }}
-          onClose={closeSheet}
-        />
-      ) : null}
-      {sheet === 'currency' ? (
-        <CurrencySheet
-          currency={settings.currency}
-          locale={i18n.language}
-          onSave={(currency) => {
-            const previous = settings.currency;
-            void runWithUndo(
-              {
-                message: t('editor.saved', { field: t('settings.currency') }),
-                apply: () => setCurrency(currency),
-                revert: () => setCurrency(previous),
               },
               'settings.errorSave',
               closeSheet,

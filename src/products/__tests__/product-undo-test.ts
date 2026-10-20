@@ -7,7 +7,7 @@ const product = {
   category: 'medication',
   strength: '50mcg',
   unit: 'tablet',
-  price: 20,
+  price: '20 zł',
   storeLink: null,
   stock: 10,
   packSize: 30,
@@ -18,7 +18,12 @@ describe('productEditChange', () => {
   it('applies the patch and reverts to the full previous input', async () => {
     // given
     const save = jest.fn().mockResolvedValue(undefined);
-    const change = productEditChange(product, { price: 25 }, 'Saved', save);
+    const change = productEditChange(
+      product,
+      { price: '25 zł' },
+      'Saved',
+      save,
+    );
 
     // when
     await change.apply();
@@ -28,12 +33,12 @@ describe('productEditChange', () => {
     expect(save).toHaveBeenNthCalledWith(
       1,
       'p1',
-      expect.objectContaining({ price: 25, name: 'Euthyrox' }),
+      expect.objectContaining({ price: '25 zł', name: 'Euthyrox' }),
     );
     expect(save).toHaveBeenNthCalledWith(
       2,
       'p1',
-      expect.objectContaining({ price: 20, strength: '50mcg' }),
+      expect.objectContaining({ price: '20 zł', strength: '50mcg' }),
     );
   });
 
