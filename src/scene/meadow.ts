@@ -13,15 +13,6 @@ const GROWTH_SPEED = 1.6;
 const GROWTH_DELAY = 0.12;
 const MIN_MARK_SPACING = 44;
 
-export const MEADOW_LABELS = [
-  { text: '06', position: 0 },
-  { text: '12', position: 1 / 3 },
-  { text: '18', position: 2 / 3 },
-  { text: '24', position: 1 },
-] as const;
-
-export const LABEL_DEPTH = 44;
-
 export function meadowSlot(
   position: number,
   index: number,

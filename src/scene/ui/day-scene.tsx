@@ -5,14 +5,8 @@ import {
   Rect,
   vec,
 } from '@shopify/react-native-skia';
-import { useEffect } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
-import {
-  Easing,
-  useDerivedValue,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import { useTheme } from '@/commons/ui/use-theme';
 import {
@@ -35,12 +29,11 @@ import { SceneNightSky } from '@/scene/ui/scene-night-sky';
 import { SceneWarningBreath } from '@/scene/ui/scene-warning-breath';
 import { SceneWeather } from '@/scene/ui/scene-weather';
 import { useBlendedColors } from '@/scene/ui/use-blended-colors';
+import { useCelebrationProgress } from '@/scene/ui/use-celebration-progress';
 import { useEntryProgress } from '@/scene/ui/use-entry-progress';
 import { useMeadowEvents } from '@/scene/ui/use-meadow-events';
 import { useSceneClock } from '@/scene/ui/use-scene-clock';
 import { useScenePalette } from '@/scene/ui/use-scene-palette';
-
-const CELEBRATION_MS = 1300;
 
 type Props = {
   scene: SkyScene;
@@ -154,21 +147,6 @@ export function DayScene({
       </Group>
     </Canvas>
   );
-}
-
-function useCelebrationProgress(celebrationKey: number, reduceMotion: boolean) {
-  const burst = useSharedValue(0);
-
-  useEffect(() => {
-    if (celebrationKey === 0 || reduceMotion) return;
-    burst.value = 0;
-    burst.value = withTiming(1, {
-      duration: CELEBRATION_MS,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [celebrationKey, reduceMotion, burst]);
-
-  return burst;
 }
 
 const styles = StyleSheet.create({

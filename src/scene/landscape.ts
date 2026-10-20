@@ -1,3 +1,4 @@
+import type { HillSpec } from './dto/hill-spec';
 import { seededRandom } from './random';
 
 const HILL_STEP = 8;
@@ -8,13 +9,6 @@ const SECOND_WAVE_PHASE_RATIO = 2.3;
 const BLADE_HALF_WIDTH = 2;
 const BLADE_HEIGHT_SPREAD = 0.6;
 const BLADE_LEAN_SPREAD = 0.7;
-
-export interface HillSpec {
-  baseY: number;
-  amplitude: number;
-  phase: number;
-  bottomY: number;
-}
 
 export function hillPath(width: number, hill: HillSpec): string {
   const points: string[] = [];

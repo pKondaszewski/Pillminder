@@ -1,15 +1,8 @@
+import type { Particle } from './dto/particle';
 import { seededRandom } from './random';
 
 const MIN_CYCLES = 2;
 const CYCLE_SPREAD = 4;
-
-export interface Particle {
-  x: number;
-  y: number;
-  size: number;
-  cycles: number;
-  offset: number;
-}
 
 export function makeParticles(seed: number, count: number): Particle[] {
   const random = seededRandom(seed);

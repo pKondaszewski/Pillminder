@@ -1,5 +1,8 @@
 export { mixColors, withAlpha } from './color';
+export type { HillSpec } from './dto/hill-spec';
 export type { MarkStatus, MeadowEvent, MeadowMark, Point } from './dto/meadow';
+export type { Particle } from './dto/particle';
+export type { ScenePalette } from './dto/scene-palette';
 export type { Season } from './dto/season';
 export type {
   BodyPosition,
@@ -10,13 +13,11 @@ export type {
   Star,
   SunTimes,
 } from './dto/sky-scene';
-export { grassPath, hillPath, type HillSpec } from './landscape';
+export { grassPath, hillPath } from './landscape';
 export {
   basketSlot,
   creatureSlot,
-  LABEL_DEPTH,
   markSpacing,
-  MEADOW_LABELS,
   meadowEvents,
   meadowSlot,
   plantGrowth,
@@ -32,11 +33,7 @@ export {
   SCENE_HORIZON_Y,
   SCENE_WINDOW_HEIGHT,
 } from './scene-geometry';
-export {
-  SCENE_PALETTES,
-  sceneColors,
-  type ScenePalette,
-} from './scene-palette';
+export { SCENE_PALETTES, sceneColors } from './scene-palette';
 export { seasonOf } from './season';
 export {
   bodyPosition,
@@ -45,4 +42,4 @@ export {
   skyScene,
   stars,
 } from './sky-scene';
-export { makeParticles, type Particle } from './weather-particles';
+export { makeParticles } from './weather-particles';

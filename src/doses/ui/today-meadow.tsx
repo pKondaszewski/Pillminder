@@ -23,7 +23,7 @@ export function TodayMeadow({
   onTake,
 }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const index = marks.findIndex(({ id }) => id === selectedId);
+  const index = timeline.findIndex(({ id }) => id === selectedId);
   const selected = index < 0 ? null : timeline[index];
 
   useEffect(() => {

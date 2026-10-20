@@ -1,6 +1,7 @@
 import { mixColors } from './color';
+import type { ScenePalette } from './dto/scene-palette';
 import type { Season } from './dto/season';
-import type { SceneMood, SkyKey, SkyPhase } from './dto/sky-scene';
+import type { SceneMood, SkyPhase } from './dto/sky-scene';
 
 const NIGHT_LAND_SHARE: Record<Season, number> = {
   spring: 0.75,
@@ -9,30 +10,6 @@ const NIGHT_LAND_SHARE: Record<Season, number> = {
   winter: 0.55,
 };
 const TWILIGHT_LAND_SHARE = 0.45;
-
-type Gradient = readonly [top: string, bottom: string];
-type Land = readonly [far: string, mid: string, near: string, grass: string];
-
-export interface ScenePalette {
-  sky: Record<SkyKey, Gradient>;
-  land: Record<Season, Land>;
-  landNight: Land;
-  star: string;
-  moon: string;
-  cloud: string;
-  cloudOpacity: number;
-  sunLow: string;
-  bud: string;
-  stem: string;
-  stone: string;
-  mushroomStem: string;
-  mushroomCap: string;
-  basket: string;
-  wilted: string;
-  petal: string;
-  petalEdge: string;
-  snow: string;
-}
 
 export const SCENE_PALETTES = {
   light: {

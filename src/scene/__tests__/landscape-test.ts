@@ -1,4 +1,5 @@
-import { grassPath, hillPath, type HillSpec } from '../landscape';
+import type { HillSpec } from '../dto/hill-spec';
+import { grassPath, hillPath } from '../landscape';
 
 const HILL: HillSpec = { baseY: 200, amplitude: 10, phase: 1, bottomY: 300 };
 const HILL_AMPLITUDE_LIMIT = 10 * 1.35;

@@ -12,17 +12,11 @@ import { MIN_TOUCH_SIZE } from '@/commons/ui/constants/theme';
 import { useTheme } from '@/commons/ui/use-theme';
 import {
   basketSlot,
-  GROUND_Y,
-  LABEL_DEPTH,
-  MEADOW_LABELS,
   type MeadowMark,
   meadowSlot,
   SCENE_HEIGHT,
 } from '@/scene/scene-service';
 
-const LABEL_WIDTH = 28;
-const LABEL_FONT_SIZE = 10;
-const LABEL_RISE = 8;
 const COUNTER_WIDTH = 40;
 const COUNTER_FONT_SIZE = 10;
 const COUNTER_LIFT = 8;
@@ -48,7 +42,6 @@ export function MeadowOverlay({
   onSelect,
   children,
 }: Props) {
-  const theme = useTheme();
   const { width } = useWindowDimensions();
   const basket = basketSlot(width);
   const taken = marks.reduce((sum, mark) => sum + mark.taken, 0);
@@ -59,21 +52,6 @@ export function MeadowOverlay({
       pointerEvents="box-none"
       style={[styles.layer, { top: topInset, height: SCENE_HEIGHT }]}
     >
-      {MEADOW_LABELS.map(({ text, position }) => (
-        <Text
-          key={text}
-          style={[
-            styles.label,
-            {
-              color: theme.textSecondary,
-              left: meadowSlot(position, 0, width).x - LABEL_WIDTH / 2,
-              top: GROUND_Y + LABEL_DEPTH - LABEL_RISE - LABEL_FONT_SIZE,
-            },
-          ]}
-        >
-          {text}
-        </Text>
-      ))}
       {total > 0 ? (
         <Text
           style={[
@@ -165,14 +143,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1,
-  },
-  label: {
-    position: 'absolute',
-    width: LABEL_WIDTH,
-    textAlign: 'center',
-    fontFamily: FontFamily.mono,
-    fontSize: LABEL_FONT_SIZE,
-    opacity: 0.7,
   },
   counter: {
     position: 'absolute',
