@@ -1,7 +1,13 @@
 import { getTableColumns } from 'drizzle-orm';
 import type { SQLiteColumn, SQLiteTable } from 'drizzle-orm/sqlite-core';
 
-import { doses, notes, products, schedules } from '@/config/db/schema';
+import {
+  asNeededIntakes,
+  doses,
+  notes,
+  products,
+  schedules,
+} from '@/config/db/schema';
 import { isPositiveInteger } from '@/schedules/schedule-validator';
 
 import {
@@ -20,7 +26,7 @@ export type { BackupRows } from './dto/backup-data';
 export type { BackupError } from './dto/backup-parse-result';
 export type { BackupParseResult } from './dto/backup-parse-result';
 
-export const BACKUP_FORMAT_VERSION = 2;
+export const BACKUP_FORMAT_VERSION = 3;
 
 const FIRST_TEXT_PRICE_VERSION = 2;
 
@@ -29,6 +35,7 @@ const TABLES: Record<BackupTable, SQLiteTable> = {
   schedules,
   doses,
   notes,
+  asNeededIntakes,
 };
 
 const TIME_OF_DAY = /^([01]?\d|2[0-3]):[0-5]\d$/;
@@ -42,6 +49,9 @@ export function serializeBackup(rows: BackupRows, exportedAt: Date): string {
     schedules: rows.schedules.map((row) => rowToJson('schedules', row)),
     doses: rows.doses.map((row) => rowToJson('doses', row)),
     notes: rows.notes.map((row) => rowToJson('notes', row)),
+    asNeededIntakes: rows.asNeededIntakes.map((row) =>
+      rowToJson('asNeededIntakes', row),
+    ),
   };
   return JSON.stringify(file, null, 2);
 }
@@ -169,6 +179,12 @@ function isValidValue(
   if (table === 'products' && key === 'packSize') {
     return isPositiveInteger(value);
   }
+  if (table === 'products' && key === 'reorderThreshold') {
+    return Number.isInteger(value) && (value as number) >= 0;
+  }
+  if (table === 'asNeededIntakes' && key === 'quantity') {
+    return isPositiveInteger(value);
+  }
   if (table === 'products' && key === 'category') {
     return typeof value === 'string' && value.trim() !== '';
   }
@@ -209,6 +225,7 @@ function validateRelations(rows: BackupRows): BackupParseResult {
     ['doses', 'productId', 'products'],
     ['doses', 'scheduleId', 'schedules'],
     ['notes', 'productId', 'products'],
+    ['asNeededIntakes', 'productId', 'products'],
   ];
   for (const [table, key, target] of references) {
     const index = rows[table].findIndex((row) => !ids[target].has(row[key]));

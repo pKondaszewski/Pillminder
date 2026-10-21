@@ -1,3 +1,5 @@
+import type { Intake } from '@/intakes/intake-service';
+
 import type {
   TimeSlot,
   TimeSlotGroup,
@@ -15,11 +17,19 @@ const TIME_SLOTS: readonly { slot: TimeSlot; beforeHour: number }[] = [
   { slot: 'night', beforeHour: 24 },
 ];
 
-export function groupDosesByTimeSlot(doses: TodayDose[]): TimeSlotGroup[] {
+export function groupDosesByTimeSlot(
+  doses: TodayDose[],
+  intakes: Intake[],
+): TimeSlotGroup[] {
   return TIME_SLOTS.map(({ slot }) => ({
     slot,
     data: doses.filter((dose) => timeSlotOf(dose.plannedAt) === slot),
-  })).filter((section) => section.data.length > 0);
+    intakes: intakes
+      .filter((intake) => timeSlotOf(intake.takenAt) === slot)
+      .sort((a, b) => a.takenAt.getTime() - b.takenAt.getTime()),
+  })).filter(
+    (section) => section.data.length > 0 || section.intakes.length > 0,
+  );
 }
 
 export function timeSlotLayout(

@@ -1,3 +1,5 @@
+import type { Intake } from '@/intakes/intake-service';
+
 import { groupDosesByTimeSlot, timeSlotLayout } from '../dose-time-slot';
 import type { TodayDose } from '../dto/today-dose-output';
 
@@ -40,7 +42,7 @@ describe('groupDosesByTimeSlot slot boundaries', () => {
     const doses = [doseAt('a', at(hours, minutes))];
 
     // when
-    const sections = groupDosesByTimeSlot(doses);
+    const sections = groupDosesByTimeSlot(doses, []);
 
     // then
     expect(sections.map(({ slot }) => slot)).toEqual([expected]);
@@ -58,7 +60,7 @@ describe('groupDosesByTimeSlot', () => {
     ];
 
     // when
-    const sections = groupDosesByTimeSlot(doses);
+    const sections = groupDosesByTimeSlot(doses, []);
 
     // then
     expect(
@@ -75,7 +77,7 @@ describe('groupDosesByTimeSlot', () => {
     const doses = [doseAt('a', at(18))];
 
     // when
-    const sections = groupDosesByTimeSlot(doses);
+    const sections = groupDosesByTimeSlot(doses, []);
 
     // then
     expect(sections.map(({ slot }) => slot)).toEqual(['evening']);
@@ -83,10 +85,70 @@ describe('groupDosesByTimeSlot', () => {
 
   it('returns no sections when there are no doses', () => {
     // when
-    const sections = groupDosesByTimeSlot([]);
+    const sections = groupDosesByTimeSlot([], []);
 
     // then
     expect(sections).toEqual([]);
+  });
+});
+
+describe('groupDosesByTimeSlot with as-needed intakes', () => {
+  function intakeAt(id: string, takenAt: Date): Intake {
+    return {
+      id,
+      productId: 'p',
+      takenAt,
+      quantity: 1,
+      productName: 'Ibuprofen',
+      category: 'medication',
+      unit: null,
+      profileImageFileName: null,
+    };
+  }
+
+  it('places intakes in the slot of their time, sorted by time', () => {
+    // given
+    const intakes = [
+      intakeAt('late', at(15)),
+      intakeAt('early', at(13)),
+      intakeAt('morning', at(8)),
+    ];
+
+    // when
+    const sections = groupDosesByTimeSlot([doseAt('a', at(8))], intakes);
+
+    // then
+    expect(
+      sections.map(({ slot, data, intakes: slotIntakes }) => [
+        slot,
+        data.map((d) => d.id),
+        slotIntakes.map((i) => i.id),
+      ]),
+    ).toEqual([
+      ['morning', ['a'], ['morning']],
+      ['afternoon', [], ['early', 'late']],
+    ]);
+  });
+
+  it('keeps a slot that has only intakes', () => {
+    // when
+    const sections = groupDosesByTimeSlot([], [intakeAt('i', at(19))]);
+
+    // then
+    expect(sections.map(({ slot }) => slot)).toEqual(['evening']);
+  });
+
+  it('does not change what the dose layout counts', () => {
+    // given
+    const doses = [doseAt('a', at(8))];
+
+    // when
+    const [section] = groupDosesByTimeSlot(doses, [intakeAt('i', at(9))]);
+
+    // then
+    expect(timeSlotLayout(section.data, false)).toEqual(
+      timeSlotLayout(doses, false),
+    );
   });
 });
 

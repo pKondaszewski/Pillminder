@@ -1,8 +1,9 @@
-import { and, eq, gte, inArray, lt, max } from 'drizzle-orm';
+import { and, eq, gte, inArray, lt } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
 import { doses, productImages, products, schedules } from '@/config/db/schema';
+import { latestUseAt } from '@/intakes/intake-service';
 
 import { type DoseState, planDoseTransition } from './dose-transition';
 import type { ReplaceDosesQueryResult } from './dto/replace-doses-query-result';
@@ -104,14 +105,7 @@ export async function setDoseStateRow(
       .get();
     if (!product) return;
 
-    const lastUsedAt =
-      tx
-        .select({ takenAt: max(doses.takenAt) })
-        .from(doses)
-        .where(
-          and(eq(doses.productId, dose.productId), eq(doses.state, 'taken')),
-        )
-        .get()?.takenAt ?? null;
+    const lastUsedAt = latestUseAt(tx, dose.productId);
     const stock =
       product.stock == null
         ? null

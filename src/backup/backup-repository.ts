@@ -3,6 +3,7 @@ import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
 
 import { db } from '@/config/db/database';
 import {
+  asNeededIntakes,
   doses,
   notes,
   productImages,
@@ -15,17 +16,20 @@ import type { BackupRow, BackupRows } from './dto/backup-data';
 const MAX_BOUND_VARIABLES = 500;
 
 export async function getAllRows(): Promise<BackupRows> {
-  const [productRows, scheduleRows, doseRows, noteRows] = await Promise.all([
-    db.select().from(products),
-    db.select().from(schedules),
-    db.select().from(doses),
-    db.select().from(notes),
-  ]);
+  const [productRows, scheduleRows, doseRows, noteRows, intakeRows] =
+    await Promise.all([
+      db.select().from(products),
+      db.select().from(schedules),
+      db.select().from(doses),
+      db.select().from(notes),
+      db.select().from(asNeededIntakes),
+    ]);
   return {
     products: productRows,
     schedules: scheduleRows,
     doses: doseRows,
     notes: noteRows,
+    asNeededIntakes: intakeRows,
   };
 }
 
@@ -35,6 +39,7 @@ export function replaceAllRows(rows: BackupRows): void {
   db.transaction((tx) => {
     tx.delete(doses).run();
     tx.delete(notes).run();
+    tx.delete(asNeededIntakes).run();
     tx.delete(productImages).run();
     tx.delete(schedules).run();
     tx.delete(products).run();
@@ -43,6 +48,7 @@ export function replaceAllRows(rows: BackupRows): void {
     insertInChunks(tx, schedules, rows.schedules);
     insertInChunks(tx, doses, rows.doses);
     insertInChunks(tx, notes, rows.notes);
+    insertInChunks(tx, asNeededIntakes, rows.asNeededIntakes);
   });
 }
 

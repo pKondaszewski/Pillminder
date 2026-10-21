@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import type { TimelineMark, TodayDose } from '@/doses/dose-service';
 import { MeadowPopup } from '@/doses/ui/meadow-popup';
-import type { MeadowMark } from '@/scene/scene-service';
+import type { IntakeMarker, MeadowMark } from '@/scene/scene-service';
 import { MeadowOverlay } from '@/scene/ui/meadow-overlay';
 
 const POPUP_VISIBLE_MS = 6000;
@@ -10,6 +10,7 @@ const POPUP_VISIBLE_MS = 6000;
 type Props = {
   timeline: TimelineMark[];
   marks: MeadowMark[];
+  intakeMarkers: IntakeMarker[];
   canTake: boolean;
   topInset: number;
   night: boolean;
@@ -19,6 +20,7 @@ type Props = {
 export function TodayMeadow({
   timeline,
   marks,
+  intakeMarkers,
   canTake,
   topInset,
   night,
@@ -47,6 +49,7 @@ export function TodayMeadow({
   return (
     <MeadowOverlay
       marks={marks}
+      intakeMarkers={intakeMarkers}
       topInset={topInset}
       selectedId={selectedId}
       night={night}

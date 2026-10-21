@@ -159,6 +159,7 @@ function productFields(input: NewProductInput, category: string) {
     storeLink: input.storeLink ?? null,
     stock: input.stock ?? null,
     packSize: input.packSize ?? null,
+    reorderThreshold: input.reorderThreshold ?? null,
     fasting: input.fasting ?? false,
   };
 }

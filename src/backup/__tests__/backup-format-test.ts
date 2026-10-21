@@ -52,6 +52,16 @@ function note(overrides: Json = {}): Json {
   };
 }
 
+function intake(overrides: Json = {}): Json {
+  return {
+    id: 'a1',
+    productId: 'p1',
+    takenAt: '2026-02-11T14:20:00.000Z',
+    quantity: 1,
+    ...overrides,
+  };
+}
+
 function backupText(overrides: Json = {}): string {
   return JSON.stringify({
     app: 'pillminder',
@@ -61,6 +71,7 @@ function backupText(overrides: Json = {}): string {
     schedules: [schedule()],
     doses: [dose()],
     notes: [note()],
+    asNeededIntakes: [intake()],
     ...overrides,
   });
 }
@@ -78,7 +89,7 @@ function rowsOf(text: string): BackupRows {
 }
 
 describe('serializeBackup / parseBackup round trip', () => {
-  it('returns the same rows for all four tables, including dates and nulls', () => {
+  it('returns the same rows for all tables, including dates and nulls', () => {
     // given
     const rows: BackupRows = {
       products: [
@@ -93,6 +104,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           status: 'archived',
           stock: 30,
           packSize: 10,
+          reorderThreshold: 4,
           lastUsedAt: new Date('2026-02-10T07:30:00.000Z'),
           fasting: true,
           createdAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -109,6 +121,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           status: 'active',
           stock: null,
           packSize: null,
+          reorderThreshold: null,
           fasting: false,
           lastUsedAt: null,
           createdAt: new Date('2026-01-05T00:00:00.000Z'),
@@ -170,6 +183,14 @@ describe('serializeBackup / parseBackup round trip', () => {
           updatedAt: new Date('2026-02-12T00:00:00.000Z'),
         },
       ],
+      asNeededIntakes: [
+        {
+          id: 'a1',
+          productId: 'p1',
+          takenAt: new Date('2026-02-11T14:20:00.000Z'),
+          quantity: 2,
+        },
+      ],
     };
 
     // when
@@ -186,6 +207,7 @@ describe('serializeBackup / parseBackup round trip', () => {
       schedules: [],
       doses: [],
       notes: [],
+      asNeededIntakes: [],
     };
 
     // when
@@ -208,6 +230,7 @@ describe('serializeBackup / parseBackup round trip', () => {
       schedules: [],
       doses: [],
       notes: [],
+      asNeededIntakes: [],
     };
 
     // when
@@ -227,6 +250,7 @@ describe('serializeBackup / parseBackup round trip', () => {
       schedules: [],
       doses: [],
       notes: [],
+      asNeededIntakes: [],
     };
 
     // when
@@ -274,6 +298,7 @@ describe('parseBackup: older schema and unknown fields', () => {
       status: 'active',
       stock: null,
       packSize: null,
+      reorderThreshold: null,
       fasting: false,
       lastUsedAt: null,
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -1184,5 +1209,122 @@ describe('parseBackup: product price', () => {
 
     // then
     expect(error).toEqual({ code: 'invalidRow', detail: 'products[0].price' });
+  });
+});
+
+describe('parseBackup: as-needed intakes', () => {
+  it.each([1, 2])(
+    'imports a version %i backup without intakes and without a threshold',
+    (version) => {
+      // given
+      const text = JSON.stringify({
+        app: 'pillminder',
+        version,
+        exportedAt: EXPORTED_AT.toISOString(),
+        products: [product()],
+      });
+
+      // when
+      const rows = rowsOf(text);
+
+      // then
+      expect(rows.asNeededIntakes).toEqual([]);
+      expect(rows.products[0].reorderThreshold).toBeNull();
+    },
+  );
+
+  it('writes the intakes under the current format version', () => {
+    // given
+    const rows = rowsOf(backupText());
+
+    // when
+    const file = JSON.parse(serializeBackup(rows, EXPORTED_AT));
+
+    // then
+    expect(BACKUP_FORMAT_VERSION).toBe(3);
+    expect(file.version).toBe(3);
+    expect(file.asNeededIntakes[0].takenAt).toBe('2026-02-11T14:20:00.000Z');
+  });
+
+  it('keeps the reorder threshold, including zero, through a round trip', () => {
+    // given
+    const text = backupText({
+      products: [product({ reorderThreshold: 0 })],
+    });
+
+    // when
+    const rows = rowsOf(serializeBackup(rowsOf(text), EXPORTED_AT));
+
+    // then
+    expect(rows.products[0].reorderThreshold).toBe(0);
+  });
+
+  it.each([-1, 1.5, '3'])('rejects the reorder threshold %p', (value) => {
+    // given
+    const text = backupText({
+      products: [product({ reorderThreshold: value })],
+    });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({
+      code: 'invalidRow',
+      detail: 'products[0].reorderThreshold',
+    });
+  });
+
+  it.each([0, -2, 1.5])('rejects the intake quantity %p', (quantity) => {
+    // given
+    const text = backupText({ asNeededIntakes: [intake({ quantity })] });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({
+      code: 'invalidRow',
+      detail: 'asNeededIntakes[0].quantity',
+    });
+  });
+
+  it('reports an intake pointing at a missing product', () => {
+    // given
+    const text = backupText({
+      asNeededIntakes: [intake({ productId: 'missing' })],
+    });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({
+      code: 'brokenReference',
+      detail: 'asNeededIntakes[0].productId',
+    });
+  });
+
+  it('reports a duplicate intake id', () => {
+    // given
+    const text = backupText({ asNeededIntakes: [intake(), intake()] });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({ code: 'duplicateId', detail: 'asNeededIntakes' });
+  });
+
+  it('defaults a missing intake quantity to one', () => {
+    // given
+    const { quantity: _quantity, ...withoutQuantity } = intake();
+    const text = backupText({ asNeededIntakes: [withoutQuantity] });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.asNeededIntakes[0].quantity).toBe(1);
   });
 });

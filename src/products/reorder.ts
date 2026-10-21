@@ -42,6 +42,38 @@ export function reorderStatus(
   };
 }
 
+export function hasActiveSchedule(schedules: Schedule[], now: Date): boolean {
+  return schedules.some(
+    ({ endDate, ...period }) =>
+      !isPaused(period, now) &&
+      (!endDate || startOfDay(now) <= startOfDay(endDate)),
+  );
+}
+
+export function productReorderStatus(
+  product: { stock: number | null; reorderThreshold: number | null },
+  schedules: Schedule[],
+  now: Date,
+): ReorderStatus {
+  const { stock, reorderThreshold } = product;
+  if (
+    hasActiveSchedule(schedules, now) ||
+    stock === null ||
+    reorderThreshold === null
+  ) {
+    return reorderStatus(stock, schedules, now);
+  }
+
+  const isLow = stock <= reorderThreshold;
+  return {
+    dailyConsumption: 0,
+    daysLeft: null,
+    runOutAt: null,
+    reorderAt: isLow ? now : null,
+    isLow,
+  };
+}
+
 export function consumptionBetween(
   schedules: Schedule[],
   firstDay: Date,

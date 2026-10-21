@@ -1,6 +1,12 @@
 export { mixColors, withAlpha } from './color';
 export type { HillSpec } from './dto/hill-spec';
-export type { MarkStatus, MeadowEvent, MeadowMark, Point } from './dto/meadow';
+export type {
+  IntakeMarker,
+  MarkStatus,
+  MeadowEvent,
+  MeadowMark,
+  Point,
+} from './dto/meadow';
 export type { Particle } from './dto/particle';
 export type { ScenePalette } from './dto/scene-palette';
 export type { Season } from './dto/season';

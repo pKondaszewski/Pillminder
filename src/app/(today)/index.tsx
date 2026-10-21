@@ -51,6 +51,10 @@ import {
   type UndoableKind,
   useUndoableDoseAction,
 } from '@/doses/ui/use-undoable-dose-action';
+import { IntakeRow } from '@/intakes/ui/intake-row';
+import { useIntakeEditor } from '@/intakes/ui/use-intake-editor';
+import { useIntakeMarkers } from '@/intakes/ui/use-intake-markers';
+import { useIntakesBetween } from '@/intakes/ui/use-intakes';
 import { useSunCoords } from '@/location/ui/use-sun-coords';
 import { useProducts } from '@/products/ui/use-products';
 import {
@@ -98,6 +102,9 @@ export default function HomeScreen() {
     taken: { apply: takeDose, revert: untakeDose },
     skipped: { apply: skipDose, revert: unskipDose },
   });
+  const dayIntakes = useIntakesBetween(day, addDays(day, 1));
+  const intakeEditor = useIntakeEditor();
+  const intakeMarkers = useIntakeMarkers(dayIntakes);
   const revertConfirmation = useConfirmation<TodayDose>((dose) =>
     revert(undoableKindOf(dose), dose.id),
   );
@@ -116,6 +123,12 @@ export default function HomeScreen() {
     calendarDays[0],
     addDays(calendarDays[calendarDays.length - 1], 1),
   ).filter((dose) => !filterProductId || dose.productId === filterProductId);
+  const monthIntakes = useIntakesBetween(
+    calendarDays[0],
+    addDays(calendarDays[calendarDays.length - 1], 1),
+  ).filter(
+    (intake) => !filterProductId || intake.productId === filterProductId,
+  );
 
   const lastDay = lastPlannedDay(now);
   const filterProduct = products.find(({ id }) => id === filterProductId);
@@ -219,6 +232,7 @@ export default function HomeScreen() {
             key={isoDay(day)}
             timeline={timeline}
             marks={meadowMarks}
+            intakeMarkers={intakeMarkers}
             canTake={isToday}
             topInset={topInset}
             night={night}
@@ -233,7 +247,9 @@ export default function HomeScreen() {
               onAction={() => router.push('/products/new')}
             />
           ) : null}
-          {products.length > 0 && doses.length === 0 ? (
+          {products.length > 0 &&
+          doses.length === 0 &&
+          dayIntakes.length === 0 ? (
             <EmptyState
               icon="event_available"
               title={t(
@@ -247,36 +263,38 @@ export default function HomeScreen() {
             />
           ) : null}
           {cardState ? (
-            <>
-              <TodayCard
-                key={isoDay(day)}
-                state={cardState}
-                onTake={(dose) => applyWithUndo('taken', dose)}
-                onTakeOverdue={takeOverdueConfirmation.request}
-              />
-              {groupDosesByTimeSlot(doses).map((group) => (
-                <TimeSlotSection
-                  key={`${isoDay(day)}-${group.slot}`}
-                  group={group}
-                  renderDose={(dose) => (
-                    <DoseRow
-                      dose={dose}
-                      mode={mode}
-                      now={now}
-                      onTake={(taken) => applyWithUndo('taken', taken)}
-                      onSkip={(skipped) => applyWithUndo('skipped', skipped)}
-                      onRevert={revertConfirmation.request}
-                      onCorrect={setCorrecting}
-                      onOpenProduct={openProduct}
-                    />
-                  )}
-                />
-              ))}
-            </>
+            <TodayCard
+              key={isoDay(day)}
+              state={cardState}
+              onTake={(dose) => applyWithUndo('taken', dose)}
+              onTakeOverdue={takeOverdueConfirmation.request}
+            />
           ) : null}
+          {groupDosesByTimeSlot(doses, dayIntakes).map((group) => (
+            <TimeSlotSection
+              key={`${isoDay(day)}-${group.slot}`}
+              group={group}
+              renderDose={(dose) => (
+                <DoseRow
+                  dose={dose}
+                  mode={mode}
+                  now={now}
+                  onTake={(taken) => applyWithUndo('taken', taken)}
+                  onSkip={(skipped) => applyWithUndo('skipped', skipped)}
+                  onRevert={revertConfirmation.request}
+                  onCorrect={setCorrecting}
+                  onOpenProduct={openProduct}
+                />
+              )}
+              renderIntake={(intake) => (
+                <IntakeRow intake={intake} onPress={intakeEditor.edit} />
+              )}
+            />
+          ))}
         </ScrollView>
       </View>
       <UndoSnackbar snackbar={snackbar} />
+      {intakeEditor.sheet}
       {correcting ? (
         <DoseCorrectionSheet
           key={correcting.id}
@@ -313,6 +331,7 @@ export default function HomeScreen() {
         days={calendarDays}
         weekdayKeys={weekdayKeysFrom(firstWeekday)}
         doses={monthDoses}
+        intakes={monthIntakes}
         selectedDay={day}
         lastDay={lastDay}
         now={now}

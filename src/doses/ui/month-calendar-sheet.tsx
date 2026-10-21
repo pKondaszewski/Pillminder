@@ -18,6 +18,7 @@ import {
   monthSummaryText,
   type TodayDose,
 } from '@/doses/dose-service';
+import { type Intake, intakeDayKeys } from '@/intakes/intake-service';
 
 const MARKER_COLORS: Partial<Record<DayStatus, ThemeColor>> = {
   allTaken: 'taken',
@@ -33,6 +34,7 @@ type Props = {
   days: Date[];
   weekdayKeys: string[];
   doses: TodayDose[];
+  intakes: Intake[];
   selectedDay: Date;
   lastDay: Date;
   now: Date;
@@ -52,6 +54,7 @@ export function MonthCalendarSheet({
   days,
   weekdayKeys,
   doses,
+  intakes,
   selectedDay,
   lastDay,
   now,
@@ -67,6 +70,7 @@ export function MonthCalendarSheet({
   const { t } = useTranslation();
   const [choosingProduct, setChoosingProduct] = useState(false);
   const currentMonthName = monthName(month, t);
+  const intakeDays = intakeDayKeys(intakes);
 
   const cellState = (day: Date): DayCellState => {
     const status = dayStatus(day, doses, now);
@@ -75,12 +79,16 @@ export function MonthCalendarSheet({
       status === 'none'
         ? t('calendar.emptyDay')
         : t(`calendar.status.${status}`);
+    const asNeeded = intakeDays.has(isoDay(day));
     return {
       selected,
+      asNeeded,
       fill: selected ? 'surface' : 'background',
       disabled: isoDay(day) > isoDay(lastDay),
       markerColor: MARKER_COLORS[status],
-      accessibilityLabel: `${day.getDate()}, ${statusLabel}`,
+      accessibilityLabel: asNeeded
+        ? `${day.getDate()}, ${statusLabel}, ${t('intake.label')}`
+        : `${day.getDate()}, ${statusLabel}`,
     };
   };
 

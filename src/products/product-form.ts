@@ -49,6 +49,16 @@ export function validateProductField(
   }
 }
 
+export function validateReorderThreshold(
+  text: string,
+): ProductFormError | null {
+  return parseWholeNumber(text, 0).valid ? null : 'editor.wholeNumberInvalid';
+}
+
+export function reorderThresholdPatch(text: string): Partial<NewProductInput> {
+  return { reorderThreshold: wholeNumberOrNull(text, 0) };
+}
+
 export function validateProductForm(
   values: ProductFormValues,
 ): ProductFormErrors {
@@ -137,6 +147,7 @@ export function editedProductInput(
     storeLink: product.storeLink,
     stock: product.stock,
     packSize: product.packSize,
+    reorderThreshold: product.reorderThreshold,
     fasting: product.fasting,
     ...patch,
   };

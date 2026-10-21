@@ -12,65 +12,83 @@ import {
   timeSlotLayout,
   type TodayDose,
 } from '@/doses/dose-service';
+import type { Intake } from '@/intakes/intake-service';
 
 type Props = {
   group: TimeSlotGroup;
   renderDose: (dose: TodayDose) => ReactNode;
+  renderIntake: (intake: Intake) => ReactNode;
 };
 
-export function TimeSlotSection({ group, renderDose }: Props) {
+export function TimeSlotSection({ group, renderDose, renderIntake }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
   const layout = timeSlotLayout(group.data, expanded);
   const slotName = t(`home.slot.${group.slot}`);
 
-  if (layout.kind === 'collapsed') {
-    return (
-      <Pressable
-        onPress={() => setExpanded(true)}
-        accessibilityRole="button"
-        accessibilityLabel={t('home.expandSlot', { slot: slotName })}
-        style={({ pressed }) => [styles.collapsed, pressed && styles.pressed]}
-      >
-        <ThemedText type="smallBold" themeColor="textSecondary">
-          {t('home.slotSummary', {
-            slot: slotName,
-            counts: handledCountsText(layout.taken, layout.skipped, t),
-          })}
-        </ThemedText>
-        <Icon name="chevron_right" size={20} color={theme.textTertiary} />
-      </Pressable>
-    );
-  }
+  const intakes = group.intakes.map((intake) => (
+    <View key={intake.id}>{renderIntake(intake)}</View>
+  ));
 
   const overflowToggleLabel = expanded
     ? t('home.showLess')
-    : t('home.showAll', { count: layout.overflowCount });
+    : t('home.showAll', {
+        count: layout.kind === 'list' ? layout.overflowCount : null,
+      });
 
-  return (
-    <View style={styles.section}>
-      {layout.collapsible ? (
+  const plainHeader = (
+    <ThemedText type="smallBold" themeColor="textSecondary">
+      {slotName}
+    </ThemedText>
+  );
+
+  const header =
+    layout.kind === 'collapsed' ? (
+      group.data.length > 0 ? (
         <Pressable
-          onPress={() => setExpanded(false)}
+          onPress={() => setExpanded(true)}
           accessibilityRole="button"
-          accessibilityLabel={t('home.collapseSlot', { slot: slotName })}
-          style={({ pressed }) => [styles.header, pressed && styles.pressed]}
+          accessibilityLabel={t('home.expandSlot', { slot: slotName })}
+          style={({ pressed }) => [styles.collapsed, pressed && styles.pressed]}
         >
           <ThemedText type="smallBold" themeColor="textSecondary">
-            {slotName}
+            {t('home.slotSummary', {
+              slot: slotName,
+              counts: handledCountsText(layout.taken, layout.skipped, t),
+            })}
           </ThemedText>
-          <Icon name="expand_less" size={20} color={theme.textTertiary} />
+          <Icon name="chevron_right" size={20} color={theme.textTertiary} />
         </Pressable>
       ) : (
+        plainHeader
+      )
+    ) : layout.collapsible ? (
+      <Pressable
+        onPress={() => setExpanded(false)}
+        accessibilityRole="button"
+        accessibilityLabel={t('home.collapseSlot', { slot: slotName })}
+        style={({ pressed }) => [styles.header, pressed && styles.pressed]}
+      >
         <ThemedText type="smallBold" themeColor="textSecondary">
           {slotName}
         </ThemedText>
-      )}
-      {layout.visible.map((dose) => (
-        <View key={dose.id}>{renderDose(dose)}</View>
-      ))}
-      {layout.overflowCount !== null ? (
+        <Icon name="expand_less" size={20} color={theme.textTertiary} />
+      </Pressable>
+    ) : (
+      plainHeader
+    );
+
+  return (
+    <View style={styles.section}>
+      {header}
+      {layout.kind === 'list'
+        ? layout.visible.map((dose) => (
+            <View key={dose.id}>{renderDose(dose)}</View>
+          ))
+        : null}
+      {intakes}
+      {layout.kind === 'list' && layout.overflowCount !== null ? (
         <Pressable
           onPress={() => setExpanded(!expanded)}
           accessibilityRole="button"

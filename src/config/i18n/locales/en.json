@@ -130,7 +130,9 @@
     "packSizeMl": "Pack volume (ml)",
     "packSizeEstimate": "{{ml}} ml ≈ {{drops}} drops (on average 20 drops per ml)",
     "packSizeMlPlaceholder": "e.g. 10",
-    "stockEmptyIsFullPack": "Empty = one full pack"
+    "stockEmptyIsFullPack": "Empty = one full pack",
+    "reorderThreshold": "Alert threshold",
+    "reorderThresholdHint": "Notify me when the stock drops to this amount or below. Leave empty for no alert."
   },
   "filters": {
     "clear": "Clear"
@@ -377,7 +379,8 @@
       "stockDays_one": "day",
       "stockDays_other": "days",
       "store": "Store",
-      "tapToEdit": "Tap to change"
+      "tapToEdit": "Tap to change",
+      "reorderThreshold": "Notify when stock is at or below"
     },
     "emptyMessage": "Add a medication or supplement and the app will remind you of doses and keep an eye on your stock.",
     "emptyTitle": "You have no products yet",
@@ -580,5 +583,24 @@
     "ml": "ml",
     "tablet": "Tablet",
     "spray": "Spray"
+  },
+  "intake": {
+    "label": "as needed",
+    "takeNow": "Take now",
+    "takenToast": "{{name}} recorded as needed",
+    "rowTime": "as needed · {{time}}",
+    "rowHint": "Edit or delete this intake",
+    "editTitle": "{{name}} · as needed",
+    "quantity": "Quantity",
+    "time": "Time",
+    "increaseQuantity": "Increase quantity",
+    "decreaseQuantity": "Decrease quantity",
+    "delete": "Delete intake",
+    "deleteTitle": "Delete this intake?",
+    "deleteMessage": "The {{name}} intake is removed from the history and its units go back to the stock.",
+    "historyTitle": "Taken as needed",
+    "recentCount_one": "{{count}} time in the last 14 days",
+    "recentCount_other": "{{count}} times in the last 14 days",
+    "errorSave": "Could not save the intake. Try again."
   }
 }
