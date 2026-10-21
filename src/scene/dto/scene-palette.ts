@@ -8,8 +8,10 @@ export interface ScenePalette {
   sky: Record<SkyKey, Gradient>;
   land: Record<Season, Land>;
   landNight: Land;
+  landDeepNight: Land;
   star: string;
   moon: string;
+  nightMoon: string;
   cloud: string;
   cloudOpacity: number;
   sunLow: string;

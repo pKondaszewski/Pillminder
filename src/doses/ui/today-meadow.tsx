@@ -12,6 +12,7 @@ type Props = {
   marks: MeadowMark[];
   canTake: boolean;
   topInset: number;
+  night: boolean;
   onTake: (dose: TodayDose) => void;
 };
 
@@ -20,6 +21,7 @@ export function TodayMeadow({
   marks,
   canTake,
   topInset,
+  night,
   onTake,
 }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -47,6 +49,7 @@ export function TodayMeadow({
       marks={marks}
       topInset={topInset}
       selectedId={selectedId}
+      night={night}
       onSelect={toggle}
     >
       {selected ? (

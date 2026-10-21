@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import { FontFamily } from '@/commons/ui/constants/fonts';
-import { MIN_TOUCH_SIZE } from '@/commons/ui/constants/theme';
+import { Colors, MIN_TOUCH_SIZE } from '@/commons/ui/constants/theme';
 import { useTheme } from '@/commons/ui/use-theme';
 import {
   basketSlot,
@@ -31,6 +31,7 @@ type Props = {
   marks: MeadowMark[];
   topInset: number;
   selectedId: string | null;
+  night: boolean;
   onSelect: (markId: string) => void;
   children?: ReactNode;
 };
@@ -39,6 +40,7 @@ export function MeadowOverlay({
   marks,
   topInset,
   selectedId,
+  night,
   onSelect,
   children,
 }: Props) {
@@ -75,6 +77,7 @@ export function MeadowOverlay({
             x={x}
             y={y}
             selected={mark.id === selectedId}
+            night={night}
             onSelect={onSelect}
           />
         );
@@ -89,15 +92,18 @@ function MarkWidgets({
   x,
   y,
   selected,
+  night,
   onSelect,
 }: {
   mark: MeadowMark;
   x: number;
   y: number;
   selected: boolean;
+  night: boolean;
   onSelect: (markId: string) => void;
 }) {
   const theme = useTheme();
+  const badgeTheme = night ? Colors.dark : theme;
 
   return (
     <>
@@ -107,13 +113,13 @@ function MarkWidgets({
           style={[
             styles.badge,
             {
-              backgroundColor: theme.text,
+              backgroundColor: badgeTheme.text,
               left: x + BADGE_OFFSET_X - BADGE_SIZE / 2,
               top: y - BADGE_OFFSET_Y - BADGE_SIZE / 2,
             },
           ]}
         >
-          <Text style={[styles.badgeText, { color: theme.background }]}>
+          <Text style={[styles.badgeText, { color: badgeTheme.background }]}>
             {mark.size > MAX_BADGE ? `${MAX_BADGE}+` : mark.size}
           </Text>
         </View>
