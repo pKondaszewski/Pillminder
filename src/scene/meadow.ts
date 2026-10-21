@@ -1,6 +1,10 @@
 import type { MeadowEvent, MeadowMark, Point } from './dto/meadow';
 import { GROUND_Y } from './scene-geometry';
 
+export const CREATURE_SHADOW_OFFSET_Y = 4;
+export const CREATURE_SHADOW_RADIUS_X = 8;
+export const CREATURE_SHADOW_RADIUS_Y = 2;
+
 const MEADOW_FROM = 0.07;
 const MEADOW_SPAN = 0.78;
 const SLOT_DEPTH = 14;
@@ -12,6 +16,12 @@ const CREATURE_START_X = -20;
 const GROWTH_SPEED = 1.6;
 const GROWTH_DELAY = 0.12;
 const MIN_MARK_SPACING = 44;
+
+export const MEADOW_BOTTOM =
+  GROUND_Y +
+  CREATURE_DEPTH +
+  CREATURE_SHADOW_OFFSET_Y +
+  CREATURE_SHADOW_RADIUS_Y;
 
 export function meadowSlot(
   position: number,

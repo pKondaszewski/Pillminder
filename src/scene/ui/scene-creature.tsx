@@ -3,6 +3,9 @@ import { type SharedValue, useDerivedValue } from 'react-native-reanimated';
 
 import { useTheme } from '@/commons/ui/use-theme';
 import {
+  CREATURE_SHADOW_OFFSET_Y,
+  CREATURE_SHADOW_RADIUS_X,
+  CREATURE_SHADOW_RADIUS_Y,
   creatureSlot,
   ellipsePath,
   type Season,
@@ -14,7 +17,12 @@ const WALK_CYCLES = 96;
 const IDLE_CYCLES = 24;
 const WING_CYCLES = 240;
 const SLEEP_CYCLES = 8;
-const SHADOW = ellipsePath(0, 4, 8, 2);
+const SHADOW = ellipsePath(
+  0,
+  CREATURE_SHADOW_OFFSET_Y,
+  CREATURE_SHADOW_RADIUS_X,
+  CREATURE_SHADOW_RADIUS_Y,
+);
 const SHADOW_COLOR = 'rgba(0,0,0,0.12)';
 const DARK = '#1F1F24';
 const BEE_DARK = '#2A2420';
