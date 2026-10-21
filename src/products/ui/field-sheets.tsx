@@ -18,7 +18,7 @@ import type {
   ProductUnit,
   TextProductField,
 } from '@/products/product-service';
-import { CategoryPicker } from '@/products/ui/category-picker';
+import { useCategoryPicker } from '@/products/ui/category-picker';
 import { StoreSuggestions } from '@/products/ui/store-suggestions';
 import { UnitChips } from '@/products/ui/unit-chips';
 
@@ -44,7 +44,9 @@ type SheetProps = {
   onClose: () => void;
 };
 
-type Props = SheetProps & { field: ProductSheetField };
+type CategorySheetProps = SheetProps & { onProductDeleted: () => void };
+
+type Props = CategorySheetProps & { field: ProductSheetField };
 
 type TextSheetConfig = {
   title: string;
@@ -144,7 +146,12 @@ function TextSheet({
   );
 }
 
-function CategorySheet({ product, onSave, onClose }: SheetProps) {
+function CategorySheet({
+  product,
+  onSave,
+  onClose,
+  onProductDeleted,
+}: CategorySheetProps) {
   const { t } = useTranslation();
   const [category, setCategory] = useState(product.category);
   const [submitted, setSubmitted] = useState(false);
@@ -159,19 +166,28 @@ function CategorySheet({ product, onSave, onClose }: SheetProps) {
     onSave(unit ? { category, unit } : { category });
   };
 
+  // The picker's dialogs are Modals too: the sheet hides while one is open
+  const { picker, dialogs, dialogOpen } = useCategoryPicker({
+    value: category,
+    error: error ? t(error) : undefined,
+    onChange: setCategory,
+    onProductsRemoved: (ids) => {
+      if (ids.includes(product.id)) onProductDeleted();
+    },
+  });
+
   return (
-    <BottomSheet
-      visible
-      title={t('editor.category')}
-      onClose={onClose}
-      onSave={save}
-    >
-      <CategoryPicker
-        value={category}
-        error={error ? t(error) : undefined}
-        onChange={setCategory}
-      />
-    </BottomSheet>
+    <>
+      <BottomSheet
+        visible={!dialogOpen}
+        title={t('editor.category')}
+        onClose={onClose}
+        onSave={save}
+      >
+        {picker}
+      </BottomSheet>
+      {dialogs}
+    </>
   );
 }
 

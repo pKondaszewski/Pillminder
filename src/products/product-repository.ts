@@ -48,6 +48,26 @@ export async function getCustomCategories(): Promise<string[]> {
   return rows.map((row) => row.category);
 }
 
+export async function getProductIdsByCategory(
+  category: string,
+): Promise<string[]> {
+  const rows = await db
+    .select({ id: products.id })
+    .from(products)
+    .where(eq(products.category, category));
+  return rows.map((row) => row.id);
+}
+
+export async function renameCategoryRows(
+  from: string,
+  to: string,
+): Promise<void> {
+  await db
+    .update(products)
+    .set({ category: to, updatedAt: new Date() })
+    .where(eq(products.category, from));
+}
+
 export async function createProductRow(
   input: NewProductInput,
 ): Promise<ProductRow> {

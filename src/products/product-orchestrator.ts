@@ -15,6 +15,7 @@ import type { NewProductInput } from './dto/new-product-input';
 import {
   addPackToStock,
   deleteProduct,
+  listProductIdsByCategory,
   setProductStatus,
   updateProduct,
 } from './product-service';
@@ -39,6 +40,14 @@ export async function removeProduct(id: string): Promise<void> {
   const imageFileNames = await getImageFileNamesByProduct(id);
   await deleteProduct(id);
   deleteImageFiles(imageFileNames);
+}
+
+export async function removeCategoryProducts(
+  category: string,
+): Promise<string[]> {
+  const ids = await listProductIdsByCategory(category);
+  for (const id of ids) await removeProduct(id);
+  return ids;
 }
 
 export async function archiveProduct(

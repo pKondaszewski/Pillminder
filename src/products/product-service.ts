@@ -1,5 +1,6 @@
 import { createLogger } from '@/config/logger';
 
+import { checkCustomCategoryName } from './category';
 import type { NewProductInput } from './dto/new-product-input';
 import {
   addPackToStockRow,
@@ -7,10 +8,12 @@ import {
   deleteProductRow,
   getCustomCategories,
   getProductById,
+  getProductIdsByCategory,
   getProductsByIds,
   type Product,
   productsQuery,
   type ProductStatus,
+  renameCategoryRows,
   setProductStatusRow,
   setStockRow,
   updateProductRow,
@@ -47,6 +50,26 @@ export function getProducts(ids: string[]): Promise<Product[]> {
 
 export function listCustomCategories(): Promise<string[]> {
   return getCustomCategories();
+}
+
+export function listProductIdsByCategory(category: string): Promise<string[]> {
+  return getProductIdsByCategory(category);
+}
+
+export async function renameCustomCategory(
+  from: string,
+  to: string,
+): Promise<string> {
+  log.info(`Renaming category "${from}" to "${to}"`);
+  const check = checkCustomCategoryName(to, from, await getCustomCategories());
+  if (check.error) throw new Error(`Category name rejected: ${check.error}`);
+  try {
+    await renameCategoryRows(from, check.name);
+    return check.name;
+  } catch (err) {
+    log.error(`Failed to rename category "${from}"`, err);
+    throw err;
+  }
 }
 
 export async function addProduct(input: NewProductInput): Promise<string> {
