@@ -2,7 +2,12 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Chip } from '@/commons/ui/chip';
-import { MIN_TOUCH_SIZE, Radius, Spacing } from '@/commons/ui/constants/theme';
+import {
+  Colors,
+  MIN_TOUCH_SIZE,
+  Radius,
+  Spacing,
+} from '@/commons/ui/constants/theme';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { useTheme } from '@/commons/ui/use-theme';
 
@@ -10,6 +15,7 @@ type Props = {
   label: string;
   canGoNext: boolean;
   showBackToToday: boolean;
+  night: boolean;
   onPrevious: () => void;
   onNext: () => void;
   onOpenCalendar: () => void;
@@ -20,18 +26,22 @@ export function DayPager({
   label,
   canGoNext,
   showBackToToday,
+  night,
   onPrevious,
   onNext,
   onOpenCalendar,
   onBackToToday,
 }: Props) {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const colors = night ? Colors.dark : theme;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <ArrowButton
           symbol="‹"
+          night={night}
           accessibilityLabel={t('home.pager.previousDay')}
           onPress={onPrevious}
         />
@@ -41,10 +51,13 @@ export function DayPager({
           accessibilityLabel={t('home.pager.openCalendar')}
           style={({ pressed }) => [styles.date, pressed && styles.pressed]}
         >
-          <ThemedText type="subtitle">{label}</ThemedText>
+          <ThemedText type="subtitle" style={{ color: colors.text }}>
+            {label}
+          </ThemedText>
         </Pressable>
         <ArrowButton
           symbol="›"
+          night={night}
           accessibilityLabel={t('home.pager.nextDay')}
           disabled={!canGoNext}
           onPress={onNext}
@@ -65,16 +78,19 @@ export function DayPager({
 
 function ArrowButton({
   symbol,
+  night,
   accessibilityLabel,
   disabled,
   onPress,
 }: {
   symbol: string;
+  night: boolean;
   accessibilityLabel: string;
   disabled?: boolean;
   onPress: () => void;
 }) {
   const theme = useTheme();
+  const colors = night ? Colors.dark : theme;
 
   return (
     <Pressable
@@ -84,12 +100,16 @@ function ArrowButton({
       accessibilityLabel={accessibilityLabel}
       style={({ pressed }) => [
         styles.arrow,
-        { borderColor: theme.borderStrong },
+        {
+          borderColor: colors.borderStrong,
+        },
         pressed && styles.pressed,
         disabled && styles.disabled,
       ]}
     >
-      <ThemedText type="subtitle">{symbol}</ThemedText>
+      <ThemedText type="subtitle" style={{ color: colors.text }}>
+        {symbol}
+      </ThemedText>
     </Pressable>
   );
 }

@@ -66,7 +66,7 @@ export function SceneCelestial({ scene, width, entry, time, burst }: Props) {
       {scene.body === 'sun' ? (
         <Sun placement={placement} time={time} />
       ) : (
-        <Moon time={time} />
+        <Moon time={time} night={scene.phase === 'night'} />
       )}
       <BurstRays burst={burst} />
     </Group>
@@ -115,8 +115,9 @@ function Sun({
   );
 }
 
-function Moon({ time }: { time: SharedValue<number> }) {
+function Moon({ time, night }: { time: SharedValue<number>; night: boolean }) {
   const palette = useScenePalette();
+  const color = night ? palette.nightMoon : palette.moon;
   const glowOpacity = useDerivedValue(
     () =>
       MOON_GLOW_BASE +
@@ -125,11 +126,11 @@ function Moon({ time }: { time: SharedValue<number> }) {
 
   return (
     <>
-      <Circle r={MOON_GLOW_RADIUS} color={palette.moon} opacity={glowOpacity}>
+      <Circle r={MOON_GLOW_RADIUS} color={color} opacity={glowOpacity}>
         <BlurMask blur={MOON_GLOW_BLUR} style="normal" />
       </Circle>
       <Group transform={[{ scale: MOON_SCALE }]}>
-        <Path path={MOON_PATH} color={palette.moon} />
+        <Path path={MOON_PATH} color={color} />
       </Group>
     </>
   );

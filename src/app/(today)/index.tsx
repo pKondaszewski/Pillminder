@@ -180,6 +180,8 @@ export default function HomeScreen() {
   const cardState = doses.length > 0 ? todayCardState(doses, day, now) : null;
   const mood = cardState ? moodOf(cardState.kind) : null;
   const celebrationKey = useCelebration(mood, isoDay(day));
+  const scene = skyScene(now, phases, isToday);
+  const night = scene.phase === 'night';
   const timeline = buildTimeline(doses, now, markSpacing(width));
   const meadowMarks = useMeadowMarks(timeline);
 
@@ -193,7 +195,7 @@ export default function HomeScreen() {
           ]}
         >
           <DayScene
-            scene={skyScene(now, phases, isToday)}
+            scene={scene}
             mood={mood ?? 'calm'}
             season={seasonOf(now, coords?.latitude ?? null)}
             marks={meadowMarks}
@@ -206,6 +208,7 @@ export default function HomeScreen() {
             label={formatDate(day, true)}
             canGoNext={isoDay(day) < isoDay(lastDay)}
             showBackToToday={mode !== 'today'}
+            night={night}
             onPrevious={() => selectDay(addDays(day, -1))}
             onNext={() => selectDay(addDays(day, 1))}
             onOpenCalendar={openCalendar}
@@ -218,6 +221,7 @@ export default function HomeScreen() {
             marks={meadowMarks}
             canTake={isToday}
             topInset={topInset}
+            night={night}
             onTake={(dose) => applyWithUndo('taken', dose)}
           />
           {loaded && products.length === 0 ? (
