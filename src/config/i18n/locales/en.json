@@ -78,6 +78,18 @@
     "eye-drops": "Eye drops"
   },
   "editor": {
+    "newCategoryTitle": "New category",
+    "editCategory": "Edit category",
+    "categoryName": {
+      "blank": "Enter a category name",
+      "taken": "A category with this name already exists"
+    },
+    "categoryRenameError": "Could not rename the category",
+    "categoryDeleteError": "Could not delete the category",
+    "deleteCategoryTitle": "Delete category",
+    "deleteCategoryEmpty": "Are you sure you want to delete this category?",
+    "deleteCategoryWithProducts_one": "Are you sure? {{count}} product created with this category will be deleted too.",
+    "deleteCategoryWithProducts_other": "Are you sure? {{count}} products created with this category will be deleted too.",
     "addCategory": "+ New",
     "archive": "Archive",
     "cancel": "Cancel",

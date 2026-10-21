@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { createLogger } from '@/config/logger';
 import { listCustomCategories } from '@/products/product-service';
 
 const log = createLogger('use-custom-categories');
 
-export function useCustomCategories(): string[] {
+export function useCustomCategories() {
   const [categories, setCategories] = useState<string[]>([]);
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -18,7 +19,9 @@ export function useCustomCategories(): string[] {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [version]);
 
-  return categories;
+  const reload = useCallback(() => setVersion((v) => v + 1), []);
+
+  return { categories, reload };
 }

@@ -82,6 +82,20 @@
     "eye-drops": "Krople do oczu"
   },
   "editor": {
+    "newCategoryTitle": "Nowa kategoria",
+    "editCategory": "Edytuj kategorię",
+    "categoryName": {
+      "blank": "Podaj nazwę kategorii",
+      "taken": "Kategoria o takiej nazwie już istnieje"
+    },
+    "categoryRenameError": "Nie udało się zmienić nazwy kategorii",
+    "categoryDeleteError": "Nie udało się usunąć kategorii",
+    "deleteCategoryTitle": "Usuń kategorię",
+    "deleteCategoryEmpty": "Czy na pewno chcesz usunąć tę kategorię?",
+    "deleteCategoryWithProducts_one": "Czy na pewno? Zniknie {{count}} produkt utworzony z tą kategorią.",
+    "deleteCategoryWithProducts_few": "Czy na pewno? Znikną {{count}} produkty utworzone z tą kategorią.",
+    "deleteCategoryWithProducts_many": "Czy na pewno? Zniknie {{count}} produktów utworzonych z tą kategorią.",
+    "deleteCategoryWithProducts_other": "Czy na pewno? Zniknie {{count}} produktów utworzonych z tą kategorią.",
     "addCategory": "+ Nowa",
     "archive": "Archiwizuj",
     "cancel": "Anuluj",

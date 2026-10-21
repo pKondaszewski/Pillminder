@@ -1,5 +1,6 @@
 import type { Translate } from '@/config/translate';
 
+import type { CategoryNameCheck } from './dto/category-name-check';
 import type { BuiltInCategory } from './dto/new-product-input';
 import type { ProductUnit } from './dto/product-unit';
 
@@ -80,6 +81,22 @@ export function normalizeCategory(
   return (
     existingCustomCategories.find((c) => c.toLowerCase() === key) ?? cleaned
   );
+}
+
+export function checkCustomCategoryName(
+  raw: string,
+  currentName: string | null,
+  customCategories: string[],
+): CategoryNameCheck {
+  const others = customCategories.filter(
+    (c) => c.toLowerCase() !== currentName?.toLowerCase(),
+  );
+  const name = normalizeCategory(raw, others);
+  if (name === null) return { error: 'blank' };
+  if (isBuiltInCategory(name) || others.includes(name)) {
+    return { error: 'taken' };
+  }
+  return { name };
 }
 
 export function categoryLabel(category: string, t: Translate): string {

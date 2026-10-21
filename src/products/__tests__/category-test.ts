@@ -3,6 +3,7 @@ import type { Translate } from '@/config/translate';
 import {
   categoryLabel,
   categoryUnit,
+  checkCustomCategoryName,
   isBuiltInCategory,
   normalizeCategory,
   packSizeInMl,
@@ -193,6 +194,64 @@ describe('nasal spray and eye drops', () => {
 
       // then
       expect(result).toBe(expected);
+    },
+  );
+});
+
+describe('checkCustomCategoryName', () => {
+  const custom = ['Vitamins', 'Herbs'];
+
+  it('accepts a new name, cleaned', () => {
+    // when
+    const result = checkCustomCategoryName('  Minerals  ', 'Vitamins', custom);
+
+    // then
+    expect(result).toEqual({ name: 'Minerals' });
+  });
+
+  it('accepts a change of letter case of the edited category', () => {
+    // when
+    const result = checkCustomCategoryName('vitamins', 'Vitamins', custom);
+
+    // then
+    expect(result).toEqual({ name: 'vitamins' });
+  });
+
+  it('accepts any free name for a new category', () => {
+    // when
+    const result = checkCustomCategoryName('Tea', null, custom);
+
+    // then
+    expect(result).toEqual({ name: 'Tea' });
+  });
+
+  it('rejects a blank name', () => {
+    // when
+    const result = checkCustomCategoryName('   ', 'Vitamins', custom);
+
+    // then
+    expect(result).toEqual({ error: 'blank' });
+  });
+
+  it.each(['Care', 'care', 'Spray do nosa', 'KROPLE DO OCZU', 'eye drops'])(
+    'rejects "%s" as a built-in category',
+    (raw) => {
+      // when
+      const result = checkCustomCategoryName(raw, 'Vitamins', custom);
+
+      // then
+      expect(result).toEqual({ error: 'taken' });
+    },
+  );
+
+  it.each(['Herbs', 'herbs', ' HERBS '])(
+    'rejects "%s" as another custom category',
+    (raw) => {
+      // when
+      const result = checkCustomCategoryName(raw, 'Vitamins', custom);
+
+      // then
+      expect(result).toEqual({ error: 'taken' });
     },
   );
 });
