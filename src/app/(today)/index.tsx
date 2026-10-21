@@ -11,7 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ConfirmDialog } from '@/commons/ui/confirm-dialog';
-import { Spacing } from '@/commons/ui/constants/theme';
+import { MIN_TOUCH_SIZE, Spacing } from '@/commons/ui/constants/theme';
 import { EmptyState } from '@/commons/ui/empty-state';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
@@ -55,7 +55,7 @@ import { useSunCoords } from '@/location/ui/use-sun-coords';
 import { useProducts } from '@/products/ui/use-products';
 import {
   markSpacing,
-  SCENE_WINDOW_HEIGHT,
+  MEADOW_BOTTOM,
   type SceneMood,
   seasonOf,
   skyScene,
@@ -189,7 +189,7 @@ export default function HomeScreen() {
         <ScrollView
           contentContainerStyle={[
             styles.content,
-            { paddingTop: topInset + Spacing.sixteen },
+            { paddingTop: topInset + CONTENT_PADDING_TOP },
           ]}
         >
           <DayScene
@@ -355,6 +355,15 @@ const DOSE_ACTION_TEXT_KEYS: Record<
   skipped: { title: 'home.unskipTitle', message: 'home.unskipConfirm' },
 };
 
+const CONTENT_GAP = Spacing.sixteen;
+const CONTENT_PADDING_TOP = Spacing.sixteen;
+const PAGER_HEIGHT = MIN_TOUCH_SIZE;
+const CARD_CLEARANCE = Spacing.eight;
+const SCENE_WINDOW_HEIGHT =
+  MEADOW_BOTTOM +
+  CARD_CLEARANCE -
+  (CONTENT_PADDING_TOP + PAGER_HEIGHT + 2 * CONTENT_GAP);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -366,7 +375,7 @@ const styles = StyleSheet.create({
     height: SCENE_WINDOW_HEIGHT,
   },
   content: {
-    gap: Spacing.sixteen,
+    gap: CONTENT_GAP,
     paddingHorizontal: Spacing.twenty,
     paddingVertical: Spacing.sixteen,
   },

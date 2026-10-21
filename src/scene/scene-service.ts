@@ -16,8 +16,12 @@ export type {
 export { grassPath, hillPath } from './landscape';
 export {
   basketSlot,
+  CREATURE_SHADOW_OFFSET_Y,
+  CREATURE_SHADOW_RADIUS_X,
+  CREATURE_SHADOW_RADIUS_Y,
   creatureSlot,
   markSpacing,
+  MEADOW_BOTTOM,
   meadowEvents,
   meadowSlot,
   plantGrowth,
@@ -43,7 +47,6 @@ export {
   SCENE_FADE_SHIFT,
   SCENE_HEIGHT,
   SCENE_HORIZON_Y,
-  SCENE_WINDOW_HEIGHT,
 } from './scene-geometry';
 export { SCENE_PALETTES, sceneColors } from './scene-palette';
 export { seasonOf } from './season';

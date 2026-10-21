@@ -3,7 +3,6 @@ export const SCENE_HORIZON_Y = 160;
 export const SCENE_BODY_TRAVEL = 80;
 export const SCENE_FADE_HEIGHT = 90;
 export const SCENE_FADE_SHIFT = 30;
-export const SCENE_WINDOW_HEIGHT = 144;
 export const GROUND_Y = 204;
 
 export function rayPath(count: number, inner: number, outer: number): string {
