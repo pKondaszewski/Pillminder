@@ -136,7 +136,9 @@
     "packSizeMl": "Pojemność opakowania (ml)",
     "packSizeEstimate": "{{ml}} ml ≈ {{drops}} kropli (średnio 20 kropli na ml)",
     "packSizeMlPlaceholder": "np. 10",
-    "stockEmptyIsFullPack": "Puste = pełne opakowanie"
+    "stockEmptyIsFullPack": "Puste = pełne opakowanie",
+    "reorderThreshold": "Próg powiadomienia",
+    "reorderThresholdHint": "Powiadomię, gdy stan spadnie do tej ilości lub niżej. Zostaw puste, żeby nie dostawać alertu."
   },
   "filters": {
     "clear": "Wyczyść"
@@ -403,7 +405,8 @@
       "stockDays_one": "dzień",
       "stockDays_other": "dni",
       "store": "Sklep",
-      "tapToEdit": "Dotknij, aby zmienić"
+      "tapToEdit": "Dotknij, aby zmienić",
+      "reorderThreshold": "Powiadom, gdy zostanie ≤"
     },
     "emptyMessage": "Dodaj lek albo suplement, a aplikacja przypomni o dawkach i przypilnuje zapasu.",
     "emptyTitle": "Nie masz jeszcze produktów",
@@ -622,5 +625,26 @@
     "ml": "ml",
     "tablet": "Tabletka",
     "spray": "Psiknięcie"
+  },
+  "intake": {
+    "label": "doraźnie",
+    "takeNow": "Weź teraz",
+    "takenToast": "{{name}}: zapisano przyjęcie doraźne",
+    "rowTime": "doraźnie · {{time}}",
+    "rowHint": "Edytuj lub usuń to przyjęcie",
+    "editTitle": "{{name}} · doraźnie",
+    "quantity": "Ilość",
+    "time": "Godzina",
+    "increaseQuantity": "Zwiększ ilość",
+    "decreaseQuantity": "Zmniejsz ilość",
+    "delete": "Usuń przyjęcie",
+    "deleteTitle": "Usunąć to przyjęcie?",
+    "deleteMessage": "Przyjęcie produktu {{name}} zniknie z historii, a jednostki wrócą do stanu.",
+    "historyTitle": "Przyjęte doraźnie",
+    "recentCount_one": "{{count}} raz w ostatnich 14 dniach",
+    "recentCount_few": "{{count}} razy w ostatnich 14 dniach",
+    "recentCount_many": "{{count}} razy w ostatnich 14 dniach",
+    "recentCount_other": "{{count}} razy w ostatnich 14 dniach",
+    "errorSave": "Nie udało się zapisać przyjęcia. Spróbuj ponownie."
   }
 }

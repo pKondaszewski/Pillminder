@@ -5,9 +5,11 @@ import {
   newProductInput,
   packSizeEstimate,
   packSizeText,
+  reorderThresholdPatch,
   textFieldPatch,
   validateProductField,
   validateProductForm,
+  validateReorderThreshold,
 } from '../product-form';
 import type { Product } from '../product-service';
 
@@ -318,5 +320,36 @@ describe('eye drops pack size', () => {
 
     // then
     expect(results).toEqual([{ ml: 10, drops: 200 }, null, null]);
+  });
+});
+
+describe('reorder threshold field', () => {
+  it.each([
+    ['5', 5],
+    ['0', 0],
+    ['  12 ', 12],
+    ['', null],
+  ])('turns "%s" into %p', (text, expected) => {
+    // when
+    const patch = reorderThresholdPatch(text);
+
+    // then
+    expect(patch).toEqual({ reorderThreshold: expected });
+  });
+
+  it.each(['-1', '2.5', 'abc'])('rejects "%s"', (text) => {
+    // when
+    const error = validateReorderThreshold(text);
+
+    // then
+    expect(error).toBe('editor.wholeNumberInvalid');
+  });
+
+  it('accepts an empty threshold as no alert', () => {
+    // when
+    const error = validateReorderThreshold('');
+
+    // then
+    expect(error).toBeNull();
   });
 });

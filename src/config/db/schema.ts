@@ -25,6 +25,7 @@ export const products = sqliteTable('products', {
     .default('active'),
   stock: integer('stock'),
   packSize: integer('pack_size'),
+  reorderThreshold: integer('reorder_threshold'),
   fasting: integer('fasting', { mode: 'boolean' }).notNull().default(false),
   profileImageId: text('profile_image_id').references(
     (): AnySQLiteColumn => productImages.id,
@@ -75,6 +76,22 @@ export const doses = sqliteTable(
     uniqueIndex('idx_doses_unique_slot').on(table.scheduleId, table.plannedAt),
     index('idx_doses_product').on(table.productId),
     index('idx_doses_planned_at').on(table.plannedAt),
+  ],
+);
+
+export const asNeededIntakes = sqliteTable(
+  'as_needed_intakes',
+  {
+    id: text('id').primaryKey(),
+    productId: text('product_id')
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    takenAt: integer('taken_at', { mode: 'timestamp' }).notNull(),
+    quantity: integer('quantity').notNull().default(1),
+  },
+  (table) => [
+    index('idx_as_needed_intakes_product').on(table.productId),
+    index('idx_as_needed_intakes_taken_at').on(table.takenAt),
   ],
 );
 

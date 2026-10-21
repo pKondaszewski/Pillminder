@@ -3,6 +3,7 @@ export const BACKUP_TABLES = [
   'schedules',
   'doses',
   'notes',
+  'asNeededIntakes',
 ] as const;
 
 export type BackupTable = (typeof BACKUP_TABLES)[number];

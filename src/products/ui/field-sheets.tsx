@@ -10,8 +10,10 @@ import {
   packSizeEstimate,
   packSizeText,
   PRICE_MAX_LENGTH,
+  reorderThresholdPatch,
   textFieldPatch,
   validateProductField,
+  validateReorderThreshold,
 } from '@/products/product-form';
 import type {
   Product,
@@ -22,7 +24,13 @@ import { useCategoryPicker } from '@/products/ui/category-picker';
 import { StoreSuggestions } from '@/products/ui/store-suggestions';
 import { UnitChips } from '@/products/ui/unit-chips';
 
-export type ProductSheetField = TextProductField | 'category' | 'unit';
+export type ProductSheetField =
+  | TextProductField
+  | 'category'
+  | 'unit'
+  | 'reorderThreshold';
+
+type TextSheetField = TextProductField | 'reorderThreshold';
 
 export type ProductEditedField = ProductSheetField | 'fasting';
 
@@ -32,6 +40,7 @@ export const PRODUCT_FIELD_LABEL_KEYS: Record<ProductEditedField, string> = {
   strength: 'editor.strength',
   unit: 'editor.unit',
   packSize: 'editor.packSize',
+  reorderThreshold: 'editor.reorderThreshold',
   stock: 'editor.stock',
   price: 'products.detail.price',
   storeLink: 'products.detail.store',
@@ -57,7 +66,7 @@ type TextSheetConfig = {
   suggestions?: boolean;
 };
 
-const TEXT_SHEETS: Record<TextProductField, TextSheetConfig> = {
+const TEXT_SHEETS: Record<TextSheetField, TextSheetConfig> = {
   name: { title: 'editor.name', placeholder: 'editor.namePlaceholder' },
   strength: {
     title: 'editor.strength',
@@ -71,6 +80,11 @@ const TEXT_SHEETS: Record<TextProductField, TextSheetConfig> = {
     maxLength: PRICE_MAX_LENGTH,
   },
   stock: { title: 'editor.stock', numeric: true },
+  reorderThreshold: {
+    title: 'editor.reorderThreshold',
+    hint: 'editor.reorderThresholdHint',
+    numeric: true,
+  },
   packSize: {
     title: 'editor.packSize',
     placeholder: 'editor.packSizePlaceholder',
@@ -94,7 +108,7 @@ function TextSheet({
   product,
   onSave,
   onClose,
-}: SheetProps & { field: TextProductField }) {
+}: SheetProps & { field: TextSheetField }) {
   const { t } = useTranslation();
   const config = TEXT_SHEETS[field];
   const inMl = field === 'packSize' && packSizeInMl(product.category);
@@ -109,14 +123,18 @@ function TextSheet({
   const [text, setText] = useState(current == null ? '' : String(current));
   const estimate = packSizeEstimate(product.category, text);
   const [submitted, setSubmitted] = useState(false);
-  const error = submitted ? validateProductField(field, text) : null;
+  const error = submitted ? validateTextSheet(field, text) : null;
 
   const save = () => {
-    if (validateProductField(field, text)) {
+    if (validateTextSheet(field, text)) {
       setSubmitted(true);
       return;
     }
-    onSave(textFieldPatch(field, text, product.category));
+    onSave(
+      field === 'reorderThreshold'
+        ? reorderThresholdPatch(text)
+        : textFieldPatch(field, text, product.category),
+    );
   };
 
   return (
@@ -144,6 +162,12 @@ function TextSheet({
       ) : null}
     </BottomSheet>
   );
+}
+
+function validateTextSheet(field: TextSheetField, text: string) {
+  return field === 'reorderThreshold'
+    ? validateReorderThreshold(text)
+    : validateProductField(field, text);
 }
 
 function CategorySheet({

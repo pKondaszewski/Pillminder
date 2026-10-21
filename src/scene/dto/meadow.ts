@@ -9,6 +9,12 @@ export interface MeadowMark {
   label: string;
 }
 
+export interface IntakeMarker {
+  id: string;
+  position: number;
+  label: string;
+}
+
 export interface MeadowEvent {
   key: number;
   markId: string;

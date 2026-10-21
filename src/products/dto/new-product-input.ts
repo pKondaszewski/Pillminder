@@ -16,5 +16,6 @@ export interface NewProductInput {
   storeLink?: string | null;
   stock?: number | null;
   packSize?: number | null;
+  reorderThreshold?: number | null;
   fasting?: boolean;
 }

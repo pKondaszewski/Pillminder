@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Radius, Spacing, type ThemeColor } from '@/commons/ui/constants/theme';
+import { Icon } from '@/commons/ui/icon';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { useTheme } from '@/commons/ui/use-theme';
@@ -9,12 +10,14 @@ import { splitIntoWeeks } from '@/config/calendar-grid';
 import { isoDay } from '@/config/date-utils';
 
 const MARKER_SIZE = 8;
+const AS_NEEDED_SIZE = 12;
 
 export type DayCellState = {
   selected: boolean;
   fill: ThemeColor;
   disabled: boolean;
   markerColor?: ThemeColor;
+  asNeeded?: boolean;
   accessibilityLabel: string;
 };
 
@@ -73,7 +76,14 @@ function DayCell({
   day,
   inMonth,
   isToday,
-  state: { selected, fill, disabled, markerColor, accessibilityLabel },
+  state: {
+    selected,
+    fill,
+    disabled,
+    markerColor,
+    asNeeded,
+    accessibilityLabel,
+  },
   onPress,
 }: {
   day: Date;
@@ -109,6 +119,11 @@ function DayCell({
             markerColor && { backgroundColor: theme[markerColor] },
           ]}
         />
+        {asNeeded ? (
+          <View style={styles.asNeeded}>
+            <Icon name="bolt" size={AS_NEEDED_SIZE} color={theme.accent} />
+          </View>
+        ) : null}
       </ThemedView>
     </Pressable>
   );
@@ -150,6 +165,11 @@ const styles = StyleSheet.create({
     width: MARKER_SIZE,
     height: MARKER_SIZE,
     borderRadius: MARKER_SIZE / 2,
+  },
+  asNeeded: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
   },
   disabled: {
     opacity: 0.4,

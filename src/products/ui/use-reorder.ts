@@ -1,6 +1,6 @@
 import type { ReorderStatus } from '@/products/dto/reorder-status';
 import type { Product } from '@/products/product-service';
-import { reorderStatus } from '@/products/reorder';
+import { productReorderStatus } from '@/products/reorder';
 import type { Schedule } from '@/schedules/schedule-service';
 import { useSchedules } from '@/schedules/ui/use-schedules';
 
@@ -21,7 +21,11 @@ function buildReorderStatuses(
   const byProduct: Record<string, ReorderStatus> = {};
   for (const product of products.filter(isActive)) {
     const productSchedules = schedulesFor(product.id, schedules);
-    byProduct[product.id] = reorderStatus(product.stock, productSchedules, now);
+    byProduct[product.id] = productReorderStatus(
+      product,
+      productSchedules,
+      now,
+    );
   }
   return byProduct;
 }

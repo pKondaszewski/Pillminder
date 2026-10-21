@@ -1,3 +1,5 @@
+import type { Intake } from '@/intakes/intake-service';
+
 import type { TodayDose } from './today-dose-output';
 
 export type TimeSlot = 'morning' | 'afternoon' | 'evening' | 'night';
@@ -5,6 +7,7 @@ export type TimeSlot = 'morning' | 'afternoon' | 'evening' | 'night';
 export interface TimeSlotGroup {
   slot: TimeSlot;
   data: TodayDose[];
+  intakes: Intake[];
 }
 
 export type TimeSlotLayout =

@@ -83,3 +83,35 @@ describe('reorderAlertAction', () => {
     expect(action).toEqual({ kind: 'notifyNow' });
   });
 });
+
+describe('reorderAlertAction for a threshold episode', () => {
+  it('notifies once when the stock reaches the threshold', () => {
+    // given
+    const reorderAt = NOW;
+
+    // when
+    const action = reorderAlertAction(reorderAt, null, NOW);
+
+    // then
+    expect(action).toEqual({ kind: 'notifyNow' });
+  });
+
+  it('keeps the delivered alert while the stock stays low', () => {
+    // given
+    const alertedAt = new Date(NOW.getTime() - 60_000);
+
+    // when
+    const action = reorderAlertAction(NOW, alertedAt, NOW);
+
+    // then
+    expect(action).toEqual({ kind: 'keep' });
+  });
+
+  it('cancels, and so ends the episode, once the stock is restocked', () => {
+    // when
+    const action = reorderAlertAction(null, NOW, NOW);
+
+    // then
+    expect(action).toEqual({ kind: 'cancel' });
+  });
+});

@@ -1,6 +1,6 @@
 import type { Schedule } from '@/schedules/schedule-service';
 
-import { reorderStatus } from '../reorder';
+import { productReorderStatus, reorderStatus } from '../reorder';
 
 const NOW = new Date(2026, 0, 10, 12, 0);
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -337,6 +337,94 @@ describe('reorderStatus with a paused schedule', () => {
 
     // then
     expect(status.daysLeft).toBe(5);
+    expect(status.isLow).toBe(true);
+  });
+});
+
+describe('productReorderStatus', () => {
+  const noRhythm: Schedule[] = [];
+
+  it('is low at the threshold for a product without a schedule', () => {
+    // given
+    const product = { stock: 3, reorderThreshold: 3 };
+
+    // when
+    const status = productReorderStatus(product, noRhythm, NOW);
+
+    // then
+    expect(status.isLow).toBe(true);
+    expect(status.reorderAt).toEqual(NOW);
+    expect(status.daysLeft).toBeNull();
+  });
+
+  it('is not low while the stock is above the threshold', () => {
+    // given
+    const product = { stock: 4, reorderThreshold: 3 };
+
+    // when
+    const status = productReorderStatus(product, noRhythm, NOW);
+
+    // then
+    expect(status.isLow).toBe(false);
+    expect(status.reorderAt).toBeNull();
+  });
+
+  it('is low at zero stock with a zero threshold', () => {
+    // given
+    const product = { stock: 0, reorderThreshold: 0 };
+
+    // when
+    const status = productReorderStatus(product, noRhythm, NOW);
+
+    // then
+    expect(status.isLow).toBe(true);
+  });
+
+  it.each([
+    ['an empty threshold', { stock: 1, reorderThreshold: null }],
+    ['an untracked stock', { stock: null, reorderThreshold: 5 }],
+  ])('has no alert with %s', (_name, product) => {
+    // when
+    const status = productReorderStatus(product, noRhythm, NOW);
+
+    // then
+    expect(status.isLow).toBe(false);
+    expect(status.reorderAt).toBeNull();
+  });
+
+  it('ignores the threshold while a schedule is active', () => {
+    // given
+    const product = { stock: 100, reorderThreshold: 100 };
+
+    // when
+    const status = productReorderStatus(product, [rhythm({})], NOW);
+
+    // then
+    expect(status).toEqual(reorderStatus(100, [rhythm({})], NOW));
+    expect(status.isLow).toBe(false);
+  });
+
+  it('uses the threshold when the only schedule has ended', () => {
+    // given
+    const product = { stock: 2, reorderThreshold: 5 };
+    const ended = rhythm({ endDate: daysFromNow(-3) });
+
+    // when
+    const status = productReorderStatus(product, [ended], NOW);
+
+    // then
+    expect(status.isLow).toBe(true);
+  });
+
+  it('uses the threshold when the only schedule is paused', () => {
+    // given
+    const product = { stock: 2, reorderThreshold: 5 };
+    const paused = rhythm({ pausedAt: daysFromNow(-1), resumeAt: null });
+
+    // when
+    const status = productReorderStatus(product, [paused], NOW);
+
+    // then
     expect(status.isLow).toBe(true);
   });
 });

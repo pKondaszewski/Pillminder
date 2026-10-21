@@ -23,10 +23,12 @@ type Props = {
   product: Product;
   reorder?: ReorderStatus;
   now: Date;
+  showThreshold: boolean;
   onDecrease: () => void;
   onIncrease: () => void;
   onAddPack: () => void;
   onEditStock: () => void;
+  onEditThreshold: () => void;
   onOrder: () => void;
 };
 
@@ -34,6 +36,8 @@ export function StockCard({
   product,
   reorder,
   now,
+  showThreshold,
+  onEditThreshold,
   onDecrease,
   onIncrease,
   onAddPack,
@@ -43,7 +47,7 @@ export function StockCard({
   const { t } = useTranslation();
   const formatDate = useFormatDate();
   const theme = useTheme();
-  const { stock, unit, packSize, storeLink } = product;
+  const { stock, unit, packSize, storeLink, reorderThreshold } = product;
   const summary = stockSummary(product, reorder, t);
   const wholeDays =
     summary.kind === 'bar' ? wholeDaysLeft(summary.daysLeft) : null;
@@ -122,6 +126,17 @@ export function StockCard({
           </>
         )}
       </ThemedView>
+      {stock !== null && showThreshold ? (
+        <FieldRow
+          label={t('products.detail.reorderThreshold')}
+          value={
+            reorderThreshold === null
+              ? t('products.detail.notSet')
+              : stockAmountText(reorderThreshold, unit, t)
+          }
+          onPress={onEditThreshold}
+        />
+      ) : null}
       {storeLink ? (
         <FieldRow
           label={t('products.detail.order')}

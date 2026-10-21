@@ -13,8 +13,13 @@ import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
 import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import { isoDay } from '@/config/date-utils';
 import { useRecentDays } from '@/doses/ui/use-recent-days';
+import { AsNeededSection } from '@/intakes/ui/as-needed-section';
+import { TakeNowButton } from '@/intakes/ui/take-now-button';
+import { useIntakeEditor } from '@/intakes/ui/use-intake-editor';
+import { useProductIntakes, useTakeNow } from '@/intakes/ui/use-intakes';
 import type { Product } from '@/products/product-service';
 import { lastUsedText } from '@/products/product-text';
+import { hasActiveSchedule } from '@/products/reorder';
 import { DetailsSection } from '@/products/ui/details-section';
 import {
   ProductFieldSheet,
@@ -61,6 +66,9 @@ function ProductDetail({ product }: { product: Product }) {
   const { snackbar, runWithUndo } = useUndoSnackbar();
   const stock = useStockActions(product, runWithUndo);
   const edit = useProductEditActions(product, runWithUndo);
+  const intakes = useProductIntakes(product.id);
+  const intakeEditor = useIntakeEditor();
+  const takeNow = useTakeNow(product, runWithUndo);
 
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const runThenGoBack = useRunWithErrorAlert(() => router.back());
@@ -97,10 +105,13 @@ function ProductDetail({ product }: { product: Product }) {
           onNamePress={() => editField('name')}
           onCategoryPress={() => editField('category')}
         />
+        {archived ? null : <TakeNowButton onPress={takeNow} />}
         <StockCard
           product={product}
           reorder={reorderStatuses[product.id]}
           now={now}
+          showThreshold={!hasActiveSchedule(productSchedules, now)}
+          onEditThreshold={() => editField('reorderThreshold')}
           onDecrease={() => stock.step(-1)}
           onIncrease={() => stock.step(1)}
           onAddPack={stock.addPack}
@@ -125,6 +136,11 @@ function ProductDetail({ product }: { product: Product }) {
           onDayPress={openDay}
           onCalendarPress={openCalendar}
         />
+        <AsNeededSection
+          intakes={intakes}
+          now={now}
+          onPress={intakeEditor.edit}
+        />
         <ProductNotes productId={product.id} />
         <DetailsSection
           product={product}
@@ -140,6 +156,7 @@ function ProductDetail({ product }: { product: Product }) {
       </KeyboardAwareScrollView>
 
       <UndoSnackbar snackbar={snackbar} />
+      {intakeEditor.sheet}
 
       {sheet?.kind === 'field' ? (
         <ProductFieldSheet
