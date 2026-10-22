@@ -598,6 +598,18 @@
     "runsOutDuringTrip": "Kup przed wyjazdem: zapas skończy się w trakcie wyjazdu",
     "title": "Planer wyjazdu"
   },
+  "tutorial": {
+    "addFirstProduct": "Dodaj pierwszy produkt",
+    "close": "Rozumiem",
+    "hint": "Stuknij, gdy weźmiesz",
+    "introMessage": "Skonfiguruj raz, potem tylko stukaj „Wzięte”. Przypomnienia i stan zapasów Pillminder ogarnia sam.",
+    "introTitle": "Skonfiguruj raz",
+    "productTitle": "Dodaj pierwszy produkt",
+    "restart": "Pokaż tutorial ponownie",
+    "scheduleTitle": "Kiedy to bierzesz?",
+    "settingsTitle": "Tutorial",
+    "skip": "Pomiń tutorial"
+  },
   "unit": {
     "capsule_few": "{{count}} kapsułki",
     "capsule_many": "{{count}} kapsułek",

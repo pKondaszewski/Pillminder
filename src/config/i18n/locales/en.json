@@ -566,6 +566,18 @@
     "runsOutDuringTrip": "Buy a refill before you go: the stock runs out during the trip",
     "title": "Trip planner"
   },
+  "tutorial": {
+    "addFirstProduct": "Add your first product",
+    "close": "Got it",
+    "hint": "Tap when you take it",
+    "introMessage": "Set it up once, then just tap Taken. Pillminder handles the reminders and the stock.",
+    "introTitle": "Set it up once",
+    "productTitle": "Add your first product",
+    "restart": "Show the tutorial again",
+    "scheduleTitle": "When do you take it?",
+    "settingsTitle": "Tutorial",
+    "skip": "Skip tutorial"
+  },
   "unit": {
     "capsule_one": "{{count}} capsule",
     "capsule_other": "{{count}} capsules",

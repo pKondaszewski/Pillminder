@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BackupImportDialog } from '@/backup/ui/backup-import-dialog';
 import { useBackup } from '@/backup/ui/use-backup';
 import { useBatteryOptimization } from '@/battery/ui/use-battery-optimization';
+import { SecondaryButton } from '@/commons/ui/button';
 import { Spacing } from '@/commons/ui/constants/theme';
 import { FieldRow } from '@/commons/ui/field-row';
 import { ScreenTitle } from '@/commons/ui/screen-title';
@@ -41,6 +42,7 @@ import {
   notificationCardState,
 } from '@/settings/ui/status-card-state';
 import { useSettings } from '@/settings/ui/use-settings';
+import { restartTutorial } from '@/tutorial/tutorial-service';
 
 type Sheet = 'snooze';
 
@@ -150,6 +152,13 @@ export default function SettingsScreen() {
                 }))}
                 selected={settings.theme}
                 onSelect={setTheme}
+              />
+            </SettingsSection>
+
+            <SettingsSection title={t('tutorial.settingsTitle')}>
+              <SecondaryButton
+                label={t('tutorial.restart')}
+                onPress={restartTutorial}
               />
             </SettingsSection>
 
