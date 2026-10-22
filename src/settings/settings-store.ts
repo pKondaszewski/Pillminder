@@ -17,6 +17,7 @@ const DEFAULT_SETTINGS: Settings = {
   batteryPromptDismissed: false,
   locationPromptDismissed: false,
   location: null,
+  appLockEnabled: false,
 };
 
 const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
@@ -27,6 +28,7 @@ const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
   batteryPromptDismissed: (value) => typeof value === 'boolean',
   locationPromptDismissed: (value) => typeof value === 'boolean',
   location: isValidStoredLocation,
+  appLockEnabled: (value) => typeof value === 'boolean',
 };
 
 const listeners = new Set<() => void>();
@@ -70,6 +72,7 @@ function readStoredSettings(): Settings {
       batteryPromptDismissed: pick('batteryPromptDismissed', stored),
       locationPromptDismissed: pick('locationPromptDismissed', stored),
       location: pick('location', stored),
+      appLockEnabled: pick('appLockEnabled', stored),
     };
   } catch {
     return DEFAULT_SETTINGS;

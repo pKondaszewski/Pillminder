@@ -8,6 +8,8 @@ import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
+import { AppLockScreen } from '@/applock/ui/app-lock-screen';
+import { useAppLock } from '@/applock/ui/use-app-lock';
 import { AnimatedSplashOverlay } from '@/commons/ui/animated-splash-overlay';
 import { FONT_ASSETS } from '@/commons/ui/constants/fonts';
 import AppTabs from '@/commons/ui/navigation/app-tabs';
@@ -24,6 +26,7 @@ import { OnboardingScreen } from '@/onboarding/ui/onboarding-screen';
 import { useOnboarding } from '@/onboarding/ui/use-onboarding';
 import { MigrationErrorScreen } from '@/recovery/ui/migration-error-screen';
 import { applyStoredTheme } from '@/settings/settings-service';
+import { useSettings } from '@/settings/ui/use-settings';
 
 import migrations from '../../drizzle/migrations';
 
@@ -50,6 +53,7 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
   const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
   useNotificationSetup();
   const onboarding = useOnboarding(migrationsReady);
+  const appLock = useAppLock(useSettings().appLockEnabled);
 
   if (migrationError) {
     return (
@@ -83,6 +87,7 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
           ) : (
             <AppTabs />
           )}
+          {appLock.locked ? <AppLockScreen onUnlock={appLock.unlock} /> : null}
         </ThemeProvider>
       </KeyboardProvider>
     </GestureHandlerRootView>
