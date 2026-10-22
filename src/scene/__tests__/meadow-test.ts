@@ -17,6 +17,7 @@ function mark(overrides: Partial<MeadowMark> = {}): MeadowMark {
     position: 0.5,
     status: 'planned',
     size: 1,
+    remaining: 1,
     taken: 0,
     label: 'a',
     ...overrides,

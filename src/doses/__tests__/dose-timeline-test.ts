@@ -119,6 +119,21 @@ describe('buildTimeline', () => {
     expect(marks[0].status).toBe('skipped');
   });
 
+  it('counts the doses of a group that are neither taken nor skipped', () => {
+    // given
+    const doses = [
+      dose('a', at(8), 'taken'),
+      dose('b', at(8, 5), 'pending'),
+      dose('c', at(8, 10), 'skipped'),
+    ];
+
+    // when
+    const marks = buildTimeline(doses, NOW, SPACING);
+
+    // then
+    expect(marks.map(({ remaining }) => remaining)).toEqual([1]);
+  });
+
   it('clamps doses before 06:00 to the start of the axis', () => {
     // given
     const doses = [dose('night', at(2))];

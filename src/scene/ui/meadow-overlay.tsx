@@ -9,11 +9,9 @@ import {
 
 import { FontFamily } from '@/commons/ui/constants/fonts';
 import { Colors, MIN_TOUCH_SIZE } from '@/commons/ui/constants/theme';
-import { Icon } from '@/commons/ui/icon';
 import { useTheme } from '@/commons/ui/use-theme';
 import {
   basketSlot,
-  type IntakeMarker,
   type MeadowMark,
   meadowSlot,
   SCENE_HEIGHT,
@@ -28,12 +26,9 @@ const BADGE_OFFSET_X = 10;
 const BADGE_OFFSET_Y = 36;
 const TARGET_LIFT = 14;
 const MAX_BADGE = 99;
-const INTAKE_MARKER_SIZE = 14;
-const INTAKE_MARKER_DROP = 4;
 
 type Props = {
   marks: MeadowMark[];
-  intakeMarkers: IntakeMarker[];
   topInset: number;
   selectedId: string | null;
   night: boolean;
@@ -43,7 +38,6 @@ type Props = {
 
 export function MeadowOverlay({
   marks,
-  intakeMarkers,
   topInset,
   selectedId,
   night,
@@ -54,8 +48,6 @@ export function MeadowOverlay({
   const basket = basketSlot(width);
   const taken = marks.reduce((sum, mark) => sum + mark.taken, 0);
   const total = marks.reduce((sum, mark) => sum + mark.size, 0);
-  const theme = useTheme();
-  const markerColor = (night ? Colors.dark : theme).accent;
 
   return (
     <View
@@ -90,26 +82,6 @@ export function MeadowOverlay({
           />
         );
       })}
-      {intakeMarkers.map((marker) => {
-        const { x, y } = meadowSlot(marker.position, 0, width);
-        return (
-          <View
-            key={marker.id}
-            pointerEvents="none"
-            accessible
-            accessibilityLabel={marker.label}
-            style={[
-              styles.intakeMarker,
-              {
-                left: x - INTAKE_MARKER_SIZE / 2,
-                top: y + INTAKE_MARKER_DROP,
-              },
-            ]}
-          >
-            <Icon name="bolt" size={INTAKE_MARKER_SIZE} color={markerColor} />
-          </View>
-        );
-      })}
       {children}
     </View>
   );
@@ -135,7 +107,7 @@ function MarkWidgets({
 
   return (
     <>
-      {mark.size > 1 ? (
+      {mark.size > 1 && mark.remaining > 0 ? (
         <View
           pointerEvents="none"
           style={[
@@ -148,7 +120,7 @@ function MarkWidgets({
           ]}
         >
           <Text style={[styles.badgeText, { color: badgeTheme.background }]}>
-            {mark.size > MAX_BADGE ? `${MAX_BADGE}+` : mark.size}
+            {mark.remaining > MAX_BADGE ? `${MAX_BADGE}+` : mark.remaining}
           </Text>
         </View>
       ) : null}
@@ -184,9 +156,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: FontFamily.bold,
     fontSize: COUNTER_FONT_SIZE,
-  },
-  intakeMarker: {
-    position: 'absolute',
   },
   badge: {
     position: 'absolute',
