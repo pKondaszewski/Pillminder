@@ -68,6 +68,10 @@ export function getStoredLocation(): StoredLocation | null {
   return getSettings().location;
 }
 
+export function setAppLockEnabled(appLockEnabled: boolean): void {
+  updateSettings({ appLockEnabled });
+}
+
 export function getSnoozeMinutes(): number {
   return getSettings().snoozeMinutes;
 }

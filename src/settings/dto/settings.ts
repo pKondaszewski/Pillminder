@@ -16,4 +16,5 @@ export interface Settings {
   batteryPromptDismissed: boolean;
   locationPromptDismissed: boolean;
   location: StoredLocation | null;
+  appLockEnabled: boolean;
 }
