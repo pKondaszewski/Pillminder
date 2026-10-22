@@ -8,11 +8,12 @@ export function useMeadowMarks(timeline: TimelineMark[]): MeadowMark[] {
   const { t } = useTranslation();
   const { formatTime } = useFormatTime();
 
-  return timeline.map(({ id, position, status, doses }) => ({
+  return timeline.map(({ id, position, status, doses, remaining }) => ({
     id,
     position,
     status,
     size: doses.length,
+    remaining,
     taken: doses.filter(({ state }) => state === 'taken').length,
     label: doses
       .map(({ productName, plannedAt }) =>

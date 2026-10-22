@@ -32,6 +32,7 @@ export function buildTimeline(
     position: positionSum / doses.length,
     status: mostUrgent(doses.map((dose) => doseStatus(dose, now))),
     doses,
+    remaining: doses.filter(({ state }) => state === 'pending').length,
   }));
 }
 

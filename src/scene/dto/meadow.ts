@@ -5,13 +5,8 @@ export interface MeadowMark {
   position: number;
   status: MarkStatus;
   size: number;
+  remaining: number;
   taken: number;
-  label: string;
-}
-
-export interface IntakeMarker {
-  id: string;
-  position: number;
   label: string;
 }
 

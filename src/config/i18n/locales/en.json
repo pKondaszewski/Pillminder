@@ -616,7 +616,6 @@
     "label": "as needed",
     "takeNow": "Take now",
     "takenToast": "{{name}} recorded as needed",
-    "rowTime": "as needed · {{time}}",
     "historyTitle": "Taken as needed",
     "recentCount_one": "{{count}} time in the last 14 days",
     "recentCount_other": "{{count}} times in the last 14 days",

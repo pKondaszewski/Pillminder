@@ -6,4 +6,5 @@ export interface TimelineMark {
   position: number;
   status: DoseStatus;
   doses: TodayDose[];
+  remaining: number;
 }

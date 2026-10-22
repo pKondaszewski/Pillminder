@@ -53,7 +53,6 @@ import {
 } from '@/doses/ui/use-undoable-dose-action';
 import type { Intake } from '@/intakes/intake-service';
 import { IntakeRow } from '@/intakes/ui/intake-row';
-import { useIntakeMarkers } from '@/intakes/ui/use-intake-markers';
 import { useIntakesBetween, useRevertIntake } from '@/intakes/ui/use-intakes';
 import { useSunCoords } from '@/location/ui/use-sun-coords';
 import { useProducts } from '@/products/ui/use-products';
@@ -113,7 +112,6 @@ export default function HomeScreen() {
     skipped: { apply: skipDose, revert: unskipDose },
   });
   const dayIntakes = useIntakesBetween(day, addDays(day, 1));
-  const intakeMarkers = useIntakeMarkers(dayIntakes);
   const handleTake = (dose: TodayDose) => applyWithUndo('taken', dose);
   const revertConfirmation = useConfirmation<TodayDose>((dose) =>
     revert(undoableKindOf(dose), dose.id),
@@ -244,7 +242,6 @@ export default function HomeScreen() {
             key={isoDay(day)}
             timeline={timeline}
             marks={meadowMarks}
-            intakeMarkers={intakeMarkers}
             canTake={isToday}
             topInset={topInset}
             night={night}
