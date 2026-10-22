@@ -1,7 +1,6 @@
 {
   "appLock": {
     "confirmPrompt": "Confirm to turn on the app lock",
-    "lockedTitle": "Pillminder is locked",
     "unlock": "Unlock",
     "unlockPrompt": "Unlock Pillminder"
   },
@@ -542,6 +541,12 @@
     "permissions": "Permissions",
     "privacy": "Privacy",
     "reminders": "Reminders",
+    "season": "Season",
+    "seasonAuto": "Automatic",
+    "seasonAutumn": "Autumn",
+    "seasonSpring": "Spring",
+    "seasonSummer": "Summer",
+    "seasonWinter": "Winter",
     "snooze": "Snooze duration",
     "snoozeExplanation": "Snooze postpones a dose reminder. When you tap \"Snooze\" on the notification, the reminder comes back after this many minutes.",
     "snoozeInvalid": "Enter a number of minutes from {{min}} to {{max}}",

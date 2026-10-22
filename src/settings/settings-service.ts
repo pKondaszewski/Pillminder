@@ -5,6 +5,7 @@ import type { Coords, StoredLocation } from '@/location/dto/coords';
 
 import type {
   LanguagePreference,
+  SeasonPreference,
   ThemePreference,
   TutorialStep,
 } from './dto/settings';
@@ -13,6 +14,8 @@ import { getSettings, updateSettings } from './settings-store';
 export {
   LANGUAGE_OPTIONS,
   type LanguagePreference,
+  SEASON_OPTIONS,
+  type SeasonPreference,
   type Settings,
   THEME_OPTIONS,
   type ThemePreference,
@@ -28,6 +31,10 @@ export function applyStoredTheme(): void {
 export function setTheme(theme: ThemePreference): void {
   updateSettings({ theme });
   applyTheme(theme);
+}
+
+export function setSeasonPreference(seasonPreference: SeasonPreference): void {
+  updateSettings({ seasonPreference });
 }
 
 export function setLanguage(language: LanguagePreference): void {
@@ -85,6 +92,10 @@ export function getStoredLocation(): StoredLocation | null {
 
 export function setAppLockEnabled(appLockEnabled: boolean): void {
   updateSettings({ appLockEnabled });
+}
+
+export function isAppLockEnabled(): boolean {
+  return getSettings().appLockEnabled;
 }
 
 export function getSnoozeMinutes(): number {

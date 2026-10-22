@@ -61,11 +61,11 @@ import {
   markSpacing,
   MEADOW_BOTTOM,
   type SceneMood,
-  seasonOf,
   skyScene,
 } from '@/scene/scene-service';
 import { DayScene } from '@/scene/ui/day-scene';
 import { useCelebration } from '@/scene/ui/use-celebration';
+import { useSeason } from '@/scene/ui/use-season';
 import { TutorialPracticeCard } from '@/tutorial/ui/tutorial-practice-card';
 import {
   usePracticeReminder,
@@ -78,6 +78,7 @@ export default function HomeScreen() {
   const formatDate = useFormatDate();
   const now = useNow();
   const coords = useSunCoords();
+  const season = useSeason(now);
   const { top: topInset } = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const today = startOfDay(now);
@@ -221,7 +222,7 @@ export default function HomeScreen() {
           <DayScene
             scene={scene}
             mood={mood ?? 'calm'}
-            season={seasonOf(now, coords?.latitude ?? null)}
+            season={season}
             marks={meadowMarks}
             nowPosition={isToday ? nowPosition(now) : null}
             celebrationKey={celebrationKey}

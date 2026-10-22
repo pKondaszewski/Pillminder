@@ -1,7 +1,6 @@
 {
   "appLock": {
     "confirmPrompt": "Potwierdź, aby włączyć blokadę aplikacji",
-    "lockedTitle": "Pillminder jest zablokowany",
     "unlock": "Odblokuj",
     "unlockPrompt": "Odblokuj Pillminder"
   },
@@ -574,6 +573,12 @@
     "permissions": "Uprawnienia",
     "privacy": "Prywatność",
     "reminders": "Przypomnienia",
+    "season": "Pora roku",
+    "seasonAuto": "Automatyczna",
+    "seasonAutumn": "Jesień",
+    "seasonSpring": "Wiosna",
+    "seasonSummer": "Lato",
+    "seasonWinter": "Zima",
     "snooze": "Czas drzemki",
     "snoozeExplanation": "Drzemka odkłada przypomnienie o dawce. Gdy wybierzesz „Drzemka” na powiadomieniu, przypomnienie wróci po tylu minutach.",
     "snoozeInvalid": "Podaj liczbę minut od {{min}} do {{max}}",
