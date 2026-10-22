@@ -24,17 +24,20 @@ import { permissionStep } from '@/onboarding/onboarding-service';
 import {
   LANGUAGE_OPTIONS,
   type LanguagePreference,
+  type SeasonPreference,
   THEME_OPTIONS,
   type ThemePreference,
 } from '@/settings/settings-service';
 import {
   setLanguage,
+  setSeasonPreference,
   setSnoozeMinutes,
   setTheme,
 } from '@/settings/settings-service';
 import { AboutLine } from '@/settings/ui/about-line';
 import { AppLockSection } from '@/settings/ui/app-lock-section';
 import { BackupSection } from '@/settings/ui/backup-section';
+import { SeasonSheet } from '@/settings/ui/season-sheet';
 import { SettingsSection } from '@/settings/ui/settings-section';
 import { SnoozeSheet } from '@/settings/ui/snooze-sheet';
 import { StatusCard } from '@/settings/ui/status-card';
@@ -46,7 +49,7 @@ import {
 import { useSettings } from '@/settings/ui/use-settings';
 import { restartTutorial } from '@/tutorial/tutorial-service';
 
-type Sheet = 'snooze';
+type Sheet = 'snooze' | 'season';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -156,6 +159,11 @@ export default function SettingsScreen() {
                 selected={settings.theme}
                 onSelect={setTheme}
               />
+              <FieldRow
+                label={t('settings.season')}
+                value={t(SEASON_LABEL_KEYS[settings.seasonPreference])}
+                onPress={() => setSheet('season')}
+              />
             </SettingsSection>
 
             {appLock.available === null ? null : (
@@ -209,6 +217,17 @@ export default function SettingsScreen() {
           onClose={closeSheet}
         />
       ) : null}
+      {sheet === 'season' ? (
+        <SeasonSheet
+          selected={settings.seasonPreference}
+          labelKeys={SEASON_LABEL_KEYS}
+          onSelect={(season) => {
+            setSeasonPreference(season);
+            closeSheet();
+          }}
+          onClose={closeSheet}
+        />
+      ) : null}
       <UndoSnackbar snackbar={snackbar} />
     </>
   );
@@ -224,6 +243,14 @@ const THEME_LABEL_KEYS: Record<ThemePreference, string> = {
   system: 'settings.themeSystem',
   light: 'settings.themeLight',
   dark: 'settings.themeDark',
+};
+
+const SEASON_LABEL_KEYS: Record<SeasonPreference, string> = {
+  auto: 'settings.seasonAuto',
+  spring: 'settings.seasonSpring',
+  summer: 'settings.seasonSummer',
+  autumn: 'settings.seasonAutumn',
+  winter: 'settings.seasonWinter',
 };
 
 const styles = StyleSheet.create({

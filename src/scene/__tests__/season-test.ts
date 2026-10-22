@@ -1,4 +1,4 @@
-import { seasonOf } from '../season';
+import { resolveSeason, seasonOf } from '../season';
 
 function inMonth(month: number): Date {
   return new Date(2026, month - 1, 15);
@@ -50,5 +50,26 @@ describe('seasonOf', () => {
 
     // then
     expect(season).toBe('winter');
+  });
+});
+
+describe('resolveSeason', () => {
+  it.each([
+    [52, 'winter'],
+    [-33, 'summer'],
+  ])('auto follows the date at latitude %i', (latitude, expected) => {
+    // when
+    const season = resolveSeason('auto', inMonth(1), latitude);
+
+    // then
+    expect(season).toBe(expected);
+  });
+
+  it('a chosen season ignores the date and latitude', () => {
+    // when
+    const season = resolveSeason('autumn', inMonth(1), -33);
+
+    // then
+    expect(season).toBe('autumn');
   });
 });
