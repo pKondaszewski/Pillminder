@@ -24,6 +24,7 @@ import { permissionStep } from '@/onboarding/onboarding-service';
 import {
   LANGUAGE_OPTIONS,
   type LanguagePreference,
+  SEASON_OPTIONS,
   type SeasonPreference,
   THEME_OPTIONS,
   type ThemePreference,
@@ -37,7 +38,6 @@ import {
 import { AboutLine } from '@/settings/ui/about-line';
 import { AppLockSection } from '@/settings/ui/app-lock-section';
 import { BackupSection } from '@/settings/ui/backup-section';
-import { SeasonSheet } from '@/settings/ui/season-sheet';
 import { SettingsSection } from '@/settings/ui/settings-section';
 import { SnoozeSheet } from '@/settings/ui/snooze-sheet';
 import { StatusCard } from '@/settings/ui/status-card';
@@ -49,7 +49,7 @@ import {
 import { useSettings } from '@/settings/ui/use-settings';
 import { restartTutorial } from '@/tutorial/tutorial-service';
 
-type Sheet = 'snooze' | 'season';
+type Sheet = 'snooze';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -159,10 +159,16 @@ export default function SettingsScreen() {
                 selected={settings.theme}
                 onSelect={setTheme}
               />
-              <FieldRow
-                label={t('settings.season')}
-                value={t(SEASON_LABEL_KEYS[settings.seasonPreference])}
-                onPress={() => setSheet('season')}
+              <ThemedText type="small" themeColor="textSecondary">
+                {t('settings.season')}
+              </ThemedText>
+              <SegmentedControl
+                options={SEASON_OPTIONS.map((value) => ({
+                  value,
+                  label: t(SEASON_LABEL_KEYS[value]),
+                }))}
+                selected={settings.seasonPreference}
+                onSelect={setSeasonPreference}
               />
             </SettingsSection>
 
@@ -213,17 +219,6 @@ export default function SettingsScreen() {
               'settings.errorSave',
               closeSheet,
             );
-          }}
-          onClose={closeSheet}
-        />
-      ) : null}
-      {sheet === 'season' ? (
-        <SeasonSheet
-          selected={settings.seasonPreference}
-          labelKeys={SEASON_LABEL_KEYS}
-          onSelect={(season) => {
-            setSeasonPreference(season);
-            closeSheet();
           }}
           onClose={closeSheet}
         />
