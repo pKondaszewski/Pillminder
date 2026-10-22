@@ -1,18 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppState } from 'react-native';
 
 import { createLogger } from '@/config/logger';
 import { setAppLockEnabled } from '@/settings/settings-service';
+import { useSettings } from '@/settings/ui/use-settings';
 
 import { shouldLockOnResume } from '../app-lock-policy';
 import { authenticate, setScreenCaptureBlocked } from '../app-lock-service';
+import { setAppLocked } from '../app-lock-state';
+import { useAppLocked } from './use-app-locked';
 
 const log = createLogger('use-app-lock');
 
-export function useAppLock(enabled: boolean) {
+export function useAppLock() {
+  const { appLockEnabled: enabled } = useSettings();
   const { t } = useTranslation();
-  const [locked, setLocked] = useState(enabled);
+  const locked = useAppLocked();
   const authenticating = useRef(false);
 
   const unlock = useCallback(() => {
@@ -21,7 +25,7 @@ export function useAppLock(enabled: boolean) {
     authenticate(t('appLock.unlockPrompt'))
       .then((result) => {
         if (result === 'notSecured') setAppLockEnabled(false);
-        if (result !== 'failed') setLocked(false);
+        if (result !== 'failed') setAppLocked(false);
       })
       .catch((err) => log.error('Unlocking failed', err))
       .finally(() => {
@@ -36,8 +40,8 @@ export function useAppLock(enabled: boolean) {
   }, [enabled]);
 
   useEffect(() => {
-    if (enabled && locked) unlock();
-  }, [enabled, locked, unlock]);
+    if (locked) unlock();
+  }, [locked, unlock]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -47,12 +51,12 @@ export function useAppLock(enabled: boolean) {
       if (authenticating.current) return;
       if (state === 'background') backgroundedAt = Date.now();
       if (state === 'active') {
-        if (shouldLockOnResume(backgroundedAt, Date.now())) setLocked(true);
+        if (shouldLockOnResume(backgroundedAt, Date.now())) setAppLocked(true);
         backgroundedAt = null;
       }
     });
     return () => subscription.remove();
   }, [enabled]);
 
-  return { locked: enabled && locked, unlock };
+  return { locked, unlock };
 }

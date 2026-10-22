@@ -26,7 +26,6 @@ import { OnboardingScreen } from '@/onboarding/ui/onboarding-screen';
 import { useOnboarding } from '@/onboarding/ui/use-onboarding';
 import { MigrationErrorScreen } from '@/recovery/ui/migration-error-screen';
 import { applyStoredTheme } from '@/settings/settings-service';
-import { useSettings } from '@/settings/ui/use-settings';
 import { TutorialIntroScreen } from '@/tutorial/ui/tutorial-intro-screen';
 import { useTutorial, useTutorialStart } from '@/tutorial/ui/use-tutorial';
 
@@ -59,7 +58,7 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
     migrationsReady && onboarding.ready && onboarding.step === null,
   );
   const tutorial = useTutorial();
-  const appLock = useAppLock(useSettings().appLockEnabled);
+  const appLock = useAppLock();
 
   if (migrationError) {
     return (
@@ -87,7 +86,7 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
         >
           <DatabaseBoundEffects />
-          <AnimatedSplashOverlay />
+          <AnimatedSplashOverlay frozen={appLock.locked} />
           {onboarding.step ? (
             <OnboardingScreen
               step={onboarding.step}

@@ -1,7 +1,6 @@
 {
   "appLock": {
     "confirmPrompt": "Potwierdź, aby włączyć blokadę aplikacji",
-    "lockedTitle": "Pillminder jest zablokowany",
     "unlock": "Odblokuj",
     "unlockPrompt": "Odblokuj Pillminder"
   },

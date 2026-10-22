@@ -94,6 +94,10 @@ export function setAppLockEnabled(appLockEnabled: boolean): void {
   updateSettings({ appLockEnabled });
 }
 
+export function isAppLockEnabled(): boolean {
+  return getSettings().appLockEnabled;
+}
+
 export function getSnoozeMinutes(): number {
   return getSettings().snoozeMinutes;
 }

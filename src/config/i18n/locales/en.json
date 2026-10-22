@@ -1,7 +1,6 @@
 {
   "appLock": {
     "confirmPrompt": "Confirm to turn on the app lock",
-    "lockedTitle": "Pillminder is locked",
     "unlock": "Unlock",
     "unlockPrompt": "Unlock Pillminder"
   },
