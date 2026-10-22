@@ -1,6 +1,8 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { StyleSheet } from 'react-native';
 
+import { ThemedView } from '@/commons/ui/themed-view';
 import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
 import { useProducts } from '@/products/ui/use-products';
 import { NewScheduleForm } from '@/schedules/ui/new-form';
@@ -31,7 +33,7 @@ export default function NewScheduleScreen() {
     : undefined;
 
   return (
-    <>
+    <ThemedView style={styles.container}>
       <Stack.Screen
         options={{ headerShown: true, title: t('schedule.newTitle') }}
       />
@@ -51,6 +53,12 @@ export default function NewScheduleScreen() {
           })
         }
       />
-    </>
+    </ThemedView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

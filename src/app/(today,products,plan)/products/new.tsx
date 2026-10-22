@@ -1,7 +1,8 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Alert } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 
+import { ThemedView } from '@/commons/ui/themed-view';
 import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
 import { addImage, DEFAULT_IMAGE_ROLE } from '@/images/image-service';
 import type { NewProductInput } from '@/products/dto/new-product-input';
@@ -48,7 +49,7 @@ export default function NewProductScreen() {
   };
 
   return (
-    <>
+    <ThemedView style={styles.container}>
       <Stack.Screen
         options={{ headerShown: true, title: t('editor.newTitle') }}
       />
@@ -61,6 +62,12 @@ export default function NewProductScreen() {
           )
         }
       />
-    </>
+    </ThemedView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
