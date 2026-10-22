@@ -3,7 +3,11 @@ import { Appearance } from 'react-native';
 import i18n, { resolveLanguage } from '@/config/i18n';
 import type { Coords, StoredLocation } from '@/location/dto/coords';
 
-import type { LanguagePreference, ThemePreference } from './dto/settings';
+import type {
+  LanguagePreference,
+  ThemePreference,
+  TutorialStep,
+} from './dto/settings';
 import { getSettings, updateSettings } from './settings-store';
 
 export {
@@ -12,7 +16,10 @@ export {
   type Settings,
   THEME_OPTIONS,
   type ThemePreference,
+  TUTORIAL_STEPS,
+  type TutorialStep,
 } from './dto/settings';
+export { subscribeToSettings } from './settings-store';
 
 export function applyStoredTheme(): void {
   applyTheme(getSettings().theme);
@@ -54,6 +61,14 @@ export function dismissLocationPrompt(): void {
 
 export function isLocationPromptDismissed(): boolean {
   return getSettings().locationPromptDismissed;
+}
+
+export function getTutorialStep(): TutorialStep {
+  return getSettings().tutorialStep;
+}
+
+export function setTutorialStep(tutorialStep: TutorialStep): void {
+  updateSettings({ tutorialStep });
 }
 
 export function saveLocation(coords: Coords, now: number): void {

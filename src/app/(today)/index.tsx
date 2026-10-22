@@ -66,6 +66,8 @@ import {
 } from '@/scene/scene-service';
 import { DayScene } from '@/scene/ui/day-scene';
 import { useCelebration } from '@/scene/ui/use-celebration';
+import { TutorialHint } from '@/tutorial/ui/tutorial-hint';
+import { useTutorial, useTutorialFormPrompt } from '@/tutorial/ui/use-tutorial';
 
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
@@ -76,6 +78,8 @@ export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const today = startOfDay(now);
   const { products, loaded } = useProducts();
+  const tutorial = useTutorial();
+  useTutorialFormPrompt(tutorial.step);
 
   const [pickedDay, setPickedDay] = useState<Date | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -104,6 +108,10 @@ export default function HomeScreen() {
   });
   const dayIntakes = useIntakesBetween(day, addDays(day, 1));
   const intakeMarkers = useIntakeMarkers(dayIntakes);
+  const handleTake = (dose: TodayDose) => {
+    if (tutorial.step === 'hint') tutorial.advance();
+    applyWithUndo('taken', dose);
+  };
   const revertConfirmation = useConfirmation<TodayDose>((dose) =>
     revert(undoableKindOf(dose), dose.id),
   );
@@ -237,7 +245,7 @@ export default function HomeScreen() {
             canTake={isToday}
             topInset={topInset}
             night={night}
-            onTake={(dose) => applyWithUndo('taken', dose)}
+            onTake={handleTake}
           />
           {loaded && products.length === 0 ? (
             <EmptyState
@@ -263,11 +271,14 @@ export default function HomeScreen() {
               onAction={() => router.navigate('/schedules')}
             />
           ) : null}
+          {tutorial.step === 'hint' && isToday && doses.length > 0 ? (
+            <TutorialHint onClose={tutorial.advance} onSkip={tutorial.skip} />
+          ) : null}
           {cardState ? (
             <TodayCard
               key={isoDay(day)}
               state={cardState}
-              onTake={(dose) => applyWithUndo('taken', dose)}
+              onTake={handleTake}
               onTakeOverdue={takeOverdueConfirmation.request}
             />
           ) : null}
@@ -280,7 +291,7 @@ export default function HomeScreen() {
                   dose={dose}
                   mode={mode}
                   now={now}
-                  onTake={(taken) => applyWithUndo('taken', taken)}
+                  onTake={handleTake}
                   onSkip={(skipped) => applyWithUndo('skipped', skipped)}
                   onRevert={revertConfirmation.request}
                   onCorrect={setCorrecting}
