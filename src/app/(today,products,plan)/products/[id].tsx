@@ -166,6 +166,7 @@ function ProductDetail({ product }: { product: Product }) {
             edit.saveField(sheet.field, patch, () => setSheet(null))
           }
           onClose={() => setSheet(null)}
+          runWithUndo={runWithUndo}
           onProductDeleted={() => router.back()}
         />
       ) : null}

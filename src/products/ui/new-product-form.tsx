@@ -13,7 +13,9 @@ import { Stepper } from '@/commons/ui/stepper';
 import { TextField } from '@/commons/ui/text-field';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
+import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
 import { useTheme } from '@/commons/ui/use-theme';
+import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import type { ImageSource } from '@/images/image-service';
 import {
   packSizeInMl,
@@ -51,6 +53,7 @@ type Props = {
 export function NewProductForm({ onSubmit }: Props) {
   const { t } = useTranslation();
   const pickImageUri = usePickImage();
+  const { snackbar, runWithUndo } = useUndoSnackbar();
   const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);
   const fieldOffsets = useRef<Partial<Record<ProductFormField, number>>>({});
 
@@ -131,6 +134,7 @@ export function NewProductForm({ onSubmit }: Props) {
             <FieldLabel text={t('editor.category')} />
             <CategoryPicker
               value={values.category}
+              runWithUndo={runWithUndo}
               error={errorText('category')}
               onChange={(category) =>
                 change({
@@ -254,6 +258,7 @@ export function NewProductForm({ onSubmit }: Props) {
           <PrimaryButton label={t('products.add')} onPress={submit} />
         </ThemedView>
       </SafeAreaView>
+      <UndoSnackbar snackbar={snackbar} />
       <ImageSourceSheet
         visible={sourceSheetVisible}
         onClose={() => setSourceSheetVisible(false)}

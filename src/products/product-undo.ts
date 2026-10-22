@@ -18,3 +18,22 @@ export function productEditChange(
     revert: () => save(product.id, editedProductInput(product, {})),
   };
 }
+
+type RenameCategory = (from: string, to: string) => Promise<unknown>;
+
+export function categoryRenameChange(
+  from: string,
+  to: string,
+  message: string,
+  rename: RenameCategory,
+): UndoableChange {
+  return {
+    message,
+    apply: async () => {
+      await rename(from, to);
+    },
+    revert: async () => {
+      await rename(to, from);
+    },
+  };
+}
