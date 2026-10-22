@@ -27,7 +27,7 @@ const FORM_ROUTES: Partial<
 const NEXT_STEP: Record<TutorialStep, TutorialStep> = {
   intro: 'product',
   product: 'schedule',
-  schedule: 'hint',
-  hint: 'done',
+  schedule: 'practice',
+  practice: 'done',
   done: 'done',
 };

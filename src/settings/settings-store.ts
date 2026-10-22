@@ -7,6 +7,7 @@ import {
   THEME_OPTIONS,
   TUTORIAL_STEPS,
 } from './dto/settings';
+import { withoutRetiredTutorialStep } from './retired-tutorial-step';
 import { isValidStoredLocation } from './stored-location-validation';
 
 export const SNOOZE_MINUTES_MIN = 1;
@@ -84,7 +85,7 @@ function readStoredSettings(): Settings {
       batteryPromptDismissed: pick('batteryPromptDismissed', stored),
       locationPromptDismissed: pick('locationPromptDismissed', stored),
       location: pick('location', stored),
-      tutorialStep: pick('tutorialStep', stored),
+      tutorialStep: pick('tutorialStep', withoutRetiredTutorialStep(stored)),
       appLockEnabled: pick('appLockEnabled', stored),
     };
   } catch {

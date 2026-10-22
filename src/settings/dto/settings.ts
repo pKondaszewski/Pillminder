@@ -17,7 +17,7 @@ export const TUTORIAL_STEPS = [
   'intro',
   'product',
   'schedule',
-  'hint',
+  'practice',
   'done',
 ] as const;
 

@@ -4,9 +4,12 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createLogger } from '@/config/logger';
 import {
   advanceTutorial,
+  completePractice,
   getTutorialStep,
+  type PracticeReminder,
   resolveTutorialStart,
   skipTutorial,
+  startPractice,
   subscribeToTutorialStep,
   tutorialFormRoute,
   type TutorialStep,
@@ -30,7 +33,25 @@ export function useTutorialStart(enabled: boolean): boolean {
 export function useTutorial() {
   const step = useSyncExternalStore(subscribeToTutorialStep, getTutorialStep);
 
-  return { step, advance: advanceTutorial, skip: skipTutorial };
+  return {
+    step,
+    advance: advanceTutorial,
+    skip: skipTutorial,
+    completePractice,
+  };
+}
+
+export function usePracticeReminder(active: boolean): PracticeReminder | null {
+  const [reminder, setReminder] = useState<PracticeReminder | null>(null);
+
+  useEffect(() => {
+    if (!active) return;
+    startPractice()
+      .then(setReminder)
+      .catch((err) => log.error('Practice reminder failed', err));
+  }, [active]);
+
+  return active ? reminder : null;
 }
 
 export function useTutorialFormPrompt(step: TutorialStep): void {
