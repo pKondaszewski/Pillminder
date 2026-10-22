@@ -1,5 +1,5 @@
 import type { Product } from '../product-service';
-import { productEditChange } from '../product-undo';
+import { categoryRenameChange, productEditChange } from '../product-undo';
 
 const product = {
   id: 'p1',
@@ -62,5 +62,34 @@ describe('productEditChange', () => {
       category: 'medication',
       strength: '50mcg',
     });
+  });
+});
+
+describe('categoryRenameChange', () => {
+  it('renames forward on apply and back on revert', async () => {
+    // given
+    const rename = jest.fn().mockResolvedValue('Vitamins');
+    const change = categoryRenameChange('Vits', 'Vitamins', 'Renamed', rename);
+
+    // when
+    await change.apply();
+    await change.revert();
+
+    // then
+    expect(change.message).toBe('Renamed');
+    expect(rename).toHaveBeenNthCalledWith(1, 'Vits', 'Vitamins');
+    expect(rename).toHaveBeenNthCalledWith(2, 'Vitamins', 'Vits');
+  });
+
+  it('rejects when the rename fails', async () => {
+    // given
+    const rename = jest.fn().mockRejectedValue(new Error('taken'));
+    const change = categoryRenameChange('Vits', 'Vitamins', 'Renamed', rename);
+
+    // when
+    const result = change.apply();
+
+    // then
+    await expect(result).rejects.toThrow('taken');
   });
 });

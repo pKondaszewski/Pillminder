@@ -1,28 +1,28 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { BottomSheet } from '@/commons/ui/bottom-sheet';
 import { DestructiveButton } from '@/commons/ui/button';
 import { TextField } from '@/commons/ui/text-field';
 import {
   checkCustomCategoryName,
   MAX_CUSTOM_CATEGORY_LENGTH,
 } from '@/products/category';
+import { CategoryActions } from '@/products/ui/category-actions';
 
 type Props = {
   originalName: string | null;
   customCategories: string[];
   onSave: (name: string) => void;
   onDelete: (name: string) => void;
-  onClose: () => void;
+  onCancel: () => void;
 };
 
-export function CategoryNameSheet({
+export function CategoryNameForm({
   originalName,
   customCategories,
   onSave,
   onDelete,
-  onClose,
+  onCancel,
 }: Props) {
   const { t } = useTranslation();
   const [text, setText] = useState(originalName ?? '');
@@ -37,12 +37,8 @@ export function CategoryNameSheet({
     onSave(check.name);
   };
 
-  const title = t(
-    originalName === null ? 'editor.newCategoryTitle' : 'editor.editCategory',
-  );
-
   return (
-    <BottomSheet visible title={title} onClose={onClose} onSave={save}>
+    <>
       <TextField
         value={text}
         onChangeText={(next) => {
@@ -51,9 +47,9 @@ export function CategoryNameSheet({
         }}
         maxLength={MAX_CUSTOM_CATEGORY_LENGTH}
         autoFocus
-        accessibilityLabel={
-          originalName === null ? t('editor.newCategory') : title
-        }
+        accessibilityLabel={t(
+          originalName === null ? 'editor.newCategory' : 'editor.editCategory',
+        )}
         placeholder={t('editor.newCategoryPlaceholder')}
         error={error ? t(`editor.categoryName.${error}`) : undefined}
       />
@@ -63,6 +59,11 @@ export function CategoryNameSheet({
           onPress={() => onDelete(originalName)}
         />
       )}
-    </BottomSheet>
+      <CategoryActions
+        confirmLabel={t('editor.save')}
+        onConfirm={save}
+        onCancel={onCancel}
+      />
+    </>
   );
 }

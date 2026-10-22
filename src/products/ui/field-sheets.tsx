@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/commons/ui/bottom-sheet';
 import { TextField } from '@/commons/ui/text-field';
 import { ThemedText } from '@/commons/ui/themed-text';
+import type { RunWithUndo } from '@/commons/ui/use-undo-snackbar';
 import { categoryUnit, packSizeInMl } from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import {
@@ -53,7 +54,10 @@ type SheetProps = {
   onClose: () => void;
 };
 
-type CategorySheetProps = SheetProps & { onProductDeleted: () => void };
+type CategorySheetProps = SheetProps & {
+  runWithUndo: RunWithUndo;
+  onProductDeleted: () => void;
+};
 
 type Props = CategorySheetProps & { field: ProductSheetField };
 
@@ -174,6 +178,7 @@ function CategorySheet({
   product,
   onSave,
   onClose,
+  runWithUndo,
   onProductDeleted,
 }: CategorySheetProps) {
   const { t } = useTranslation();
@@ -190,28 +195,25 @@ function CategorySheet({
     onSave(unit ? { category, unit } : { category });
   };
 
-  // The picker's dialogs are Modals too: the sheet hides while one is open
-  const { picker, dialogs, dialogOpen } = useCategoryPicker({
+  const { picker, editor } = useCategoryPicker({
     value: category,
     error: error ? t(error) : undefined,
     onChange: setCategory,
+    runWithUndo,
     onProductsRemoved: (ids) => {
       if (ids.includes(product.id)) onProductDeleted();
     },
   });
 
   return (
-    <>
-      <BottomSheet
-        visible={!dialogOpen}
-        title={t('editor.category')}
-        onClose={onClose}
-        onSave={save}
-      >
-        {picker}
-      </BottomSheet>
-      {dialogs}
-    </>
+    <BottomSheet
+      visible
+      title={editor?.title ?? t('editor.category')}
+      onClose={editor?.close ?? onClose}
+      onSave={editor ? undefined : save}
+    >
+      {editor?.body ?? picker}
+    </BottomSheet>
   );
 }
 
