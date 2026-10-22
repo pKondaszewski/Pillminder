@@ -23,6 +23,7 @@ const DEFAULT_SETTINGS: Settings = {
   locationPromptDismissed: false,
   location: null,
   tutorialStep: 'intro',
+  appLockEnabled: false,
 };
 
 const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
@@ -34,6 +35,7 @@ const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
   locationPromptDismissed: (value) => typeof value === 'boolean',
   location: isValidStoredLocation,
   tutorialStep: (value) => TUTORIAL_STEPS.some((step) => step === value),
+  appLockEnabled: (value) => typeof value === 'boolean',
 };
 
 const listeners = new Set<() => void>();
@@ -78,6 +80,7 @@ function readStoredSettings(): Settings {
       locationPromptDismissed: pick('locationPromptDismissed', stored),
       location: pick('location', stored),
       tutorialStep: pick('tutorialStep', stored),
+      appLockEnabled: pick('appLockEnabled', stored),
     };
   } catch {
     return DEFAULT_SETTINGS;

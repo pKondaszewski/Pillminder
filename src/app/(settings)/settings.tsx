@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Linking, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useAppLockSetting } from '@/applock/ui/use-app-lock-setting';
 import { BackupImportDialog } from '@/backup/ui/backup-import-dialog';
 import { useBackup } from '@/backup/ui/use-backup';
 import { useBatteryOptimization } from '@/battery/ui/use-battery-optimization';
@@ -32,6 +33,7 @@ import {
   setTheme,
 } from '@/settings/settings-service';
 import { AboutLine } from '@/settings/ui/about-line';
+import { AppLockSection } from '@/settings/ui/app-lock-section';
 import { BackupSection } from '@/settings/ui/backup-section';
 import { SettingsSection } from '@/settings/ui/settings-section';
 import { SnoozeSheet } from '@/settings/ui/snooze-sheet';
@@ -53,6 +55,7 @@ export default function SettingsScreen() {
   const battery = useBatteryOptimization();
   const location = useLocationPermission();
   const backup = useBackup();
+  const appLock = useAppLockSetting();
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const { snackbar, runWithUndo } = useUndoSnackbar();
 
@@ -155,6 +158,13 @@ export default function SettingsScreen() {
               />
             </SettingsSection>
 
+            {appLock.available === null ? null : (
+              <AppLockSection
+                enabled={settings.appLockEnabled}
+                available={appLock.available}
+                onChange={(enabled) => void appLock.change(enabled)}
+              />
+            )}
             <SettingsSection title={t('tutorial.settingsTitle')}>
               <SecondaryButton
                 label={t('tutorial.restart')}

@@ -1,4 +1,10 @@
 {
+  "appLock": {
+    "confirmPrompt": "Confirm to turn on the app lock",
+    "lockedTitle": "Pillminder is locked",
+    "unlock": "Unlock",
+    "unlockPrompt": "Unlock Pillminder"
+  },
   "backup": {
     "cancel": "Cancel",
     "confirmAction": "Replace everything",
@@ -507,6 +513,9 @@
   },
   "settings": {
     "aboutLink": "Pillminder on GitHub",
+    "appLock": "Lock the app",
+    "appLockDescription": "Ask for fingerprint, face or the phone's screen lock when the app opens and after a minute in the background. Reminder buttons keep working without unlocking.",
+    "appLockUnavailable": "Set a screen lock or fingerprint in the phone's settings to use this.",
     "appearance": "Appearance",
     "batteryOptimization": "Battery optimization",
     "batteryRestricted": "On: Android may put the app to sleep and delay reminders",
@@ -531,6 +540,7 @@
     "notificationsGranted": "Allowed: dose reminders show up on your phone",
     "notificationsPermission": "Notification permission",
     "permissions": "Permissions",
+    "privacy": "Privacy",
     "reminders": "Reminders",
     "snooze": "Snooze duration",
     "snoozeExplanation": "Snooze postpones a dose reminder. When you tap \"Snooze\" on the notification, the reminder comes back after this many minutes.",

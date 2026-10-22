@@ -27,4 +27,5 @@ export interface Settings {
   locationPromptDismissed: boolean;
   location: StoredLocation | null;
   tutorialStep: TutorialStep;
+  appLockEnabled: boolean;
 }

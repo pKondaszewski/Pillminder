@@ -1,4 +1,10 @@
 {
+  "appLock": {
+    "confirmPrompt": "Potwierdź, aby włączyć blokadę aplikacji",
+    "lockedTitle": "Pillminder jest zablokowany",
+    "unlock": "Odblokuj",
+    "unlockPrompt": "Odblokuj Pillminder"
+  },
   "backup": {
     "cancel": "Anuluj",
     "confirmAction": "Zastąp wszystko",
@@ -539,6 +545,9 @@
   },
   "settings": {
     "aboutLink": "Pillminder na GitHubie",
+    "appLock": "Blokada aplikacji",
+    "appLockDescription": "Prosi o odcisk palca, twarz lub blokadę ekranu telefonu przy otwarciu aplikacji i po minucie w tle. Przyciski w przypomnieniach działają bez odblokowania.",
+    "appLockUnavailable": "Ustaw blokadę ekranu lub odcisk palca w ustawieniach telefonu, aby z tego skorzystać.",
     "appearance": "Wygląd",
     "batteryOptimization": "Optymalizacja baterii",
     "batteryRestricted": "Włączona: Android może usypiać aplikację i spóźniać przypomnienia",
@@ -563,6 +572,7 @@
     "notificationsGranted": "Zezwolono: przypomnienia o dawkach pojawiają się na telefonie",
     "notificationsPermission": "Uprawnienie do powiadomień",
     "permissions": "Uprawnienia",
+    "privacy": "Prywatność",
     "reminders": "Przypomnienia",
     "snooze": "Czas drzemki",
     "snoozeExplanation": "Drzemka odkłada przypomnienie o dawce. Gdy wybierzesz „Drzemka” na powiadomieniu, przypomnienie wróci po tylu minutach.",
