@@ -14,6 +14,7 @@ import {
   subscribeToReminderResponses,
 } from '@/notifications/notification-service';
 import { restockPack } from '@/products/product-orchestrator';
+import { completePractice, snoozePractice } from '@/tutorial/tutorial-service';
 
 const log = createLogger('use-notifications');
 
@@ -60,6 +61,11 @@ const responseHandlers: ReminderResponseHandlers = {
   onSnooze: (doseId) =>
     snoozeDose(doseId).catch((err) =>
       log.error('Snooze from notification failed', err),
+    ),
+  onPracticeTake: completePractice,
+  onPracticeSnooze: (texts) =>
+    snoozePractice(texts).catch((err) =>
+      log.error('Snooze of the practice reminder failed', err),
     ),
   onReorder: openStore,
   onAddPack: (productId) =>

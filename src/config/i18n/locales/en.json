@@ -578,10 +578,10 @@
   },
   "tutorial": {
     "addFirstProduct": "Add your first product",
-    "close": "Got it",
-    "hint": "Tap when you take it",
     "introMessage": "Set it up once, then just tap Taken. Pillminder handles the reminders and the stock.",
     "introTitle": "Set it up once",
+    "practiceInApp": "Practice run: confirm a dose here. Real reminders for {{name}} can be confirmed the same way.",
+    "practiceMessage": "A practice reminder for {{name}} arrives in a minute. Confirm it here or with “{{action}}” on the notification.",
     "productTitle": "Add your first product",
     "restart": "Show the tutorial again",
     "scheduleTitle": "When do you take it?",

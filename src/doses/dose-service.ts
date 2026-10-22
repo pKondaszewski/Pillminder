@@ -68,7 +68,7 @@ export type { TodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');
 
-function reminderTexts(product: Product, quantity: number) {
+export function reminderTexts(product: Product, quantity: number) {
   const name = productLabel(product.name, product.strength);
   const body = reminderBody(
     name,

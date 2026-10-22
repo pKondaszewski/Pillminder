@@ -24,7 +24,7 @@ describe('startingTutorialStep', () => {
     },
   );
 
-  it.each(['product', 'schedule', 'hint'] as const)(
+  it.each(['product', 'schedule', 'practice'] as const)(
     'resumes an unfinished tutorial at %s even when products exist',
     (stored) => {
       // when
@@ -48,8 +48,8 @@ describe('nextTutorialStep', () => {
   it.each([
     ['intro', 'product'],
     ['product', 'schedule'],
-    ['schedule', 'hint'],
-    ['hint', 'done'],
+    ['schedule', 'practice'],
+    ['practice', 'done'],
     ['done', 'done'],
   ] as const)('moves %s to %s', (step, expected) => {
     // when
@@ -72,7 +72,7 @@ describe('tutorialFormRoute', () => {
     expect(result).toBe(expected);
   });
 
-  it.each(['intro', 'hint', 'done'] as const)(
+  it.each(['intro', 'practice', 'done'] as const)(
     'opens no form for %s',
     (step) => {
       // when

@@ -7,6 +7,7 @@ import {
   SNOOZE_ACTION,
   TAKE_ACTION,
 } from './identifiers';
+import { isPracticeData, practiceTexts } from './practice-reminder';
 
 const handledResponses = new Set<string>();
 
@@ -24,9 +25,24 @@ export function processReminderResponse(
   handlers: ReminderResponseHandlers,
 ): boolean {
   const data = response.notification.request.content.data ?? {};
-  return data.type === 'reorder'
-    ? processReorderResponse(response, data, handlers)
+  if (data.type === 'reorder') {
+    return processReorderResponse(response, data, handlers);
+  }
+  return isPracticeData(data)
+    ? processPracticeResponse(response, handlers)
     : processDoseResponse(response, data, handlers);
+}
+
+function processPracticeResponse(
+  response: NotificationResponse,
+  handlers: ReminderResponseHandlers,
+): boolean {
+  if (response.actionIdentifier === TAKE_ACTION) {
+    return runHandlerOnce(response, handlers.onPracticeTake);
+  }
+  if (response.actionIdentifier !== SNOOZE_ACTION) return false;
+  const texts = practiceTexts(response.notification.request.content);
+  return runHandlerOnce(response, () => handlers.onPracticeSnooze(texts));
 }
 
 function processReorderResponse(

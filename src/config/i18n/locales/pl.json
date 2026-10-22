@@ -610,10 +610,10 @@
   },
   "tutorial": {
     "addFirstProduct": "Dodaj pierwszy produkt",
-    "close": "Rozumiem",
-    "hint": "Stuknij, gdy weźmiesz",
     "introMessage": "Skonfiguruj raz, potem tylko stukaj „Wzięte”. Przypomnienia i stan zapasów Pillminder ogarnia sam.",
     "introTitle": "Skonfiguruj raz",
+    "practiceInApp": "Próba: potwierdź dawkę tutaj. Prawdziwe przypomnienia o {{name}} potwierdzasz tak samo.",
+    "practiceMessage": "Za chwilę przyjdzie próbne przypomnienie o {{name}}. Potwierdź tutaj albo przyciskiem „{{action}}” w powiadomieniu.",
     "productTitle": "Dodaj pierwszy produkt",
     "restart": "Pokaż tutorial ponownie",
     "scheduleTitle": "Kiedy to bierzesz?",

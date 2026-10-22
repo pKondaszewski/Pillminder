@@ -8,6 +8,7 @@ import { AppState } from 'react-native';
 import { createLogger } from '@/config/logger';
 import { snoozeDose, takeDose } from '@/doses/dose-service';
 import { restockPack } from '@/products/product-orchestrator';
+import { completePractice, snoozePractice } from '@/tutorial/tutorial-service';
 
 import {
   ADD_PACK_ACTION,
@@ -16,6 +17,7 @@ import {
   TAKE_ACTION,
 } from './identifiers';
 import { isNotificationsSupported } from './notification-service';
+import { isPracticeData, practiceTexts } from './practice-reminder';
 import { claimResponse } from './reminder-response-router';
 
 const log = createLogger('background-task');
@@ -50,6 +52,11 @@ async function handleResponse(response: NotificationResponse): Promise<void> {
     return;
   }
 
+  if (isPracticeData(payload)) {
+    await handlePracticeResponse(response);
+    return;
+  }
+
   const doseId = payload.doseId;
   if (typeof doseId !== 'string') return;
 
@@ -61,6 +68,26 @@ async function handleResponse(response: NotificationResponse): Promise<void> {
     }
   } catch (err) {
     log.error(`Background ${actionIdentifier} failed for dose ${doseId}`, err);
+  }
+}
+
+async function handlePracticeResponse(
+  response: NotificationResponse,
+): Promise<void> {
+  if (!claimResponse(response)) return;
+  try {
+    if (response.actionIdentifier === TAKE_ACTION) {
+      completePractice();
+    } else if (response.actionIdentifier === SNOOZE_ACTION) {
+      await snoozePractice(
+        practiceTexts(response.notification.request.content),
+      );
+    }
+  } catch (err) {
+    log.error(
+      `Background ${response.actionIdentifier} failed for practice`,
+      err,
+    );
   }
 }
 

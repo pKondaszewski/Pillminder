@@ -66,8 +66,12 @@ import {
 } from '@/scene/scene-service';
 import { DayScene } from '@/scene/ui/day-scene';
 import { useCelebration } from '@/scene/ui/use-celebration';
-import { TutorialHint } from '@/tutorial/ui/tutorial-hint';
-import { useTutorial, useTutorialFormPrompt } from '@/tutorial/ui/use-tutorial';
+import { TutorialPracticeCard } from '@/tutorial/ui/tutorial-practice-card';
+import {
+  usePracticeReminder,
+  useTutorial,
+  useTutorialFormPrompt,
+} from '@/tutorial/ui/use-tutorial';
 
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
@@ -80,6 +84,7 @@ export default function HomeScreen() {
   const { products, loaded } = useProducts();
   const tutorial = useTutorial();
   useTutorialFormPrompt(tutorial.step);
+  const practice = usePracticeReminder(tutorial.step === 'practice');
 
   const [pickedDay, setPickedDay] = useState<Date | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -108,10 +113,7 @@ export default function HomeScreen() {
   });
   const dayIntakes = useIntakesBetween(day, addDays(day, 1));
   const intakeMarkers = useIntakeMarkers(dayIntakes);
-  const handleTake = (dose: TodayDose) => {
-    if (tutorial.step === 'hint') tutorial.advance();
-    applyWithUndo('taken', dose);
-  };
+  const handleTake = (dose: TodayDose) => applyWithUndo('taken', dose);
   const revertConfirmation = useConfirmation<TodayDose>((dose) =>
     revert(undoableKindOf(dose), dose.id),
   );
@@ -271,8 +273,12 @@ export default function HomeScreen() {
               onAction={() => router.navigate('/schedules')}
             />
           ) : null}
-          {tutorial.step === 'hint' && isToday && doses.length > 0 ? (
-            <TutorialHint onClose={tutorial.advance} onSkip={tutorial.skip} />
+          {practice && isToday ? (
+            <TutorialPracticeCard
+              reminder={practice}
+              onTake={tutorial.completePractice}
+              onSkip={tutorial.skip}
+            />
           ) : null}
           {cardState ? (
             <TodayCard

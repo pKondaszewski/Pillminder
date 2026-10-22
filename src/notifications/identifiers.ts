@@ -8,6 +8,8 @@ export const SNOOZE_ACTION = 'SNOOZE_ACTION';
 // Read by the expo-notifications patch: notifications sharing this tag replace each other on Android.
 export const ANDROID_TAG_KEY = 'androidTag';
 
+export const PRACTICE_NOTIFICATION_ID = 'tutorial-practice';
+
 export const REORDER_CHANNEL_ID = 'reorder-alerts-v1';
 export const REORDER_CATEGORY_ID = 'reorder-alert';
 export const REORDER_PACK_CATEGORY_ID = 'reorder-alert-pack';
