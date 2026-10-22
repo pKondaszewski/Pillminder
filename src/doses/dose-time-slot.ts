@@ -2,6 +2,7 @@ import type { Intake } from '@/intakes/intake-service';
 
 import type {
   TimeSlot,
+  TimeSlotEntry,
   TimeSlotGroup,
   TimeSlotLayout,
 } from './dto/time-slot-output';
@@ -21,40 +22,69 @@ export function groupDosesByTimeSlot(
   doses: TodayDose[],
   intakes: Intake[],
 ): TimeSlotGroup[] {
+  const entries: TimeSlotEntry[] = [
+    ...doses.map((dose): TimeSlotEntry => ({ kind: 'dose', dose })),
+    ...intakes.map((intake): TimeSlotEntry => ({ kind: 'intake', intake })),
+  ];
   return TIME_SLOTS.map(({ slot }) => ({
     slot,
-    data: doses.filter((dose) => timeSlotOf(dose.plannedAt) === slot),
-    intakes: intakes
-      .filter((intake) => timeSlotOf(intake.takenAt) === slot)
-      .sort((a, b) => a.takenAt.getTime() - b.takenAt.getTime()),
-  })).filter(
-    (section) => section.data.length > 0 || section.intakes.length > 0,
-  );
+    entries: entries
+      .filter((entry) => timeSlotOf(entryTime(entry)) === slot)
+      .sort(byTimeDosesFirst),
+  })).filter((section) => section.entries.length > 0);
 }
 
 export function timeSlotLayout(
-  doses: TodayDose[],
+  entries: TimeSlotEntry[],
   expanded: boolean,
 ): TimeSlotLayout {
-  const active = doses.filter((dose) => dose.state === 'pending');
+  const active = entries.filter(isPendingDose);
   if (active.length === 0 && !expanded) {
     return {
       kind: 'collapsed',
-      taken: doses.filter((dose) => dose.state === 'taken').length,
-      skipped: doses.filter((dose) => dose.state === 'skipped').length,
+      taken: entries.filter(isTaken).length,
+      skipped: entries.filter((entry) => isDoseWithState(entry, 'skipped'))
+        .length,
     };
   }
   const overflows = active.length > SLOT_MAX_ACTIVE_DOSES;
   return {
     kind: 'list',
     visible:
-      overflows && !expanded ? active.slice(0, SLOT_ACTIVE_DOSES_SHOWN) : doses,
+      overflows && !expanded
+        ? active.slice(0, SLOT_ACTIVE_DOSES_SHOWN)
+        : entries,
     collapsible: active.length === 0,
-    overflowCount: overflows ? doses.length : null,
+    overflowCount: overflows ? entries.length : null,
   };
 }
 
-function timeSlotOf(plannedAt: Date): TimeSlot {
-  const hour = plannedAt.getHours();
+function entryTime(entry: TimeSlotEntry): Date {
+  return entry.kind === 'dose' ? entry.dose.plannedAt : entry.intake.takenAt;
+}
+
+function byTimeDosesFirst(a: TimeSlotEntry, b: TimeSlotEntry): number {
+  const byTime = entryTime(a).getTime() - entryTime(b).getTime();
+  if (byTime !== 0) return byTime;
+  return Number(a.kind === 'intake') - Number(b.kind === 'intake');
+}
+
+function isDoseWithState(
+  entry: TimeSlotEntry,
+  state: TodayDose['state'],
+): boolean {
+  return entry.kind === 'dose' && entry.dose.state === state;
+}
+
+function isTaken(entry: TimeSlotEntry): boolean {
+  return entry.kind === 'intake' || isDoseWithState(entry, 'taken');
+}
+
+function isPendingDose(entry: TimeSlotEntry): boolean {
+  return isDoseWithState(entry, 'pending');
+}
+
+function timeSlotOf(time: Date): TimeSlot {
+  const hour = time.getHours();
   return TIME_SLOTS.find(({ beforeHour }) => hour < beforeHour)!.slot;
 }

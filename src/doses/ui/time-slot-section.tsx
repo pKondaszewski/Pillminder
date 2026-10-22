@@ -24,12 +24,8 @@ export function TimeSlotSection({ group, renderDose, renderIntake }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
-  const layout = timeSlotLayout(group.data, expanded);
+  const layout = timeSlotLayout(group.entries, expanded);
   const slotName = t(`home.slot.${group.slot}`);
-
-  const intakes = group.intakes.map((intake) => (
-    <View key={intake.id}>{renderIntake(intake)}</View>
-  ));
 
   const overflowToggleLabel = expanded
     ? t('home.showLess')
@@ -45,24 +41,20 @@ export function TimeSlotSection({ group, renderDose, renderIntake }: Props) {
 
   const header =
     layout.kind === 'collapsed' ? (
-      group.data.length > 0 ? (
-        <Pressable
-          onPress={() => setExpanded(true)}
-          accessibilityRole="button"
-          accessibilityLabel={t('home.expandSlot', { slot: slotName })}
-          style={({ pressed }) => [styles.collapsed, pressed && styles.pressed]}
-        >
-          <ThemedText type="smallBold" themeColor="textSecondary">
-            {t('home.slotSummary', {
-              slot: slotName,
-              counts: handledCountsText(layout.taken, layout.skipped, t),
-            })}
-          </ThemedText>
-          <Icon name="chevron_right" size={20} color={theme.textTertiary} />
-        </Pressable>
-      ) : (
-        plainHeader
-      )
+      <Pressable
+        onPress={() => setExpanded(true)}
+        accessibilityRole="button"
+        accessibilityLabel={t('home.expandSlot', { slot: slotName })}
+        style={({ pressed }) => [styles.collapsed, pressed && styles.pressed]}
+      >
+        <ThemedText type="smallBold" themeColor="textSecondary">
+          {t('home.slotSummary', {
+            slot: slotName,
+            counts: handledCountsText(layout.taken, layout.skipped, t),
+          })}
+        </ThemedText>
+        <Icon name="chevron_right" size={20} color={theme.textTertiary} />
+      </Pressable>
     ) : layout.collapsible ? (
       <Pressable
         onPress={() => setExpanded(false)}
@@ -83,11 +75,14 @@ export function TimeSlotSection({ group, renderDose, renderIntake }: Props) {
     <View style={styles.section}>
       {header}
       {layout.kind === 'list'
-        ? layout.visible.map((dose) => (
-            <View key={dose.id}>{renderDose(dose)}</View>
-          ))
+        ? layout.visible.map((entry) =>
+            entry.kind === 'dose' ? (
+              <View key={entry.dose.id}>{renderDose(entry.dose)}</View>
+            ) : (
+              <View key={entry.intake.id}>{renderIntake(entry.intake)}</View>
+            ),
+          )
         : null}
-      {intakes}
       {layout.kind === 'list' && layout.overflowCount !== null ? (
         <Pressable
           onPress={() => setExpanded(!expanded)}

@@ -1,10 +1,21 @@
 import type { Intake } from '@/intakes/intake-service';
 
 import { groupDosesByTimeSlot, timeSlotLayout } from '../dose-time-slot';
+import type { TimeSlotEntry } from '../dto/time-slot-output';
 import type { TodayDose } from '../dto/today-dose-output';
 
 function at(hours: number, minutes = 0): Date {
   return new Date(2026, 9, 10, hours, minutes);
+}
+
+function entriesOf(doses: TodayDose[]): TimeSlotEntry[] {
+  return doses.map((dose) => ({ kind: 'dose', dose }));
+}
+
+function entryIds(entries: TimeSlotEntry[]): string[] {
+  return entries.map((entry) =>
+    entry.kind === 'dose' ? entry.dose.id : entry.intake.id,
+  );
 }
 
 function doseAt(id: string, plannedAt: Date): TodayDose {
@@ -24,6 +35,23 @@ function doseAt(id: string, plannedAt: Date): TodayDose {
     profileImageFileName: null,
     stockTracked: true,
   };
+}
+
+function intakeAt(id: string, takenAt: Date): Intake {
+  return {
+    id,
+    productId: 'p',
+    takenAt,
+    quantity: 1,
+    productName: 'Ibuprofen',
+    category: 'medication',
+    unit: null,
+    profileImageFileName: null,
+  };
+}
+
+function intake(): Intake {
+  return intakeAt('i', at(8));
 }
 
 describe('groupDosesByTimeSlot slot boundaries', () => {
@@ -64,7 +92,7 @@ describe('groupDosesByTimeSlot', () => {
 
     // then
     expect(
-      sections.map(({ slot, data }) => [slot, data.map((d) => d.id)]),
+      sections.map(({ slot, entries }) => [slot, entryIds(entries)]),
     ).toEqual([
       ['morning', ['a', 'b']],
       ['afternoon', ['c']],
@@ -93,40 +121,24 @@ describe('groupDosesByTimeSlot', () => {
 });
 
 describe('groupDosesByTimeSlot with as-needed intakes', () => {
-  function intakeAt(id: string, takenAt: Date): Intake {
-    return {
-      id,
-      productId: 'p',
-      takenAt,
-      quantity: 1,
-      productName: 'Ibuprofen',
-      category: 'medication',
-      unit: null,
-      profileImageFileName: null,
-    };
-  }
-
-  it('places intakes in the slot of their time, sorted by time', () => {
+  it('merges doses and intakes of a slot by time, a dose first on a tie', () => {
     // given
+    const doses = [doseAt('dose-8', at(8)), doseAt('dose-10', at(10))];
     const intakes = [
-      intakeAt('late', at(15)),
-      intakeAt('early', at(13)),
-      intakeAt('morning', at(8)),
+      intakeAt('intake-10', at(10)),
+      intakeAt('intake-9', at(9)),
+      intakeAt('intake-15', at(15)),
     ];
 
     // when
-    const sections = groupDosesByTimeSlot([doseAt('a', at(8))], intakes);
+    const sections = groupDosesByTimeSlot(doses, intakes);
 
     // then
     expect(
-      sections.map(({ slot, data, intakes: slotIntakes }) => [
-        slot,
-        data.map((d) => d.id),
-        slotIntakes.map((i) => i.id),
-      ]),
+      sections.map(({ slot, entries }) => [slot, entryIds(entries)]),
     ).toEqual([
-      ['morning', ['a'], ['morning']],
-      ['afternoon', [], ['early', 'late']],
+      ['morning', ['dose-8', 'intake-9', 'dose-10', 'intake-10']],
+      ['afternoon', ['intake-15']],
     ]);
   });
 
@@ -136,19 +148,6 @@ describe('groupDosesByTimeSlot with as-needed intakes', () => {
 
     // then
     expect(sections.map(({ slot }) => slot)).toEqual(['evening']);
-  });
-
-  it('does not change what the dose layout counts', () => {
-    // given
-    const doses = [doseAt('a', at(8))];
-
-    // when
-    const [section] = groupDosesByTimeSlot(doses, [intakeAt('i', at(9))]);
-
-    // then
-    expect(timeSlotLayout(section.data, false)).toEqual(
-      timeSlotLayout(doses, false),
-    );
   });
 });
 
@@ -170,7 +169,7 @@ describe('timeSlotLayout', () => {
     ];
 
     // when
-    const layout = timeSlotLayout(doses, false);
+    const layout = timeSlotLayout(entriesOf(doses), false);
 
     // then
     expect(layout).toEqual({ kind: 'collapsed', taken: 2, skipped: 1 });
@@ -181,12 +180,12 @@ describe('timeSlotLayout', () => {
     const doses = [withState('a', 'taken')];
 
     // when
-    const layout = timeSlotLayout(doses, true);
+    const layout = timeSlotLayout(entriesOf(doses), true);
 
     // then
     expect(layout).toEqual({
       kind: 'list',
-      visible: doses,
+      visible: entriesOf(doses),
       collapsible: true,
       overflowCount: null,
     });
@@ -198,8 +197,8 @@ describe('timeSlotLayout', () => {
     const after = [withState('a', 'taken'), withState('b', 'taken')];
 
     // when
-    const duringEdit = timeSlotLayout(before, true);
-    const afterEdit = timeSlotLayout(after, true);
+    const duringEdit = timeSlotLayout(entriesOf(before), true);
+    const afterEdit = timeSlotLayout(entriesOf(after), true);
 
     // then
     expect(duringEdit).toMatchObject({ kind: 'list', collapsible: false });
@@ -211,12 +210,12 @@ describe('timeSlotLayout', () => {
     const doses = [withState('a', 'taken'), withState('b', 'pending')];
 
     // when
-    const layout = timeSlotLayout(doses, false);
+    const layout = timeSlotLayout(entriesOf(doses), false);
 
     // then
     expect(layout).toEqual({
       kind: 'list',
-      visible: doses,
+      visible: entriesOf(doses),
       collapsible: false,
       overflowCount: null,
     });
@@ -227,11 +226,11 @@ describe('timeSlotLayout', () => {
     const doses = pendingDoses(['a', 'b', 'c', 'd', 'e']);
 
     // when
-    const layout = timeSlotLayout(doses, false);
+    const layout = timeSlotLayout(entriesOf(doses), false);
 
     // then
     expect(layout).toMatchObject({
-      visible: doses,
+      visible: entriesOf(doses),
       overflowCount: null,
     });
   });
@@ -242,12 +241,12 @@ describe('timeSlotLayout', () => {
     const active = pendingDoses(['a', 'b', 'c', 'd', 'e', 'f']);
 
     // when
-    const layout = timeSlotLayout([handled, ...active], false);
+    const layout = timeSlotLayout(entriesOf([handled, ...active]), false);
 
     // then
     expect(layout).toMatchObject({
       kind: 'list',
-      visible: active.slice(0, 4),
+      visible: entriesOf(active.slice(0, 4)),
       overflowCount: 7,
     });
   });
@@ -257,12 +256,75 @@ describe('timeSlotLayout', () => {
     const doses = pendingDoses(['a', 'b', 'c', 'd', 'e', 'f']);
 
     // when
-    const layout = timeSlotLayout(doses, true);
+    const layout = timeSlotLayout(entriesOf(doses), true);
 
     // then
     expect(layout).toMatchObject({
-      visible: doses,
+      visible: entriesOf(doses),
       overflowCount: 6,
+    });
+  });
+
+  it('counts an intake as taken in a collapsed summary', () => {
+    // given
+    const entries: TimeSlotEntry[] = [
+      ...entriesOf([withState('a', 'skipped')]),
+      { kind: 'intake', intake: intake() },
+    ];
+
+    // when
+    const layout = timeSlotLayout(entries, false);
+
+    // then
+    expect(layout).toEqual({ kind: 'collapsed', taken: 1, skipped: 1 });
+  });
+
+  it('collapses a slot with only intakes and lists it as collapsible once expanded', () => {
+    // given
+    const entries: TimeSlotEntry[] = [{ kind: 'intake', intake: intake() }];
+
+    // when
+    const collapsed = timeSlotLayout(entries, false);
+    const expanded = timeSlotLayout(entries, true);
+
+    // then
+    expect(collapsed).toEqual({ kind: 'collapsed', taken: 1, skipped: 0 });
+    expect(expanded).toEqual({
+      kind: 'list',
+      visible: entries,
+      collapsible: true,
+      overflowCount: null,
+    });
+  });
+
+  it('keeps intakes visible next to a pending dose', () => {
+    // given
+    const entries: TimeSlotEntry[] = [
+      { kind: 'intake', intake: intake() },
+      ...entriesOf(pendingDoses(['a'])),
+    ];
+
+    // when
+    const layout = timeSlotLayout(entries, false);
+
+    // then
+    expect(layout).toMatchObject({ visible: entries, collapsible: false });
+  });
+
+  it('counts intakes in the overflow total and hides them while limited', () => {
+    // given
+    const entries: TimeSlotEntry[] = [
+      { kind: 'intake', intake: intake() },
+      ...entriesOf(pendingDoses(['a', 'b', 'c', 'd', 'e', 'f'])),
+    ];
+
+    // when
+    const layout = timeSlotLayout(entries, false);
+
+    // then
+    expect(layout).toMatchObject({
+      visible: entries.slice(1, 5),
+      overflowCount: 7,
     });
   });
 });
