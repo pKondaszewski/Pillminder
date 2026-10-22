@@ -57,7 +57,15 @@
         }
       ],
       "expo-status-bar",
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 33
+          }
+        }
+      ]
     ],
     "extra": {
       "repositoryUrl": "https://github.com/pKondaszewski/Pillminder"
