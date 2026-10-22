@@ -614,7 +614,7 @@
   },
   "intake": {
     "label": "as needed",
-    "takeNow": "Take now",
+    "takeNow": "Take as needed",
     "takenToast": "{{name}} recorded as needed",
     "rowTime": "as needed · {{time}}",
     "historyTitle": "Taken as needed",
