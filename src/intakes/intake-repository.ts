@@ -1,5 +1,4 @@
 import { and, desc, eq, gte, lt, max } from 'drizzle-orm';
-import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
 import {
@@ -9,7 +8,6 @@ import {
   products,
 } from '@/config/db/schema';
 
-import type { IntakeEdit } from './dto/intake-output';
 import { adjustedStock } from './intake-stock';
 
 export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -25,36 +23,17 @@ export function productIntakesQuery(productId: string) {
 }
 
 export function insertIntakeRow(
+  id: string,
   productId: string,
   takenAt: Date,
   quantity: number,
-): string {
-  const id = Crypto.randomUUID();
+): void {
   db.transaction((tx) => {
     tx.insert(asNeededIntakes)
       .values({ id, productId, takenAt, quantity })
       .run();
     shiftStock(tx, productId, -quantity);
     refreshLastUsedAt(tx, productId);
-  });
-  return id;
-}
-
-export function updateIntakeRow(id: string, edit: IntakeEdit): void {
-  db.transaction((tx) => {
-    const intake = tx
-      .select()
-      .from(asNeededIntakes)
-      .where(eq(asNeededIntakes.id, id))
-      .get();
-    if (!intake) return;
-
-    tx.update(asNeededIntakes)
-      .set({ quantity: edit.quantity, takenAt: edit.takenAt })
-      .where(eq(asNeededIntakes.id, id))
-      .run();
-    shiftStock(tx, intake.productId, intake.quantity - edit.quantity);
-    refreshLastUsedAt(tx, intake.productId);
   });
 }
 

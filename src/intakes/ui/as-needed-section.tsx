@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { Spacing } from '@/commons/ui/constants/theme';
 import { ThemedText } from '@/commons/ui/themed-text';
@@ -15,10 +15,9 @@ const SHOWN_INTAKES = 5;
 type Props = {
   intakes: Intake[];
   now: Date;
-  onPress: (intake: Intake) => void;
 };
 
-export function AsNeededSection({ intakes, now, onPress }: Props) {
+export function AsNeededSection({ intakes, now }: Props) {
   const { t } = useTranslation();
   const { formatDateTime } = useFormatTime();
   if (intakes.length === 0) return null;
@@ -29,23 +28,15 @@ export function AsNeededSection({ intakes, now, onPress }: Props) {
         {t('intake.recentCount', { count: recentIntakeCount(intakes, now) })}
       </ThemedText>
       {intakes.slice(0, SHOWN_INTAKES).map((intake) => (
-        <Pressable
-          key={intake.id}
-          onPress={() => onPress(intake)}
-          accessibilityRole="button"
-          accessibilityHint={t('intake.rowHint')}
-          style={({ pressed }) => pressed && styles.pressed}
-        >
-          <ThemedView style={styles.row}>
-            <AsNeededMark />
-            <ThemedText type="small" themeColor="accent" style={styles.when}>
-              {formatDateTime(intake.takenAt)}
-            </ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">
-              {doseQuantityText(intake.quantity, intake.unit, t) ?? ''}
-            </ThemedText>
-          </ThemedView>
-        </Pressable>
+        <ThemedView key={intake.id} style={styles.row}>
+          <AsNeededMark />
+          <ThemedText type="small" themeColor="accent" style={styles.when}>
+            {formatDateTime(intake.takenAt)}
+          </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            {doseQuantityText(intake.quantity, intake.unit, t) ?? ''}
+          </ThemedText>
+        </ThemedView>
       ))}
     </ProductSection>
   );
@@ -60,8 +51,5 @@ const styles = StyleSheet.create({
   },
   when: {
     flex: 1,
-  },
-  pressed: {
-    opacity: 0.7,
   },
 });

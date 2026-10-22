@@ -7,27 +7,41 @@ import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { useFormatTime } from '@/commons/ui/use-format-date';
 import { doseQuantityText } from '@/doses/dose-service';
+import { type DayMode } from '@/doses/ui/dose-row-action';
 import type { Intake } from '@/intakes/intake-service';
 import { AsNeededMark } from '@/intakes/ui/as-needed-mark';
 
 type Props = {
   intake: Intake;
-  onPress: (intake: Intake) => void;
+  mode: DayMode;
+  onRevert: (intake: Intake) => void;
+  onOpenProduct: (intake: Intake) => void;
 };
 
-export function IntakeRow({ intake, onPress }: Props) {
+export function IntakeRow({ intake, mode, onRevert, onOpenProduct }: Props) {
   const { t } = useTranslation();
   const { formatTime } = useFormatTime();
   const quantity = doseQuantityText(intake.quantity, intake.unit, t);
+  const reverts = mode === 'today';
+  const openProduct = () => onOpenProduct(intake);
 
   return (
     <Pressable
-      onPress={() => onPress(intake)}
-      accessibilityRole="button"
-      accessibilityHint={t('intake.rowHint')}
+      onPress={reverts ? () => onRevert(intake) : openProduct}
+      onLongPress={openProduct}
+      accessibilityHint={t(
+        reverts ? 'home.rowHint.revert' : 'home.rowHint.open',
+      )}
+      accessibilityActions={[
+        { name: 'longpress', label: t('home.rowHint.open') },
+      ]}
+      onAccessibilityAction={openProduct}
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <ThemedView style={styles.row}>
+      <ThemedView type="accentSoft" style={styles.row}>
+        <ThemedText type="mono" themeColor="textSecondary" style={styles.time}>
+          {formatTime(intake.takenAt)}
+        </ThemedText>
         <ProductAvatar
           category={intake.category}
           size={36}
@@ -35,12 +49,14 @@ export function IntakeRow({ intake, onPress }: Props) {
         />
         <View style={styles.info}>
           <ThemedText numberOfLines={1}>{intake.productName}</ThemedText>
-          <ThemedText type="small" themeColor="accent">
-            {t('intake.rowTime', { time: formatTime(intake.takenAt) })}
-            {quantity ? ` · ${quantity}` : ''}
-          </ThemedText>
+          <View style={styles.caption}>
+            <AsNeededMark />
+            <ThemedText type="small" themeColor="accent">
+              {t('intake.label')}
+              {quantity ? ` · ${quantity}` : ''}
+            </ThemedText>
+          </View>
         </View>
-        <AsNeededMark size={20} />
       </ThemedView>
     </Pressable>
   );
@@ -55,8 +71,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.twelve,
     borderRadius: Radius.button,
   },
+  time: {
+    width: 48,
+  },
   info: {
     flex: 1,
+  },
+  caption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.four,
   },
   pressed: {
     opacity: 0.7,

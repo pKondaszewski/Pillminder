@@ -10,8 +10,3 @@ export interface Intake {
   unit: ProductUnit | null;
   profileImageFileName: string | null;
 }
-
-export interface IntakeEdit {
-  quantity: number;
-  takenAt: Date;
-}

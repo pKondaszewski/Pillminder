@@ -1,16 +1,15 @@
+import * as Crypto from 'expo-crypto';
+
 import { createLogger } from '@/config/logger';
 
-import type { IntakeEdit } from './dto/intake-output';
 import {
   deleteIntakeRow,
   insertIntakeRow,
   intakesBetweenQuery,
   productIntakesQuery,
-  updateIntakeRow,
 } from './intake-repository';
-import { isValidIntakeQuantity } from './intake-stock';
 
-export type { Intake, IntakeEdit } from './dto/intake-output';
+export type { Intake } from './dto/intake-output';
 export { intakeDayKeys, recentIntakeCount } from './intake-history';
 export { latestUseAt } from './intake-repository';
 
@@ -24,25 +23,16 @@ export function getProductIntakesQuery(productId: string) {
   return productIntakesQuery(productId);
 }
 
-export function takeNow(productId: string, now: Date): string {
-  log.info(`Recording as-needed intake of product ${productId}`);
-  try {
-    return insertIntakeRow(productId, now, 1);
-  } catch (err) {
-    log.error(`Failed to record intake of product ${productId}`, err);
-    throw err;
-  }
+export function newIntakeId(): string {
+  return Crypto.randomUUID();
 }
 
-export function editIntake(id: string, edit: IntakeEdit): void {
-  if (!isValidIntakeQuantity(edit.quantity)) {
-    throw new Error(`Invalid intake quantity ${edit.quantity}`);
-  }
-  log.info(`Editing intake ${id}`);
+export function takeNow(id: string, productId: string, now: Date): void {
+  log.info(`Recording as-needed intake ${id} of product ${productId}`);
   try {
-    updateIntakeRow(id, edit);
+    insertIntakeRow(id, productId, now, 1);
   } catch (err) {
-    log.error(`Failed to edit intake ${id}`, err);
+    log.error(`Failed to record intake of product ${productId}`, err);
     throw err;
   }
 }

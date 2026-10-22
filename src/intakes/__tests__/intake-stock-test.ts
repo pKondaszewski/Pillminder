@@ -1,4 +1,4 @@
-import { adjustedStock, isValidIntakeQuantity } from '../intake-stock';
+import { adjustedStock } from '../intake-stock';
 
 describe('adjustedStock', () => {
   it('lowers a tracked stock', () => {
@@ -23,23 +23,5 @@ describe('adjustedStock', () => {
 
     // then
     expect(stock).toBe(0);
-  });
-});
-
-describe('isValidIntakeQuantity', () => {
-  it.each([1, 2, 30])('accepts %i', (quantity) => {
-    // when
-    const valid = isValidIntakeQuantity(quantity);
-
-    // then
-    expect(valid).toBe(true);
-  });
-
-  it.each([0, -1, 1.5, NaN])('rejects %p', (quantity) => {
-    // when
-    const valid = isValidIntakeQuantity(quantity);
-
-    // then
-    expect(valid).toBe(false);
   });
 });
