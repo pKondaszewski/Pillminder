@@ -2,6 +2,7 @@ import Storage from 'expo-sqlite/kv-store';
 
 import {
   LANGUAGE_OPTIONS,
+  SEASON_OPTIONS,
   type Settings,
   THEME_OPTIONS,
   TUTORIAL_STEPS,
@@ -17,6 +18,7 @@ const STORAGE_KEY = 'settings';
 const DEFAULT_SETTINGS: Settings = {
   language: 'system',
   theme: 'system',
+  seasonPreference: 'auto',
   snoozeMinutes: SNOOZE_MINUTES_DEFAULT,
   notificationsPromptDismissed: false,
   batteryPromptDismissed: false,
@@ -29,6 +31,8 @@ const DEFAULT_SETTINGS: Settings = {
 const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
   language: (value) => LANGUAGE_OPTIONS.some((option) => option === value),
   theme: (value) => THEME_OPTIONS.some((option) => option === value),
+  seasonPreference: (value) =>
+    SEASON_OPTIONS.some((option) => option === value),
   snoozeMinutes: isValidSnoozeMinutes,
   notificationsPromptDismissed: (value) => typeof value === 'boolean',
   batteryPromptDismissed: (value) => typeof value === 'boolean',
@@ -71,6 +75,7 @@ function readStoredSettings(): Settings {
     return {
       language: pick('language', stored),
       theme: pick('theme', stored),
+      seasonPreference: pick('seasonPreference', stored),
       snoozeMinutes: pick('snoozeMinutes', stored),
       notificationsPromptDismissed: pick(
         'notificationsPromptDismissed',

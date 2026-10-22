@@ -9,15 +9,11 @@ import {
   ribbonPanelHeight,
   TripRibbonsPanel,
 } from '@/products/ui/trip-ribbons-panel';
-import {
-  ROAD_PANEL_TOP,
-  roadAxis,
-  seasonOf,
-  skyScene,
-} from '@/scene/scene-service';
+import { ROAD_PANEL_TOP, roadAxis, skyScene } from '@/scene/scene-service';
 import { RoadScene } from '@/scene/ui/road-scene';
 import { useEntryProgress } from '@/scene/ui/use-entry-progress';
 import { useSceneClock } from '@/scene/ui/use-scene-clock';
+import { useSeason } from '@/scene/ui/use-season';
 
 const SCENE_BOTTOM_GAP = 14;
 
@@ -30,6 +26,7 @@ type Props = {
 export function TripScene({ entries, tripDays, replayKey }: Props) {
   const now = useNow();
   const coords = useSunCoords();
+  const season = useSeason(now);
   const { width } = useWindowDimensions();
   const { time, active, reduceMotion } = useSceneClock();
   const entry = useEntryProgress(replayKey);
@@ -40,7 +37,7 @@ export function TripScene({ entries, tripDays, replayKey }: Props) {
     <View style={{ height }}>
       <RoadScene
         scene={skyScene(now, dayPhases(now, coords), true)}
-        season={seasonOf(now, coords?.latitude ?? null)}
+        season={season}
         tripDays={tripDays}
         height={height}
         time={time}

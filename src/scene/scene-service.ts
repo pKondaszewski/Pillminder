@@ -10,6 +10,7 @@ export type {
 export type { Particle } from './dto/particle';
 export type { ScenePalette } from './dto/scene-palette';
 export type { Season } from './dto/season';
+export { SEASONS } from './dto/season';
 export type {
   BodyPosition,
   SceneMood,
@@ -55,7 +56,7 @@ export {
   SCENE_HORIZON_Y,
 } from './scene-geometry';
 export { SCENE_PALETTES, sceneColors } from './scene-palette';
-export { seasonOf } from './season';
+export { resolveSeason, seasonOf } from './season';
 export {
   bodyPosition,
   isCelebration,
