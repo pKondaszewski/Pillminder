@@ -114,7 +114,8 @@ You don't hand-write SQL or edit the generated files.
 
 CI builds an APK automatically on every push to `main` (see
 [`.github/workflows/cd.yml`](./.github/workflows/cd.yml)) and uploads it as a
-build artifact (`pillminder-apk`). To build one locally:
+build artifact (`pillminder-apk`). The APK requires Android 13 (API 33) or
+newer. To build one locally:
 
 ```bash
 npx expo prebuild --platform android --no-install
