@@ -15,7 +15,6 @@ import { isoDay } from '@/config/date-utils';
 import { useRecentDays } from '@/doses/ui/use-recent-days';
 import { AsNeededSection } from '@/intakes/ui/as-needed-section';
 import { TakeNowButton } from '@/intakes/ui/take-now-button';
-import { useIntakeEditor } from '@/intakes/ui/use-intake-editor';
 import { useProductIntakes, useTakeNow } from '@/intakes/ui/use-intakes';
 import type { Product } from '@/products/product-service';
 import { lastUsedText } from '@/products/product-text';
@@ -67,7 +66,6 @@ function ProductDetail({ product }: { product: Product }) {
   const stock = useStockActions(product, runWithUndo);
   const edit = useProductEditActions(product, runWithUndo);
   const intakes = useProductIntakes(product.id);
-  const intakeEditor = useIntakeEditor();
   const takeNow = useTakeNow(product, runWithUndo);
 
   const [sheet, setSheet] = useState<Sheet | null>(null);
@@ -136,11 +134,7 @@ function ProductDetail({ product }: { product: Product }) {
           onDayPress={openDay}
           onCalendarPress={openCalendar}
         />
-        <AsNeededSection
-          intakes={intakes}
-          now={now}
-          onPress={intakeEditor.edit}
-        />
+        <AsNeededSection intakes={intakes} now={now} />
         <ProductNotes productId={product.id} />
         <DetailsSection
           product={product}
@@ -156,7 +150,6 @@ function ProductDetail({ product }: { product: Product }) {
       </KeyboardAwareScrollView>
 
       <UndoSnackbar snackbar={snackbar} />
-      {intakeEditor.sheet}
 
       {sheet?.kind === 'field' ? (
         <ProductFieldSheet

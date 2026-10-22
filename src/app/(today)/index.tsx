@@ -51,10 +51,10 @@ import {
   type UndoableKind,
   useUndoableDoseAction,
 } from '@/doses/ui/use-undoable-dose-action';
+import type { Intake } from '@/intakes/intake-service';
 import { IntakeRow } from '@/intakes/ui/intake-row';
-import { useIntakeEditor } from '@/intakes/ui/use-intake-editor';
 import { useIntakeMarkers } from '@/intakes/ui/use-intake-markers';
-import { useIntakesBetween } from '@/intakes/ui/use-intakes';
+import { useIntakesBetween, useRevertIntake } from '@/intakes/ui/use-intakes';
 import { useSunCoords } from '@/location/ui/use-sun-coords';
 import { useProducts } from '@/products/ui/use-products';
 import {
@@ -103,11 +103,12 @@ export default function HomeScreen() {
     skipped: { apply: skipDose, revert: unskipDose },
   });
   const dayIntakes = useIntakesBetween(day, addDays(day, 1));
-  const intakeEditor = useIntakeEditor();
   const intakeMarkers = useIntakeMarkers(dayIntakes);
   const revertConfirmation = useConfirmation<TodayDose>((dose) =>
     revert(undoableKindOf(dose), dose.id),
   );
+  const revertIntake = useRevertIntake();
+  const revertIntakeConfirmation = useConfirmation<Intake>(revertIntake);
   const takeOverdueConfirmation = useConfirmation<TodayDose[]>((overdue) =>
     takeAll(overdue.map(({ id }) => id)),
   );
@@ -171,7 +172,7 @@ export default function HomeScreen() {
       params: { id: returnProductId },
     });
   };
-  const openProduct = ({ productId }: TodayDose) =>
+  const openProduct = ({ productId }: { productId: string }) =>
     router.push({ pathname: '/products/[id]', params: { id: productId } });
   const openCalendar = () => {
     setCalendarMonth(day);
@@ -287,14 +288,18 @@ export default function HomeScreen() {
                 />
               )}
               renderIntake={(intake) => (
-                <IntakeRow intake={intake} onPress={intakeEditor.edit} />
+                <IntakeRow
+                  intake={intake}
+                  mode={mode}
+                  onRevert={revertIntakeConfirmation.request}
+                  onOpenProduct={openProduct}
+                />
               )}
             />
           ))}
         </ScrollView>
       </View>
       <UndoSnackbar snackbar={snackbar} />
-      {intakeEditor.sheet}
       {correcting ? (
         <DoseCorrectionSheet
           key={correcting.id}
@@ -314,6 +319,16 @@ export default function HomeScreen() {
         confirmLabel={t('home.undo')}
         onConfirm={revertConfirmation.confirm}
         onCancel={revertConfirmation.cancel}
+      />
+      <ConfirmDialog
+        visible={revertIntakeConfirmation.pending !== null}
+        title={t(DOSE_ACTION_TEXT_KEYS.taken.title)}
+        message={t(DOSE_ACTION_TEXT_KEYS.taken.message, {
+          name: revertIntakeConfirmation.pending?.value.productName,
+        })}
+        confirmLabel={t('home.undo')}
+        onConfirm={revertIntakeConfirmation.confirm}
+        onCancel={revertIntakeConfirmation.cancel}
       />
       <ConfirmDialog
         visible={takeOverdueConfirmation.pending !== null}
