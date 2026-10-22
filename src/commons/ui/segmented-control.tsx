@@ -5,6 +5,8 @@ import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { useTheme } from '@/commons/ui/use-theme';
 
+const MIN_LABEL_FONT_SCALE = 0.75;
+
 type Props<T extends string> = {
   options: readonly { value: T; label: string }[];
   selected: T;
@@ -36,6 +38,9 @@ export function SegmentedControl<T extends string>({
             <ThemedText
               type="smallBold"
               themeColor={isSelected ? 'text' : 'textSecondary'}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={MIN_LABEL_FONT_SCALE}
             >
               {label}
             </ThemedText>
