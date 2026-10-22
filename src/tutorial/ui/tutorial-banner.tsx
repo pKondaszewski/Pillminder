@@ -17,7 +17,7 @@ const FORM_STEPS: Record<'product' | 'schedule', string> = {
 export function TutorialBanner({ step }: { step: 'product' | 'schedule' }) {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { step: current, skip } = useTutorial();
+  const { step: current, skipAndGoHome } = useTutorial();
 
   if (current !== step) return null;
 
@@ -25,13 +25,13 @@ export function TutorialBanner({ step }: { step: 'product' | 'schedule' }) {
     <ThemedView
       style={[
         styles.banner,
-        { backgroundColor: theme.cardGlass, borderColor: theme.border },
+        { backgroundColor: theme.surface, borderColor: theme.border },
       ]}
     >
       <ThemedText type="smallBold" style={styles.title}>
         {t(FORM_STEPS[step])}
       </ThemedText>
-      <TutorialSkipButton onSkip={skip} />
+      <TutorialSkipButton onSkip={skipAndGoHome} />
     </ThemedView>
   );
 }

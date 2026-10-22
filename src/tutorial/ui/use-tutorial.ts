@@ -37,8 +37,14 @@ export function useTutorial() {
     step,
     advance: advanceTutorial,
     skip: skipTutorial,
+    skipAndGoHome,
     completePractice,
   };
+}
+
+function skipAndGoHome(): void {
+  skipTutorial();
+  router.navigate('/');
 }
 
 export function usePracticeReminder(active: boolean): PracticeReminder | null {
