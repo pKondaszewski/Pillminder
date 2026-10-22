@@ -656,7 +656,7 @@
   },
   "intake": {
     "label": "doraźnie",
-    "takeNow": "Weź teraz",
+    "takeNow": "Weź lek doraźnie",
     "takenToast": "{{name}}: zapisano przyjęcie doraźne",
     "rowTime": "doraźnie · {{time}}",
     "historyTitle": "Przyjęte doraźnie",

@@ -18,7 +18,6 @@ export function TakeNowButton({ onPress }: Props) {
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${t('intake.takeNow')}, ${t('intake.label')}`}
       style={({ pressed }) => [
         styles.button,
         { backgroundColor: theme.accentSoft, borderColor: theme.accent },
