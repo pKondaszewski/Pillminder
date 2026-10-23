@@ -6,6 +6,7 @@ import {
   packSizeEstimate,
   packSizeText,
   reorderThresholdPatch,
+  storeLinkPatch,
   textFieldPatch,
   validateProductField,
   validateProductForm,
@@ -208,7 +209,37 @@ describe('textFieldPatch', () => {
   });
 });
 
+describe('storeLinkPatch', () => {
+  it.each([
+    [' apteka ', 'maps', { storeLink: 'apteka', storeLinkTarget: 'maps' }],
+    ['allegro', null, { storeLink: 'allegro', storeLinkTarget: null }],
+    [
+      'https://allegro.pl',
+      'web',
+      { storeLink: 'https://allegro.pl', storeLinkTarget: null },
+    ],
+    ['  ', 'maps', { storeLink: null, storeLinkTarget: null }],
+  ] as const)('patches "%s" with the target %s', (text, target, expected) => {
+    // when
+    const patch = storeLinkPatch(text, target);
+
+    // then
+    expect(patch).toEqual(expected);
+  });
+});
+
 describe('editedProductInput', () => {
+  it('keeps the remembered store target', () => {
+    // given
+    const product = { ...PRODUCT, storeLinkTarget: 'web' } as Product;
+
+    // when
+    const input = editedProductInput(product, { price: null });
+
+    // then
+    expect(input.storeLinkTarget).toBe('web');
+  });
+
   it('keeps every other field, including the fasting flag', () => {
     // when
     const input = editedProductInput(PRODUCT, { price: null });

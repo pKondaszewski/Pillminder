@@ -52,13 +52,12 @@ function processReorderResponse(
   handlers: ReminderResponseHandlers,
 ): boolean {
   const { productId } = data;
+  if (typeof productId !== 'string') return false;
   if (response.actionIdentifier === ADD_PACK_ACTION) {
-    if (typeof productId !== 'string') return false;
     return runHandlerOnce(response, () => handlers.onAddPack(productId));
   }
   if (response.actionIdentifier !== BUY_ACTION) return false;
-  const storeLink = typeof data.storeLink === 'string' ? data.storeLink : null;
-  return runHandlerOnce(response, () => handlers.onReorder(storeLink));
+  return runHandlerOnce(response, () => handlers.onReorder(productId));
 }
 
 function processDoseResponse(

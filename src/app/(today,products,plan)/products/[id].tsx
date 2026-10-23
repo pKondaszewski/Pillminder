@@ -1,11 +1,10 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
 import { Spacing } from '@/commons/ui/constants/theme';
 import { KeyboardAwareScrollView } from '@/commons/ui/keyboard-aware-scroll-view';
-import { openStore } from '@/commons/ui/open-store';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
 import { useFormatDate, useFormatTime } from '@/commons/ui/use-format-date';
@@ -34,6 +33,7 @@ import { ProductHeader } from '@/products/ui/product-header';
 import { RecentDaysSection } from '@/products/ui/recent-days';
 import { ScheduleSection } from '@/products/ui/schedule-section';
 import { StockCard } from '@/products/ui/stock-card';
+import { useOpenStore } from '@/products/ui/use-open-store';
 import { useProductEditActions } from '@/products/ui/use-product-edit-actions';
 import { useProductImages } from '@/products/ui/use-product-images';
 import { useProducts } from '@/products/ui/use-products';
@@ -46,14 +46,22 @@ type Sheet =
   | { kind: 'archive' | 'delete' };
 
 export default function ProductScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, buy } = useLocalSearchParams<{ id: string; buy?: string }>();
   const { products } = useProducts();
   const product = products.find((p) => p.id === id);
 
-  return product ? <ProductDetail product={product} /> : null;
+  return product ? (
+    <ProductDetail product={product} openStoreOnMount={buy === '1'} />
+  ) : null;
 }
 
-function ProductDetail({ product }: { product: Product }) {
+function ProductDetail({
+  product,
+  openStoreOnMount,
+}: {
+  product: Product;
+  openStoreOnMount: boolean;
+}) {
   const { t } = useTranslation();
   const formatDate = useFormatDate();
   const { formatTime } = useFormatTime();
@@ -67,6 +75,7 @@ function ProductDetail({ product }: { product: Product }) {
   const edit = useProductEditActions(product, runWithUndo);
   const intakes = useProductIntakes(product.id);
   const takeNow = useTakeNow(product, runWithUndo);
+  const { openStore, storeTargetSheet } = useOpenStore();
 
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const runThenGoBack = useRunWithErrorAlert(() => router.back());
@@ -84,6 +93,14 @@ function ProductDetail({ product }: { product: Product }) {
     });
   const editField = (field: ProductSheetField) =>
     setSheet({ kind: 'field', field });
+
+  // The Buy action on the reorder notification lands here and asks if needed
+  useEffect(() => {
+    if (!openStoreOnMount) return;
+    router.setParams({ buy: undefined });
+    openStore(product);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per arrival
+  }, [openStoreOnMount]);
 
   return (
     <ThemedView style={styles.container}>
@@ -114,7 +131,7 @@ function ProductDetail({ product }: { product: Product }) {
           onIncrease={() => stock.step(1)}
           onAddPack={stock.addPack}
           onEditStock={() => editField('stock')}
-          onOrder={() => openStore(product.storeLink)}
+          onOrder={() => openStore(product)}
         />
         <ScheduleSection
           schedules={productSchedules}
@@ -150,6 +167,7 @@ function ProductDetail({ product }: { product: Product }) {
       </KeyboardAwareScrollView>
 
       <UndoSnackbar snackbar={snackbar} />
+      {storeTargetSheet}
 
       {sheet?.kind === 'field' ? (
         <ProductFieldSheet

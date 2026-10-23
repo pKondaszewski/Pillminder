@@ -367,7 +367,6 @@ async function postReorderAlert(
         data: {
           type: 'reorder',
           productId: alert.productId,
-          storeLink: alert.storeLink,
         },
       },
       trigger:

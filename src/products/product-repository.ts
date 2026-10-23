@@ -157,6 +157,7 @@ function productFields(input: NewProductInput, category: string) {
     unit: input.unit ?? null,
     price: input.price ?? null,
     storeLink: input.storeLink ?? null,
+    storeLinkTarget: input.storeLinkTarget ?? null,
     stock: input.stock ?? null,
     packSize: input.packSize ?? null,
     reorderThreshold: input.reorderThreshold ?? null,

@@ -1,0 +1,1 @@
+ALTER TABLE `products` ADD `store_link_target` text;

@@ -122,3 +122,35 @@ describe('processReminderResponse for the practice reminder', () => {
     expect(given.onPracticeTake).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('processReminderResponse for the reorder alert', () => {
+  it('hands the product to the Buy handler', () => {
+    // given
+    const given = handlers();
+    const response = responseTo(
+      'BUY_ACTION',
+      { type: 'reorder', productId: 'p1' },
+      'reorder-p1',
+    );
+
+    // when
+    const handled = processReminderResponse(response, given);
+
+    // then
+    expect(handled).toBe(true);
+    expect(given.onReorder).toHaveBeenCalledWith('p1');
+  });
+
+  it('ignores Buy without a product', () => {
+    // given
+    const given = handlers();
+    const response = responseTo('BUY_ACTION', { type: 'reorder' }, 'reorder-x');
+
+    // when
+    const handled = processReminderResponse(response, given);
+
+    // then
+    expect(handled).toBe(false);
+    expect(given.onReorder).not.toHaveBeenCalled();
+  });
+});
