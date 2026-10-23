@@ -6,16 +6,16 @@ import { type ImageSource, pickImage } from '@/images/image-service';
 export function usePickImage() {
   const { t } = useTranslation();
 
-  return async (source: ImageSource): Promise<string | null> => {
+  return async (source: ImageSource, multiple?: boolean): Promise<string[]> => {
     try {
-      const result = await pickImage(source);
+      const result = await pickImage(source, multiple);
       if (result.status === 'permissionDenied') {
         Alert.alert(t('products.errorTitle'), t('images.cameraDenied'));
       }
-      return result.status === 'picked' ? result.uri : null;
+      return result.status === 'picked' ? result.uris : [];
     } catch {
       Alert.alert(t('products.errorTitle'), t('images.errorSave'));
-      return null;
+      return [];
     }
   };
 }

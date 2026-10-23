@@ -19,22 +19,31 @@ export function usePhotoUndo(
   runWithUndo: RunWithUndo,
 ) {
   const { t } = useTranslation();
-  const pickImageUri = usePickImage();
+  const pickImageUris = usePickImage();
   const [busy, setBusy] = useState(false);
 
-  const pickAndAddImage = async (source: ImageSource) => {
+  const pickAndAddImages = async (source: ImageSource) => {
     setBusy(true);
     try {
-      const uri = await pickImageUri(source);
-      if (!uri) return;
-      let added: ProductImage;
+      const uris = await pickImageUris(source, source === 'gallery');
+      if (uris.length === 0) return;
+      const added: ProductImage[] = [];
       await runWithUndo(
         {
           message: t('images.added'),
           apply: async () => {
-            added = await addImage(productId, uri, DEFAULT_IMAGE_ROLE);
+            try {
+              for (const uri of uris) {
+                added.push(await addImage(productId, uri, DEFAULT_IMAGE_ROLE));
+              }
+            } catch (error) {
+              await Promise.all(added.splice(0).map(discardAddedImage));
+              throw error;
+            }
           },
-          revert: () => discardAddedImage(added),
+          revert: async () => {
+            await Promise.all(added.map(discardAddedImage));
+          },
         },
         'images.errorSave',
       );
@@ -53,5 +62,5 @@ export function usePhotoUndo(
       'images.errorDelete',
     );
 
-  return { busy, pickAndAddImage, removeImageWithUndo };
+  return { busy, pickAndAddImages, removeImageWithUndo };
 }

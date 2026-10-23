@@ -7,22 +7,21 @@ import { Icon } from '@/commons/ui/icon';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { useTheme } from '@/commons/ui/use-theme';
-import type { ProductImage } from '@/images/image-service';
-import { PhotoGallery } from '@/products/ui/photo-gallery';
+import { PhotoGallery, type PhotoItem } from '@/products/ui/photo-gallery';
 import { PhotoTile } from '@/products/ui/photo-tile';
 
 type Props = {
-  images: ProductImage[];
-  profileImageId: string | null;
-  addDisabled: boolean;
+  photos: PhotoItem[];
+  profilePhotoId: string | null;
+  addDisabled?: boolean;
   onAdd: () => void;
-  onSetProfile: (image: ProductImage) => void;
-  onDelete: (image: ProductImage) => void;
+  onSetProfile: (photoId: string) => void;
+  onDelete: (photoId: string) => void;
 };
 
 export function PhotoGrid({
-  images,
-  profileImageId,
+  photos,
+  profilePhotoId,
   addDisabled,
   onAdd,
   onSetProfile,
@@ -34,14 +33,14 @@ export function PhotoGrid({
 
   return (
     <ThemedView style={styles.grid}>
-      {images.map((image, index) => (
-        <ThemedView key={image.id} style={styles.cell}>
+      {photos.map((photo, index) => (
+        <ThemedView key={photo.id} style={styles.cell}>
           <PhotoTile
-            fileName={image.fileName}
-            profile={image.id === profileImageId}
+            uri={photo.uri}
+            profile={photo.id === profilePhotoId}
             onPress={() => setPreviewedIndex(index)}
-            onSetProfile={() => onSetProfile(image)}
-            onDelete={() => onDelete(image)}
+            onSetProfile={() => onSetProfile(photo.id)}
+            onDelete={() => onDelete(photo.id)}
           />
         </ThemedView>
       ))}
@@ -61,7 +60,7 @@ export function PhotoGrid({
       </ThemedView>
 
       <PhotoGallery
-        images={images}
+        photos={photos}
         startIndex={previewedIndex}
         onClose={() => setPreviewedIndex(null)}
       />
