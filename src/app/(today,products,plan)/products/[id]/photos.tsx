@@ -7,7 +7,7 @@ import { Spacing } from '@/commons/ui/constants/theme';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
 import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
-import { orderPhotos } from '@/images/image-service';
+import { imageFileUri, orderPhotos } from '@/images/image-service';
 import { ImageSourceSheet } from '@/products/ui/image-source-sheet';
 import { PhotoGrid } from '@/products/ui/photo-grid';
 import { usePhotoUndo } from '@/products/ui/use-photo-undo';
@@ -23,7 +23,7 @@ export default function ProductPhotosScreen() {
     products.find((p) => p.id === id)?.profileImageId ?? null;
   const { images } = useProductImages(id);
   const { snackbar, runWithUndo } = useUndoSnackbar();
-  const { busy, pickAndAddImage, removeImageWithUndo } = usePhotoUndo(
+  const { busy, pickAndAddImages, removeImageWithUndo } = usePhotoUndo(
     id,
     profileImageId,
     runWithUndo,
@@ -35,24 +35,32 @@ export default function ProductPhotosScreen() {
   );
   const [sourceSheetVisible, setSourceSheetVisible] = useState(false);
 
+  const deleteImage = (imageId: string) => {
+    const image = images.find((candidate) => candidate.id === imageId);
+    if (image) void removeImageWithUndo(image);
+  };
+
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ headerShown: true, title: t('images.title') }} />
       <ScrollView contentContainerStyle={styles.content}>
         <PhotoGrid
-          images={orderPhotos(images, profileImageId)}
-          profileImageId={profileImageId}
+          photos={orderPhotos(images, profileImageId).map((image) => ({
+            id: image.id,
+            uri: imageFileUri(image.fileName),
+          }))}
+          profilePhotoId={profileImageId}
           addDisabled={busy}
           onAdd={() => setSourceSheetVisible(true)}
-          onSetProfile={(image) => setProfileWithUndo(image.id)}
-          onDelete={removeImageWithUndo}
+          onSetProfile={setProfileWithUndo}
+          onDelete={deleteImage}
         />
       </ScrollView>
       <UndoSnackbar snackbar={snackbar} />
       <ImageSourceSheet
         visible={sourceSheetVisible}
         onClose={() => setSourceSheetVisible(false)}
-        onSelect={pickAndAddImage}
+        onSelect={pickAndAddImages}
       />
     </ThemedView>
   );

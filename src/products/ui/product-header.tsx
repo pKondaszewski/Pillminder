@@ -10,6 +10,7 @@ import { categoryLabel } from '@/products/category';
 import { categoryAvatar } from '@/products/category-avatar';
 import { productLabel } from '@/products/product-label';
 import type { Product } from '@/products/product-service';
+import { PhotoCountBadge } from '@/products/ui/photo-count-badge';
 
 type Props = {
   product: Product;
@@ -46,13 +47,7 @@ export function ProductHeader({
           size={88}
           imageFileName={product.profileImageFileName}
         />
-        {photoCount > 0 ? (
-          <ThemedView type="accent" style={styles.badge}>
-            <ThemedText type="caption" themeColor="onAccent">
-              {photoCount}
-            </ThemedText>
-          </ThemedView>
-        ) : null}
+        {photoCount > 0 ? <PhotoCountBadge count={photoCount} /> : null}
       </Pressable>
       <ThemedView style={styles.texts}>
         <Pressable
@@ -113,17 +108,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.four,
     paddingHorizontal: Spacing.ten,
     borderRadius: Radius.pill,
-  },
-  badge: {
-    position: 'absolute',
-    right: -Spacing.four,
-    bottom: -Spacing.four,
-    minWidth: 22,
-    height: 22,
-    paddingHorizontal: Spacing.four,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   pressed: {
     opacity: 0.7,

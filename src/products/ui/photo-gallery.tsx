@@ -16,22 +16,26 @@ import { MIN_TOUCH_SIZE, Spacing } from '@/commons/ui/constants/theme';
 import { Icon } from '@/commons/ui/icon';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { useTheme } from '@/commons/ui/use-theme';
-import { imageFileUri, type ProductImage } from '@/images/image-service';
 import { ZoomablePhoto } from '@/products/ui/zoomable-photo';
 
+export type PhotoItem = {
+  id: string;
+  uri: string;
+};
+
 type Props = {
-  images: ProductImage[];
+  photos: PhotoItem[];
   startIndex: number | null;
   onClose: () => void;
 };
 
 type ContentProps = {
-  images: ProductImage[];
+  photos: PhotoItem[];
   startIndex: number;
   onClose: () => void;
 };
 
-export function PhotoGallery({ images, startIndex, onClose }: Props) {
+export function PhotoGallery({ photos, startIndex, onClose }: Props) {
   return (
     <Modal
       visible={startIndex !== null}
@@ -43,7 +47,7 @@ export function PhotoGallery({ images, startIndex, onClose }: Props) {
     >
       {startIndex !== null ? (
         <GalleryContent
-          images={images}
+          photos={photos}
           startIndex={startIndex}
           onClose={onClose}
         />
@@ -52,7 +56,7 @@ export function PhotoGallery({ images, startIndex, onClose }: Props) {
   );
 }
 
-function GalleryContent({ images, startIndex, onClose }: ContentProps) {
+function GalleryContent({ photos, startIndex, onClose }: ContentProps) {
   const { t } = useTranslation();
   const theme = useTheme();
   const { top } = useSafeAreaInsets();
@@ -70,8 +74,8 @@ function GalleryContent({ images, startIndex, onClose }: ContentProps) {
       style={[styles.root, { backgroundColor: theme.scrim }]}
     >
       <FlatList
-        data={images}
-        keyExtractor={(image) => image.id}
+        data={photos}
+        keyExtractor={(photo) => photo.id}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -84,7 +88,7 @@ function GalleryContent({ images, startIndex, onClose }: ContentProps) {
         onMomentumScrollEnd={onPageSettled}
         renderItem={({ item, index }) => (
           <ZoomablePhoto
-            uri={imageFileUri(item.fileName)}
+            uri={item.uri}
             width={width}
             height={height}
             active={index === current}
@@ -104,7 +108,7 @@ function GalleryContent({ images, startIndex, onClose }: ContentProps) {
         themeColor="onSnackbar"
         accessibilityLiveRegion="polite"
       >
-        {t('images.position', { current: current + 1, total: images.length })}
+        {t('images.position', { current: current + 1, total: photos.length })}
       </ThemedText>
     </GestureHandlerRootView>
   );
