@@ -56,9 +56,7 @@ export function RoadScene({
   const theme = useTheme();
   const palette = useScenePalette();
   const { width } = useWindowDimensions();
-  const colors = useBlendedColors(
-    sceneColors(palette, season, scene.phase, 'calm'),
-  );
+  const colors = useBlendedColors(sceneColors(palette, season, scene.phase));
   const sky = useDerivedValue(() => colors.value.slice(0, 2));
   const burst = useSharedValue(0);
   const axis = roadAxis(width, tripDays);

@@ -7,32 +7,10 @@ describe('sceneColors', () => {
     const palette = SCENE_PALETTES.light;
 
     // when
-    const colors = sceneColors(palette, 'summer', 'day', 'calm');
+    const colors = sceneColors(palette, 'summer', 'day');
 
     // then
     expect(colors).toEqual([...palette.sky.day, ...palette.land.summer]);
-  });
-
-  it('turns the sky green when everything is done, whatever the phase', () => {
-    // given
-    const palette = SCENE_PALETTES.dark;
-
-    // when
-    const colors = sceneColors(palette, 'spring', 'night', 'done');
-
-    // then
-    expect(colors.slice(0, 2)).toEqual([...palette.sky.done]);
-  });
-
-  it('keeps the phase gradient when overdue', () => {
-    // given
-    const palette = SCENE_PALETTES.light;
-
-    // when
-    const colors = sceneColors(palette, 'autumn', 'dusk', 'overdue');
-
-    // then
-    expect(colors.slice(0, 2)).toEqual([...palette.sky.dusk]);
   });
 
   it('darkens the land at night, less in winter', () => {
@@ -40,8 +18,8 @@ describe('sceneColors', () => {
     const palette = SCENE_PALETTES.light;
 
     // when
-    const summer = sceneColors(palette, 'summer', 'night', 'calm');
-    const winter = sceneColors(palette, 'winter', 'night', 'calm');
+    const summer = sceneColors(palette, 'summer', 'night');
+    const winter = sceneColors(palette, 'winter', 'night');
 
     // then
     expect(summer.slice(2)).not.toEqual([...palette.land.summer]);
@@ -53,9 +31,9 @@ describe('sceneColors', () => {
     const palette = SCENE_PALETTES.light;
 
     // when
-    const dawn = sceneColors(palette, 'spring', 'dawn', 'calm');
-    const dusk = sceneColors(palette, 'spring', 'dusk', 'calm');
-    const night = sceneColors(palette, 'spring', 'night', 'calm');
+    const dawn = sceneColors(palette, 'spring', 'dawn');
+    const dusk = sceneColors(palette, 'spring', 'dusk');
+    const night = sceneColors(palette, 'spring', 'night');
 
     // then
     expect(dawn.slice(2)).toEqual(dusk.slice(2));
@@ -67,7 +45,7 @@ describe('sceneColors', () => {
     const palette = SCENE_PALETTES.light;
 
     // when
-    const colors = sceneColors(palette, 'summer', 'night', 'calm');
+    const colors = sceneColors(palette, 'summer', 'night');
 
     // then
     expect(colors.slice(0, 2)).toEqual([...SCENE_PALETTES.dark.sky.night]);
@@ -78,29 +56,13 @@ describe('sceneColors', () => {
     const palette = SCENE_PALETTES.light;
 
     // when
-    const dusk = sceneColors(palette, 'summer', 'dusk', 'calm');
-    const night = sceneColors(palette, 'summer', 'night', 'calm');
+    const dusk = sceneColors(palette, 'summer', 'dusk');
+    const night = sceneColors(palette, 'summer', 'night');
 
     // then
     expect(night[5]).not.toEqual(dusk[5]);
     expect(luminance(night[5])).toBeLessThan(luminance(dusk[5]));
     expect(luminance(night[5])).toBeLessThan(80);
-  });
-
-  it('keeps the done sky dark at night in light mode only', () => {
-    // given
-    const light = SCENE_PALETTES.light;
-    const dark = SCENE_PALETTES.dark;
-
-    // when
-    const lightNight = sceneColors(light, 'spring', 'night', 'done');
-    const lightDay = sceneColors(light, 'spring', 'day', 'done');
-    const darkNight = sceneColors(dark, 'spring', 'night', 'done');
-
-    // then
-    expect(lightNight.slice(0, 2)).toEqual([...light.sky.doneNight]);
-    expect(lightDay.slice(0, 2)).toEqual([...light.sky.done]);
-    expect(darkNight.slice(0, 2)).toEqual([...dark.sky.done]);
   });
 
   it('leaves the light dusk land and dark night land as they were', () => {
@@ -109,8 +71,8 @@ describe('sceneColors', () => {
     const dark = SCENE_PALETTES.dark;
 
     // when
-    const lightDusk = sceneColors(light, 'spring', 'dusk', 'calm');
-    const darkNight = sceneColors(dark, 'spring', 'night', 'calm');
+    const lightDusk = sceneColors(light, 'spring', 'dusk');
+    const darkNight = sceneColors(dark, 'spring', 'night');
 
     // then
     expect(lightDusk[2]).toEqual(

@@ -8,7 +8,6 @@ export { SEASONS } from './dto/season';
 export type {
   BodyPosition,
   SceneMood,
-  SkyKey,
   SkyPhase,
   SkyScene,
   Star,

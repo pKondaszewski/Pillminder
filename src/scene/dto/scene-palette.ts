@@ -1,11 +1,11 @@
 import type { Season } from './season';
-import type { SkyKey } from './sky-scene';
+import type { SkyPhase } from './sky-scene';
 
 type Gradient = readonly [top: string, bottom: string];
 type Land = readonly [far: string, mid: string, near: string, grass: string];
 
 export interface ScenePalette {
-  sky: Record<SkyKey, Gradient>;
+  sky: Record<SkyPhase, Gradient>;
   land: Record<Season, Land>;
   landNight: Land;
   landDeepNight: Land;

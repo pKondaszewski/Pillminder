@@ -1,7 +1,7 @@
 import { mixColors } from './color';
 import type { ScenePalette } from './dto/scene-palette';
 import type { Season } from './dto/season';
-import type { SceneMood, SkyKey, SkyPhase } from './dto/sky-scene';
+import type { SkyPhase } from './dto/sky-scene';
 
 const NIGHT_LAND_SHARE: Record<Season, number> = {
   spring: 0.75,
@@ -18,8 +18,6 @@ export const SCENE_PALETTES = {
       day: ['#CDE7F7', '#EAF5FB'],
       dusk: ['#E2D2F2', '#FFDCC4'],
       night: ['#0B0F2A', '#1B1730'],
-      done: ['#CBEBD7', '#E9F4EE'],
-      doneNight: ['#0F2A1E', '#16241D'],
     },
     land: {
       spring: ['#A9CFE0', '#8CC4A0', '#6FB487', '#5AA571'],
@@ -62,8 +60,6 @@ export const SCENE_PALETTES = {
       day: ['#17405C', '#12293A'],
       dusk: ['#3B2A52', '#5A3626'],
       night: ['#0B0F2A', '#1B1730'],
-      done: ['#1B4430', '#16291F'],
-      doneNight: ['#1B4430', '#16291F'],
     },
     land: {
       spring: ['#1E4A63', '#1E5444', '#1C5A45', '#2A7A5A'],
@@ -106,15 +102,9 @@ export function sceneColors(
   palette: ScenePalette,
   season: Season,
   phase: SkyPhase,
-  mood: SceneMood,
 ): string[] {
-  const [top, bottom] = palette.sky[skyKey(phase, mood)];
+  const [top, bottom] = palette.sky[phase];
   return [top, bottom, ...landColors(palette, season, phase)];
-}
-
-function skyKey(phase: SkyPhase, mood: SceneMood): SkyKey {
-  if (mood !== 'done') return phase;
-  return phase === 'night' ? 'doneNight' : 'done';
 }
 
 function landColors(
