@@ -55,6 +55,12 @@ jobs:
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon
 
+      - name: Verify the expo-notifications patch is compiled into the APK
+        run: |
+          dex_dir=$(mktemp -d)
+          unzip -q android/app/build/outputs/apk/release/app-release.apk 'classes*.dex' -d "$dex_dir"
+          grep -qa androidTag "$dex_dir"/classes*.dex
+
       - name: Name APK after version and commit
         id: apk
         run: |
