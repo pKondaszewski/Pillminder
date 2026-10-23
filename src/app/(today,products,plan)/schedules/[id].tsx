@@ -2,7 +2,6 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DestructiveButton, SecondaryButton } from '@/commons/ui/button';
 import { ConfirmDialog } from '@/commons/ui/confirm-dialog';
@@ -109,87 +108,80 @@ export default function ScheduleScreen() {
         options={{ headerShown: true, title: t('schedule.editTitle') }}
       />
       <ThemedView style={styles.container}>
-        <SafeAreaView style={styles.safeArea} edges={['bottom']}>
-          <ScrollView contentContainerStyle={styles.content}>
-            <ScheduleProductCard
-              product={product}
-              onPress={() => router.push(`/products/${product.id}`)}
+        <ScrollView contentContainerStyle={styles.content}>
+          <ScheduleProductCard
+            product={product}
+            onPress={() => router.push(`/products/${product.id}`)}
+          />
+
+          {statusMessageKey ? (
+            <ThemedText type="small" themeColor="textSecondary">
+              {t(statusMessageKey)}
+            </ThemedText>
+          ) : null}
+          {schedule.endDate ? (
+            <CourseProgressBar
+              progress={progress}
+              label={describeCourse(progress, schedule.endDate, t, formatDate)}
             />
+          ) : null}
+          {stock ? (
+            <ThemedText
+              type="small"
+              themeColor={stock.warning ? 'overdueText' : 'textSecondary'}
+            >
+              {stock.message}
+            </ThemedText>
+          ) : null}
 
-            {statusMessageKey ? (
-              <ThemedText type="small" themeColor="textSecondary">
-                {t(statusMessageKey)}
-              </ThemedText>
-            ) : null}
-            {schedule.endDate ? (
-              <CourseProgressBar
-                progress={progress}
-                label={describeCourse(
-                  progress,
-                  schedule.endDate,
-                  t,
-                  formatDate,
-                )}
-              />
-            ) : null}
-            {stock ? (
-              <ThemedText
-                type="small"
-                themeColor={stock.warning ? 'overdueText' : 'textSecondary'}
-              >
-                {stock.message}
-              </ThemedText>
-            ) : null}
+          <View style={styles.section}>
+            <ThemedText type="label">{t('schedule.fieldsHint')}</ThemedText>
+            <FieldRow
+              label={t('schedule.intervalDays')}
+              value={describeInterval(schedule.intervalDays, t)}
+              onPress={() => setField('rhythm')}
+            />
+            <FieldRow
+              label={t('schedule.timesOfDay')}
+              value={formatTimes(schedule.timesOfDay)}
+              onPress={() => setField('times')}
+            />
+            <FieldRow
+              label={t('schedule.quantity')}
+              value={describeQuantity(schedule.quantity, product.unit, t)}
+              onPress={() => setField('quantity')}
+            />
+            <FieldRow
+              label={t('schedule.periodLabel')}
+              value={
+                describePeriod(schedule, t, formatDate) ||
+                t('schedule.periodOpen')
+              }
+              onPress={() => setField('period')}
+            />
+          </View>
 
+          {productArchived ? null : (
             <View style={styles.section}>
-              <ThemedText type="label">{t('schedule.fieldsHint')}</ThemedText>
-              <FieldRow
-                label={t('schedule.intervalDays')}
-                value={describeInterval(schedule.intervalDays, t)}
-                onPress={() => setField('rhythm')}
-              />
-              <FieldRow
-                label={t('schedule.timesOfDay')}
-                value={formatTimes(schedule.timesOfDay)}
-                onPress={() => setField('times')}
-              />
-              <FieldRow
-                label={t('schedule.quantity')}
-                value={describeQuantity(schedule.quantity, product.unit, t)}
-                onPress={() => setField('quantity')}
-              />
-              <FieldRow
-                label={t('schedule.periodLabel')}
-                value={
-                  describePeriod(schedule, t, formatDate) ||
-                  t('schedule.periodOpen')
-                }
-                onPress={() => setField('period')}
+              <ThemedText type="label">{t('schedule.preview')}</ThemedText>
+              <DosePreview
+                hasTimes={schedule.timesOfDay.length > 0}
+                doses={doses}
               />
             </View>
+          )}
 
-            {productArchived ? null : (
-              <View style={styles.section}>
-                <ThemedText type="label">{t('schedule.preview')}</ThemedText>
-                <DosePreview
-                  hasTimes={schedule.timesOfDay.length > 0}
-                  doses={doses}
-                />
-              </View>
-            )}
-
-            <View style={styles.actions}>
-              <SecondaryButton
-                label={t(stateAction.labelKey)}
-                onPress={stateAction.onPress}
-              />
-              <DestructiveButton
-                label={t('editor.delete')}
-                onPress={() => setConfirmingDelete(true)}
-              />
-            </View>
-          </ScrollView>
-        </SafeAreaView>
+          <View style={styles.actions}>
+            <SecondaryButton
+              label={t(stateAction.labelKey)}
+              onPress={stateAction.onPress}
+            />
+            <DestructiveButton
+              label={t('editor.delete')}
+              onPress={() => setConfirmingDelete(true)}
+            />
+          </View>
+        </ScrollView>
 
         <UndoSnackbar snackbar={snackbar} />
 
@@ -263,9 +255,6 @@ function describeQuantity(
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  safeArea: {
     flex: 1,
   },
   content: {

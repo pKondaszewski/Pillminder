@@ -6,7 +6,6 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/commons/ui/button';
 import { Spacing } from '@/commons/ui/constants/theme';
@@ -114,94 +113,92 @@ export function NewScheduleForm({
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['bottom']}>
-        <ScrollView
-          ref={scrollRef}
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Section
+          label={t('schedule.product')}
+          onLayout={trackOffset('product')}
         >
-          <Section
-            label={t('schedule.product')}
-            onLayout={trackOffset('product')}
-          >
-            {productLocked && product ? (
-              <View style={styles.locked}>
-                <ProductAvatar
-                  category={product.category}
-                  imageFileName={product.profileImageFileName}
-                  size={36}
-                />
-                <ThemedText>
-                  {productLabel(product.name, product.strength)}
-                </ThemedText>
-              </View>
-            ) : (
-              <ProductPicker
-                products={products}
-                selectedProductId={productId}
-                error={shownErrors.product && t(shownErrors.product)}
-                onSelect={setProductId}
-                onNewProduct={onNewProduct}
+          {productLocked && product ? (
+            <View style={styles.locked}>
+              <ProductAvatar
+                category={product.category}
+                imageFileName={product.profileImageFileName}
+                size={36}
               />
-            )}
-          </Section>
-
-          <Section label={t('schedule.intervalDays')}>
-            <RhythmPicker
-              intervalDays={intervalDays}
-              onChange={setIntervalDays}
+              <ThemedText>
+                {productLabel(product.name, product.strength)}
+              </ThemedText>
+            </View>
+          ) : (
+            <ProductPicker
+              products={products}
+              selectedProductId={productId}
+              error={shownErrors.product && t(shownErrors.product)}
+              onSelect={setProductId}
+              onNewProduct={onNewProduct}
             />
-          </Section>
+          )}
+        </Section>
 
-          <Section
-            label={t('schedule.timesOfDay')}
-            onLayout={trackOffset('times')}
+        <Section label={t('schedule.intervalDays')}>
+          <RhythmPicker
+            intervalDays={intervalDays}
+            onChange={setIntervalDays}
+          />
+        </Section>
+
+        <Section
+          label={t('schedule.timesOfDay')}
+          onLayout={trackOffset('times')}
+        >
+          <TimeChips
+            times={timesOfDay}
+            error={shownErrors.times && t(shownErrors.times)}
+            onChange={setTimesOfDay}
+          />
+        </Section>
+
+        <Section label={t('schedule.quantity')}>
+          <QuantityStepper
+            quantity={quantity}
+            unit={product?.unit ?? null}
+            onChange={setQuantity}
+          />
+        </Section>
+
+        <Section
+          label={t('schedule.periodLabel')}
+          onLayout={trackOffset('period')}
+        >
+          <PeriodFields
+            {...period}
+            now={now}
+            error={shownErrors.period && t(shownErrors.period)}
+            onChange={setPeriod}
+          />
+        </Section>
+
+        {stockLine ? (
+          <ThemedText
+            type="small"
+            themeColor={stockLine.warning ? 'overdueText' : 'textSecondary'}
           >
-            <TimeChips
-              times={timesOfDay}
-              error={shownErrors.times && t(shownErrors.times)}
-              onChange={setTimesOfDay}
-            />
-          </Section>
+            {stockLine.message}
+          </ThemedText>
+        ) : null}
 
-          <Section label={t('schedule.quantity')}>
-            <QuantityStepper
-              quantity={quantity}
-              unit={product?.unit ?? null}
-              onChange={setQuantity}
-            />
-          </Section>
+        <Section label={t('schedule.preview')}>
+          <DosePreview hasTimes={timesOfDay.length > 0} doses={doses} />
+        </Section>
+      </ScrollView>
 
-          <Section
-            label={t('schedule.periodLabel')}
-            onLayout={trackOffset('period')}
-          >
-            <PeriodFields
-              {...period}
-              now={now}
-              error={shownErrors.period && t(shownErrors.period)}
-              onChange={setPeriod}
-            />
-          </Section>
-
-          {stockLine ? (
-            <ThemedText
-              type="small"
-              themeColor={stockLine.warning ? 'overdueText' : 'textSecondary'}
-            >
-              {stockLine.message}
-            </ThemedText>
-          ) : null}
-
-          <Section label={t('schedule.preview')}>
-            <DosePreview hasTimes={timesOfDay.length > 0} doses={doses} />
-          </Section>
-        </ScrollView>
-
-        <View style={styles.footer}>
-          <PrimaryButton label={t('schedule.submit')} onPress={submit} />
-        </View>
-      </SafeAreaView>
+      <View style={styles.footer}>
+        <PrimaryButton label={t('schedule.submit')} onPress={submit} />
+      </View>
     </ThemedView>
   );
 }
@@ -251,9 +248,6 @@ function describeStock(
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  safeArea: {
     flex: 1,
   },
   content: {
