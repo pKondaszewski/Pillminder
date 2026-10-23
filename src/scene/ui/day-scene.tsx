@@ -63,9 +63,7 @@ export function DayScene({
   const entry = useEntryProgress(replayKey);
   const burst = useCelebrationProgress(celebrationKey, reduceMotion);
   const events = useMeadowEvents(marks);
-  const colors = useBlendedColors(
-    sceneColors(palette, season, scene.phase, mood),
-  );
+  const colors = useBlendedColors(sceneColors(palette, season, scene.phase));
   const sky = useDerivedValue(() => colors.value.slice(0, 2));
   const fadeTop = SCENE_HEIGHT - SCENE_FADE_HEIGHT + SCENE_FADE_SHIFT;
 
