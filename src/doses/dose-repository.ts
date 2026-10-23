@@ -5,6 +5,7 @@ import { db } from '@/config/db/database';
 import { doses, productImages, products, schedules } from '@/config/db/schema';
 import { latestUseAt } from '@/intakes/intake-service';
 
+import { planPendingReplacement } from './dose-replacement';
 import { type DoseState, planDoseTransition } from './dose-transition';
 import type { ReplaceDosesQueryResult } from './dto/replace-doses-query-result';
 
@@ -181,37 +182,34 @@ export async function deleteFuturePendingDoseRowsForSchedules(
   });
 }
 
-export async function replaceFuturePendingDoseRows(
+export async function replacePendingDoseRows(
   scheduleId: string,
   from: Date,
+  now: Date,
   slots: NewDoseSlot[],
 ): Promise<ReplaceDosesQueryResult> {
   return db.transaction((tx) => {
-    const futurePending = and(
-      eq(doses.scheduleId, scheduleId),
-      eq(doses.state, 'pending'),
-      gte(doses.plannedAt, from),
+    const existing = tx
+      .select()
+      .from(doses)
+      .where(
+        and(
+          eq(doses.scheduleId, scheduleId),
+          eq(doses.state, 'pending'),
+          gte(doses.plannedAt, from),
+        ),
+      )
+      .all();
+
+    const { kept, removedIds, newSlots } = planPendingReplacement(
+      existing,
+      slots,
+      now,
     );
-
-    const existing = tx.select().from(doses).where(futurePending).all();
-
-    const wanted = new Set(slots.map((slot) => slot.plannedAt.getTime()));
-    const existingTimes = new Set(
-      existing.map((row) => row.plannedAt.getTime()),
-    );
-
-    const kept = existing.filter((row) => wanted.has(row.plannedAt.getTime()));
-    const removedIds = existing
-      .filter((row) => !wanted.has(row.plannedAt.getTime()))
-      .map((row) => row.id);
 
     if (removedIds.length > 0) {
       tx.delete(doses).where(inArray(doses.id, removedIds)).run();
     }
-
-    const newSlots = slots.filter(
-      (slot) => !existingTimes.has(slot.plannedAt.getTime()),
-    );
 
     if (newSlots.length === 0) return { removedIds, inserted: [], kept };
 
