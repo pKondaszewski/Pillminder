@@ -419,6 +419,7 @@
     "emptyMessage": "Dodaj lek albo suplement, a aplikacja przypomni o dawkach i przypilnuje zapasu.",
     "emptyTitle": "Nie masz jeszcze produktów",
     "errorStock": "Nie udało się zmienić zapasu. Spróbuj ponownie.",
+    "errorTitle": "Coś poszło nie tak",
     "filterActive": "Aktywne",
     "filterArchived": "Archiwum",
     "filterCategory": "Kategoria",

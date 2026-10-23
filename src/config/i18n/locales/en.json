@@ -393,6 +393,7 @@
     "emptyMessage": "Add a medication or supplement and the app will remind you of doses and keep an eye on your stock.",
     "emptyTitle": "You have no products yet",
     "errorStock": "Could not change the stock. Try again.",
+    "errorTitle": "Something went wrong",
     "filterActive": "Active",
     "filterArchived": "Archived",
     "filterCategory": "Category",
