@@ -2,7 +2,6 @@ import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type LayoutChangeEvent, StyleSheet } from 'react-native';
 import { type KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/commons/ui/button';
 import { Spacing } from '@/commons/ui/constants/theme';
@@ -100,156 +99,154 @@ export function NewProductForm({ onSubmit, onPhotosPress }: Props) {
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['bottom']}>
-        <KeyboardAwareScrollView
-          ref={scrollRef}
-          contentContainerStyle={styles.content}
-        >
-          <PhotoPickerTile
-            category={values.category}
-            profileUri={uris[0] ?? null}
-            count={uris.length}
-            onPress={onPhotosPress}
+      <KeyboardAwareScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.content}
+      >
+        <PhotoPickerTile
+          category={values.category}
+          profileUri={uris[0] ?? null}
+          count={uris.length}
+          onPress={onPhotosPress}
+        />
+
+        <FormField field="name" onOffset={recordOffset}>
+          <FieldLabel text={t('editor.name')} />
+          <TextField
+            value={values.name}
+            onChangeText={(name) => change({ name })}
+            placeholder={t('editor.namePlaceholder')}
+            error={errorText('name')}
           />
+        </FormField>
 
-          <FormField field="name" onOffset={recordOffset}>
-            <FieldLabel text={t('editor.name')} />
-            <TextField
-              value={values.name}
-              onChangeText={(name) => change({ name })}
-              placeholder={t('editor.namePlaceholder')}
-              error={errorText('name')}
-            />
-          </FormField>
-
-          <FormField field="category" onOffset={recordOffset}>
-            <FieldLabel text={t('editor.category')} />
-            <CategoryPicker
-              value={values.category}
-              runWithUndo={runWithUndo}
-              error={errorText('category')}
-              onChange={(category) =>
-                change({
+        <FormField field="category" onOffset={recordOffset}>
+          <FieldLabel text={t('editor.category')} />
+          <CategoryPicker
+            value={values.category}
+            runWithUndo={runWithUndo}
+            error={errorText('category')}
+            onChange={(category) =>
+              change({
+                category,
+                unit: unitAfterCategoryChange(
+                  values.category,
                   category,
-                  unit: unitAfterCategoryChange(
-                    values.category,
-                    category,
-                    values.unit,
-                  ),
-                })
-              }
-            />
-          </FormField>
+                  values.unit,
+                ),
+              })
+            }
+          />
+        </FormField>
 
-          {showStrength ? (
-            <ThemedView style={styles.field}>
-              <FieldLabel text={t('editor.strength')} />
-              <TextField
-                value={values.strength}
-                onChangeText={(strength) => change({ strength })}
-                placeholder={t(strengthKeys.placeholder)}
-              />
-              <ThemedText type="caption">{t(strengthKeys.hint)}</ThemedText>
-            </ThemedView>
-          ) : null}
-
+        {showStrength ? (
           <ThemedView style={styles.field}>
-            <FieldLabel text={t('editor.unit')} />
-            <UnitChips
-              selected={values.unit}
-              onSelect={(unit) => change({ unit })}
-            />
-            <ThemedText type="caption">{t('editor.unitHint')}</ThemedText>
-          </ThemedView>
-
-          {supportsFasting(values.category) ? (
-            <FastingRow
-              value={values.fasting}
-              onChange={(fasting) => change({ fasting })}
-            />
-          ) : null}
-
-          <ThemedText type="label">{t('editor.sectionStock')}</ThemedText>
-          <FormField field="stock" onOffset={recordOffset}>
-            <Stepper
-              decrementLabel={t('editor.stockLess')}
-              incrementLabel={t('editor.stockMore')}
-              onDecrement={() =>
-                change({ stock: adjustWholeNumberText(values.stock, -1) })
-              }
-              onIncrement={() =>
-                change({ stock: adjustWholeNumberText(values.stock, 1) })
-              }
-            >
-              <ThemedView style={styles.stepperValue}>
-                <TextField
-                  value={values.stock}
-                  onChangeText={(stock) => change({ stock })}
-                  keyboardType="numeric"
-                  textAlign="center"
-                  placeholder="0"
-                  accessibilityLabel={t('editor.stock')}
-                  error={errorText('stock')}
-                />
-              </ThemedView>
-            </Stepper>
-            {packSizeMl ? (
-              <ThemedText type="caption">
-                {t('editor.stockEmptyIsFullPack')}
-              </ThemedText>
-            ) : null}
-          </FormField>
-          <FormField field="packSize" onOffset={recordOffset}>
-            <FieldLabel
-              text={t(packSizeMl ? 'editor.packSizeMl' : 'editor.packSize')}
-            />
+            <FieldLabel text={t('editor.strength')} />
             <TextField
-              value={values.packSize}
-              onChangeText={(packSize) => change({ packSize })}
-              keyboardType="numeric"
-              placeholder={t(
-                packSizeMl
-                  ? 'editor.packSizeMlPlaceholder'
-                  : 'editor.packSizePlaceholder',
-              )}
-              error={errorText('packSize')}
+              value={values.strength}
+              onChangeText={(strength) => change({ strength })}
+              placeholder={t(strengthKeys.placeholder)}
             />
-            {estimate ? (
-              <ThemedText type="caption">
-                {t('editor.packSizeEstimate', estimate)}
-              </ThemedText>
-            ) : null}
-          </FormField>
-
-          <ThemedText type="label">{t('editor.sectionShopping')}</ThemedText>
-          <ThemedView style={styles.field}>
-            <FieldLabel text={t('editor.price')} />
-            <TextField
-              value={values.price}
-              onChangeText={(price) => change({ price })}
-              maxLength={PRICE_MAX_LENGTH}
-              placeholder={t('editor.pricePlaceholder')}
-            />
-            <ThemedText type="caption">{t('editor.priceHint')}</ThemedText>
+            <ThemedText type="caption">{t(strengthKeys.hint)}</ThemedText>
           </ThemedView>
-          <ThemedView style={styles.field}>
-            <FieldLabel text={t('editor.storeLink')} />
-            <TextField
-              value={values.storeLink}
-              onChangeText={(storeLink) => change({ storeLink })}
-              placeholder={t('editor.storeLinkPlaceholder')}
-            />
-            <StoreSuggestions
-              category={values.category}
-              onPick={(storeLink) => change({ storeLink })}
-            />
-          </ThemedView>
-        </KeyboardAwareScrollView>
+        ) : null}
 
-        <ThemedView style={styles.footer}>
-          <PrimaryButton label={t('products.add')} onPress={submit} />
+        <ThemedView style={styles.field}>
+          <FieldLabel text={t('editor.unit')} />
+          <UnitChips
+            selected={values.unit}
+            onSelect={(unit) => change({ unit })}
+          />
+          <ThemedText type="caption">{t('editor.unitHint')}</ThemedText>
         </ThemedView>
-      </SafeAreaView>
+
+        {supportsFasting(values.category) ? (
+          <FastingRow
+            value={values.fasting}
+            onChange={(fasting) => change({ fasting })}
+          />
+        ) : null}
+
+        <ThemedText type="label">{t('editor.sectionStock')}</ThemedText>
+        <FormField field="stock" onOffset={recordOffset}>
+          <Stepper
+            decrementLabel={t('editor.stockLess')}
+            incrementLabel={t('editor.stockMore')}
+            onDecrement={() =>
+              change({ stock: adjustWholeNumberText(values.stock, -1) })
+            }
+            onIncrement={() =>
+              change({ stock: adjustWholeNumberText(values.stock, 1) })
+            }
+          >
+            <ThemedView style={styles.stepperValue}>
+              <TextField
+                value={values.stock}
+                onChangeText={(stock) => change({ stock })}
+                keyboardType="numeric"
+                textAlign="center"
+                placeholder="0"
+                accessibilityLabel={t('editor.stock')}
+                error={errorText('stock')}
+              />
+            </ThemedView>
+          </Stepper>
+          {packSizeMl ? (
+            <ThemedText type="caption">
+              {t('editor.stockEmptyIsFullPack')}
+            </ThemedText>
+          ) : null}
+        </FormField>
+        <FormField field="packSize" onOffset={recordOffset}>
+          <FieldLabel
+            text={t(packSizeMl ? 'editor.packSizeMl' : 'editor.packSize')}
+          />
+          <TextField
+            value={values.packSize}
+            onChangeText={(packSize) => change({ packSize })}
+            keyboardType="numeric"
+            placeholder={t(
+              packSizeMl
+                ? 'editor.packSizeMlPlaceholder'
+                : 'editor.packSizePlaceholder',
+            )}
+            error={errorText('packSize')}
+          />
+          {estimate ? (
+            <ThemedText type="caption">
+              {t('editor.packSizeEstimate', estimate)}
+            </ThemedText>
+          ) : null}
+        </FormField>
+
+        <ThemedText type="label">{t('editor.sectionShopping')}</ThemedText>
+        <ThemedView style={styles.field}>
+          <FieldLabel text={t('editor.price')} />
+          <TextField
+            value={values.price}
+            onChangeText={(price) => change({ price })}
+            maxLength={PRICE_MAX_LENGTH}
+            placeholder={t('editor.pricePlaceholder')}
+          />
+          <ThemedText type="caption">{t('editor.priceHint')}</ThemedText>
+        </ThemedView>
+        <ThemedView style={styles.field}>
+          <FieldLabel text={t('editor.storeLink')} />
+          <TextField
+            value={values.storeLink}
+            onChangeText={(storeLink) => change({ storeLink })}
+            placeholder={t('editor.storeLinkPlaceholder')}
+          />
+          <StoreSuggestions
+            category={values.category}
+            onPick={(storeLink) => change({ storeLink })}
+          />
+        </ThemedView>
+      </KeyboardAwareScrollView>
+
+      <ThemedView style={styles.footer}>
+        <PrimaryButton label={t('products.add')} onPress={submit} />
+      </ThemedView>
       <UndoSnackbar snackbar={snackbar} />
     </ThemedView>
   );
@@ -286,9 +283,6 @@ function FieldLabel({ text }: { text: string }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  safeArea: {
     flex: 1,
   },
   content: {

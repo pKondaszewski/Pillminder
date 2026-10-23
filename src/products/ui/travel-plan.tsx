@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Radius, Spacing } from '@/commons/ui/constants/theme';
 import { ThemedText } from '@/commons/ui/themed-text';
@@ -40,37 +39,30 @@ export function TravelPlan() {
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['bottom']}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <TripScene
-            entries={plan}
-            tripDays={daysBetween(range.from, range.to) + 1}
-            replayKey={`${isoDay(range.from)}|${isoDay(range.to)}`}
-          />
-          <View style={styles.body}>
-            <Pressable
-              onPress={() => setPickingRange(true)}
-              accessibilityRole="button"
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <ThemedView type="surface" style={styles.rangeField}>
-                <ThemedText type="small" themeColor="textSecondary">
-                  {t('travel.dates')}
-                </ThemedText>
-                <ThemedText themeColor="accent">
-                  {formatDateRange(
-                    range.from,
-                    range.to,
-                    dateLocale,
-                    new Date(),
-                  )}
-                </ThemedText>
-              </ThemedView>
-            </Pressable>
-            <TravelResults entries={plan} />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+      <ScrollView contentContainerStyle={styles.content}>
+        <TripScene
+          entries={plan}
+          tripDays={daysBetween(range.from, range.to) + 1}
+          replayKey={`${isoDay(range.from)}|${isoDay(range.to)}`}
+        />
+        <View style={styles.body}>
+          <Pressable
+            onPress={() => setPickingRange(true)}
+            accessibilityRole="button"
+            style={({ pressed }) => pressed && styles.pressed}
+          >
+            <ThemedView type="surface" style={styles.rangeField}>
+              <ThemedText type="small" themeColor="textSecondary">
+                {t('travel.dates')}
+              </ThemedText>
+              <ThemedText themeColor="accent">
+                {formatDateRange(range.from, range.to, dateLocale, new Date())}
+              </ThemedText>
+            </ThemedView>
+          </Pressable>
+          <TravelResults entries={plan} />
+        </View>
+      </ScrollView>
       <TripRangeSheet
         visible={pickingRange}
         range={range}
@@ -127,7 +119,6 @@ function ProductBlock({ entry }: { entry: TravelPlanEntry }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  safeArea: { flex: 1 },
   content: { paddingBottom: Spacing.twenty },
   body: {
     gap: Spacing.twelve,
