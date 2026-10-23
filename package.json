@@ -84,6 +84,15 @@
     "*.{json,css,md}": "prettier --write"
   },
   "private": true,
+  "expo": {
+    "autolinking": {
+      "android": {
+        "buildFromSource": [
+          "expo-notifications"
+        ]
+      }
+    }
+  },
   "jest": {
     "preset": "jest-expo",
     "globalSetup": "<rootDir>/jest.global-setup.js",
