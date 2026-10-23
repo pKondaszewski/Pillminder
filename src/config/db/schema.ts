@@ -11,6 +11,7 @@ import {
 import { DOSE_STATES } from '../../doses/dose-transition';
 import { IMAGE_ROLES } from '../../images/image-role';
 import { PRODUCT_UNITS } from '../../products/dto/product-unit';
+import { STORE_LINK_TARGETS } from '../../products/dto/store-link-target';
 
 export const products = sqliteTable('products', {
   id: text('id').primaryKey(),
@@ -20,6 +21,7 @@ export const products = sqliteTable('products', {
   unit: text('unit', { enum: PRODUCT_UNITS }),
   price: text('price'),
   storeLink: text('store_link'),
+  storeLinkTarget: text('store_link_target', { enum: STORE_LINK_TARGETS }),
   status: text('status', { enum: ['active', 'archived'] })
     .notNull()
     .default('active'),

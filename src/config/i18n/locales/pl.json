@@ -596,6 +596,14 @@
     "pharmacy": "apteka",
     "rossmann": "Rossmann"
   },
+  "storeTarget": {
+    "ask": "Zapytaj",
+    "maps": "Mapy",
+    "openWith": "Otwieraj w",
+    "remember": "Zapamiętaj dla tego produktu",
+    "title": "Gdzie otworzyć?",
+    "web": "Przeglądarka"
+  },
   "tabs": {
     "home": "Start",
     "plan": "Plan",

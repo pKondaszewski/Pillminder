@@ -1,4 +1,5 @@
 import type { ProductUnit } from './product-unit';
+import type { StoreLinkTarget } from './store-link-target';
 
 export type BuiltInCategory =
   | 'medication'
@@ -14,6 +15,7 @@ export interface NewProductInput {
   unit?: ProductUnit | null;
   price?: string | null;
   storeLink?: string | null;
+  storeLinkTarget?: StoreLinkTarget | null;
   stock?: number | null;
   packSize?: number | null;
   reorderThreshold?: number | null;

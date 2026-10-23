@@ -101,6 +101,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           unit: 'tablet',
           price: '12,99 zł',
           storeLink: 'https://pharmacy.example/ibuprofen',
+          storeLinkTarget: null,
           status: 'archived',
           stock: 30,
           packSize: 10,
@@ -117,7 +118,8 @@ describe('serializeBackup / parseBackup round trip', () => {
           strength: null,
           unit: null,
           price: null,
-          storeLink: null,
+          storeLink: 'allegro',
+          storeLinkTarget: 'web',
           status: 'active',
           stock: null,
           packSize: null,
@@ -295,6 +297,7 @@ describe('parseBackup: older schema and unknown fields', () => {
       unit: null,
       price: null,
       storeLink: null,
+      storeLinkTarget: null,
       status: 'active',
       stock: null,
       packSize: null,
@@ -1326,5 +1329,47 @@ describe('parseBackup: as-needed intakes', () => {
 
     // then
     expect(rows.asNeededIntakes[0].quantity).toBe(1);
+  });
+});
+
+describe('parseBackup: product store link target', () => {
+  it('imports a backup made before the store link target with none remembered', () => {
+    // given
+    const text = backupText();
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.products[0].storeLinkTarget).toBeNull();
+  });
+
+  it('keeps the store link target through a round trip', () => {
+    // given
+    const text = backupText({
+      products: [product({ storeLink: 'apteka', storeLinkTarget: 'web' })],
+    });
+
+    // when
+    const rows = rowsOf(serializeBackup(rowsOf(text), EXPORTED_AT));
+
+    // then
+    expect(rows.products[0].storeLinkTarget).toBe('web');
+  });
+
+  it('rejects an unknown store link target', () => {
+    // given
+    const text = backupText({
+      products: [product({ storeLinkTarget: 'satellite' })],
+    });
+
+    // when
+    const error = errorOf(text);
+
+    // then
+    expect(error).toEqual({
+      code: 'invalidRow',
+      detail: 'products[0].storeLinkTarget',
+    });
   });
 });
