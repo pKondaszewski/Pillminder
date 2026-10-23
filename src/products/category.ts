@@ -37,6 +37,21 @@ export function supportsStrength(category: string): boolean {
   return !['care', 'nasal-spray', 'eye-drops'].includes(category);
 }
 
+export function strengthTextKeys(unit: ProductUnit | null): {
+  placeholder: string;
+  hint: string;
+} {
+  return unit === 'drop'
+    ? {
+        placeholder: 'editor.strengthPlaceholderDrop',
+        hint: 'editor.strengthHintDrop',
+      }
+    : {
+        placeholder: 'editor.strengthPlaceholder',
+        hint: 'editor.strengthHint',
+      };
+}
+
 export function categoryUnit(category: string): ProductUnit | null {
   if (category === 'nasal-spray') return 'spray';
   if (category === 'eye-drops') return 'drop';

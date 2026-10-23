@@ -19,6 +19,7 @@ import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import type { ImageSource } from '@/images/image-service';
 import {
   packSizeInMl,
+  strengthTextKeys,
   supportsFasting,
   supportsStrength,
   unitAfterCategoryChange,
@@ -104,6 +105,7 @@ export function NewProductForm({ onSubmit }: Props) {
 
   const packSizeMl = packSizeInMl(values.category);
   const estimate = packSizeEstimate(values.category, values.packSize);
+  const strengthKeys = strengthTextKeys(values.unit);
   const showStrength =
     values.category !== '' && supportsStrength(values.category);
 
@@ -155,9 +157,9 @@ export function NewProductForm({ onSubmit }: Props) {
               <TextField
                 value={values.strength}
                 onChangeText={(strength) => change({ strength })}
-                placeholder={t('editor.strengthPlaceholder')}
+                placeholder={t(strengthKeys.placeholder)}
               />
-              <ThemedText type="caption">{t('editor.strengthHint')}</ThemedText>
+              <ThemedText type="caption">{t(strengthKeys.hint)}</ThemedText>
             </ThemedView>
           ) : null}
 

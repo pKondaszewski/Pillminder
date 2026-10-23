@@ -8,6 +8,7 @@ import {
   normalizeCategory,
   packSizeInMl,
   storeSuggestionKeys,
+  strengthTextKeys,
   supportsFasting,
   supportsStrength,
   unitAfterCategoryChange,
@@ -166,6 +167,20 @@ describe('nasal spray and eye drops', () => {
 
       // then
       expect(result).toEqual([false, false, ['pharmacy']]);
+    },
+  );
+
+  it.each([
+    ['drop', 'editor.strengthPlaceholderDrop', 'editor.strengthHintDrop'],
+    ['tablet', 'editor.strengthPlaceholder', 'editor.strengthHint'],
+  ] as const)(
+    'picks the strength texts for unit %s',
+    (unit, placeholder, hint) => {
+      // when
+      const result = strengthTextKeys(unit);
+
+      // then
+      expect(result).toEqual({ placeholder, hint });
     },
   );
 
