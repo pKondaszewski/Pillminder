@@ -5,7 +5,11 @@ import { BottomSheet } from '@/commons/ui/bottom-sheet';
 import { TextField } from '@/commons/ui/text-field';
 import { ThemedText } from '@/commons/ui/themed-text';
 import type { RunWithUndo } from '@/commons/ui/use-undo-snackbar';
-import { categoryUnit, packSizeInMl } from '@/products/category';
+import {
+  categoryUnit,
+  packSizeInMl,
+  strengthTextKeys,
+} from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import {
   packSizeEstimate,
@@ -72,11 +76,7 @@ type TextSheetConfig = {
 
 const TEXT_SHEETS: Record<TextSheetField, TextSheetConfig> = {
   name: { title: 'editor.name', placeholder: 'editor.namePlaceholder' },
-  strength: {
-    title: 'editor.strength',
-    placeholder: 'editor.strengthPlaceholder',
-    hint: 'editor.strengthHint',
-  },
+  strength: { title: 'editor.strength' },
   price: {
     title: 'editor.price',
     placeholder: 'editor.pricePlaceholder',
@@ -116,9 +116,10 @@ function TextSheet({
   const { t } = useTranslation();
   const config = TEXT_SHEETS[field];
   const inMl = field === 'packSize' && packSizeInMl(product.category);
+  const texts = field === 'strength' ? strengthTextKeys(product.unit) : config;
   const placeholderKey = inMl
     ? 'editor.packSizeMlPlaceholder'
-    : config.placeholder;
+    : texts.placeholder;
   const title = t(inMl ? 'editor.packSizeMl' : config.title);
   const current =
     field === 'packSize'
@@ -158,8 +159,8 @@ function TextSheet({
           {t('editor.packSizeEstimate', estimate)}
         </ThemedText>
       ) : null}
-      {config.hint ? (
-        <ThemedText type="caption">{t(config.hint)}</ThemedText>
+      {texts.hint ? (
+        <ThemedText type="caption">{t(texts.hint)}</ThemedText>
       ) : null}
       {config.suggestions ? (
         <StoreSuggestions category={product.category} onPick={setText} />
