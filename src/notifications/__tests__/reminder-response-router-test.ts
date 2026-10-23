@@ -6,10 +6,12 @@ function responseTo(
   action: string,
   data: Record<string, unknown>,
   identifier: string,
+  date = 0,
 ): NotificationResponse {
   return {
     actionIdentifier: action,
     notification: {
+      date,
       request: { identifier, content: { title: 'Time', body: 'Vit D', data } },
     },
   } as unknown as NotificationResponse;
@@ -39,6 +41,50 @@ describe('processReminderResponse for the practice reminder', () => {
     expect(handled).toBe(true);
     expect(given.onPracticeTake).toHaveBeenCalledTimes(1);
     expect(given.onTake).not.toHaveBeenCalled();
+  });
+
+  it('finishes the practice again when the reminder is delivered anew', () => {
+    // given
+    const given = handlers();
+    const first = responseTo(
+      'TAKE_ACTION',
+      { type: 'practice' },
+      'p-redelivered',
+      1000,
+    );
+    const again = responseTo(
+      'TAKE_ACTION',
+      { type: 'practice' },
+      'p-redelivered',
+      2000,
+    );
+    processReminderResponse(first, given);
+
+    // when
+    const handled = processReminderResponse(again, given);
+
+    // then
+    expect(handled).toBe(true);
+    expect(given.onPracticeTake).toHaveBeenCalledTimes(2);
+  });
+
+  it('ignores the same delivery seen twice', () => {
+    // given
+    const given = handlers();
+    const response = responseTo(
+      'TAKE_ACTION',
+      { type: 'practice' },
+      'p-seen-twice',
+      1000,
+    );
+    processReminderResponse(response, given);
+
+    // when
+    const handled = processReminderResponse(response, given);
+
+    // then
+    expect(handled).toBe(false);
+    expect(given.onPracticeTake).toHaveBeenCalledTimes(1);
   });
 
   it('snoozes with the texts of the notification', () => {
