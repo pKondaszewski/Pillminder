@@ -6,13 +6,12 @@ import { MIN_TOUCH_SIZE, Radius, Spacing } from '@/commons/ui/constants/theme';
 import { Icon } from '@/commons/ui/icon';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { useTheme } from '@/commons/ui/use-theme';
-import { imageFileUri } from '@/images/image-service';
 
 const BADGE_SIZE = 28;
 const BADGE_HIT_SLOP = (MIN_TOUCH_SIZE - BADGE_SIZE) / 2;
 
 type Props = {
-  fileName: string;
+  uri: string;
   profile: boolean;
   onPress: () => void;
   onSetProfile: () => void;
@@ -20,7 +19,7 @@ type Props = {
 };
 
 export function PhotoTile({
-  fileName,
+  uri,
   profile,
   onPress,
   onSetProfile,
@@ -37,11 +36,7 @@ export function PhotoTile({
         accessibilityLabel={t('images.preview')}
         style={styles.fill}
       >
-        <Image
-          source={{ uri: imageFileUri(fileName) }}
-          style={styles.fill}
-          contentFit="cover"
-        />
+        <Image source={{ uri }} style={styles.fill} contentFit="cover" />
       </Pressable>
       <Pressable
         onPress={onDelete}

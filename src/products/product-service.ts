@@ -31,6 +31,10 @@ export type {
 export { PRODUCT_UNITS, type ProductUnit } from './dto/product-unit';
 export type { RangeDraft } from './dto/range-draft';
 export type { StockSummary } from './dto/stock-summary';
+export {
+  STORE_LINK_TARGETS,
+  type StoreLinkTarget,
+} from './dto/store-link-target';
 export type { TravelPlanEntry } from './dto/travel-plan-output';
 export type { Product, ProductStatus } from './product-repository';
 

@@ -5,8 +5,10 @@ import type {
   ProductFormValues,
   TextProductField,
 } from './dto/product-form-values';
+import type { StoreLinkTarget } from './dto/store-link-target';
 import { dropsToMl, mlToDrops } from './eye-drops';
 import type { Product } from './product-service';
+import { isPlainTextStore } from './store-link';
 import { normalizeStrength } from './strength-text';
 import { parseWholeNumber } from './whole-number-input';
 
@@ -97,6 +99,17 @@ export function textFieldPatch(
   }
 }
 
+export function storeLinkPatch(
+  text: string,
+  target: StoreLinkTarget | null,
+): Partial<NewProductInput> {
+  const storeLink = text.trim() || null;
+  return {
+    storeLink,
+    storeLinkTarget: isPlainTextStore(storeLink) ? target : null,
+  };
+}
+
 export function newProductInput(values: ProductFormValues): NewProductInput {
   const packSize = packSizeOrNull(values.packSize, values.category);
   const stock = wholeNumberOrNull(values.stock, 0);
@@ -145,6 +158,7 @@ export function editedProductInput(
     unit: product.unit,
     price: product.price,
     storeLink: product.storeLink,
+    storeLinkTarget: product.storeLinkTarget,
     stock: product.stock,
     packSize: product.packSize,
     reorderThreshold: product.reorderThreshold,

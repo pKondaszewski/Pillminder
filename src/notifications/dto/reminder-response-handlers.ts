@@ -5,6 +5,6 @@ export interface ReminderResponseHandlers {
   onSnooze: (doseId: string) => void;
   onPracticeTake: () => void;
   onPracticeSnooze: (text: NotificationText) => void;
-  onReorder: (storeLink: string | null) => void;
+  onReorder: (productId: string) => void;
   onAddPack: (productId: string) => void;
 }

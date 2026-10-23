@@ -5,13 +5,18 @@ import { BottomSheet } from '@/commons/ui/bottom-sheet';
 import { TextField } from '@/commons/ui/text-field';
 import { ThemedText } from '@/commons/ui/themed-text';
 import type { RunWithUndo } from '@/commons/ui/use-undo-snackbar';
-import { categoryUnit, packSizeInMl } from '@/products/category';
+import {
+  categoryUnit,
+  packSizeInMl,
+  strengthTextKeys,
+} from '@/products/category';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import {
   packSizeEstimate,
   packSizeText,
   PRICE_MAX_LENGTH,
   reorderThresholdPatch,
+  storeLinkPatch,
   textFieldPatch,
   validateProductField,
   validateReorderThreshold,
@@ -21,7 +26,9 @@ import type {
   ProductUnit,
   TextProductField,
 } from '@/products/product-service';
+import { isPlainTextStore } from '@/products/store-link';
 import { useCategoryPicker } from '@/products/ui/category-picker';
+import { StoreLinkTargetChips } from '@/products/ui/store-link-target-chips';
 import { StoreSuggestions } from '@/products/ui/store-suggestions';
 import { UnitChips } from '@/products/ui/unit-chips';
 
@@ -67,16 +74,11 @@ type TextSheetConfig = {
   hint?: string;
   numeric?: boolean;
   maxLength?: number;
-  suggestions?: boolean;
 };
 
 const TEXT_SHEETS: Record<TextSheetField, TextSheetConfig> = {
   name: { title: 'editor.name', placeholder: 'editor.namePlaceholder' },
-  strength: {
-    title: 'editor.strength',
-    placeholder: 'editor.strengthPlaceholder',
-    hint: 'editor.strengthHint',
-  },
+  strength: { title: 'editor.strength' },
   price: {
     title: 'editor.price',
     placeholder: 'editor.pricePlaceholder',
@@ -97,7 +99,6 @@ const TEXT_SHEETS: Record<TextSheetField, TextSheetConfig> = {
   storeLink: {
     title: 'editor.storeLink',
     placeholder: 'editor.storeLinkPlaceholder',
-    suggestions: true,
   },
 };
 
@@ -116,15 +117,17 @@ function TextSheet({
   const { t } = useTranslation();
   const config = TEXT_SHEETS[field];
   const inMl = field === 'packSize' && packSizeInMl(product.category);
+  const texts = field === 'strength' ? strengthTextKeys(product.unit) : config;
   const placeholderKey = inMl
     ? 'editor.packSizeMlPlaceholder'
-    : config.placeholder;
+    : texts.placeholder;
   const title = t(inMl ? 'editor.packSizeMl' : config.title);
   const current =
     field === 'packSize'
       ? packSizeText(product.category, product.packSize)
       : product[field];
   const [text, setText] = useState(current == null ? '' : String(current));
+  const [target, setTarget] = useState(product.storeLinkTarget);
   const estimate = packSizeEstimate(product.category, text);
   const [submitted, setSubmitted] = useState(false);
   const error = submitted ? validateTextSheet(field, text) : null;
@@ -134,18 +137,25 @@ function TextSheet({
       setSubmitted(true);
       return;
     }
-    onSave(
-      field === 'reorderThreshold'
-        ? reorderThresholdPatch(text)
-        : textFieldPatch(field, text, product.category),
-    );
+    onSave(savePatch());
+  };
+
+  const savePatch = () => {
+    if (field === 'reorderThreshold') return reorderThresholdPatch(text);
+    if (field === 'storeLink') return storeLinkPatch(text, target);
+    return textFieldPatch(field, text, product.category);
+  };
+
+  const changeText = (value: string) => {
+    setText(value);
+    if (field === 'storeLink') setTarget(null);
   };
 
   return (
     <BottomSheet visible title={title} onClose={onClose} onSave={save}>
       <TextField
         value={text}
-        onChangeText={setText}
+        onChangeText={changeText}
         keyboardType={config.numeric ? 'numeric' : 'default'}
         maxLength={config.maxLength}
         placeholder={placeholderKey ? t(placeholderKey) : undefined}
@@ -158,11 +168,14 @@ function TextSheet({
           {t('editor.packSizeEstimate', estimate)}
         </ThemedText>
       ) : null}
-      {config.hint ? (
-        <ThemedText type="caption">{t(config.hint)}</ThemedText>
+      {texts.hint ? (
+        <ThemedText type="caption">{t(texts.hint)}</ThemedText>
       ) : null}
-      {config.suggestions ? (
-        <StoreSuggestions category={product.category} onPick={setText} />
+      {field === 'storeLink' ? (
+        <StoreSuggestions category={product.category} onPick={changeText} />
+      ) : null}
+      {field === 'storeLink' && isPlainTextStore(text) ? (
+        <StoreLinkTargetChips selected={target} onSelect={setTarget} />
       ) : null}
     </BottomSheet>
   );

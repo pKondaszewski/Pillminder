@@ -12,7 +12,8 @@ import { isPracticeData, practiceTexts } from './practice-reminder';
 const handledResponses = new Set<string>();
 
 // The app listener and the background task can both see one response when the
-// app is alive in the background; adding a pack is not idempotent.
+// app is alive in the background; adding a pack is not idempotent. The delivery
+// date is in the key because the practice reminder reuses one identifier.
 export function claimResponse(response: NotificationResponse): boolean {
   const key = responseKey(response);
   if (handledResponses.has(key)) return false;
@@ -51,13 +52,12 @@ function processReorderResponse(
   handlers: ReminderResponseHandlers,
 ): boolean {
   const { productId } = data;
+  if (typeof productId !== 'string') return false;
   if (response.actionIdentifier === ADD_PACK_ACTION) {
-    if (typeof productId !== 'string') return false;
     return runHandlerOnce(response, () => handlers.onAddPack(productId));
   }
   if (response.actionIdentifier !== BUY_ACTION) return false;
-  const storeLink = typeof data.storeLink === 'string' ? data.storeLink : null;
-  return runHandlerOnce(response, () => handlers.onReorder(storeLink));
+  return runHandlerOnce(response, () => handlers.onReorder(productId));
 }
 
 function processDoseResponse(
@@ -78,7 +78,8 @@ function processDoseResponse(
 }
 
 function responseKey(response: NotificationResponse): string {
-  return `${response.notification.request.identifier}:${response.actionIdentifier}`;
+  const { identifier } = response.notification.request;
+  return `${identifier}:${response.notification.date}:${response.actionIdentifier}`;
 }
 
 function runHandlerOnce(

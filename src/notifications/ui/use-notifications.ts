@@ -1,6 +1,6 @@
+import { router } from 'expo-router';
 import { useEffect } from 'react';
 
-import { openStore } from '@/commons/ui/open-store';
 import i18n from '@/config/i18n';
 import { createLogger } from '@/config/logger';
 import {
@@ -67,7 +67,12 @@ const responseHandlers: ReminderResponseHandlers = {
     snoozePractice(texts).catch((err) =>
       log.error('Snooze of the practice reminder failed', err),
     ),
-  onReorder: openStore,
+  // The product screen opens the store, or asks where to when nothing is remembered
+  onReorder: (productId) =>
+    router.navigate({
+      pathname: '/products/[id]',
+      params: { id: productId, buy: '1' },
+    }),
   onAddPack: (productId) =>
     restockPack(productId).catch((err) =>
       log.error('Add pack from notification failed', err),

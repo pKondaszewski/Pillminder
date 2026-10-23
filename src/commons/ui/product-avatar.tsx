@@ -13,6 +13,7 @@ type Props = {
   category: string;
   size: keyof typeof RADIUS_BY_SIZE;
   imageFileName?: string | null;
+  imageUri?: string | null;
   dimmed?: boolean;
 };
 
@@ -20,11 +21,13 @@ export function ProductAvatar({
   category,
   size,
   imageFileName,
+  imageUri,
   dimmed,
 }: Props) {
   const theme = useTheme();
   const { tone, icon } = categoryAvatar(category);
   const colors = theme.category[tone];
+  const uri = imageUri ?? (imageFileName ? imageFileUri(imageFileName) : null);
   const shape = {
     width: size,
     height: size,
@@ -40,8 +43,8 @@ export function ProductAvatar({
         dimmed && styles.dimmed,
       ]}
     >
-      {imageFileName ? (
-        <Image source={{ uri: imageFileUri(imageFileName) }} style={shape} />
+      {uri ? (
+        <Image source={{ uri }} style={shape} />
       ) : (
         <Icon name={icon} size={size / 2} color={colors.icon} />
       )}

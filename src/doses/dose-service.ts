@@ -1,3 +1,4 @@
+import { startOfDay } from '@/config/date-utils';
 import i18n from '@/config/i18n';
 import { createLogger } from '@/config/logger';
 import {
@@ -31,7 +32,7 @@ import {
   getDoseById,
   getFuturePendingDosesByProduct,
   productDosesBetweenQuery,
-  replaceFuturePendingDoseRows,
+  replacePendingDoseRows,
   setDoseSnoozedUntilRow,
   setDoseStateRow,
 } from './dose-repository';
@@ -204,7 +205,8 @@ export async function syncDosesForSchedules(
 
   for (const schedule of schedules) {
     const product = productById.get(schedule.productId);
-    const from = new Date();
+    const now = new Date();
+    const from = startOfDay(now);
 
     const slots =
       product?.status === 'archived'
@@ -221,9 +223,10 @@ export async function syncDosesForSchedules(
       `Syncing ${slots.length} dose slot(s) for schedule ${schedule.id}`,
     );
     try {
-      const { removedIds, inserted, kept } = await replaceFuturePendingDoseRows(
+      const { removedIds, inserted, kept } = await replacePendingDoseRows(
         schedule.id,
         from,
+        now,
         slots.map((plannedAt) => ({
           productId: schedule.productId,
           scheduleId: schedule.id,
@@ -236,9 +239,7 @@ export async function syncDosesForSchedules(
 
       const toSchedule = [
         ...inserted,
-        ...kept.filter(({ plannedAt }) =>
-          isWithinRetryHorizon(plannedAt, from),
-        ),
+        ...kept.filter(({ plannedAt }) => isWithinRetryHorizon(plannedAt, now)),
       ];
       await Promise.all(
         toSchedule.map((dose) =>

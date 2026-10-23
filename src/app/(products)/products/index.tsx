@@ -11,7 +11,6 @@ import {
   FLOATING_ADD_BUTTON_CLEARANCE,
   FloatingAddButton,
 } from '@/commons/ui/floating-add-button';
-import { openStore } from '@/commons/ui/open-store';
 import { type FilterToken, SearchField } from '@/commons/ui/search-field';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
@@ -31,6 +30,7 @@ import { ProductFilterSheet } from '@/products/ui/list-filters';
 import { ProductListHeader } from '@/products/ui/list-header';
 import { LowStockBanner } from '@/products/ui/low-stock-banner';
 import { ProductRow } from '@/products/ui/row';
+import { useOpenStore } from '@/products/ui/use-open-store';
 import { useProducts } from '@/products/ui/use-products';
 import { useReorderStatuses } from '@/products/ui/use-reorder';
 import { useSchedules } from '@/schedules/ui/use-schedules';
@@ -41,6 +41,7 @@ export default function ProductListScreen() {
   const { products } = useProducts();
   const { schedules } = useSchedules();
   const reorderStatuses = useReorderStatuses();
+  const { openStore, storeTargetSheet } = useOpenStore();
 
   const [filters, setFilters] = useState(DEFAULT_PRODUCT_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -101,7 +102,7 @@ export default function ProductListScreen() {
                 onPress={() => openProduct(lowStock.product.id)}
                 onOrder={() =>
                   lowStock.product.storeLink
-                    ? openStore(lowStock.product.storeLink)
+                    ? openStore(lowStock.product)
                     : openProduct(lowStock.product.id)
                 }
               />
@@ -134,6 +135,7 @@ export default function ProductListScreen() {
         onChange={setFilters}
         onClose={() => setFiltersOpen(false)}
       />
+      {storeTargetSheet}
     </ThemedView>
   );
 }

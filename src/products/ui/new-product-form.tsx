@@ -1,23 +1,20 @@
-import { Image } from 'expo-image';
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type LayoutChangeEvent, Pressable, StyleSheet } from 'react-native';
+import { type LayoutChangeEvent, StyleSheet } from 'react-native';
 import { type KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
 
 import { PrimaryButton } from '@/commons/ui/button';
-import { Radius, Spacing } from '@/commons/ui/constants/theme';
-import { Icon } from '@/commons/ui/icon';
+import { Spacing } from '@/commons/ui/constants/theme';
 import { KeyboardAwareScrollView } from '@/commons/ui/keyboard-aware-scroll-view';
 import { Stepper } from '@/commons/ui/stepper';
 import { TextField } from '@/commons/ui/text-field';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
-import { useTheme } from '@/commons/ui/use-theme';
 import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
-import type { ImageSource } from '@/images/image-service';
 import {
   packSizeInMl,
+  strengthTextKeys,
   supportsFasting,
   supportsStrength,
   unitAfterCategoryChange,
@@ -36,23 +33,23 @@ import type {
 } from '@/products/product-service';
 import { CategoryPicker } from '@/products/ui/category-picker';
 import { FastingRow } from '@/products/ui/fasting-row';
-import { ImageSourceSheet } from '@/products/ui/image-source-sheet';
+import { PhotoPickerTile } from '@/products/ui/photo-picker-tile';
 import { StoreSuggestions } from '@/products/ui/store-suggestions';
 import { UnitChips } from '@/products/ui/unit-chips';
-import { usePickImage } from '@/products/ui/use-pick-image';
+import { usePendingPhotoUris } from '@/products/ui/use-pending-photos';
 import { adjustWholeNumberText } from '@/products/whole-number-input';
 
 const SUBMIT_BUTTON_HEIGHT = 52;
-const PHOTO_TILE_SIZE = 96;
 
 type Props = {
-  onSubmit: (input: NewProductInput, photoUri: string | null) => void;
+  onSubmit: (input: NewProductInput, photoUris: string[]) => void;
+  onPhotosPress: () => void;
 };
 
-export function NewProductForm({ onSubmit }: Props) {
+export function NewProductForm({ onSubmit, onPhotosPress }: Props) {
   const { t } = useTranslation();
-  const pickImageUri = usePickImage();
   const { snackbar, runWithUndo } = useUndoSnackbar();
+  const uris = usePendingPhotoUris();
   const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);
   const fieldOffsets = useRef<Partial<Record<ProductFormField, number>>>({});
 
@@ -67,9 +64,7 @@ export function NewProductForm({ onSubmit }: Props) {
     storeLink: '',
     fasting: false,
   });
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
-  const [sourceSheetVisible, setSourceSheetVisible] = useState(false);
 
   const errors = submitted ? validateProductForm(values) : {};
   const errorText = (field: ProductFormField) => {
@@ -86,7 +81,7 @@ export function NewProductForm({ onSubmit }: Props) {
     const found = validateProductForm(values);
     const first = firstErrorField(found);
     if (first === null) {
-      onSubmit(newProductInput(values), photoUri);
+      onSubmit(newProductInput(values), uris);
       return;
     }
     setSubmitted(true);
@@ -96,13 +91,9 @@ export function NewProductForm({ onSubmit }: Props) {
     });
   };
 
-  const pickPhoto = async (source: ImageSource) => {
-    const uri = await pickImageUri(source);
-    if (uri) setPhotoUri(uri);
-  };
-
   const packSizeMl = packSizeInMl(values.category);
   const estimate = packSizeEstimate(values.category, values.packSize);
+  const strengthKeys = strengthTextKeys(values.unit);
   const showStrength =
     values.category !== '' && supportsStrength(values.category);
 
@@ -113,9 +104,10 @@ export function NewProductForm({ onSubmit }: Props) {
         contentContainerStyle={styles.content}
       >
         <PhotoPickerTile
-          uri={photoUri}
-          label={t('images.add')}
-          onPress={() => setSourceSheetVisible(true)}
+          category={values.category}
+          profileUri={uris[0] ?? null}
+          count={uris.length}
+          onPress={onPhotosPress}
         />
 
         <FormField field="name" onOffset={recordOffset}>
@@ -153,9 +145,9 @@ export function NewProductForm({ onSubmit }: Props) {
             <TextField
               value={values.strength}
               onChangeText={(strength) => change({ strength })}
-              placeholder={t('editor.strengthPlaceholder')}
+              placeholder={t(strengthKeys.placeholder)}
             />
-            <ThemedText type="caption">{t('editor.strengthHint')}</ThemedText>
+            <ThemedText type="caption">{t(strengthKeys.hint)}</ThemedText>
           </ThemedView>
         ) : null}
 
@@ -256,39 +248,7 @@ export function NewProductForm({ onSubmit }: Props) {
         <PrimaryButton label={t('products.add')} onPress={submit} />
       </ThemedView>
       <UndoSnackbar snackbar={snackbar} />
-      <ImageSourceSheet
-        visible={sourceSheetVisible}
-        onClose={() => setSourceSheetVisible(false)}
-        onSelect={pickPhoto}
-      />
     </ThemedView>
-  );
-}
-
-function PhotoPickerTile({
-  uri,
-  label,
-  onPress,
-}: {
-  uri: string | null;
-  label: string;
-  onPress: () => void;
-}) {
-  const theme = useTheme();
-
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      style={[styles.photoTile, { borderColor: theme.borderStrong }]}
-    >
-      {uri ? (
-        <Image source={{ uri }} style={styles.photoImage} contentFit="cover" />
-      ) : (
-        <Icon name="add_a_photo" size={28} color={theme.textSecondary} />
-      )}
-    </Pressable>
   );
 }
 
@@ -331,21 +291,6 @@ const styles = StyleSheet.create({
   },
   field: {
     gap: Spacing.eight,
-  },
-  photoTile: {
-    width: PHOTO_TILE_SIZE,
-    height: PHOTO_TILE_SIZE,
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderRadius: Radius.card,
-  },
-  photoImage: {
-    width: '100%',
-    height: '100%',
   },
   stepperValue: {
     flex: 1,
