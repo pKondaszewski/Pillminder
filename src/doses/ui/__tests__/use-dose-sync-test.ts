@@ -1,11 +1,10 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { AppState, type AppStateStatus } from 'react-native';
 
-import { refreshAllReminders, syncAllSchedules } from '@/doses/dose-service';
+import { syncAllSchedules } from '@/doses/dose-service';
 import { useDoseSync } from '@/doses/ui/use-dose-sync';
 
 jest.mock('@/doses/dose-service', () => ({
-  refreshAllReminders: jest.fn(),
   syncAllSchedules: jest.fn(),
 }));
 
@@ -32,7 +31,6 @@ async function renderDoseSync() {
 beforeEach(() => {
   jest.clearAllMocks();
   jest.mocked(syncAllSchedules).mockResolvedValue(undefined as never);
-  jest.mocked(refreshAllReminders).mockResolvedValue(undefined as never);
   appStateListeners = [];
   jest.spyOn(AppState, 'addEventListener').mockImplementation((_, listener) => {
     appStateListeners.push(listener);
@@ -41,21 +39,15 @@ beforeEach(() => {
 });
 
 describe('useDoseSync', () => {
-  it('syncs the schedules and then re-plans all reminders on the first start', async () => {
+  it('syncs the schedules once on the first start', async () => {
     // when
     await renderDoseSync();
 
     // then
     expect(syncAllSchedules).toHaveBeenCalledTimes(1);
-    expect(refreshAllReminders).toHaveBeenCalledTimes(1);
-    expect(
-      jest.mocked(syncAllSchedules).mock.invocationCallOrder[0],
-    ).toBeLessThan(
-      jest.mocked(refreshAllReminders).mock.invocationCallOrder[0],
-    );
   });
 
-  it('only syncs the schedules when the app becomes active again', async () => {
+  it('syncs the schedules again when the app becomes active', async () => {
     // given
     await renderDoseSync();
 
@@ -64,7 +56,6 @@ describe('useDoseSync', () => {
 
     // then
     expect(syncAllSchedules).toHaveBeenCalledTimes(2);
-    expect(refreshAllReminders).toHaveBeenCalledTimes(1);
   });
 
   it('does not start a second sync when the app reports active while the first one runs', async () => {
@@ -96,7 +87,7 @@ describe('useDoseSync', () => {
     expect(syncAllSchedules).toHaveBeenCalledTimes(1);
   });
 
-  it('does not re-plan the reminders when the first sync fails', async () => {
+  it('logs the error when the first sync fails', async () => {
     // given
     jest.mocked(syncAllSchedules).mockRejectedValueOnce(new Error('db locked'));
 
@@ -104,7 +95,6 @@ describe('useDoseSync', () => {
     await renderDoseSync();
 
     // then
-    expect(refreshAllReminders).not.toHaveBeenCalled();
     expect(mockLogError).toHaveBeenCalledTimes(1);
   });
 

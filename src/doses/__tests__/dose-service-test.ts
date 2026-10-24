@@ -9,7 +9,7 @@ import {
 import {
   cancelDoseReminder,
   cancelDoseReminders,
-  scheduleDoseReminder,
+  scheduleDoseReminders,
 } from '@/notifications/notification-service';
 
 import {
@@ -31,6 +31,7 @@ jest.mock('@/notifications/notification-service', () => ({
   cancelDoseReminders: jest.fn().mockResolvedValue(undefined),
   dismissDoseReminder: jest.fn().mockResolvedValue(undefined),
   scheduleDoseReminder: jest.fn().mockResolvedValue(undefined),
+  scheduleDoseReminders: jest.fn().mockResolvedValue(undefined),
 }));
 jest.mock('@/config/logger', () => ({
   createLogger: () => ({ info: jest.fn(), warn: jest.fn(), error: jest.fn() }),
@@ -79,11 +80,12 @@ describe('dose service on a real database', () => {
       expect(times).toHaveLength(30);
       expect(times[0]).toBe(TODAY_EVENING.toISOString());
       expect(times[1]).toBe(TOMORROW_EVENING.toISOString());
-      expect(scheduleDoseReminder).toHaveBeenCalledTimes(30);
-      expect(scheduleDoseReminder).toHaveBeenCalledWith(
-        { id: expect.any(String), plannedAt: TODAY_EVENING },
-        expect.anything(),
-      );
+      const inputs = jest.mocked(scheduleDoseReminders).mock.calls[0][0];
+      expect(inputs).toHaveLength(30);
+      expect(inputs[0]).toEqual({
+        reminder: { id: expect.any(String), plannedAt: TODAY_EVENING },
+        texts: expect.anything(),
+      });
     });
 
     it('is idempotent: a second sync keeps the doses and adds none', async () => {
@@ -192,7 +194,35 @@ describe('dose service on a real database', () => {
 
       // then
       expect(db.select().from(doses).all()).toEqual([]);
-      expect(scheduleDoseReminder).not.toHaveBeenCalled();
+      expect(scheduleDoseReminders).toHaveBeenCalledWith([]);
+    });
+
+    it('plans the reminders of all products together, not only of the synced schedule', async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      insertProduct({ id: 'p2' });
+      insertSchedule({ id: 's1', productId: 'p1', timesOfDay: ['20:00'] });
+      const second = insertSchedule({
+        id: 's2',
+        productId: 'p2',
+        timesOfDay: ['21:00'],
+      });
+      insertDose({
+        id: 'other',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: TOMORROW_EVENING,
+      });
+
+      // when
+      await syncDosesForSchedules([second]);
+
+      // then
+      const ids = jest
+        .mocked(scheduleDoseReminders)
+        .mock.calls[0][0].map(({ reminder }) => reminder.id);
+      expect(ids).toContain('other');
+      expect(ids).toHaveLength(31);
     });
 
     it('plans nothing after the end date of the course', async () => {
@@ -262,10 +292,12 @@ describe('dose service on a real database', () => {
       // then
       expect(db.select().from(doses).get()?.state).toBe('pending');
       expect(db.select().from(products).get()?.stock).toBe(10);
-      expect(scheduleDoseReminder).toHaveBeenCalledWith(
-        { id: 'd1', plannedAt: TODAY_EVENING },
-        expect.anything(),
-      );
+      expect(scheduleDoseReminders).toHaveBeenCalledWith([
+        {
+          reminder: { id: 'd1', plannedAt: TODAY_EVENING },
+          texts: expect.anything(),
+        },
+      ]);
     });
 
     it('revertDose of a past dose restores the stock without a new reminder', async () => {
@@ -278,7 +310,7 @@ describe('dose service on a real database', () => {
 
       // then
       expect(db.select().from(products).get()?.stock).toBe(10);
-      expect(scheduleDoseReminder).not.toHaveBeenCalled();
+      expect(scheduleDoseReminders).not.toHaveBeenCalled();
     });
   });
 });

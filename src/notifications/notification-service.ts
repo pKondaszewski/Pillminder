@@ -5,6 +5,7 @@ import Storage from 'expo-sqlite/kv-store';
 import { createLogger } from '@/config/logger';
 
 import type { DoseReminder } from './dto/dose-reminder';
+import type { DoseReminderInput } from './dto/dose-reminder-input';
 import type { DoseReminderTexts } from './dto/dose-reminder-texts';
 import type { NotificationPermission } from './dto/notification-permission';
 import type { NotificationStrings } from './dto/notification-strings';
@@ -27,6 +28,8 @@ import {
 import {
   doseNotificationIdentifiers,
   planDoseNotifications,
+  type PlannedNotification,
+  planReminderAlarms,
 } from './reminder-plan';
 import { processReminderResponse } from './reminder-response-router';
 
@@ -74,35 +77,26 @@ export async function scheduleDoseReminder(
 ): Promise<void> {
   if (!isNotificationsSupported) return;
 
-  const planned = planDoseNotifications(
-    reminder.id,
-    reminder.plannedAt,
+  await scheduleNotifications(
+    planDoseNotifications(reminder.id, reminder.plannedAt, new Date()),
+    new Map([[reminder.id, texts]]),
+  );
+}
+
+// Replaces the alarms of all the given doses, keeping the nearest ones within the alarm budget.
+export async function scheduleDoseReminders(
+  inputs: DoseReminderInput[],
+): Promise<void> {
+  if (!isNotificationsSupported) return;
+
+  const { scheduled, dropped } = planReminderAlarms(
+    inputs.map(({ reminder }) => reminder),
     new Date(),
   );
-  await Promise.all(
-    planned.map(async ({ identifier, kind, at }) => {
-      try {
-        await Notifications.scheduleNotificationAsync({
-          identifier,
-          content: {
-            title: texts[kind].title,
-            body: texts[kind].body,
-            categoryIdentifier: CATEGORY_ID,
-            data: { doseId: reminder.id, [ANDROID_TAG_KEY]: reminder.id },
-          },
-          trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.DATE,
-            date: at,
-            channelId: CHANNEL_ID,
-          },
-        });
-      } catch (err) {
-        log.error(
-          `Failed to schedule ${identifier} for dose ${reminder.id}`,
-          err,
-        );
-      }
-    }),
+  await cancelNotifications(dropped);
+  await scheduleNotifications(
+    scheduled,
+    new Map(inputs.map(({ reminder, texts }) => [reminder.id, texts])),
   );
 }
 
@@ -198,6 +192,48 @@ export function subscribeToReminderResponses(
     log.error('Failed to subscribe to reminder responses', err);
     return () => {};
   }
+}
+
+async function scheduleNotifications(
+  planned: PlannedNotification[],
+  textsByDoseId: Map<string, DoseReminderTexts>,
+): Promise<void> {
+  await Promise.all(
+    planned.map(async ({ identifier, doseId, kind, at }) => {
+      const texts = textsByDoseId.get(doseId);
+      if (!texts) return;
+      try {
+        await Notifications.scheduleNotificationAsync({
+          identifier,
+          content: {
+            title: texts[kind].title,
+            body: texts[kind].body,
+            categoryIdentifier: CATEGORY_ID,
+            data: { doseId, [ANDROID_TAG_KEY]: doseId },
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date: at,
+            channelId: CHANNEL_ID,
+          },
+        });
+      } catch (err) {
+        log.error(`Failed to schedule ${identifier} for dose ${doseId}`, err);
+      }
+    }),
+  );
+}
+
+async function cancelNotifications(identifiers: string[]): Promise<void> {
+  await Promise.all(
+    identifiers.map(async (identifier) => {
+      try {
+        await Notifications.cancelScheduledNotificationAsync(identifier);
+      } catch (err) {
+        log.warn(`Failed to cancel ${identifier}`, err);
+      }
+    }),
+  );
 }
 
 async function forEachDoseNotification(

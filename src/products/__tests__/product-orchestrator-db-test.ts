@@ -48,6 +48,7 @@ jest.mock('@/notifications/notification-service', () => ({
   cancelReorderAlert: jest.fn().mockResolvedValue(undefined),
   dismissDoseReminder: jest.fn().mockResolvedValue(undefined),
   scheduleDoseReminder: jest.fn().mockResolvedValue(undefined),
+  scheduleDoseReminders: jest.fn().mockResolvedValue(undefined),
 }));
 
 const NOW = new Date('2026-03-10T10:00:00Z');
@@ -255,6 +256,27 @@ describe('product orchestrator on a real database', () => {
       ).toEqual(['history']);
       expect(db.select().from(notes).all()).toMatchObject([
         { productId: 'p1', body: 'Course finished' },
+      ]);
+    });
+
+    it('archives: silences the reminders of an overdue pending dose, which stays in the history', async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      insertSchedule({ id: 's1', productId: 'p1' });
+      insertDose({
+        id: 'overdue',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: new Date('2026-03-10T08:00:00Z'),
+      });
+
+      // when
+      await archiveProduct('p1');
+
+      // then
+      expect(cancelDoseReminders).toHaveBeenCalledWith(['overdue']);
+      expect(db.select().from(doses).all()).toMatchObject([
+        { id: 'overdue', state: 'pending' },
       ]);
     });
 
