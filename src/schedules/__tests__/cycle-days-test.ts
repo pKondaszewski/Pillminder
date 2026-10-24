@@ -13,8 +13,8 @@ function cycled(
     intervalDays: 1,
     weekdays: null,
     cycle: { onDays, offDays, unit: 'days' },
-    cycleAnchor: ANCHOR,
-    cyclePausedDays: 0,
+    rhythmAnchor: ANCHOR,
+    rhythmPausedDays: 0,
     ...overrides,
   };
 }
@@ -54,7 +54,7 @@ describe('isCycleOnDay', () => {
 
   it('is off before the anchor', () => {
     // given
-    const rhythm = cycled(3, 2, { cycleAnchor: january(10) });
+    const rhythm = cycled(3, 2, { rhythmAnchor: january(10) });
 
     // when
     const result = onDaysOf(rhythm, [7, 8, 9, 10]);
@@ -81,7 +81,7 @@ describe('isCycleOnDay', () => {
 
   it('keeps counting across a daylight saving change', () => {
     // given
-    const rhythm = cycled(2, 2, { cycleAnchor: new Date(2026, 2, 27) });
+    const rhythm = cycled(2, 2, { rhythmAnchor: new Date(2026, 2, 27) });
 
     // when
     const result = [27, 28, 29, 30, 31].map((day) =>
@@ -94,7 +94,7 @@ describe('isCycleOnDay', () => {
 
   it('is off for the whole cycle when it starts in the future', () => {
     // given
-    const rhythm = cycled(3, 2, { cycleAnchor: january(20) });
+    const rhythm = cycled(3, 2, { rhythmAnchor: january(20) });
 
     // when
     const result = onDaysOf(rhythm, [18, 19, 20, 21, 22, 23, 24, 25]);
@@ -133,7 +133,7 @@ describe('isCycleOnDay', () => {
 
   it('uses the counter of closed pauses', () => {
     // given
-    const rhythm = cycled(3, 2, { cyclePausedDays: 2 });
+    const rhythm = cycled(3, 2, { rhythmPausedDays: 2 });
 
     // when
     const result = onDaysOf(rhythm, [4, 5, 6, 7, 8, 9]);
@@ -149,7 +149,7 @@ describe('isRhythmDay with a cycle', () => {
     const saturdayAndSunday = [6, 0];
     const rhythm = cycled(7, 7, {
       weekdays: saturdayAndSunday,
-      cycleAnchor: january(5),
+      rhythmAnchor: january(5),
     });
 
     // when
@@ -178,7 +178,7 @@ describe('pausedDaysBefore', () => {
 
   it('counts a pause without a resume date up to the given day', () => {
     // given
-    const rhythm = cycled(3, 2, { pausedAt: january(2), cyclePausedDays: 1 });
+    const rhythm = cycled(3, 2, { pausedAt: january(2), rhythmPausedDays: 1 });
 
     // when
     const result = pausedDaysBefore(rhythm, january(5));
@@ -190,7 +190,7 @@ describe('pausedDaysBefore', () => {
   it('ignores the days of a pause before the cycle started', () => {
     // given
     const rhythm = cycled(3, 2, {
-      cycleAnchor: january(10),
+      rhythmAnchor: january(10),
       pausedAt: january(5),
       resumeAt: january(12),
     });
@@ -209,7 +209,7 @@ describe('pausedDaysBefore', () => {
       resumeAt: january(4),
     });
     const settled = cycled(3, 2, {
-      cyclePausedDays: pausedDaysBefore(withPause, january(4)),
+      rhythmPausedDays: pausedDaysBefore(withPause, january(4)),
     });
     const days = Array.from({ length: 20 }, (_, index) => index + 4);
 
@@ -242,8 +242,8 @@ describe('pausedDaysBefore without a cycle', () => {
     const rhythm: Rhythm = {
       intervalDays: 1,
       weekdays: null,
-      cycleAnchor: ANCHOR,
-      cyclePausedDays: 2,
+      rhythmAnchor: ANCHOR,
+      rhythmPausedDays: 2,
       pausedAt: january(10),
       resumeAt: january(14),
     };

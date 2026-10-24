@@ -137,8 +137,8 @@ describe('serializeBackup / parseBackup round trip', () => {
           intervalDays: 2,
           weekdays: null,
           cycle: null,
-          cycleAnchor: null,
-          cyclePausedDays: 0,
+          rhythmAnchor: null,
+          rhythmPausedDays: 0,
           timesOfDay: ['08:00', '20:30'],
           quantity: 2,
           steps: null,
@@ -153,8 +153,8 @@ describe('serializeBackup / parseBackup round trip', () => {
           intervalDays: 1,
           weekdays: [6, 0],
           cycle: null,
-          cycleAnchor: null,
-          cyclePausedDays: 0,
+          rhythmAnchor: null,
+          rhythmPausedDays: 0,
           timesOfDay: ['09:00'],
           quantity: 1,
           steps: null,
@@ -406,8 +406,8 @@ describe('parseBackup: older schema and unknown fields', () => {
     // then
     expect(rows.schedules[0]).toMatchObject({
       cycle: null,
-      cycleAnchor: null,
-      cyclePausedDays: 0,
+      rhythmAnchor: null,
+      rhythmPausedDays: 0,
     });
   });
 
@@ -419,8 +419,8 @@ describe('parseBackup: older schema and unknown fields', () => {
         schedules: [
           schedule({
             cycle,
-            cycleAnchor: '2026-01-05T00:00:00.000Z',
-            cyclePausedDays: 3,
+            rhythmAnchor: '2026-01-05T00:00:00.000Z',
+            rhythmPausedDays: 3,
           }),
         ],
       }),
@@ -432,8 +432,81 @@ describe('parseBackup: older schema and unknown fields', () => {
     // then
     expect(restored.schedules[0]).toMatchObject({
       cycle,
-      cycleAnchor: new Date('2026-01-05T00:00:00.000Z'),
-      cyclePausedDays: 3,
+      rhythmAnchor: new Date('2026-01-05T00:00:00.000Z'),
+      rhythmPausedDays: 3,
+    });
+  });
+
+  it.each([5, 6])(
+    'maps the cycle anchor and paused days of a version %i backup to the rhythm fields',
+    (version) => {
+      // given
+      const text = backupText({
+        version,
+        schedules: [
+          schedule({
+            cycle: { onDays: 21, offDays: 7, unit: 'days' },
+            cycleAnchor: '2026-01-05T00:00:00.000Z',
+            cyclePausedDays: 3,
+          }),
+        ],
+      });
+
+      // when
+      const rows = rowsOf(text);
+
+      // then
+      expect(rows.schedules[0]).toMatchObject({
+        rhythmAnchor: new Date('2026-01-05T00:00:00.000Z'),
+        rhythmPausedDays: 3,
+      });
+      expect(rows.schedules[0]).not.toHaveProperty('cycleAnchor');
+      expect(rows.schedules[0]).not.toHaveProperty('cyclePausedDays');
+    },
+  );
+
+  it('maps the anchor of a version 6 backup with steps', () => {
+    // given
+    const steps = [
+      { days: 3, quantity: 4 },
+      { days: null, quantity: 1 },
+    ];
+    const text = backupText({
+      version: 6,
+      schedules: [
+        schedule({
+          steps,
+          cycleAnchor: '2026-01-05T00:00:00.000Z',
+        }),
+      ],
+    });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.schedules[0]).toMatchObject({
+      steps,
+      rhythmAnchor: new Date('2026-01-05T00:00:00.000Z'),
+    });
+  });
+
+  it('reports a version 6 cycle without an anchor under the rhythm field', () => {
+    // given
+    const text = backupText({
+      version: 6,
+      schedules: [
+        schedule({ cycle: { onDays: 21, offDays: 7, unit: 'days' } }),
+      ],
+    });
+
+    // when
+    const result = parseBackup(text);
+
+    // then
+    expect(result).toEqual({
+      ok: false,
+      error: { code: 'invalidRow', detail: 'schedules[0].rhythmAnchor' },
     });
   });
 
@@ -447,8 +520,8 @@ describe('parseBackup: older schema and unknown fields', () => {
     // then
     expect(file.schedules[0]).toMatchObject({
       cycle: null,
-      cycleAnchor: null,
-      cyclePausedDays: 0,
+      rhythmAnchor: null,
+      rhythmPausedDays: 0,
     });
   });
 
@@ -460,7 +533,9 @@ describe('parseBackup: older schema and unknown fields', () => {
   ])('rejects the cycle %j', (cycle) => {
     // given
     const text = backupText({
-      schedules: [schedule({ cycle, cycleAnchor: '2026-01-05T00:00:00.000Z' })],
+      schedules: [
+        schedule({ cycle, rhythmAnchor: '2026-01-05T00:00:00.000Z' }),
+      ],
     });
 
     // when
@@ -484,14 +559,14 @@ describe('parseBackup: older schema and unknown fields', () => {
     // then
     expect(result).toEqual({
       ok: false,
-      error: { code: 'invalidRow', detail: 'schedules[0].cycleAnchor' },
+      error: { code: 'invalidRow', detail: 'schedules[0].rhythmAnchor' },
     });
   });
 
   it.each([-1, 1.5, '3'])('rejects the paused days %j', (days) => {
     // given
     const text = backupText({
-      schedules: [schedule({ cyclePausedDays: days })],
+      schedules: [schedule({ rhythmPausedDays: days })],
     });
 
     // when
@@ -500,7 +575,7 @@ describe('parseBackup: older schema and unknown fields', () => {
     // then
     expect(result).toEqual({
       ok: false,
-      error: { code: 'invalidRow', detail: 'schedules[0].cyclePausedDays' },
+      error: { code: 'invalidRow', detail: 'schedules[0].rhythmPausedDays' },
     });
   });
 
@@ -1417,8 +1492,8 @@ describe('parseBackup: as-needed intakes', () => {
     const file = JSON.parse(serializeBackup(rows, EXPORTED_AT));
 
     // then
-    expect(BACKUP_FORMAT_VERSION).toBe(6);
-    expect(file.version).toBe(6);
+    expect(BACKUP_FORMAT_VERSION).toBe(7);
+    expect(file.version).toBe(7);
     expect(file.asNeededIntakes[0].takenAt).toBe('2026-02-11T14:20:00.000Z');
   });
 
@@ -1557,7 +1632,7 @@ describe('schedule steps in a backup', () => {
   it('keeps steps with their anchor through a round trip', () => {
     // given
     const rows = rowsOf(
-      backupText({ schedules: [schedule({ steps, cycleAnchor: anchor })] }),
+      backupText({ schedules: [schedule({ steps, rhythmAnchor: anchor })] }),
     );
 
     // when
@@ -1566,7 +1641,7 @@ describe('schedule steps in a backup', () => {
     // then
     expect(restored.schedules[0]).toMatchObject({
       steps,
-      cycleAnchor: new Date(anchor),
+      rhythmAnchor: new Date(anchor),
     });
   });
 
@@ -1610,7 +1685,7 @@ describe('schedule steps in a backup', () => {
   ])('rejects the steps %j', (invalidSteps) => {
     // given
     const text = backupText({
-      schedules: [schedule({ steps: invalidSteps, cycleAnchor: anchor })],
+      schedules: [schedule({ steps: invalidSteps, rhythmAnchor: anchor })],
     });
 
     // when
@@ -1633,7 +1708,7 @@ describe('schedule steps in a backup', () => {
     // then
     expect(result).toEqual({
       ok: false,
-      error: { code: 'invalidRow', detail: 'schedules[0].cycleAnchor' },
+      error: { code: 'invalidRow', detail: 'schedules[0].rhythmAnchor' },
     });
   });
 });

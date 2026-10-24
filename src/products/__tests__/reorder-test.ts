@@ -16,8 +16,8 @@ function rhythm(overrides: Partial<Schedule>): Schedule {
     intervalDays: 1,
     weekdays: null,
     cycle: null,
-    cycleAnchor: null,
-    cyclePausedDays: 0,
+    rhythmAnchor: null,
+    rhythmPausedDays: 0,
     timesOfDay: ['08:00'],
     quantity: 1,
     steps: null,
@@ -511,7 +511,7 @@ describe('reorderStatus with a cycle', () => {
   const cycled = (overrides: Partial<Schedule> = {}) =>
     rhythm({
       cycle: { onDays: 3, offDays: 2, unit: 'days' },
-      cycleAnchor: new Date(2026, 0, 10),
+      rhythmAnchor: new Date(2026, 0, 10),
       ...overrides,
     });
 
@@ -575,7 +575,7 @@ describe('reorderStatus with steps', () => {
         { days: 3, quantity: 4 },
         { days: 3, quantity: 2 },
       ],
-      cycleAnchor: new Date(2026, 0, 10),
+      rhythmAnchor: new Date(2026, 0, 10),
       ...overrides,
     });
 
@@ -621,7 +621,7 @@ describe('reorderStatus with steps', () => {
 
   it('reports the quantity of the current step as the daily consumption', () => {
     // given
-    const schedules = [prednisone({ cycleAnchor: new Date(2026, 0, 7) })];
+    const schedules = [prednisone({ rhythmAnchor: new Date(2026, 0, 7) })];
 
     // when
     const status = reorderStatus(null, schedules, NOW);
@@ -657,7 +657,7 @@ describe('reorderStatus with steps', () => {
   it('treats a finished taper as no active schedule', () => {
     // given
     const product = { stock: 3, reorderThreshold: 5 };
-    const finished = prednisone({ cycleAnchor: new Date(2025, 11, 1) });
+    const finished = prednisone({ rhythmAnchor: new Date(2025, 11, 1) });
 
     // when
     const status = productReorderStatus(product, [finished], NOW);

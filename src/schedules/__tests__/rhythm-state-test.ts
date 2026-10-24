@@ -1,5 +1,5 @@
-import { cycleStateOf } from '../cycle-state';
 import type { NewScheduleInput } from '../dto/new-schedule-input';
+import { rhythmStateOf } from '../rhythm-state';
 import { draftSchedule } from '../schedule-draft';
 import type { Schedule } from '../schedule-repository';
 
@@ -16,18 +16,18 @@ function input(overrides: Partial<NewScheduleInput> = {}): NewScheduleInput {
   };
 }
 
-describe('cycleStateOf', () => {
+describe('rhythmStateOf', () => {
   it('anchors the cycle to the start date', () => {
     // given
     const withStart = input({ startDate: new Date(2026, 0, 20, 15, 30) });
 
     // when
-    const state = cycleStateOf(withStart, undefined, NOW);
+    const state = rhythmStateOf(withStart, undefined, NOW);
 
     // then
     expect(state).toEqual({
-      cycleAnchor: new Date(2026, 0, 20),
-      cyclePausedDays: 0,
+      rhythmAnchor: new Date(2026, 0, 20),
+      rhythmPausedDays: 0,
     });
   });
 
@@ -36,53 +36,53 @@ describe('cycleStateOf', () => {
     const withoutStart = input();
 
     // when
-    const state = cycleStateOf(withoutStart, undefined, NOW);
+    const state = rhythmStateOf(withoutStart, undefined, NOW);
 
     // then
-    expect(state.cycleAnchor).toEqual(new Date(2026, 0, 10));
+    expect(state.rhythmAnchor).toEqual(new Date(2026, 0, 10));
   });
 
   it('keeps the anchor and the paused days when other fields are edited', () => {
     // given
     const existing = {
-      cycleAnchor: new Date(2026, 0, 2),
-      cyclePausedDays: 4,
+      rhythmAnchor: new Date(2026, 0, 2),
+      rhythmPausedDays: 4,
     } as Schedule;
 
     // when
-    const state = cycleStateOf(input(), existing, NOW);
+    const state = rhythmStateOf(input(), existing, NOW);
 
     // then
     expect(state).toEqual({
-      cycleAnchor: new Date(2026, 0, 2),
-      cyclePausedDays: 4,
+      rhythmAnchor: new Date(2026, 0, 2),
+      rhythmPausedDays: 4,
     });
   });
 
   it('follows a changed start date', () => {
     // given
-    const existing = { cycleAnchor: new Date(2026, 0, 2) } as Schedule;
+    const existing = { rhythmAnchor: new Date(2026, 0, 2) } as Schedule;
     const moved = input({ startDate: new Date(2026, 0, 6) });
 
     // when
-    const state = cycleStateOf(moved, existing, NOW);
+    const state = rhythmStateOf(moved, existing, NOW);
 
     // then
-    expect(state.cycleAnchor).toEqual(new Date(2026, 0, 6));
+    expect(state.rhythmAnchor).toEqual(new Date(2026, 0, 6));
   });
 
   it('clears the state when the cycle is removed', () => {
     // given
     const existing = {
-      cycleAnchor: new Date(2026, 0, 2),
-      cyclePausedDays: 4,
+      rhythmAnchor: new Date(2026, 0, 2),
+      rhythmPausedDays: 4,
     } as Schedule;
 
     // when
-    const state = cycleStateOf(input({ cycle: null }), existing, NOW);
+    const state = rhythmStateOf(input({ cycle: null }), existing, NOW);
 
     // then
-    expect(state).toEqual({ cycleAnchor: null, cyclePausedDays: 0 });
+    expect(state).toEqual({ rhythmAnchor: null, rhythmPausedDays: 0 });
   });
 });
 
@@ -97,13 +97,13 @@ describe('draftSchedule', () => {
     // then
     expect(draft).toMatchObject({
       cycle: CYCLE,
-      cycleAnchor: new Date(2026, 0, 10),
-      cyclePausedDays: 0,
+      rhythmAnchor: new Date(2026, 0, 10),
+      rhythmPausedDays: 0,
     });
   });
 });
 
-describe('cycleStateOf with steps', () => {
+describe('rhythmStateOf with steps', () => {
   const steps = [
     { days: 3, quantity: 2 },
     { days: null, quantity: 1 },
@@ -114,24 +114,24 @@ describe('cycleStateOf with steps', () => {
     const tapered = input({ cycle: null, steps });
 
     // when
-    const state = cycleStateOf(tapered, undefined, NOW);
+    const state = rhythmStateOf(tapered, undefined, NOW);
 
     // then
     expect(state).toEqual({
-      cycleAnchor: new Date(2026, 0, 10),
-      cyclePausedDays: 0,
+      rhythmAnchor: new Date(2026, 0, 10),
+      rhythmPausedDays: 0,
     });
   });
 
   it('keeps the state while either the cycle or the steps remain', () => {
     // given
     const existing = {
-      cycleAnchor: new Date(2026, 0, 2),
-      cyclePausedDays: 4,
+      rhythmAnchor: new Date(2026, 0, 2),
+      rhythmPausedDays: 4,
     } as Schedule;
 
     // when
-    const withoutCycle = cycleStateOf(
+    const withoutCycle = rhythmStateOf(
       input({ cycle: null, steps }),
       existing,
       NOW,
@@ -139,17 +139,17 @@ describe('cycleStateOf with steps', () => {
 
     // then
     expect(withoutCycle).toEqual({
-      cycleAnchor: new Date(2026, 0, 2),
-      cyclePausedDays: 4,
+      rhythmAnchor: new Date(2026, 0, 2),
+      rhythmPausedDays: 4,
     });
   });
 
   it('clears the state when neither is left', () => {
     // when
-    const state = cycleStateOf(input({ cycle: null }), undefined, NOW);
+    const state = rhythmStateOf(input({ cycle: null }), undefined, NOW);
 
     // then
-    expect(state).toEqual({ cycleAnchor: null, cyclePausedDays: 0 });
+    expect(state).toEqual({ rhythmAnchor: null, rhythmPausedDays: 0 });
   });
 
   it('carries the steps into the draft', () => {
@@ -157,19 +157,19 @@ describe('cycleStateOf with steps', () => {
     const draft = draftSchedule(input({ cycle: null, steps }), NOW);
 
     // then
-    expect(draft).toMatchObject({ steps, cycleAnchor: new Date(2026, 0, 10) });
+    expect(draft).toMatchObject({ steps, rhythmAnchor: new Date(2026, 0, 10) });
   });
 });
 
-describe('cycleStateOf anchor rule', () => {
+describe('rhythmStateOf anchor rule', () => {
   const steps = [
     { days: 3, quantity: 2 },
     { days: null, quantity: 1 },
   ];
   const startedLongAgo = {
     startDate: new Date(2025, 11, 1),
-    cycleAnchor: null,
-    cyclePausedDays: 0,
+    rhythmAnchor: null,
+    rhythmPausedDays: 0,
   } as Schedule;
 
   it.each([
@@ -180,12 +180,12 @@ describe('cycleStateOf anchor rule', () => {
     const added = input({ ...change, startDate: new Date(2025, 11, 1) });
 
     // when
-    const state = cycleStateOf(added, startedLongAgo, NOW);
+    const state = rhythmStateOf(added, startedLongAgo, NOW);
 
     // then
     expect(state).toEqual({
-      cycleAnchor: new Date(2026, 0, 10),
-      cyclePausedDays: 0,
+      rhythmAnchor: new Date(2026, 0, 10),
+      rhythmPausedDays: 0,
     });
   });
 
@@ -196,18 +196,18 @@ describe('cycleStateOf anchor rule', () => {
     // given
     const existing = {
       startDate: new Date(2026, 0, 6),
-      cycleAnchor: new Date(2026, 0, 6),
-      cyclePausedDays: 2,
+      rhythmAnchor: new Date(2026, 0, 6),
+      rhythmPausedDays: 2,
     } as Schedule;
     const edited = input({ ...change, startDate: new Date(2026, 0, 6, 9, 0) });
 
     // when
-    const state = cycleStateOf(edited, existing, NOW);
+    const state = rhythmStateOf(edited, existing, NOW);
 
     // then
     expect(state).toEqual({
-      cycleAnchor: new Date(2026, 0, 6),
-      cyclePausedDays: 2,
+      rhythmAnchor: new Date(2026, 0, 6),
+      rhythmPausedDays: 2,
     });
   });
 
@@ -218,18 +218,18 @@ describe('cycleStateOf anchor rule', () => {
     // given
     const existing = {
       startDate: new Date(2026, 0, 6),
-      cycleAnchor: new Date(2026, 0, 6),
-      cyclePausedDays: 2,
+      rhythmAnchor: new Date(2026, 0, 6),
+      rhythmPausedDays: 2,
     } as Schedule;
     const moved = input({ ...change, startDate: new Date(2026, 0, 8) });
 
     // when
-    const state = cycleStateOf(moved, existing, NOW);
+    const state = rhythmStateOf(moved, existing, NOW);
 
     // then
     expect(state).toEqual({
-      cycleAnchor: new Date(2026, 0, 8),
-      cyclePausedDays: 0,
+      rhythmAnchor: new Date(2026, 0, 8),
+      rhythmPausedDays: 0,
     });
   });
 
@@ -242,9 +242,9 @@ describe('cycleStateOf anchor rule', () => {
     });
 
     // when
-    const state = cycleStateOf(created, undefined, NOW);
+    const state = rhythmStateOf(created, undefined, NOW);
 
     // then
-    expect(state.cycleAnchor).toEqual(new Date(2026, 0, 20));
+    expect(state.rhythmAnchor).toEqual(new Date(2026, 0, 20));
   });
 });

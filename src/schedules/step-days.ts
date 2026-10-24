@@ -7,18 +7,18 @@ export function quantityOn(
   flatQuantity: number,
   day: Date,
 ): number {
-  const { steps, cycleAnchor } = rhythm;
-  if (!steps || !cycleAnchor) return flatQuantity;
+  const { steps, rhythmAnchor } = rhythm;
+  if (!steps || !rhythmAnchor) return flatQuantity;
   return (
-    stepOn(steps, daysCountedUntil(rhythm, cycleAnchor, day))?.quantity ?? 0
+    stepOn(steps, daysCountedUntil(rhythm, rhythmAnchor, day))?.quantity ?? 0
   );
 }
 
 // The last step had a length and has run out, so nothing is due from this day on.
 export function isTaperOver(rhythm: Rhythm, day: Date): boolean {
-  const { steps, cycleAnchor } = rhythm;
-  if (!steps || !cycleAnchor) return false;
-  return stepOn(steps, daysCountedUntil(rhythm, cycleAnchor, day)) === null;
+  const { steps, rhythmAnchor } = rhythm;
+  if (!steps || !rhythmAnchor) return false;
+  return stepOn(steps, daysCountedUntil(rhythm, rhythmAnchor, day)) === null;
 }
 
 export function hasFiniteTaper({ steps }: Rhythm): boolean {

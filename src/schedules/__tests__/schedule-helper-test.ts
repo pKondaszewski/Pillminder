@@ -702,8 +702,8 @@ describe('occurrencesWithin with a cycle', () => {
     intervalDays: 1,
     weekdays: null,
     cycle: { onDays: 3, offDays: 2, unit: 'days' },
-    cycleAnchor: new Date(2026, 0, 8),
-    cyclePausedDays: 0,
+    rhythmAnchor: new Date(2026, 0, 8),
+    rhythmPausedDays: 0,
     ...overrides,
   });
 
@@ -727,7 +727,7 @@ describe('occurrencesWithin with a cycle', () => {
 
   it('starts a cycle that begins in the future on its first day', () => {
     // given
-    const rhythm = cycled({ cycleAnchor: new Date(2026, 0, 15) });
+    const rhythm = cycled({ rhythmAnchor: new Date(2026, 0, 15) });
     const period = { startDate: new Date(2026, 0, 15) };
 
     // when
@@ -765,7 +765,7 @@ describe('occurrencesWithin with a cycle', () => {
     const rhythm = cycled({
       weekdays: [6, 0],
       cycle: { onDays: 7, offDays: 7, unit: 'days' },
-      cycleAnchor: new Date(2026, 0, 5),
+      rhythmAnchor: new Date(2026, 0, 5),
     });
 
     // when
@@ -789,8 +789,8 @@ describe('occurrencesWithin with steps', () => {
       { days: 3, quantity: 4 },
       { days: 3, quantity: 1 },
     ],
-    cycleAnchor: new Date(2026, 0, 9),
-    cyclePausedDays: 0,
+    rhythmAnchor: new Date(2026, 0, 9),
+    rhythmPausedDays: 0,
   };
 
   it('generates the doses of the steps and then stops', () => {
@@ -829,7 +829,7 @@ describe('occurrencesWithin with steps', () => {
     const period = { pausedAt: new Date(2026, 0, 9), resumeAt: at(1, 12, 0) };
     const rhythm: Rhythm = {
       ...prednisone,
-      cycleAnchor: new Date(2026, 0, 8),
+      rhythmAnchor: new Date(2026, 0, 8),
       ...period,
     };
 
@@ -848,7 +848,7 @@ describe('occurrencesWithin with steps', () => {
 
   it('returns no previews once the taper is over', () => {
     // given
-    const over: Rhythm = { ...prednisone, cycleAnchor: new Date(2025, 11, 1) };
+    const over: Rhythm = { ...prednisone, rhythmAnchor: new Date(2025, 11, 1) };
 
     // when
     const result = occurrencesWithin(over, ['18:00'], 20, {}, NOW);

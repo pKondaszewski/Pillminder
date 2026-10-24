@@ -1,5 +1,5 @@
-import { cycleStateOf } from './cycle-state';
 import type { NewScheduleInput } from './dto/new-schedule-input';
+import { rhythmStateOf } from './rhythm-state';
 import { isPeriodInvalid } from './schedule-period';
 import type { Schedule } from './schedule-repository';
 
@@ -34,7 +34,7 @@ export function draftSchedule(input: NewScheduleInput, now: Date): Schedule {
     intervalDays: input.intervalDays,
     weekdays: input.weekdays ?? null,
     cycle: input.cycle ?? null,
-    ...cycleStateOf(input, undefined, now),
+    ...rhythmStateOf(input, undefined, now),
     timesOfDay: input.timesOfDay,
     quantity: input.quantity ?? 1,
     steps: input.steps ?? null,

@@ -50,8 +50,8 @@ export const schedules = sqliteTable(
     intervalDays: integer('interval_days').notNull(),
     weekdays: text('weekdays', { mode: 'json' }).$type<number[]>(),
     cycle: text('cycle', { mode: 'json' }).$type<ScheduleCycle>(),
-    cycleAnchor: integer('cycle_anchor', { mode: 'timestamp' }),
-    cyclePausedDays: integer('cycle_paused_days').notNull().default(0),
+    rhythmAnchor: integer('rhythm_anchor', { mode: 'timestamp' }),
+    rhythmPausedDays: integer('rhythm_paused_days').notNull().default(0),
     timesOfDay: text('times_of_day', { mode: 'json' })
       .$type<string[]>()
       .notNull(),

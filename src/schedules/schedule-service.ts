@@ -2,8 +2,8 @@ import { startOfDay } from '@/config/date-utils';
 import { createLogger } from '@/config/logger';
 
 import { pausedDaysBefore } from './cycle-days';
-import { cycleStateOf } from './cycle-state';
 import type { NewScheduleInput } from './dto/new-schedule-input';
+import { rhythmStateOf } from './rhythm-state';
 import {
   createScheduleRow,
   deleteScheduleRow,
@@ -20,8 +20,8 @@ import { assertValidScheduleInput } from './schedule-validator';
 
 export { cycleUnitKey, daysPerUnit } from './cycle-days';
 export type { CourseProgress } from './dto/course-progress';
-export type { CycleState } from './dto/cycle-state';
 export type { Rhythm } from './dto/rhythm';
+export type { RhythmState } from './dto/rhythm-state';
 export {
   type CycleUnit,
   MAX_CYCLE_DAYS,
@@ -75,7 +75,7 @@ export async function createSchedule(
     assertValidScheduleInput(input);
     const created = await createScheduleRow(
       input,
-      cycleStateOf(input, undefined, new Date()),
+      rhythmStateOf(input, undefined, new Date()),
     );
     log.info(`Created schedule ${JSON.stringify(created)}`);
     return created;
@@ -96,7 +96,7 @@ export async function updateSchedule(
     const updated = await updateScheduleRow(
       id,
       input,
-      cycleStateOf(input, existing, new Date()),
+      rhythmStateOf(input, existing, new Date()),
     );
     log.info(`Updated schedule ${JSON.stringify(updated)}`);
     return updated;
@@ -116,7 +116,7 @@ export async function suspendSchedule(
     return await setSchedulePauseRow(id, {
       pausedAt: now,
       resumeAt,
-      cyclePausedDays: await settledPausedDays(id, now),
+      rhythmPausedDays: await settledPausedDays(id, now),
     });
   } catch (err) {
     log.error(`Failed to pause schedule ${id}`, err);
@@ -130,7 +130,7 @@ export async function reactivateSchedule(id: string): Promise<Schedule> {
     return await setSchedulePauseRow(id, {
       pausedAt: null,
       resumeAt: null,
-      cyclePausedDays: await settledPausedDays(id, new Date()),
+      rhythmPausedDays: await settledPausedDays(id, new Date()),
     });
   } catch (err) {
     log.error(`Failed to resume schedule ${id}`, err);

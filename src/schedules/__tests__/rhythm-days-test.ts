@@ -106,7 +106,7 @@ describe('cycle consumption', () => {
         intervalDays: 1,
         weekdays,
         cycle: cycleValue,
-        cycleAnchor: anchor,
+        rhythmAnchor: anchor,
       };
 
       // when
@@ -123,7 +123,7 @@ describe('cycle consumption', () => {
       intervalDays: 1,
       weekdays: null,
       cycle: cycle(3, 2),
-      cycleAnchor: anchor,
+      rhythmAnchor: anchor,
     };
 
     // when
@@ -141,7 +141,7 @@ describe('cycle consumption', () => {
       intervalDays: 1,
       weekdays: [6, 0],
       cycle: cycle(7, 7),
-      cycleAnchor: new Date(2026, 0, 5),
+      rhythmAnchor: new Date(2026, 0, 5),
     };
 
     // when
@@ -162,8 +162,8 @@ describe('dayShareOn with steps', () => {
       { days: 2, quantity: 3 },
       { days: 2, quantity: 1 },
     ],
-    cycleAnchor: new Date(2026, 0, 1),
-    cyclePausedDays: 0,
+    rhythmAnchor: new Date(2026, 0, 1),
+    rhythmPausedDays: 0,
   };
 
   it('is 1 inside the steps and 0 after the last finite one', () => {
