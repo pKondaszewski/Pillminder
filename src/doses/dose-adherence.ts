@@ -1,11 +1,7 @@
 import type { DoseState } from './dose-transition';
-import type {
-  AdherenceCounts,
-  AdherenceReport,
-} from './dto/adherence-report-output';
+import type { AdherenceCounts } from './dto/adherence-counts';
 
 export interface AdherenceDose {
-  productId: string;
   plannedAt: Date;
   state: DoseState;
 }
@@ -15,25 +11,12 @@ export function calculateAdherence(
   from: Date,
   to: Date,
   now: Date,
-): AdherenceReport {
+): AdherenceCounts {
   const inRange = doses.filter(
     (dose) => dose.plannedAt >= from && dose.plannedAt < to,
   );
 
-  const byProduct: Record<string, AdherenceCounts> = {};
-  for (const [productId, productDoses] of groupByProduct(inRange)) {
-    byProduct[productId] = countDoses(productDoses, now);
-  }
-
-  return { total: countDoses(inRange, now), byProduct };
-}
-
-function groupByProduct(doses: AdherenceDose[]): Map<string, AdherenceDose[]> {
-  const groups = new Map<string, AdherenceDose[]>();
-  for (const dose of doses) {
-    groups.set(dose.productId, [...(groups.get(dose.productId) ?? []), dose]);
-  }
-  return groups;
+  return countDoses(inRange, now);
 }
 
 function countDoses(doses: AdherenceDose[], now: Date): AdherenceCounts {
@@ -50,12 +33,5 @@ function countDoses(doses: AdherenceDose[], now: Date): AdherenceCounts {
   }
 
   const due = taken + skipped + missed;
-  return {
-    taken,
-    skipped,
-    missed,
-    upcoming,
-    due,
-    rate: due === 0 ? null : taken / due,
-  };
+  return { taken, skipped, missed, upcoming, due };
 }

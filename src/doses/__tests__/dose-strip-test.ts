@@ -4,7 +4,7 @@ import { buildRecentDays, recentDaysRange, STRIP_DAYS } from '../dose-strip';
 const NOW = new Date(2026, 9, 18, 12, 0);
 
 function dose(plannedAt: Date, state: AdherenceDose['state']): AdherenceDose {
-  return { productId: 'p1', plannedAt, state };
+  return { plannedAt, state };
 }
 
 describe('recentDaysRange', () => {

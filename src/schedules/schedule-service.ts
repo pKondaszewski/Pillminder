@@ -148,7 +148,8 @@ export async function deleteSchedule(id: string): Promise<void> {
   }
 }
 
-// Moves the pause that is ending (or being replaced) into the cycle's counter.
+// Moves the pause that is ending (or being replaced) into the rhythm's
+// paused-days counter.
 async function settledPausedDays(id: string, now: Date): Promise<number> {
   const schedule = await getScheduleById(id);
   if (!schedule) throw new Error(`Schedule ${id} not found`);

@@ -1,4 +1,4 @@
-import { daysBetween, isoDay, msUntilNextDay, startOfDay } from '../date-utils';
+import { daysBetween, isoDay, startOfDay } from '../date-utils';
 
 function at(month: number, day: number, hours: number): Date {
   return new Date(2026, month - 1, day, hours);
@@ -28,30 +28,6 @@ describe('startOfDay', () => {
 
     // then
     expect(keys[0]).not.toBe(keys[1]);
-  });
-});
-
-describe('msUntilNextDay', () => {
-  it('returns the time left until the next local midnight', () => {
-    // given
-    const now = new Date(2026, 0, 10, 23, 0, 0);
-
-    // when
-    const delay = msUntilNextDay(now);
-
-    // then
-    expect(delay).toBe(60 * 60 * 1000);
-  });
-
-  it('returns a full day at exactly midnight', () => {
-    // given
-    const now = new Date(2026, 0, 10, 0, 0, 0);
-
-    // when
-    const delay = msUntilNextDay(now);
-
-    // then
-    expect(delay).toBe(24 * 60 * 60 * 1000);
   });
 });
 

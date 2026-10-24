@@ -7,7 +7,7 @@ import {
   getNotificationPermission,
   type NotificationPermission,
   requestNotificationPermission,
-} from '@/onboarding/onboarding-service';
+} from '@/notifications/notification-service';
 
 const log = createLogger('use-notification-permission');
 

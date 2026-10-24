@@ -9,7 +9,6 @@ import {
 
 // Relative on purpose: drizzle-kit loads this file without the @ alias.
 import { DOSE_STATES } from '../../doses/dose-transition';
-import { IMAGE_ROLES } from '../../images/image-role';
 import { PRODUCT_UNITS } from '../../products/dto/product-unit';
 import { STORE_LINK_TARGETS } from '../../products/dto/store-link-target';
 import type { ScheduleCycle } from '../../schedules/dto/schedule-cycle';
@@ -126,7 +125,7 @@ export const productImages = sqliteTable(
       .notNull()
       .references(() => products.id, { onDelete: 'cascade' }),
     fileName: text('file_name').notNull(),
-    role: text('role', { enum: IMAGE_ROLES }).notNull(),
+    role: text('role').notNull(),
     createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   },
   (table) => [index('idx_product_images_product').on(table.productId)],

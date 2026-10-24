@@ -21,6 +21,6 @@ export function monthSummary(
     from,
     to,
     now,
-  ).total;
+  );
   return { taken, due, skipped, missed, throughToday: now >= from && now < to };
 }

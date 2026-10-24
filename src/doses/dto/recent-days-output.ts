@@ -1,4 +1,4 @@
-import type { AdherenceCounts } from './adherence-report-output';
+import type { AdherenceCounts } from './adherence-counts';
 import type { DayStatus } from './day-status';
 
 export interface StripDay {

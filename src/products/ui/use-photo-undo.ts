@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import type { RunWithUndo } from '@/commons/ui/use-undo-snackbar';
 import {
   addImage,
-  DEFAULT_IMAGE_ROLE,
   discardAddedImage,
   type ImageSource,
   type ProductImage,
@@ -34,7 +33,7 @@ export function usePhotoUndo(
           apply: async () => {
             try {
               for (const uri of uris) {
-                added.push(await addImage(productId, uri, DEFAULT_IMAGE_ROLE));
+                added.push(await addImage(productId, uri));
               }
             } catch (error) {
               await Promise.all(added.splice(0).map(discardAddedImage));

@@ -11,12 +11,12 @@ export function dayStatus(
   now: Date,
 ): DayStatus {
   const from = startOfDay(day);
-  const { total } = calculateAdherence(doses, from, addDays(from, 1), now);
+  const counts = calculateAdherence(doses, from, addDays(from, 1), now);
 
-  if (total.missed > 0) return 'missed';
-  if (total.skipped > 0) return 'skipped';
-  if (total.upcoming > 0) return 'upcoming';
-  return total.taken > 0 ? 'allTaken' : 'none';
+  if (counts.missed > 0) return 'missed';
+  if (counts.skipped > 0) return 'skipped';
+  if (counts.upcoming > 0) return 'upcoming';
+  return counts.taken > 0 ? 'allTaken' : 'none';
 }
 
 // Doses are generated from now, so only the days that end before now + horizon are complete.

@@ -85,17 +85,11 @@ export default function HomeScreen() {
 
   const day = pickedDay ?? today;
   const mode = dayMode(day, today);
-  const {
-    doses,
-    takeDose,
-    untakeDose,
-    skipDose,
-    unskipDose,
-    correctDoseState,
-  } = useDayDoses(day);
+  const { doses, takeDose, skipDose, revertDose, correctDoseState } =
+    useDayDoses(day);
   const { snackbar, applyWithUndo, takeAll, revert } = useUndoableDoseAction({
-    taken: { apply: takeDose, revert: untakeDose },
-    skipped: { apply: skipDose, revert: unskipDose },
+    taken: { apply: takeDose, revert: revertDose },
+    skipped: { apply: skipDose, revert: revertDose },
   });
   const dayIntakes = useIntakesBetween(day, addDays(day, 1));
   const handleTake = (dose: TodayDose) => applyWithUndo('taken', dose);

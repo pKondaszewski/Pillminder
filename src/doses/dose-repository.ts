@@ -4,6 +4,7 @@ import * as Crypto from 'expo-crypto';
 import { db } from '@/config/db/database';
 import { doses, productImages, products, schedules } from '@/config/db/schema';
 import { latestUseAt } from '@/intakes/intake-service';
+import { adjustedStock } from '@/intakes/intake-stock';
 import { quantityOn } from '@/schedules/step-days';
 
 import { planPendingReplacement } from './dose-replacement';
@@ -111,7 +112,7 @@ export async function setDoseStateRow(
     const stock =
       product.stock == null
         ? null
-        : Math.max(0, product.stock + transition.stockDelta);
+        : adjustedStock(product.stock, transition.stockDelta);
     const stockChanged = stock !== product.stock;
     const lastUsedChanged =
       (lastUsedAt?.getTime() ?? null) !==

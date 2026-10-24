@@ -41,7 +41,6 @@ function syncReorderAlerts(
 
       const alert = {
         productId: product.id,
-        productName: product.name,
         canAddPack: product.packSize !== null,
       };
       const text = reorderNotificationText(product, t);
