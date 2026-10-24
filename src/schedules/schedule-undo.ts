@@ -8,16 +8,17 @@ import { toScheduleInput } from './schedule-draft';
 import type { Schedule } from './schedule-repository';
 
 type SaveSchedule = (id: string, input: NewScheduleInput) => Promise<void>;
+type RestoreSchedule = (snapshot: Schedule) => Promise<void>;
 
 export function scheduleEditChange(
   schedule: Schedule,
   change: ScheduleChange,
   message: string,
-  save: SaveSchedule,
+  { save, restore }: { save: SaveSchedule; restore: RestoreSchedule },
 ): UndoableChange {
   return {
     message,
     apply: () => save(schedule.id, { ...toScheduleInput(schedule), ...change }),
-    revert: () => save(schedule.id, toScheduleInput(schedule)),
+    revert: () => restore(schedule),
   };
 }

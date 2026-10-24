@@ -5,10 +5,12 @@ import {
 } from '@/doses/dose-service';
 
 import type { NewScheduleInput } from './dto/new-schedule-input';
+import type { Schedule } from './schedule-repository';
 import {
   createSchedule,
   deleteSchedule,
   reactivateSchedule,
+  restoreScheduleSnapshot,
   suspendSchedule,
   updateSchedule,
 } from './schedule-service';
@@ -25,6 +27,11 @@ export async function editSchedule(
 ): Promise<void> {
   const updated = await updateSchedule(id, input);
   await syncDosesForSchedule(updated);
+}
+
+export async function restoreSchedule(snapshot: Schedule): Promise<void> {
+  const restored = await restoreScheduleSnapshot(snapshot);
+  await syncDosesForSchedule(restored);
 }
 
 export async function pauseSchedule(
