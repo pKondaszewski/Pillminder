@@ -8,21 +8,33 @@ reminders, history, and low-stock alerts happen automatically. All data lives
 **on the device** — no backend, no account, no server.
 
 > Full product vision and roadmap: [`CLAUDE.md`](./CLAUDE.md).
-> Current granular tasks: [`TODO.md`](./TODO.md).
+> Screen-by-screen design: [`docs/design.md`](./docs/design.md).
+> Granular tasks and bugs: [GitHub Issues](https://github.com/pKondaszewski/Pillminder/issues).
 
 ## Features (v1)
 
-- **Products** — name, category (medication / supplement / care), dose, price,
-  store link, stock, notes, and an active / archived status.
-- **Intake rhythm** — daily or every X days, at one or more times of day, over a
-  date range or indefinitely.
+- **Products** — name, category (medication / supplement / care / nasal spray /
+  eye drops / your own), dose, price, store link, photos, stock, notes, and an
+  active / archived status.
+- **Intake rhythm** — daily, every X days or on chosen weekdays, optionally in
+  cycles with breaks and with the quantity changing in steps, at one or more
+  times of day, over a date range or indefinitely.
 - **Scheduled doses** — the rhythm generates planned dose "slots", each with a
-  state (pending / taken / skipped). One tap confirms a dose and decrements stock.
+  state (pending / taken / skipped); a pending dose past its time shows as
+  overdue. One tap confirms a dose and decrements stock. Medication taken as
+  needed is logged separately.
 - **Reminders** — local notifications per dose with **Taken** / **Snooze**
   actions directly on the notification.
 - **Reorder alerts** — the reorder moment is computed from rhythm + stock; you
   get an amber low-stock badge and a notification with a **Buy** action.
-- **History** — per-product list of what was taken / skipped.
+- **History** — a day view you can page through, a month calendar with a status
+  per day, and the last 14 days on each product.
+- **Today meadow** — the Start screen draws the day as a meadow with a plant per
+  dose, following the sunrise and sunset of your location and the season.
+- **Trip planner** — pick a date range on one calendar and get what to pack per
+  product, with a road scene showing when the stock runs out.
+- **Privacy** — optional app lock (biometrics or screen lock).
+- **Backup** — Android Auto Backup (Google backup).
 - **i18n** — Polish and English, auto-selected from the device locale.
 
 ## Tech stack
@@ -39,63 +51,66 @@ reminders, history, and low-stock alerts happen automatically. All data lives
 
 ## Project structure
 
+Code is grouped by feature module; each module keeps its presentation code in
+its own `ui/` folder next to the service, DTOs and pure logic (see
+[`CLAUDE.md`](./CLAUDE.md) for the layering rules enforced by ESLint).
+
 ```
 src/
-  app/            # Expo Router routes (index = Today, products, schedules)
-  products/       # product domain: repository, service, reorder logic, DTOs
-  schedules/      # schedule domain: repository, service, helpers
-  doses/          # dose domain: repository, service, validation, DTOs
+  app/            # Expo Router routes (tabs: Start, Products, Plan, Settings)
+  products/       # product domain: repository, service, reorder logic, DTOs, ui/
+  schedules/      # schedule domain: rhythm, cycles, steps, repository, service, ui/
+  doses/          # dose domain: planning, status, day view logic, ui/
+  intakes/        # as-needed intakes
   notifications/  # scheduling, actions, background task
+  scene/          # Skia sky and meadow behind the Start screen
+  settings/       # preferences store and Settings screen parts
+  location/       # approximate location, sunrise and sunset
+  ...             # other feature modules (see `src/`)
+  commons/ui/     # theme, shared components, navigation
   config/
     db/           # Drizzle schema + database bootstrap
     i18n/         # i18next setup + PL/EN locale JSON
-  ui/
-    components/   # screens and reusable components
-    hooks/        # data hooks (live SQLite queries)
-    commons/      # theme, formatting helpers
 drizzle/          # generated SQL migrations + snapshots
 ```
 
 ## Local setup
 
+The app uses native modules and notifications, so it does **not** run in Expo Go.
+Run it as a **development build** on an Android phone (USB) or emulator.
+
 ### Prerequisites
 
-- **Node.js 22** (matches CI)
-- **npm**
-- An Android phone with the **Expo Go** app installed
-  ([Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)),
-  on the **same Wi-Fi network** as your computer.
+- **Node.js 22** (matches CI) and **npm**
+- **JDK 17** and the **Android SDK** (`ANDROID_HOME`, platform tools on `PATH`)
+- An Android device with **USB debugging** on, or an emulator. Check it with
+  `adb devices -l` (status must be `device`). Details and Samsung-specific
+  pitfalls: [`CLAUDE.md`](./CLAUDE.md#running-locally-dev-build).
 
 ### Run it
 
 1. Install dependencies:
 
    ```bash
-   npm install
+   npm ci
    ```
 
-2. Start the Expo dev server:
+2. Build and install the dev build (first run, and after any native, permission
+   or `app.json` change):
 
    ```bash
-   npm start
+   npx expo run:android
    ```
 
-3. A **QR code** appears in the terminal. Open **Expo Go** on your phone →
-   _Scan QR code_.
+3. For JS-only changes, start the dev server and open the installed app
+   (hot reload, no rebuild):
 
-   The app loads on your phone and hot-reloads as you edit files. Shake the phone
-   for the dev menu.
+   ```bash
+   npx expo start --dev-client
+   ```
 
-> **Emulator instead of a phone?** With the dev server running, press `a` for an
-> Android emulator in the terminal (or use `npm run android`).
-
-### A note on notifications in Expo Go
-
-Expo Go is great for the UI and everyday flows. However, the **full notification
-behaviour** — background action handling and responding to **Taken** / **Snooze**
-while the app is killed — relies on native code and a registered background task,
-which Expo Go can't run. For that, use a **development build** or the **release
-APK** (see below). The in-app dose flow and history work fine in Expo Go.
+   If the app hangs on the splash screen, run `adb reverse tcp:8081 tcp:8081`
+   and relaunch.
 
 ## Database & migrations
 
@@ -103,7 +118,7 @@ The schema lives in [`src/config/db/schema.ts`](./src/config/db/schema.ts) and i
 the single source of truth. After changing it, generate a migration:
 
 ```bash
-npx drizzle-kit generate
+npx drizzle-kit generate --name <snake_case_description>
 ```
 
 This diffs the schema against the previous snapshot and writes a new versioned
@@ -127,13 +142,14 @@ cd android && ./gradlew assembleRelease
 
 ## Scripts
 
-| Command                    | What it does                            |
-| -------------------------- | --------------------------------------- |
-| `npm start`                | Start the Expo dev server (QR code)     |
-| `npm run android`          | Start and open on an Android emulator   |
-| `npm run lint`             | ESLint                                  |
-| `npm run typecheck`        | `tsc --noEmit`                          |
-| `npx drizzle-kit generate` | Generate a DB migration from the schema |
+| Command                                  | What it does                            |
+| ---------------------------------------- | --------------------------------------- |
+| `npm start`                              | Start the Expo dev server               |
+| `npm run android`                        | Build and run the dev build on Android  |
+| `npm run lint`                           | ESLint                                  |
+| `npm run typecheck`                      | `tsc --noEmit`                          |
+| `npm test`                               | Jest                                    |
+| `npx drizzle-kit generate --name <name>` | Generate a DB migration from the schema |
 
 CI runs lint + typecheck + test on every push and PR
 ([`.github/workflows/ci.yml`](./.github/workflows/ci.yml)).
