@@ -21,7 +21,7 @@ describe('renameCustomCategory', () => {
     expect(renameCategoryRows).toHaveBeenCalledWith('Vitamins', 'Minerals');
   });
 
-  it.each(['herbs', 'Medication', 'spray do nosa'])(
+  it.each(['herbs', 'Medication', 'spray do nosa', 'Lek', 'EYE DROPS'])(
     'rejects the colliding name "%s" without touching products',
     async (name) => {
       // when

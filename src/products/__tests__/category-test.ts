@@ -1,6 +1,7 @@
 import type { Translate } from '@/config/translate';
 
 import {
+  builtInForName,
   categoryLabel,
   categoryUnit,
   checkCustomCategoryName,
@@ -269,4 +270,51 @@ describe('checkCustomCategoryName', () => {
       expect(result).toEqual({ error: 'taken' });
     },
   );
+});
+
+describe('built-in labels from the locale files', () => {
+  it.each([
+    ['Lek', 'medication'],
+    ['suplement', 'supplement'],
+    ['PIELĘGNACJA', 'care'],
+    ['Medication', 'medication'],
+    ['  nasal   SPRAY ', 'nasal-spray'],
+    ['Eye drops', 'eye-drops'],
+    ['Spray do nosa', 'nasal-spray'],
+    ['krople do oczu', 'eye-drops'],
+    ['nasal-spray', 'nasal-spray'],
+  ])('maps "%s" to %s', (raw, expected) => {
+    // when
+    const result = normalizeCategory(raw, [raw]);
+
+    // then
+    expect(result).toBe(expected);
+  });
+
+  it.each(['Lek', 'Supplement', 'krople DO oczu', 'Care'])(
+    'rejects the custom name "%s" as taken',
+    (raw) => {
+      // when
+      const result = checkCustomCategoryName(raw, 'Vet gel', ['Vet gel']);
+
+      // then
+      expect(result).toEqual({ error: 'taken' });
+    },
+  );
+
+  it('accepts a name that is no built-in label', () => {
+    // when
+    const result = checkCustomCategoryName('Leki weterynaryjne', null, []);
+
+    // then
+    expect(result).toEqual({ name: 'Leki weterynaryjne' });
+  });
+
+  it('finds the built-in for a name and nothing for a custom one', () => {
+    // when
+    const results = ['lek', 'Vet gel', ''].map(builtInForName);
+
+    // then
+    expect(results).toEqual(['medication', undefined, undefined]);
+  });
 });

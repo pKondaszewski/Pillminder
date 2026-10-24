@@ -10,6 +10,7 @@ import {
   cancelDoseReminders,
   cancelReorderAlert,
 } from '@/notifications/notification-service';
+import { mergeBuiltInDuplicateCategories } from '@/products/product-service';
 
 import {
   type BackupParseResult,
@@ -69,6 +70,7 @@ export async function replaceAllWithBackup(rows: BackupRows): Promise<void> {
   log.info('Replacing all data with imported backup');
   const previous = await getAllRows();
   replaceAllRows(rows);
+  mergeBuiltInDuplicateCategories();
 
   // The data is committed at this point; a failure below only leaves
   // reminders to be rebuilt by the next app start.

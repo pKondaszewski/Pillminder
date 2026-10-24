@@ -10,6 +10,7 @@ import {
   getProductById,
   getProductIdsByCategory,
   getProductsByIds,
+  mergeBuiltInDuplicateCategoryRows,
   type Product,
   productsQuery,
   type ProductStatus,
@@ -58,6 +59,17 @@ export function listCustomCategories(): Promise<string[]> {
 
 export function listProductIdsByCategory(category: string): Promise<string[]> {
   return getProductIdsByCategory(category);
+}
+
+export function mergeBuiltInDuplicateCategories(): void {
+  try {
+    const merged = mergeBuiltInDuplicateCategoryRows();
+    if (merged > 0) {
+      log.info(`Merged ${merged} custom categories into built-ins`);
+    }
+  } catch (err) {
+    log.error('Merging duplicate categories failed', err);
+  }
 }
 
 export async function renameCustomCategory(

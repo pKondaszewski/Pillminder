@@ -24,6 +24,7 @@ import {
 import { useReorderNotifications } from '@/notifications/ui/use-reorder-notifications';
 import { OnboardingScreen } from '@/onboarding/ui/onboarding-screen';
 import { useOnboarding } from '@/onboarding/ui/use-onboarding';
+import { useCategoryMerge } from '@/products/ui/use-category-merge';
 import { MigrationErrorScreen } from '@/recovery/ui/migration-error-screen';
 import { applyStoredTheme } from '@/settings/settings-service';
 
@@ -99,5 +100,6 @@ function DatabaseBoundEffects() {
   useDoseSync();
   useLocationRefresh();
   useOrphanedImageCleanup();
+  useCategoryMerge();
   return null;
 }

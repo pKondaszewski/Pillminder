@@ -1,3 +1,5 @@
+import en from '@/config/i18n/locales/en.json';
+import pl from '@/config/i18n/locales/pl.json';
 import type { Translate } from '@/config/translate';
 
 import type { CategoryNameCheck } from './dto/category-name-check';
@@ -14,10 +16,15 @@ export const BUILT_IN_CATEGORIES: BuiltInCategory[] = [
   'eye-drops',
 ];
 
-const BUILT_IN_ALIASES: Record<string, BuiltInCategory> = {
-  'spray do nosa': 'nasal-spray',
-  'krople do oczu': 'eye-drops',
-};
+// Labels come from the locale files, so a new built-in or a renamed label
+// needs no second list here.
+const BUILT_IN_LABELS = new Map<string, BuiltInCategory>(
+  BUILT_IN_CATEGORIES.flatMap((category) =>
+    [en, pl].map(
+      (locale) => [locale.category[category].toLowerCase(), category] as const,
+    ),
+  ),
+);
 
 const BUILT_IN_STORE_SUGGESTIONS: Record<BuiltInCategory, string[]> = {
   care: ['rossmann', 'hebe', 'biedronka'],
@@ -82,16 +89,22 @@ export function storeSuggestionKeys(category: string): string[] {
     : [];
 }
 
+export function builtInForName(name: string): BuiltInCategory | undefined {
+  const key = cleanCategoryName(name).toLowerCase();
+  const slug = key.replace(/ /g, '-');
+  return (
+    BUILT_IN_CATEGORIES.find((c) => c === slug) ?? BUILT_IN_LABELS.get(key)
+  );
+}
+
 export function normalizeCategory(
   raw: string,
   existingCustomCategories: string[],
 ): string | null {
-  const cleaned = raw.trim().replace(/\s+/g, ' ');
+  const cleaned = cleanCategoryName(raw);
   if (cleaned === '') return null;
   const key = cleaned.toLowerCase();
-  const slug = key.replace(/ /g, '-');
-  const builtIn =
-    BUILT_IN_CATEGORIES.find((c) => c === slug) ?? BUILT_IN_ALIASES[key];
+  const builtIn = builtInForName(cleaned);
   if (builtIn) return builtIn;
   return (
     existingCustomCategories.find((c) => c.toLowerCase() === key) ?? cleaned
@@ -116,4 +129,8 @@ export function checkCustomCategoryName(
 
 export function categoryLabel(category: string, t: Translate): string {
   return isBuiltInCategory(category) ? t(`category.${category}`) : category;
+}
+
+function cleanCategoryName(raw: string): string {
+  return raw.trim().replace(/\s+/g, ' ');
 }
