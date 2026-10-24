@@ -11,6 +11,7 @@ const schedule: Schedule = {
   cyclePausedDays: 0,
   timesOfDay: ['08:00'],
   quantity: 1,
+  steps: null,
   startDate: null,
   endDate: null,
   pausedAt: new Date(2026, 9, 18),

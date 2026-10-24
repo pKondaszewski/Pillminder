@@ -235,3 +235,40 @@ describe('pausedDaysBefore', () => {
     expect(result).toBe(0);
   });
 });
+
+describe('pausedDaysBefore without a cycle', () => {
+  it('counts the pause for a rhythm that only has an anchor', () => {
+    // given
+    const rhythm: Rhythm = {
+      intervalDays: 1,
+      weekdays: null,
+      cycleAnchor: ANCHOR,
+      cyclePausedDays: 2,
+      pausedAt: january(10),
+      resumeAt: january(14),
+    };
+
+    // when
+    const result = [9, 12, 20].map((day) =>
+      pausedDaysBefore(rhythm, january(day)),
+    );
+
+    // then
+    expect(result).toEqual([2, 4, 6]);
+  });
+
+  it('is zero without an anchor', () => {
+    // given
+    const rhythm: Rhythm = {
+      intervalDays: 1,
+      weekdays: null,
+      pausedAt: january(10),
+    };
+
+    // when
+    const result = pausedDaysBefore(rhythm, january(20));
+
+    // then
+    expect(result).toBe(0);
+  });
+});

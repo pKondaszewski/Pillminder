@@ -1,4 +1,5 @@
 import type { ScheduleCycle } from './schedule-cycle';
+import type { ScheduleStep } from './schedule-step';
 
 export interface Rhythm {
   intervalDays: number;
@@ -6,6 +7,7 @@ export interface Rhythm {
   pausedAt?: Date | null;
   resumeAt?: Date | null;
   cycle?: ScheduleCycle | null;
+  steps?: ScheduleStep[] | null;
   cycleAnchor?: Date | null;
   cyclePausedDays?: number;
 }

@@ -31,16 +31,19 @@ export type {
   ScheduleKind,
   ScheduleListFilters,
 } from './dto/schedule-list-filters';
+export type { ScheduleStep } from './dto/schedule-step';
 export { occurrencesWithin, previewOccurrences } from './schedule-helper';
 export { isPaused } from './schedule-pause';
 export type { Schedule, ScheduleListItem } from './schedule-repository';
 export {
+  describeAmount,
   describeCourse,
   describeDays,
   describePause,
   describePeriod,
   describeRhythm,
 } from './schedule-rhythm';
+export { hasFiniteTaper, quantityOn } from './step-days';
 
 const log = createLogger('schedule-service');
 

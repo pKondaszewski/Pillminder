@@ -45,6 +45,7 @@ function schedule(overrides: Partial<Schedule> = {}): Schedule {
     cyclePausedDays: 0,
     timesOfDay: ['08:00'],
     quantity: 1,
+    steps: null,
     startDate: null,
     endDate: null,
     pausedAt: null,

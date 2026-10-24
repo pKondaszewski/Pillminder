@@ -18,6 +18,7 @@ import m0013 from './0013_add_as_needed_intakes.sql';
 import m0014 from './0014_add_product_store_link_target.sql';
 import m0015 from './0015_add_schedule_weekdays.sql';
 import m0016 from './0016_add_schedule_cycle.sql';
+import m0017 from './0017_add_schedule_steps.sql';
 
 export default {
   journal,
@@ -39,5 +40,6 @@ export default {
     m0014,
     m0015,
     m0016,
+    m0017,
   },
 };

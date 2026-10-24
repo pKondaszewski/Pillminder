@@ -108,6 +108,7 @@ function scheduleFields(input: NewScheduleInput, cycleState: CycleState) {
     ...cycleState,
     timesOfDay: input.timesOfDay,
     quantity: input.quantity ?? 1,
+    steps: input.steps ?? null,
     startDate: input.startDate ?? null,
     endDate: input.endDate ?? null,
   };

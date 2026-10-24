@@ -2,6 +2,7 @@ import type { Translate } from '@/config/translate';
 
 import type { Schedule } from '../schedule-repository';
 import {
+  describeAmount,
   describeCourse,
   describeDays,
   describeRhythm,
@@ -49,6 +50,7 @@ function schedule(overrides: Partial<Schedule>): Schedule {
     cyclePausedDays: 0,
     timesOfDay: ['08:00'],
     quantity: 1,
+    steps: null,
     startDate: null,
     endDate: null,
     pausedAt: null,
@@ -326,5 +328,88 @@ describe('describeDays with a cycle', () => {
 
     // then
     expect(result).toBe('So, Nd · 8 tyg. stosowania / 4 tyg. przerwy');
+  });
+});
+
+describe('describeAmount', () => {
+  const texts: Record<string, string> = {
+    'schedule.stepDays': '{{count}} dni',
+    'schedule.taperStops': '{{from}} → {{to}} w ciągu {{days}}',
+    'schedule.taperStays': '{{from}} → {{to}} od dnia {{day}}',
+    'unit.tablet': '{{count}} tabl.',
+  };
+  const tt: Translate = (key, options = {}) =>
+    Object.entries(options).reduce(
+      (text, [name, value]) => text.replace(`{{${name}}}`, String(value)),
+      texts[key] ?? key,
+    );
+  const prednisone = [
+    { days: 3, quantity: 4 },
+    { days: 3, quantity: 3 },
+    { days: 3, quantity: 2 },
+    { days: 3, quantity: 1 },
+  ];
+  const rampUp = [
+    { days: 7, quantity: 1 },
+    { days: null, quantity: 2 },
+  ];
+
+  it('reads a stopping taper from the first to the last quantity', () => {
+    // when
+    const result = describeAmount(5, prednisone, 'tablet', tt);
+
+    // then
+    expect(result).toBe('4 tabl. → 1 tabl. w ciągu 12 dni');
+  });
+
+  it('reads an open-ended taper with the day the last quantity starts', () => {
+    // when
+    const result = describeAmount(5, rampUp, 'tablet', tt);
+
+    // then
+    expect(result).toBe('1 tabl. → 2 tabl. od dnia 8');
+  });
+
+  it('shows plain numbers for a product without a unit', () => {
+    // when
+    const result = describeAmount(5, prednisone, null, tt);
+
+    // then
+    expect(result).toBe('4 → 1 w ciągu 12 dni');
+  });
+
+  it('reads a flat quantity as the bare amount with the unit', () => {
+    // when
+    const result = describeAmount(2, null, 'tablet', tt);
+
+    // then
+    expect(result).toBe('2 tabl.');
+  });
+
+  it('reads a flat quantity as the bare number without a unit', () => {
+    // when
+    const result = describeAmount(3, null, null, tt);
+
+    // then
+    expect(result).toBe('3');
+  });
+
+  it('replaces the quantity in the whole rhythm description', () => {
+    // given
+    const tapered = schedule({ steps: rampUp, quantity: 5 });
+
+    // when
+    const result = describeRhythm(
+      tapered,
+      tt,
+      formatDate,
+      null,
+      NOW,
+      joinTimes,
+      MONDAY,
+    );
+
+    // then
+    expect(result).toBe('schedule.daily · 08:00 · 1 → 2 od dnia 8');
   });
 });

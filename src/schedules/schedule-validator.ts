@@ -6,6 +6,12 @@ import {
   MAX_CYCLE_DAYS,
   type ScheduleCycle,
 } from './dto/schedule-cycle';
+import {
+  MAX_STEP_DAYS,
+  MAX_STEPS,
+  MIN_STEPS,
+  type ScheduleStep,
+} from './dto/schedule-step';
 
 export function isPositiveInteger(value: unknown): value is number {
   return Number.isInteger(value) && (value as number) >= 1;
@@ -34,6 +40,21 @@ export function isValidCycle(value: unknown): value is ScheduleCycle {
   );
 }
 
+export function isValidSteps(value: unknown): value is ScheduleStep[] {
+  return (
+    Array.isArray(value) &&
+    value.length >= MIN_STEPS &&
+    value.length <= MAX_STEPS &&
+    value.every(
+      (step, index) =>
+        typeof step === 'object' &&
+        step !== null &&
+        isPositiveInteger(step.quantity) &&
+        isValidStepDays(step.days, index === value.length - 1),
+    )
+  );
+}
+
 export function assertValidScheduleInput(input: NewScheduleInput): void {
   if (!isPositiveInteger(input.intervalDays)) {
     throw new Error(`Invalid intervalDays: ${input.intervalDays}`);
@@ -50,6 +71,9 @@ export function assertValidScheduleInput(input: NewScheduleInput): void {
   if (input.cycle != null && input.intervalDays !== 1) {
     throw new Error('Cycle cannot be combined with an interval');
   }
+  if (input.steps != null && !isValidSteps(input.steps)) {
+    throw new Error(`Invalid steps: ${JSON.stringify(input.steps)}`);
+  }
   if (input.quantity !== undefined && !isPositiveInteger(input.quantity)) {
     throw new Error(`Invalid quantity: ${input.quantity}`);
   }
@@ -57,4 +81,10 @@ export function assertValidScheduleInput(input: NewScheduleInput): void {
 
 function isCycleLength(value: unknown): value is number {
   return isPositiveInteger(value) && value <= MAX_CYCLE_DAYS;
+}
+
+// Only the last step may be open-ended: it then stays until the schedule ends.
+function isValidStepDays(value: unknown, isLast: boolean): boolean {
+  if (value === null) return isLast;
+  return isPositiveInteger(value) && value <= MAX_STEP_DAYS;
 }

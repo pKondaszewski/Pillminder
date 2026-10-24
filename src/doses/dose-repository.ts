@@ -1,9 +1,10 @@
-import { and, eq, gte, inArray, lt } from 'drizzle-orm';
+import { and, eq, getTableColumns, gte, inArray, lt } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/config/db/database';
 import { doses, productImages, products, schedules } from '@/config/db/schema';
 import { latestUseAt } from '@/intakes/intake-service';
+import { quantityOn } from '@/schedules/step-days';
 
 import { planPendingReplacement } from './dose-replacement';
 import { type DoseState, planDoseTransition } from './dose-transition';
@@ -34,7 +35,7 @@ export function dosesBetweenQuery(from: Date, to: Date) {
       fasting: products.fasting,
       stock: products.stock,
       profileImageFileName: productImages.fileName,
-      quantity: schedules.quantity,
+      schedule: getTableColumns(schedules),
     })
     .from(doses)
     .innerJoin(products, eq(doses.productId, products.id))
@@ -75,7 +76,7 @@ export async function setDoseStateRow(
     if (!dose) return;
 
     const schedule = tx
-      .select({ quantity: schedules.quantity })
+      .select()
       .from(schedules)
       .where(eq(schedules.id, dose.scheduleId))
       .get();
@@ -84,7 +85,7 @@ export async function setDoseStateRow(
     const transition = planDoseTransition(
       dose,
       state,
-      schedule?.quantity ?? 1,
+      schedule ? quantityOn(schedule, schedule.quantity, dose.plannedAt) : 1,
       takenAt,
     );
     if (!transition) return;

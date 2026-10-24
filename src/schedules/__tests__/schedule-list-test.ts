@@ -33,6 +33,7 @@ function item(
     cyclePausedDays: 0,
     timesOfDay: ['08:00'],
     quantity: 1,
+    steps: null,
     startDate: null,
     endDate: null,
     pausedAt: null,
@@ -345,5 +346,46 @@ describe('groupSchedules with archived products', () => {
 
     // then
     expect(result.map((g) => g.items.map((i) => i.id))).toEqual([['a']]);
+  });
+});
+
+describe('scheduleKind with steps', () => {
+  const steps = [
+    { days: 3, quantity: 2 },
+    { days: 3, quantity: 1 },
+  ];
+
+  it('is timed while a stopping taper runs', () => {
+    // given
+    const schedule = item('1', { steps, cycleAnchor: day(10, 18) });
+
+    // when
+    const result = scheduleKind(schedule, NOW);
+
+    // then
+    expect(result).toBe('timed');
+  });
+
+  it('is ended the day after the taper', () => {
+    // given
+    const schedule = item('1', { steps, cycleAnchor: day(10, 14) });
+
+    // when
+    const result = scheduleKind(schedule, NOW);
+
+    // then
+    expect(result).toBe('ended');
+  });
+
+  it('stays ongoing with an open-ended last step', () => {
+    // given
+    const open = [steps[0], { days: null, quantity: 3 }];
+    const schedule = item('1', { steps: open, cycleAnchor: day(10, 1) });
+
+    // when
+    const result = scheduleKind(schedule, NOW);
+
+    // then
+    expect(result).toBe('ongoing');
   });
 });

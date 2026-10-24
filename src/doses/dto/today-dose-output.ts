@@ -1,4 +1,5 @@
 import type { ProductUnit } from '@/products/product-service';
+import type { Schedule } from '@/schedules/schedule-service';
 
 import type { DoseState } from '../dose-transition';
 
@@ -17,7 +18,7 @@ export interface TodayDoseRow {
   fasting: boolean;
   stock: number | null;
   profileImageFileName: string | null;
-  quantity: number;
+  schedule: Schedule;
 }
 
 export interface TodayDose {

@@ -15,7 +15,7 @@ import type { ScheduleChange } from '@/schedules/dto/new-schedule-input';
 import { scheduleDraftErrors } from '@/schedules/schedule-draft';
 import type { Rhythm, Schedule } from '@/schedules/schedule-service';
 import { PeriodFields } from '@/schedules/ui/period-fields';
-import { QuantityStepper } from '@/schedules/ui/quantity-stepper';
+import { QuantityPicker } from '@/schedules/ui/quantity-picker';
 import { RhythmPicker } from '@/schedules/ui/rhythm-picker';
 import { TimeChips } from '@/schedules/ui/time-chips';
 
@@ -115,16 +115,19 @@ function TimesSheet({ schedule, onSave, onClose }: SheetProps) {
 
 function QuantitySheet({ schedule, unit, onSave, onClose }: SheetProps) {
   const { t } = useTranslation();
-  const [quantity, setQuantity] = useState(schedule.quantity);
+  const [amount, setAmount] = useState({
+    quantity: schedule.quantity,
+    steps: schedule.steps,
+  });
 
   return (
     <BottomSheet
       visible
       title={t('schedule.quantity')}
       onClose={onClose}
-      onSave={() => onSave({ quantity })}
+      onSave={() => onSave(amount)}
     >
-      <QuantityStepper quantity={quantity} unit={unit} onChange={setQuantity} />
+      <QuantityPicker {...amount} unit={unit} onChange={setAmount} />
       <ChangeNote />
     </BottomSheet>
   );

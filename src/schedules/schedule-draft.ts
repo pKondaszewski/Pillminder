@@ -37,6 +37,7 @@ export function draftSchedule(input: NewScheduleInput, now: Date): Schedule {
     ...cycleStateOf(input, undefined, now),
     timesOfDay: input.timesOfDay,
     quantity: input.quantity ?? 1,
+    steps: input.steps ?? null,
     startDate: input.startDate ?? null,
     endDate: input.endDate ?? null,
     pausedAt: null,
@@ -52,6 +53,7 @@ export function toScheduleInput(schedule: Schedule): NewScheduleInput {
     cycle: schedule.cycle,
     timesOfDay: schedule.timesOfDay,
     quantity: schedule.quantity,
+    steps: schedule.steps,
     startDate: schedule.startDate,
     endDate: schedule.endDate,
   };

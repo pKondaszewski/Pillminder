@@ -780,3 +780,80 @@ describe('occurrencesWithin with a cycle', () => {
     ]);
   });
 });
+
+describe('occurrencesWithin with steps', () => {
+  const prednisone: Rhythm = {
+    intervalDays: 1,
+    weekdays: null,
+    steps: [
+      { days: 3, quantity: 4 },
+      { days: 3, quantity: 1 },
+    ],
+    cycleAnchor: new Date(2026, 0, 9),
+    cyclePausedDays: 0,
+  };
+
+  it('generates the doses of the steps and then stops', () => {
+    // when
+    const result = occurrencesWithin(prednisone, ['18:00'], 20, {}, NOW);
+
+    // then
+    expect(result).toEqual([
+      at(1, 10, 18),
+      at(1, 11, 18),
+      at(1, 12, 18),
+      at(1, 13, 18),
+      at(1, 14, 18),
+    ]);
+  });
+
+  it('keeps generating after an open-ended last step', () => {
+    // given
+    const rampUp: Rhythm = {
+      ...prednisone,
+      steps: [
+        { days: 1, quantity: 1 },
+        { days: null, quantity: 2 },
+      ],
+    };
+
+    // when
+    const result = occurrencesWithin(rampUp, ['18:00'], 5, {}, NOW);
+
+    // then
+    expect(result).toHaveLength(5);
+  });
+
+  it('freezes the steps during a pause', () => {
+    // given
+    const period = { pausedAt: new Date(2026, 0, 9), resumeAt: at(1, 12, 0) };
+    const rhythm: Rhythm = {
+      ...prednisone,
+      cycleAnchor: new Date(2026, 0, 8),
+      ...period,
+    };
+
+    // when
+    const result = occurrencesWithin(rhythm, ['18:00'], 10, period, NOW);
+
+    // then
+    expect(result).toEqual([
+      at(1, 12, 18),
+      at(1, 13, 18),
+      at(1, 14, 18),
+      at(1, 15, 18),
+      at(1, 16, 18),
+    ]);
+  });
+
+  it('returns no previews once the taper is over', () => {
+    // given
+    const over: Rhythm = { ...prednisone, cycleAnchor: new Date(2025, 11, 1) };
+
+    // when
+    const result = occurrencesWithin(over, ['18:00'], 20, {}, NOW);
+
+    // then
+    expect(result).toEqual([]);
+  });
+});

@@ -3,6 +3,7 @@ import { addDays, startOfDay } from '@/config/date-utils';
 import type { Rhythm } from './dto/rhythm';
 import { isRhythmDay } from './rhythm-days';
 import { isPaused, type SchedulePeriod } from './schedule-pause';
+import { isTaperOver } from './step-days';
 
 const PREVIEW_COUNT = 3;
 const MAX_SCAN_DAYS = 3660;
@@ -73,7 +74,7 @@ function* occurrenceStream(
 
   let day = anchor >= earliest ? anchor : earliest;
   for (let scanned = 0; scanned < MAX_SCAN_DAYS; scanned++) {
-    if (lastDay && day > lastDay) return;
+    if ((lastDay && day > lastDay) || isTaperOver(rhythm, day)) return;
     if (isRhythmDay(rhythm, anchor, day)) {
       let previous: Date | null = null;
       for (const time of times) {

@@ -3,10 +3,11 @@ import { daysBetween } from '@/config/date-utils';
 
 import { cycleOnShare, isCycleOnDay } from './cycle-days';
 import type { Rhythm } from './dto/rhythm';
+import { isTaperOver } from './step-days';
 
 export function isRhythmDay(rhythm: Rhythm, anchor: Date, day: Date): boolean {
   const { intervalDays, weekdays } = rhythm;
-  if (!isCycleOnDay(rhythm, day)) return false;
+  if (!isCycleOnDay(rhythm, day) || isTaperOver(rhythm, day)) return false;
   if (weekdays) return weekdays.includes(day.getDay());
   return daysBetween(anchor, day) % intervalDays === 0;
 }
@@ -23,7 +24,7 @@ export function averageDayShare(rhythm: Rhythm): number {
 // stays averaged.
 export function dayShareOn(rhythm: Rhythm, day: Date): number {
   const { intervalDays, weekdays } = rhythm;
-  if (!isCycleOnDay(rhythm, day)) return 0;
+  if (!isCycleOnDay(rhythm, day) || isTaperOver(rhythm, day)) return 0;
   if (weekdays) return weekdays.includes(day.getDay()) ? 1 : 0;
   return 1 / intervalDays;
 }
