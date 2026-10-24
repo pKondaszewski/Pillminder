@@ -12,6 +12,7 @@ import { DOSE_STATES } from '../../doses/dose-transition';
 import { IMAGE_ROLES } from '../../images/image-role';
 import { PRODUCT_UNITS } from '../../products/dto/product-unit';
 import { STORE_LINK_TARGETS } from '../../products/dto/store-link-target';
+import type { ScheduleCycle } from '../../schedules/dto/schedule-cycle';
 
 export const products = sqliteTable('products', {
   id: text('id').primaryKey(),
@@ -47,6 +48,9 @@ export const schedules = sqliteTable(
       .references(() => products.id, { onDelete: 'cascade' }),
     intervalDays: integer('interval_days').notNull(),
     weekdays: text('weekdays', { mode: 'json' }).$type<number[]>(),
+    cycle: text('cycle', { mode: 'json' }).$type<ScheduleCycle>(),
+    cycleAnchor: integer('cycle_anchor', { mode: 'timestamp' }),
+    cyclePausedDays: integer('cycle_paused_days').notNull().default(0),
     timesOfDay: text('times_of_day', { mode: 'json' })
       .$type<string[]>()
       .notNull(),

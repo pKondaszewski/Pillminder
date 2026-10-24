@@ -1,5 +1,8 @@
+import { startOfDay } from '@/config/date-utils';
 import { createLogger } from '@/config/logger';
 
+import { pausedDaysBefore } from './cycle-days';
+import { cycleStateOf } from './cycle-state';
 import type { NewScheduleInput } from './dto/new-schedule-input';
 import {
   createScheduleRow,
@@ -15,8 +18,15 @@ import {
 } from './schedule-repository';
 import { assertValidScheduleInput } from './schedule-validator';
 
+export { cycleUnitKey, daysPerUnit } from './cycle-days';
 export type { CourseProgress } from './dto/course-progress';
+export type { CycleState } from './dto/cycle-state';
 export type { Rhythm } from './dto/rhythm';
+export {
+  type CycleUnit,
+  MAX_CYCLE_DAYS,
+  type ScheduleCycle,
+} from './dto/schedule-cycle';
 export type {
   ScheduleKind,
   ScheduleListFilters,
@@ -60,7 +70,10 @@ export async function createSchedule(
   log.info(`Adding schedule for product ${input.productId}`);
   try {
     assertValidScheduleInput(input);
-    const created = await createScheduleRow(input);
+    const created = await createScheduleRow(
+      input,
+      cycleStateOf(input, undefined, new Date()),
+    );
     log.info(`Created schedule ${JSON.stringify(created)}`);
     return created;
   } catch (err) {
@@ -76,7 +89,12 @@ export async function updateSchedule(
   log.info(`Updating schedule with id ${id}`);
   try {
     assertValidScheduleInput(input);
-    const updated = await updateScheduleRow(id, input);
+    const existing = await getScheduleById(id);
+    const updated = await updateScheduleRow(
+      id,
+      input,
+      cycleStateOf(input, existing, new Date()),
+    );
     log.info(`Updated schedule ${JSON.stringify(updated)}`);
     return updated;
   } catch (err) {
@@ -91,7 +109,12 @@ export async function suspendSchedule(
 ): Promise<Schedule> {
   log.info(`Pausing schedule ${id}`);
   try {
-    return await setSchedulePauseRow(id, { pausedAt: new Date(), resumeAt });
+    const now = new Date();
+    return await setSchedulePauseRow(id, {
+      pausedAt: now,
+      resumeAt,
+      cyclePausedDays: await settledPausedDays(id, now),
+    });
   } catch (err) {
     log.error(`Failed to pause schedule ${id}`, err);
     throw err;
@@ -101,7 +124,11 @@ export async function suspendSchedule(
 export async function reactivateSchedule(id: string): Promise<Schedule> {
   log.info(`Resuming schedule ${id}`);
   try {
-    return await setSchedulePauseRow(id, { pausedAt: null, resumeAt: null });
+    return await setSchedulePauseRow(id, {
+      pausedAt: null,
+      resumeAt: null,
+      cyclePausedDays: await settledPausedDays(id, new Date()),
+    });
   } catch (err) {
     log.error(`Failed to resume schedule ${id}`, err);
     throw err;
@@ -116,4 +143,11 @@ export async function deleteSchedule(id: string): Promise<void> {
     log.error(`Failed to delete schedule with id ${id}`, err);
     throw err;
   }
+}
+
+// Moves the pause that is ending (or being replaced) into the cycle's counter.
+async function settledPausedDays(id: string, now: Date): Promise<number> {
+  const schedule = await getScheduleById(id);
+  if (!schedule) throw new Error(`Schedule ${id} not found`);
+  return pausedDaysBefore(schedule, startOfDay(now));
 }

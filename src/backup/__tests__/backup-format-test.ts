@@ -136,6 +136,9 @@ describe('serializeBackup / parseBackup round trip', () => {
           productId: 'p1',
           intervalDays: 2,
           weekdays: null,
+          cycle: null,
+          cycleAnchor: null,
+          cyclePausedDays: 0,
           timesOfDay: ['08:00', '20:30'],
           quantity: 2,
           startDate: new Date('2026-01-01T00:00:00.000Z'),
@@ -148,6 +151,9 @@ describe('serializeBackup / parseBackup round trip', () => {
           productId: 'p2',
           intervalDays: 1,
           weekdays: [6, 0],
+          cycle: null,
+          cycleAnchor: null,
+          cyclePausedDays: 0,
           timesOfDay: ['09:00'],
           quantity: 1,
           startDate: null,
@@ -387,6 +393,114 @@ describe('parseBackup: older schema and unknown fields', () => {
       });
     },
   );
+
+  it('imports a schedule from a backup made before cycles without one', () => {
+    // given
+    const text = backupText({ version: 4, schedules: [schedule()] });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.schedules[0]).toMatchObject({
+      cycle: null,
+      cycleAnchor: null,
+      cyclePausedDays: 0,
+    });
+  });
+
+  it('keeps a cycle with its anchor and paused days through a round trip', () => {
+    // given
+    const cycle = { onDays: 56, offDays: 28, unit: 'weeks' };
+    const rows = rowsOf(
+      backupText({
+        schedules: [
+          schedule({
+            cycle,
+            cycleAnchor: '2026-01-05T00:00:00.000Z',
+            cyclePausedDays: 3,
+          }),
+        ],
+      }),
+    );
+
+    // when
+    const restored = rowsOf(serializeBackup(rows, EXPORTED_AT));
+
+    // then
+    expect(restored.schedules[0]).toMatchObject({
+      cycle,
+      cycleAnchor: new Date('2026-01-05T00:00:00.000Z'),
+      cyclePausedDays: 3,
+    });
+  });
+
+  it('writes a null cycle for a schedule without one', () => {
+    // given
+    const rows = rowsOf(backupText());
+
+    // when
+    const file = JSON.parse(serializeBackup(rows, EXPORTED_AT));
+
+    // then
+    expect(file.schedules[0]).toMatchObject({
+      cycle: null,
+      cycleAnchor: null,
+      cyclePausedDays: 0,
+    });
+  });
+
+  it.each([
+    [{ onDays: 0, offDays: 7, unit: 'days' }],
+    [{ onDays: 10, offDays: 7, unit: 'weeks' }],
+    [{ onDays: 21, offDays: 7 }],
+    ['21/7'],
+  ])('rejects the cycle %j', (cycle) => {
+    // given
+    const text = backupText({
+      schedules: [schedule({ cycle, cycleAnchor: '2026-01-05T00:00:00.000Z' })],
+    });
+
+    // when
+    const result = parseBackup(text);
+
+    // then
+    expect(result).toEqual({
+      ok: false,
+      error: { code: 'invalidRow', detail: 'schedules[0].cycle' },
+    });
+  });
+
+  it('rejects a cycle without an anchor day', () => {
+    // given
+    const cycle = { onDays: 21, offDays: 7, unit: 'days' };
+    const text = backupText({ schedules: [schedule({ cycle })] });
+
+    // when
+    const result = parseBackup(text);
+
+    // then
+    expect(result).toEqual({
+      ok: false,
+      error: { code: 'invalidRow', detail: 'schedules[0].cycleAnchor' },
+    });
+  });
+
+  it.each([-1, 1.5, '3'])('rejects the paused days %j', (days) => {
+    // given
+    const text = backupText({
+      schedules: [schedule({ cyclePausedDays: days })],
+    });
+
+    // when
+    const result = parseBackup(text);
+
+    // then
+    expect(result).toEqual({
+      ok: false,
+      error: { code: 'invalidRow', detail: 'schedules[0].cyclePausedDays' },
+    });
+  });
 
   it('keeps pause dates through a round trip', () => {
     // given
@@ -1301,8 +1415,8 @@ describe('parseBackup: as-needed intakes', () => {
     const file = JSON.parse(serializeBackup(rows, EXPORTED_AT));
 
     // then
-    expect(BACKUP_FORMAT_VERSION).toBe(4);
-    expect(file.version).toBe(4);
+    expect(BACKUP_FORMAT_VERSION).toBe(5);
+    expect(file.version).toBe(5);
     expect(file.asNeededIntakes[0].takenAt).toBe('2026-02-11T14:20:00.000Z');
   });
 

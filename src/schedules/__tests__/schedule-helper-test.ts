@@ -696,3 +696,87 @@ describe('weekday rhythms', () => {
     expect(result).toEqual([]);
   });
 });
+
+describe('occurrencesWithin with a cycle', () => {
+  const cycled = (overrides: Partial<Rhythm> = {}): Rhythm => ({
+    intervalDays: 1,
+    weekdays: null,
+    cycle: { onDays: 3, offDays: 2, unit: 'days' },
+    cycleAnchor: new Date(2026, 0, 8),
+    cyclePausedDays: 0,
+    ...overrides,
+  });
+
+  it('skips the off days of the cycle', () => {
+    // given
+    const rhythm = cycled();
+
+    // when
+    const result = occurrencesWithin(rhythm, ['18:00'], 10, {}, NOW);
+
+    // then
+    expect(result).toEqual([
+      at(1, 10, 18),
+      at(1, 13, 18),
+      at(1, 14, 18),
+      at(1, 15, 18),
+      at(1, 18, 18),
+      at(1, 19, 18),
+    ]);
+  });
+
+  it('starts a cycle that begins in the future on its first day', () => {
+    // given
+    const rhythm = cycled({ cycleAnchor: new Date(2026, 0, 15) });
+    const period = { startDate: new Date(2026, 0, 15) };
+
+    // when
+    const result = occurrencesWithin(rhythm, ['18:00'], 12, period, NOW);
+
+    // then
+    expect(result).toEqual([
+      at(1, 15, 18),
+      at(1, 16, 18),
+      at(1, 17, 18),
+      at(1, 20, 18),
+      at(1, 21, 18),
+    ]);
+  });
+
+  it('freezes the cycle during a pause', () => {
+    // given
+    const period = { pausedAt: new Date(2026, 0, 9), resumeAt: at(1, 12, 0) };
+    const rhythm = cycled(period);
+
+    // when
+    const result = occurrencesWithin(rhythm, ['18:00'], 6, period, NOW);
+
+    // then
+    expect(result).toEqual([
+      at(1, 12, 18),
+      at(1, 13, 18),
+      at(1, 16, 18),
+      at(1, 17, 18),
+    ]);
+  });
+
+  it('combines the cycle with weekdays', () => {
+    // given
+    const rhythm = cycled({
+      weekdays: [6, 0],
+      cycle: { onDays: 7, offDays: 7, unit: 'days' },
+      cycleAnchor: new Date(2026, 0, 5),
+    });
+
+    // when
+    const result = occurrencesWithin(rhythm, ['20:00'], 21, {}, NOW);
+
+    // then
+    expect(result).toEqual([
+      at(1, 10, 20),
+      at(1, 11, 20),
+      at(1, 24, 20),
+      at(1, 25, 20),
+    ]);
+  });
+});

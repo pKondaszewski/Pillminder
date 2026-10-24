@@ -10,6 +10,7 @@ import { ThemedView } from '@/commons/ui/themed-view';
 import { useFirstWeekday } from '@/commons/ui/use-format-date';
 import { DAYS_IN_WEEK, weekdayKeyOf } from '@/config/calendar-grid';
 import type { Rhythm } from '@/schedules/schedule-service';
+import { CyclePicker } from '@/schedules/ui/cycle-picker';
 
 type Props = {
   rhythm: Rhythm;
@@ -34,14 +35,19 @@ export function RhythmPicker({ rhythm, onChange }: Props) {
   const selectMode = (value: Mode) => {
     switch (value) {
       case 'daily':
-        return onChange({ intervalDays: 1, weekdays: null });
+        return onChange({ ...rhythm, intervalDays: 1, weekdays: null });
       case 'interval':
         return onChange({
           intervalDays: Math.max(intervalDays, MIN_INTERVAL_DAYS),
           weekdays: null,
+          cycle: null,
         });
       case 'weekdays':
-        return onChange({ intervalDays: 1, weekdays: [new Date().getDay()] });
+        return onChange({
+          ...rhythm,
+          intervalDays: 1,
+          weekdays: [new Date().getDay()],
+        });
     }
   };
 
@@ -50,7 +56,8 @@ export function RhythmPicker({ rhythm, onChange }: Props) {
       ? current.filter((selected) => selected !== day)
       : [...current, day];
     // At least one day stays selected, a schedule without any would never fire
-    if (next.length > 0) onChange({ intervalDays: 1, weekdays: next });
+    if (next.length > 0)
+      onChange({ ...rhythm, intervalDays: 1, weekdays: next });
   };
 
   return (
@@ -66,12 +73,12 @@ export function RhythmPicker({ rhythm, onChange }: Props) {
           incrementLabel={t('schedule.intervalMore')}
           onDecrement={() =>
             onChange({
+              ...rhythm,
               intervalDays: Math.max(MIN_INTERVAL_DAYS, intervalDays - 1),
-              weekdays: null,
             })
           }
           onIncrement={() =>
-            onChange({ intervalDays: intervalDays + 1, weekdays: null })
+            onChange({ ...rhythm, intervalDays: intervalDays + 1 })
           }
         >
           <ThemedText style={styles.value}>
@@ -93,6 +100,12 @@ export function RhythmPicker({ rhythm, onChange }: Props) {
             />
           ))}
         </ThemedView>
+      ) : null}
+      {mode !== 'interval' ? (
+        <CyclePicker
+          cycle={rhythm.cycle ?? null}
+          onChange={(cycle) => onChange({ ...rhythm, cycle })}
+        />
       ) : null}
     </ThemedView>
   );

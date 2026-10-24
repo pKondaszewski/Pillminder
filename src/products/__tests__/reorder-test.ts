@@ -15,6 +15,9 @@ function rhythm(overrides: Partial<Schedule>): Schedule {
     productId: 'product-1',
     intervalDays: 1,
     weekdays: null,
+    cycle: null,
+    cycleAnchor: null,
+    cyclePausedDays: 0,
     timesOfDay: ['08:00'],
     quantity: 1,
     startDate: null,
@@ -496,6 +499,67 @@ describe('consumptionBetween on weekdays', () => {
       schedules,
       new Date(2026, 0, 12),
       new Date(2026, 0, 16),
+    );
+
+    // then
+    expect(units).toBe(0);
+  });
+});
+
+describe('reorderStatus with a cycle', () => {
+  const cycled = (overrides: Partial<Schedule> = {}) =>
+    rhythm({
+      cycle: { onDays: 3, offDays: 2, unit: 'days' },
+      cycleAnchor: new Date(2026, 0, 10),
+      ...overrides,
+    });
+
+  it('averages the consumption over the on and off days', () => {
+    // given
+    const schedules = [cycled()];
+
+    // when
+    const status = reorderStatus(null, schedules, NOW);
+
+    // then
+    expect(status.dailyConsumption).toBeCloseTo(3 / 5);
+  });
+
+  it('spends nothing on the off days', () => {
+    // given
+    const stock = 4;
+
+    // when
+    const status = reorderStatus(stock, [cycled()], NOW);
+
+    // then
+    expect(status.daysLeft).toBeCloseTo(6);
+  });
+
+  it('counts only the on days inside a trip', () => {
+    // given
+    const schedules = [cycled({ quantity: 2 })];
+
+    // when
+    const units = consumptionBetween(
+      schedules,
+      new Date(2026, 0, 10),
+      new Date(2026, 0, 16),
+    );
+
+    // then
+    expect(units).toBe(10);
+  });
+
+  it('is zero for a trip that falls in the off days', () => {
+    // given
+    const schedules = [cycled()];
+
+    // when
+    const units = consumptionBetween(
+      schedules,
+      new Date(2026, 0, 13),
+      new Date(2026, 0, 14),
     );
 
     // then

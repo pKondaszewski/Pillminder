@@ -1,3 +1,4 @@
+import { cycleStateOf } from './cycle-state';
 import type { NewScheduleInput } from './dto/new-schedule-input';
 import { isPeriodInvalid } from './schedule-period';
 import type { Schedule } from './schedule-repository';
@@ -26,12 +27,14 @@ export function scheduleDraftErrors({
   };
 }
 
-export function draftSchedule(input: NewScheduleInput): Schedule {
+export function draftSchedule(input: NewScheduleInput, now: Date): Schedule {
   return {
     id: '',
     productId: input.productId,
     intervalDays: input.intervalDays,
     weekdays: input.weekdays ?? null,
+    cycle: input.cycle ?? null,
+    ...cycleStateOf(input, undefined, now),
     timesOfDay: input.timesOfDay,
     quantity: input.quantity ?? 1,
     startDate: input.startDate ?? null,
@@ -46,6 +49,7 @@ export function toScheduleInput(schedule: Schedule): NewScheduleInput {
     productId: schedule.productId,
     intervalDays: schedule.intervalDays,
     weekdays: schedule.weekdays,
+    cycle: schedule.cycle,
     timesOfDay: schedule.timesOfDay,
     quantity: schedule.quantity,
     startDate: schedule.startDate,

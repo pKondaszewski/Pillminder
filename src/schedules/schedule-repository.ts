@@ -4,6 +4,7 @@ import * as Crypto from 'expo-crypto';
 import { db } from '@/config/db/database';
 import { productImages, products, schedules } from '@/config/db/schema';
 
+import type { CycleState } from './dto/cycle-state';
 import type { NewScheduleInput } from './dto/new-schedule-input';
 
 export type Schedule = typeof schedules.$inferSelect;
@@ -53,12 +54,13 @@ export async function getSchedulesByProductId(
 
 export async function createScheduleRow(
   input: NewScheduleInput,
+  cycleState: CycleState,
 ): Promise<Schedule> {
   const [created] = await db
     .insert(schedules)
     .values({
       id: Crypto.randomUUID(),
-      ...scheduleFields(input),
+      ...scheduleFields(input, cycleState),
     })
     .returning();
   return created;
@@ -67,10 +69,11 @@ export async function createScheduleRow(
 export async function updateScheduleRow(
   id: string,
   input: NewScheduleInput,
+  cycleState: CycleState,
 ): Promise<Schedule> {
   const [updated] = await db
     .update(schedules)
-    .set(scheduleFields(input))
+    .set(scheduleFields(input, cycleState))
     .where(eq(schedules.id, id))
     .returning();
   return updated;
@@ -78,7 +81,11 @@ export async function updateScheduleRow(
 
 export async function setSchedulePauseRow(
   id: string,
-  pause: { pausedAt: Date | null; resumeAt: Date | null },
+  pause: {
+    pausedAt: Date | null;
+    resumeAt: Date | null;
+    cyclePausedDays: number;
+  },
 ): Promise<Schedule> {
   const [updated] = await db
     .update(schedules)
@@ -92,11 +99,13 @@ export async function deleteScheduleRow(id: string): Promise<void> {
   await db.delete(schedules).where(eq(schedules.id, id));
 }
 
-function scheduleFields(input: NewScheduleInput) {
+function scheduleFields(input: NewScheduleInput, cycleState: CycleState) {
   return {
     productId: input.productId,
     intervalDays: input.intervalDays,
     weekdays: input.weekdays ?? null,
+    cycle: input.cycle ?? null,
+    ...cycleState,
     timesOfDay: input.timesOfDay,
     quantity: input.quantity ?? 1,
     startDate: input.startDate ?? null,

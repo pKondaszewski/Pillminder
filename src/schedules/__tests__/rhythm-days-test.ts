@@ -87,3 +87,68 @@ describe('dayShareOn', () => {
     expect(share).toBe(0.5);
   });
 });
+
+describe('cycle consumption', () => {
+  const cycle = (onDays: number, offDays: number) =>
+    ({ onDays, offDays, unit: 'days' }) as const;
+  const anchor = new Date(2026, 0, 1);
+
+  it.each([
+    [cycle(21, 7), null, 0.75],
+    [cycle(56, 28), null, 2 / 3],
+    [cycle(7, 7), [6, 0], 1 / 7],
+  ])(
+    'averages the share of %j with weekdays %j to %d',
+    (cycleValue, weekdays, expected) => {
+      // given
+      const rhythm = {
+        intervalDays: 1,
+        weekdays,
+        cycle: cycleValue,
+        cycleAnchor: anchor,
+      };
+
+      // when
+      const share = averageDayShare(rhythm);
+
+      // then
+      expect(share).toBeCloseTo(expected);
+    },
+  );
+
+  it('consumes the full share on an on day and nothing on an off day', () => {
+    // given
+    const rhythm = {
+      intervalDays: 1,
+      weekdays: null,
+      cycle: cycle(3, 2),
+      cycleAnchor: anchor,
+    };
+
+    // when
+    const shares = [1, 3, 4, 5, 6].map((day) =>
+      dayShareOn(rhythm, new Date(2026, 0, day)),
+    );
+
+    // then
+    expect(shares).toEqual([1, 1, 0, 0, 1]);
+  });
+
+  it('consumes nothing on a weekday that falls in the off part', () => {
+    // given
+    const rhythm = {
+      intervalDays: 1,
+      weekdays: [6, 0],
+      cycle: cycle(7, 7),
+      cycleAnchor: new Date(2026, 0, 5),
+    };
+
+    // when
+    const shares = [10, 17, 24].map((day) =>
+      dayShareOn(rhythm, new Date(2026, 0, day)),
+    );
+
+    // then
+    expect(shares).toEqual([1, 0, 1]);
+  });
+});

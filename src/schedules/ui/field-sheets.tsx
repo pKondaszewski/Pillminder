@@ -74,6 +74,7 @@ function RhythmSheet({ schedule, onSave, onClose }: SheetProps) {
   const [rhythm, setRhythm] = useState<Rhythm>({
     intervalDays: schedule.intervalDays,
     weekdays: schedule.weekdays,
+    cycle: schedule.cycle,
   });
 
   return (

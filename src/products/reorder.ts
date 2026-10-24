@@ -131,9 +131,14 @@ function changesOverTime({
   endDate,
   pausedAt,
   weekdays,
+  cycle,
 }: Schedule): boolean {
   return (
-    startDate != null || endDate != null || pausedAt != null || weekdays != null
+    startDate != null ||
+    endDate != null ||
+    pausedAt != null ||
+    weekdays != null ||
+    cycle != null
   );
 }
 
