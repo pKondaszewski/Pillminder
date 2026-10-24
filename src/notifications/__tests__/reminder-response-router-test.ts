@@ -21,41 +21,51 @@ function handlers() {
   return {
     onTake: jest.fn(),
     onSnooze: jest.fn(),
-    onPracticeTake: jest.fn(),
-    onPracticeSnooze: jest.fn(),
     onReorder: jest.fn(),
     onAddPack: jest.fn(),
   };
 }
 
-describe('processReminderResponse for the practice reminder', () => {
-  it('finishes the practice without touching doses on Taken', () => {
+describe('processReminderResponse for a dose reminder', () => {
+  it('hands the dose to the Taken handler', () => {
     // given
     const given = handlers();
-    const response = responseTo('TAKE_ACTION', { type: 'practice' }, 'p-take');
+    const response = responseTo('TAKE_ACTION', { doseId: 'd1' }, 'd-take');
 
     // when
     const handled = processReminderResponse(response, given);
 
     // then
     expect(handled).toBe(true);
-    expect(given.onPracticeTake).toHaveBeenCalledTimes(1);
-    expect(given.onTake).not.toHaveBeenCalled();
+    expect(given.onTake).toHaveBeenCalledWith('d1');
   });
 
-  it('finishes the practice again when the reminder is delivered anew', () => {
+  it('hands the dose to the Snooze handler', () => {
+    // given
+    const given = handlers();
+    const response = responseTo('SNOOZE_ACTION', { doseId: 'd1' }, 'd-snooze');
+
+    // when
+    const handled = processReminderResponse(response, given);
+
+    // then
+    expect(handled).toBe(true);
+    expect(given.onSnooze).toHaveBeenCalledWith('d1');
+  });
+
+  it('handles the reminder again when it is delivered anew', () => {
     // given
     const given = handlers();
     const first = responseTo(
       'TAKE_ACTION',
-      { type: 'practice' },
-      'p-redelivered',
+      { doseId: 'd1' },
+      'd-redelivered',
       1000,
     );
     const again = responseTo(
       'TAKE_ACTION',
-      { type: 'practice' },
-      'p-redelivered',
+      { doseId: 'd1' },
+      'd-redelivered',
       2000,
     );
     processReminderResponse(first, given);
@@ -65,7 +75,7 @@ describe('processReminderResponse for the practice reminder', () => {
 
     // then
     expect(handled).toBe(true);
-    expect(given.onPracticeTake).toHaveBeenCalledTimes(2);
+    expect(given.onTake).toHaveBeenCalledTimes(2);
   });
 
   it('ignores the same delivery seen twice', () => {
@@ -73,8 +83,8 @@ describe('processReminderResponse for the practice reminder', () => {
     const given = handlers();
     const response = responseTo(
       'TAKE_ACTION',
-      { type: 'practice' },
-      'p-seen-twice',
+      { doseId: 'd1' },
+      'd-seen-twice',
       1000,
     );
     processReminderResponse(response, given);
@@ -84,42 +94,20 @@ describe('processReminderResponse for the practice reminder', () => {
 
     // then
     expect(handled).toBe(false);
-    expect(given.onPracticeTake).toHaveBeenCalledTimes(1);
+    expect(given.onTake).toHaveBeenCalledTimes(1);
   });
 
-  it('snoozes with the texts of the notification', () => {
+  it('ignores a response without a dose, like a leftover practice reminder', () => {
     // given
     const given = handlers();
-    const response = responseTo(
-      'SNOOZE_ACTION',
-      { type: 'practice' },
-      'p-snooze',
-    );
-
-    // when
-    const handled = processReminderResponse(response, given);
-
-    // then
-    expect(handled).toBe(true);
-    expect(given.onPracticeSnooze).toHaveBeenCalledWith({
-      title: 'Time',
-      body: 'Vit D',
-    });
-    expect(given.onSnooze).not.toHaveBeenCalled();
-  });
-
-  it('ignores a repeated response', () => {
-    // given
-    const given = handlers();
-    const response = responseTo('TAKE_ACTION', { type: 'practice' }, 'p-twice');
-    processReminderResponse(response, given);
+    const response = responseTo('TAKE_ACTION', { type: 'practice' }, 'p-left');
 
     // when
     const handled = processReminderResponse(response, given);
 
     // then
     expect(handled).toBe(false);
-    expect(given.onPracticeTake).toHaveBeenCalledTimes(1);
+    expect(given.onTake).not.toHaveBeenCalled();
   });
 });
 

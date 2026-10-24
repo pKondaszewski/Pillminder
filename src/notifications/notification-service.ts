@@ -18,14 +18,12 @@ import {
   BUY_ACTION,
   CATEGORY_ID,
   CHANNEL_ID,
-  PRACTICE_NOTIFICATION_ID,
   REORDER_CATEGORY_ID,
   REORDER_CHANNEL_ID,
   REORDER_PACK_CATEGORY_ID,
   SNOOZE_ACTION,
   TAKE_ACTION,
 } from './identifiers';
-import { PRACTICE_TYPE, practiceReminderAt } from './practice-reminder';
 import {
   doseNotificationIdentifiers,
   planDoseNotifications,
@@ -33,9 +31,7 @@ import {
 import { processReminderResponse } from './reminder-response-router';
 
 export type { NotificationPermission } from './dto/notification-permission';
-export type { NotificationText } from './dto/notification-text';
 export type { ReminderResponseHandlers } from './dto/reminder-response-handlers';
-export { practiceReminderAt } from './practice-reminder';
 
 export const isNotificationsSupported =
   Constants.executionEnvironment !== ExecutionEnvironment.StoreClient;
@@ -122,50 +118,6 @@ export async function cancelDoseReminder(doseId: string): Promise<void> {
 
 export async function cancelDoseReminders(doseIds: string[]): Promise<void> {
   await Promise.all(doseIds.map(cancelDoseReminder));
-}
-
-export async function schedulePracticeReminder(
-  texts: NotificationText,
-  at: Date,
-): Promise<void> {
-  if (!isNotificationsSupported) return;
-  try {
-    await Notifications.scheduleNotificationAsync({
-      identifier: PRACTICE_NOTIFICATION_ID,
-      content: {
-        title: texts.title,
-        body: texts.body,
-        categoryIdentifier: CATEGORY_ID,
-        data: {
-          type: PRACTICE_TYPE,
-          [ANDROID_TAG_KEY]: PRACTICE_NOTIFICATION_ID,
-        },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: at,
-        channelId: CHANNEL_ID,
-      },
-    });
-  } catch (err) {
-    log.error('Failed to schedule the practice reminder', err);
-  }
-}
-
-export function snoozePracticeReminder(texts: NotificationText): Promise<void> {
-  return schedulePracticeReminder(texts, practiceReminderAt(new Date()));
-}
-
-export async function cancelPracticeReminder(): Promise<void> {
-  if (!isNotificationsSupported) return;
-  try {
-    await Notifications.cancelScheduledNotificationAsync(
-      PRACTICE_NOTIFICATION_ID,
-    );
-    await Notifications.dismissNotificationAsync(PRACTICE_NOTIFICATION_ID);
-  } catch (err) {
-    log.warn('Failed to cancel the practice reminder', err);
-  }
 }
 
 export async function scheduleReorderAlert(
