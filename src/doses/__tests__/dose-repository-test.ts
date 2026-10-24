@@ -400,8 +400,6 @@ describe('replacePendingDoseRows', () => {
 
     // then
     expect(result.removedIds).toEqual(['obsolete']);
-    expect(result.kept.map((dose) => dose.id)).toEqual(['wanted']);
-    expect(result.inserted.map((dose) => dose.plannedAt)).toEqual([dayAfter]);
     expect(
       db
         .select()
@@ -468,7 +466,7 @@ describe('replacePendingDoseRows', () => {
     ]);
 
     // then
-    expect(result.inserted).toEqual([]);
+    expect(result.removedIds).toEqual([]);
     expect(db.select().from(doses).all()).toHaveLength(1);
   });
 

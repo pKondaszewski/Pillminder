@@ -239,7 +239,7 @@ export async function replacePendingDoseRows(
       )
       .all();
 
-    const { kept, removedIds, newSlots } = planPendingReplacement(
+    const { removedIds, newSlots } = planPendingReplacement(
       existing,
       slots,
       now,
@@ -249,10 +249,9 @@ export async function replacePendingDoseRows(
       tx.delete(doses).where(inArray(doses.id, removedIds)).run();
     }
 
-    if (newSlots.length === 0) return { removedIds, inserted: [], kept };
+    if (newSlots.length === 0) return { removedIds };
 
-    const inserted = tx
-      .insert(doses)
+    tx.insert(doses)
       .values(
         newSlots.map((slot) => ({
           id: Crypto.randomUUID(),
@@ -264,10 +263,9 @@ export async function replacePendingDoseRows(
         })),
       )
       .onConflictDoNothing()
-      .returning()
-      .all();
+      .run();
 
-    return { removedIds, inserted, kept };
+    return { removedIds };
   });
 }
 

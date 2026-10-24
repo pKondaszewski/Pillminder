@@ -31,6 +31,7 @@ jest.mock('@/notifications/notification-service', () => ({
   cancelDoseReminders: jest.fn().mockResolvedValue(undefined),
   dismissDoseReminder: jest.fn().mockResolvedValue(undefined),
   scheduleDoseReminder: jest.fn().mockResolvedValue(undefined),
+  scheduleDoseReminders: jest.fn().mockResolvedValue(undefined),
 }));
 jest.mock('@/settings/settings-service', () => ({
   getSnoozeMinutes: () => 10,

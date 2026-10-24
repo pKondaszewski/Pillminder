@@ -1,7 +1,7 @@
 import {
   cancelFutureDosesForSchedules,
   cancelPendingReminders,
-  refreshRemindersForProduct,
+  refreshAllReminders,
   syncDosesForSchedules,
 } from '@/doses/dose-service';
 import {
@@ -26,7 +26,7 @@ export async function editProduct(
   input: NewProductInput,
 ): Promise<void> {
   await updateProduct(id, input);
-  await refreshRemindersForProduct(id);
+  await refreshAllReminders();
 }
 
 export async function restockPack(id: string): Promise<void> {
@@ -56,8 +56,9 @@ export async function archiveProduct(
   completionNote?: string,
 ): Promise<string | null> {
   await setProductStatus(id, 'archived');
-  const schedules = await getSchedulesByProduct(id);
-  await cancelFutureDosesForSchedules(schedules.map((s) => s.id));
+  const scheduleIds = (await getSchedulesByProduct(id)).map((s) => s.id);
+  await cancelPendingReminders(scheduleIds);
+  await cancelFutureDosesForSchedules(scheduleIds);
   return completionNote ? addNote(id, completionNote) : null;
 }
 

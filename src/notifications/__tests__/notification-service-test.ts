@@ -1,9 +1,13 @@
 import * as Notifications from 'expo-notifications';
 
-import { scheduleDoseReminder } from '../notification-service';
+import {
+  scheduleDoseReminder,
+  scheduleDoseReminders,
+} from '../notification-service';
 
 jest.mock('expo-notifications', () => ({
   scheduleNotificationAsync: jest.fn().mockResolvedValue('id'),
+  cancelScheduledNotificationAsync: jest.fn().mockResolvedValue(undefined),
   SchedulableTriggerInputTypes: { DATE: 'date' },
 }));
 jest.mock('expo-constants', () => ({
@@ -52,5 +56,57 @@ describe('scheduleDoseReminder', () => {
       { doseId: 'dose-1', androidTag: 'dose-1' },
       { doseId: 'dose-1', androidTag: 'dose-1' },
     ]);
+  });
+});
+
+describe('scheduleDoseReminders', () => {
+  beforeEach(() => {
+    jest.useFakeTimers().setSystemTime(NOW);
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => jest.useRealTimers());
+
+  function dosesEveryDay(count: number, hour: number) {
+    return Array.from({ length: count }, (_, day) => ({
+      reminder: {
+        id: `d${day}-${hour}`,
+        plannedAt: new Date(2026, 0, 11 + day, hour, 0),
+      },
+      texts: TEXTS,
+    }));
+  }
+
+  it('cancels the alarms that no longer fit instead of scheduling them', async () => {
+    // given
+    const inputs = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19].flatMap(
+      (hour) => dosesEveryDay(30, hour),
+    );
+
+    // when
+    await scheduleDoseReminders(inputs);
+
+    // then
+    const scheduled = jest
+      .mocked(Notifications.scheduleNotificationAsync)
+      .mock.calls.map(([request]) => request.identifier);
+    const cancelled = jest
+      .mocked(Notifications.cancelScheduledNotificationAsync)
+      .mock.calls.map(([identifier]) => identifier);
+    expect(scheduled).not.toContain('d5-19:retry:2');
+    expect(cancelled).toContain('d5-19:retry:2');
+  });
+
+  it('keeps going when one alarm fails to schedule', async () => {
+    // given
+    jest
+      .mocked(Notifications.scheduleNotificationAsync)
+      .mockRejectedValueOnce(new Error('too many alarms'));
+
+    // when
+    await scheduleDoseReminders(dosesEveryDay(2, 20));
+
+    // then
+    expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledTimes(6);
   });
 });
