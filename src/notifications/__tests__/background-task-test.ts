@@ -3,11 +3,7 @@ import '../background-task';
 import type { NotificationResponse } from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
 
-import {
-  snoozeDose,
-  syncDosesForProductOfDose,
-  takeDose,
-} from '@/doses/dose-service';
+import { snoozeDose, syncAllSchedules, takeDose } from '@/doses/dose-service';
 
 import { SNOOZE_ACTION, TAKE_ACTION } from '../identifiers';
 
@@ -31,7 +27,7 @@ jest.mock('../../../drizzle/migrations', () => ({}));
 jest.mock('@/doses/dose-service', () => ({
   snoozeDose: jest.fn().mockResolvedValue(undefined),
   takeDose: jest.fn().mockResolvedValue(undefined),
-  syncDosesForProductOfDose: jest.fn().mockResolvedValue(undefined),
+  syncAllSchedules: jest.fn().mockResolvedValue(undefined),
 }));
 jest.mock('@/products/product-orchestrator', () => ({
   restockPack: jest.fn(),
@@ -61,22 +57,22 @@ async function runTask(actionIdentifier: string): Promise<void> {
 describe('background notification task', () => {
   beforeEach(() => jest.clearAllMocks());
 
-  it('syncs the doses of the product after a Take', async () => {
+  it('syncs all schedules after a Take', async () => {
     // when
     await runTask(TAKE_ACTION);
 
     // then
     expect(takeDose).toHaveBeenCalledWith('d1');
-    expect(syncDosesForProductOfDose).toHaveBeenCalledWith('d1');
+    expect(syncAllSchedules).toHaveBeenCalledTimes(1);
   });
 
-  it('syncs the doses of the product after a Snooze', async () => {
+  it('syncs all schedules after a Snooze', async () => {
     // when
     await runTask(SNOOZE_ACTION);
 
     // then
     expect(snoozeDose).toHaveBeenCalledWith('d1');
-    expect(syncDosesForProductOfDose).toHaveBeenCalledWith('d1');
+    expect(syncAllSchedules).toHaveBeenCalledTimes(1);
   });
 
   it('still syncs when the Take fails', async () => {
@@ -87,12 +83,12 @@ describe('background notification task', () => {
     await runTask(TAKE_ACTION);
 
     // then
-    expect(syncDosesForProductOfDose).toHaveBeenCalledWith('d1');
+    expect(syncAllSchedules).toHaveBeenCalledTimes(1);
   });
 
   it('does not throw when the sync fails', async () => {
     // given
-    (syncDosesForProductOfDose as jest.Mock).mockRejectedValueOnce(
+    (syncAllSchedules as jest.Mock).mockRejectedValueOnce(
       new Error('db locked'),
     );
 

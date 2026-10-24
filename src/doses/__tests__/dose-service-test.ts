@@ -17,7 +17,7 @@ import {
   refreshAllReminders,
   revertDose,
   skipDose,
-  syncDosesForProductOfDose,
+  syncAllSchedules,
   syncDosesForSchedules,
   takeDose,
 } from '../dose-service';
@@ -312,57 +312,31 @@ describe('dose service on a real database', () => {
     });
   });
 
-  describe('syncDosesForProductOfDose', () => {
-    it('extends the plan of the dose product to the full window', async () => {
-      // given
-      insertProduct({ id: 'p1' });
-      insertSchedule({ id: 's1', productId: 'p1', timesOfDay: ['20:00'] });
-      insertDose({
-        id: 'd1',
-        productId: 'p1',
-        scheduleId: 's1',
-        plannedAt: TODAY_EVENING,
-      });
-
-      // when
-      await syncDosesForProductOfDose('d1');
-
-      // then
-      expect(plannedTimes()).toHaveLength(30);
-    });
-
-    it('leaves the doses of other products alone', async () => {
+  describe('syncAllSchedules', () => {
+    it('extends the plan of every product to the full window', async () => {
       // given
       insertProduct({ id: 'p1' });
       insertProduct({ id: 'p2' });
       insertSchedule({ id: 's1', productId: 'p1', timesOfDay: ['20:00'] });
       insertSchedule({ id: 's2', productId: 'p2', timesOfDay: ['20:00'] });
-      insertDose({
-        id: 'd1',
-        productId: 'p1',
-        scheduleId: 's1',
-        plannedAt: TODAY_EVENING,
-      });
 
       // when
-      await syncDosesForProductOfDose('d1');
+      await syncAllSchedules();
 
       // then
-      const otherProductDoses = db
-        .select()
-        .from(doses)
-        .all()
-        .filter((dose) => dose.productId === 'p2');
-      expect(otherProductDoses).toEqual([]);
+      const plannedByProduct = (productId: string) =>
+        db
+          .select()
+          .from(doses)
+          .all()
+          .filter((dose) => dose.productId === productId);
+      expect(plannedByProduct('p1')).toHaveLength(30);
+      expect(plannedByProduct('p2')).toHaveLength(30);
     });
 
-    it('does nothing for an unknown dose', async () => {
-      // given
-      insertProduct({ id: 'p1' });
-      insertSchedule({ id: 's1', productId: 'p1', timesOfDay: ['20:00'] });
-
+    it('does nothing without schedules', async () => {
       // when
-      await syncDosesForProductOfDose('missing');
+      await syncAllSchedules();
 
       // then
       expect(plannedTimes()).toEqual([]);
