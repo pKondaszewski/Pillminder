@@ -9,3 +9,12 @@ export function doseStatus(
   if (state === 'skipped') return 'skipped';
   return plannedAt <= now ? 'overdue' : 'planned';
 }
+
+export function activeSnoozeEnd(
+  { state, snoozedUntil }: TodayDose,
+  now: Date,
+): Date | null {
+  return state === 'pending' && snoozedUntil && snoozedUntil > now
+    ? snoozedUntil
+    : null;
+}

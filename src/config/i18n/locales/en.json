@@ -381,6 +381,7 @@
     "lastUsedToday": "Last used: today, {{time}}",
     "lastUsedYesterday": "Last used: yesterday, {{time}}",
     "lowStockBanner": "{{name}} runs out in {{days}}",
+    "lowStockBannerNoDays": "{{name}} is running low",
     "lowStockOrder": "Order",
     "neverUsed": "Never used",
     "noMatching": "No matching products",
@@ -399,11 +400,15 @@
     "title": "Products",
     "travel": "Trip",
     "unitShort": {
-      "capsule": "{{count}} caps.",
-      "drop": "{{count}} drops",
+      "capsule_one": "{{count}} cap.",
+      "capsule_other": "{{count}} caps.",
+      "drop_one": "{{count}} drop",
+      "drop_other": "{{count}} drops",
       "ml": "{{count}} ml",
-      "tablet": "{{count}} tabs",
-      "spray": "{{count}} sprays"
+      "tablet_one": "{{count}} tab",
+      "tablet_other": "{{count}} tabs",
+      "spray_one": "{{count}} spray",
+      "spray_other": "{{count}} sprays"
     }
   },
   "schedule": {

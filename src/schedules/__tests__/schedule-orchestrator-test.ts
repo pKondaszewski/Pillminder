@@ -6,6 +6,7 @@ import {
   insertProduct,
   insertSchedule,
 } from '@/config/db/test-database';
+import { cancelDoseReminders } from '@/notifications/notification-service';
 
 import {
   addSchedule,
@@ -45,6 +46,7 @@ function doseCount() {
 describe('schedule orchestrator on a real database', () => {
   beforeEach(() => {
     jest.useFakeTimers({ now: NOW });
+    jest.clearAllMocks();
     clearTestDatabase();
     insertProduct({ id: 'p1' });
   });
@@ -145,5 +147,30 @@ describe('schedule orchestrator on a real database', () => {
         .all()
         .map((d) => d.id),
     ).toEqual(['other-dose']);
+  });
+
+  it('removeSchedule cancels the reminders of its overdue pending doses', async () => {
+    // given
+    insertSchedule({ id: 's1', productId: 'p1' });
+    insertDose({
+      id: 'overdue',
+      productId: 'p1',
+      scheduleId: 's1',
+      plannedAt: new Date('2026-03-09T19:00:00Z'),
+    });
+    insertDose({
+      id: 'taken',
+      productId: 'p1',
+      scheduleId: 's1',
+      plannedAt: new Date('2026-03-09T07:00:00Z'),
+      state: 'taken',
+      takenAt: NOW,
+    });
+
+    // when
+    await removeSchedule('s1');
+
+    // then
+    expect(cancelDoseReminders).toHaveBeenCalledWith(['overdue']);
   });
 });

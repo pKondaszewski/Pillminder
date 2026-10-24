@@ -7,7 +7,7 @@ export const PRODUCT_SEARCH_THRESHOLD = 8;
 
 export type LowStockProduct = {
   product: Product;
-  daysLeft: number;
+  daysLeft: number | null;
 };
 
 export const DEFAULT_PRODUCT_FILTERS: ProductListFilters = {
@@ -73,14 +73,13 @@ export function mostUrgentLowStock(
 ): LowStockProduct | null {
   const low = products.flatMap((product) => {
     const status = statuses[product.id];
-    return status?.isLow && status.daysLeft !== null
-      ? [{ product, daysLeft: status.daysLeft }]
-      : [];
+    return status?.isLow ? [{ product, daysLeft: status.daysLeft }] : [];
   });
   return (
     low.sort(
       (a, b) =>
-        a.daysLeft - b.daysLeft || a.product.id.localeCompare(b.product.id),
+        (a.daysLeft ?? Infinity) - (b.daysLeft ?? Infinity) ||
+        a.product.id.localeCompare(b.product.id),
     )[0] ?? null
   );
 }

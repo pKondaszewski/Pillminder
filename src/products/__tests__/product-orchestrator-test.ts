@@ -5,6 +5,7 @@ import { deleteProduct, listProductIdsByCategory } from '../product-service';
 
 jest.mock('@/doses/dose-service', () => ({
   cancelFutureDosesForSchedules: jest.fn().mockResolvedValue(undefined),
+  cancelPendingReminders: jest.fn().mockResolvedValue(undefined),
 }));
 jest.mock('@/images/image-service', () => ({
   deleteImageFiles: jest.fn(),

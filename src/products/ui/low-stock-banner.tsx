@@ -9,7 +9,7 @@ import { wholeDaysLeft } from '@/products/product-text';
 
 type Props = {
   productName: string;
-  daysLeft: number;
+  daysLeft: number | null;
   onPress: () => void;
   onOrder: () => void;
 };
@@ -34,10 +34,14 @@ export function LowStockBanner({
         style={styles.message}
       >
         <ThemedText type="smallBold" themeColor="overdueText">
-          {t('products.lowStockBanner', {
-            name: productName,
-            days: t('products.daysCount', { count: wholeDaysLeft(daysLeft) }),
-          })}
+          {daysLeft === null
+            ? t('products.lowStockBannerNoDays', { name: productName })
+            : t('products.lowStockBanner', {
+                name: productName,
+                days: t('products.daysCount', {
+                  count: wholeDaysLeft(daysLeft),
+                }),
+              })}
         </ThemedText>
       </Pressable>
       <Pressable

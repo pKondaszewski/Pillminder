@@ -159,7 +159,6 @@ export function editedProductInput(
     price: product.price,
     storeLink: product.storeLink,
     storeLinkTarget: product.storeLinkTarget,
-    stock: product.stock,
     packSize: product.packSize,
     reorderThreshold: product.reorderThreshold,
     fasting: product.fasting,

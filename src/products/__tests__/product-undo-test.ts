@@ -14,16 +14,21 @@ const product = {
   fasting: true,
 } as Product;
 
+function deps() {
+  return {
+    save: jest.fn().mockResolvedValue(undefined),
+    shiftStock: jest.fn().mockResolvedValue(undefined),
+  };
+}
+
 describe('productEditChange', () => {
   it('applies the patch and reverts to the full previous input', async () => {
     // given
-    const save = jest.fn().mockResolvedValue(undefined);
-    const change = productEditChange(
-      product,
-      { price: '25 zł' },
-      'Saved',
+    const { save, shiftStock } = deps();
+    const change = productEditChange(product, { price: '25 zł' }, 'Saved', {
       save,
-    );
+      shiftStock,
+    });
 
     // when
     await change.apply();
@@ -44,13 +49,11 @@ describe('productEditChange', () => {
 
   it('restores strength when the category change had cleared it', async () => {
     // given
-    const save = jest.fn().mockResolvedValue(undefined);
-    const change = productEditChange(
-      product,
-      { category: 'care' },
-      'Saved',
+    const { save, shiftStock } = deps();
+    const change = productEditChange(product, { category: 'care' }, 'Saved', {
       save,
-    );
+      shiftStock,
+    });
 
     // when
     await change.apply();
@@ -62,6 +65,63 @@ describe('productEditChange', () => {
       category: 'medication',
       strength: '50mcg',
     });
+  });
+});
+
+describe('productEditChange and the stock', () => {
+  it('does not write the stock when another field is edited or reverted', async () => {
+    // given
+    const { save, shiftStock } = deps();
+    const change = productEditChange(product, { price: '25 zł' }, 'Saved', {
+      save,
+      shiftStock,
+    });
+
+    // when
+    await change.apply();
+    await change.revert();
+
+    // then
+    expect(save.mock.calls[0][1]).not.toHaveProperty('stock');
+    expect(save.mock.calls[1][1]).not.toHaveProperty('stock');
+    expect(shiftStock).not.toHaveBeenCalled();
+  });
+
+  it('reverts a stock edit by the amount it changed, not to the old absolute value', async () => {
+    // given
+    const { save, shiftStock } = deps();
+    const change = productEditChange(product, { stock: 25 }, 'Saved', {
+      save,
+      shiftStock,
+    });
+
+    // when
+    await change.apply();
+    await change.revert();
+
+    // then
+    expect(save.mock.calls[0][1]).toMatchObject({ stock: 25 });
+    expect(save.mock.calls[1][1]).not.toHaveProperty('stock');
+    expect(shiftStock).toHaveBeenCalledWith('p1', -15);
+  });
+
+  it('restores the old stock when tracking was switched on or off', async () => {
+    // given
+    const { save, shiftStock } = deps();
+    const change = productEditChange(product, { stock: null }, 'Saved', {
+      save,
+      shiftStock,
+    });
+
+    // when
+    await change.revert();
+
+    // then
+    expect(save).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ stock: 10 }),
+    );
+    expect(shiftStock).not.toHaveBeenCalled();
   });
 });
 

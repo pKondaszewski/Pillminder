@@ -16,7 +16,7 @@ import {
   type ProductStatus,
   renameCategoryRows,
   setProductStatusRow,
-  setStockRow,
+  shiftStockRow,
   updateProductRow,
 } from './product-repository';
 
@@ -124,15 +124,12 @@ export async function addPackToStock(id: string): Promise<void> {
   }
 }
 
-export async function setStock(
-  id: string,
-  stock: number | null,
-): Promise<void> {
-  log.info(`Setting stock of product ${id} to ${stock}`);
+export async function shiftStock(id: string, delta: number): Promise<void> {
+  log.info(`Shifting stock of product ${id} by ${delta}`);
   try {
-    await setStockRow(id, stock);
+    await shiftStockRow(id, delta);
   } catch (err) {
-    log.error(`Failed to set stock of product ${id}`, err);
+    log.error(`Failed to shift stock of product ${id}`, err);
     throw err;
   }
 }
