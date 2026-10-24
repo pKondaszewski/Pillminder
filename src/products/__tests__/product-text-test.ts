@@ -23,7 +23,6 @@ const t = (key: string, options?: Record<string, string | number>) =>
 
 function reorder(overrides: Partial<ReorderStatus>): ReorderStatus {
   return {
-    dailyConsumption: 1,
     daysLeft: 17.2,
     runOutAt: new Date(2026, 10, 4),
     reorderAt: new Date(2026, 9, 28),

@@ -54,7 +54,7 @@ export function describeAmount(
   return unit ? formatAmount(quantity, unit, t) : String(quantity);
 }
 
-export function describePause(
+function describePause(
   { resumeAt }: Schedule,
   t: Translate,
   formatDate: (date: Date) => string,
@@ -74,6 +74,23 @@ export function describeCourse(
   return progress
     ? `${t('schedule.courseDay', { day: progress.day, total: progress.total })} · ${until}`
     : until;
+}
+
+export function describePeriod(
+  { startDate, endDate }: Schedule,
+  t: Translate,
+  formatDate: (date: Date) => string,
+): string {
+  if (startDate && endDate) {
+    return t('schedule.periodRange', {
+      from: formatDate(startDate),
+      to: formatDate(endDate),
+    });
+  }
+  if (startDate)
+    return t('schedule.periodFrom', { date: formatDate(startDate) });
+  if (endDate) return t('schedule.periodUntil', { date: formatDate(endDate) });
+  return '';
 }
 
 function describeFlatQuantity(
@@ -108,23 +125,6 @@ function describeTaper(
         ...amounts,
         days: t('schedule.stepDays', { count: totalDays }),
       });
-}
-
-export function describePeriod(
-  { startDate, endDate }: Schedule,
-  t: Translate,
-  formatDate: (date: Date) => string,
-): string {
-  if (startDate && endDate) {
-    return t('schedule.periodRange', {
-      from: formatDate(startDate),
-      to: formatDate(endDate),
-    });
-  }
-  if (startDate)
-    return t('schedule.periodFrom', { date: formatDate(startDate) });
-  if (endDate) return t('schedule.periodUntil', { date: formatDate(endDate) });
-  return '';
 }
 
 function inWeekOrder(weekdays: number[], firstWeekday: number): number[] {

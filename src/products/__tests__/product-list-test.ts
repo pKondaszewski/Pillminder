@@ -207,7 +207,6 @@ describe('categoryFilterIfListed', () => {
 
 describe('mostUrgentLowStock', () => {
   const status = (daysLeft: number | null, isLow: boolean): ReorderStatus => ({
-    dailyConsumption: 1,
     daysLeft,
     runOutAt: null,
     reorderAt: null,

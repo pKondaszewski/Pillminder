@@ -1,3 +1,10 @@
+const ORDINAL_SUFFIXES: Partial<Record<Intl.LDMLPluralRule, string>> = {
+  one: 'st',
+  two: 'nd',
+  few: 'rd',
+  other: 'th',
+};
+
 export function resolveDateLocale(
   language: string,
   region: string | null,
@@ -100,10 +107,3 @@ function withOrdinal(day: number, locale: string): string {
   if (!locale.startsWith('en')) return String(day);
   return `${day}${ORDINAL_SUFFIXES[new Intl.PluralRules('en', { type: 'ordinal' }).select(day)] ?? 'th'}`;
 }
-
-const ORDINAL_SUFFIXES: Partial<Record<Intl.LDMLPluralRule, string>> = {
-  one: 'st',
-  two: 'nd',
-  few: 'rd',
-  other: 'th',
-};

@@ -12,7 +12,6 @@ const formatDate = () => '20.12.2026';
 
 function status(overrides: Partial<ReorderStatus>): ReorderStatus {
   return {
-    dailyConsumption: 1,
     daysLeft: 60,
     runOutAt: RUN_OUT_AT,
     reorderAt: null,

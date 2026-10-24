@@ -2,7 +2,6 @@ import type { Coords } from './dto/coords';
 
 export interface SunTimes {
   sunrise: Date;
-  noon: Date;
   sunset: Date;
 }
 
@@ -45,7 +44,6 @@ export function sunTimes(
 
   return {
     sunrise: at(noonMinutes - hourAngleMinutes),
-    noon: at(noonMinutes),
     sunset: at(noonMinutes + hourAngleMinutes),
   };
 }

@@ -8,7 +8,7 @@ import {
   isValidSnoozeMinutes,
   SNOOZE_MINUTES_MAX,
   SNOOZE_MINUTES_MIN,
-} from '@/settings/settings-store';
+} from '@/settings/settings-service';
 
 type Props = {
   minutes: number;
