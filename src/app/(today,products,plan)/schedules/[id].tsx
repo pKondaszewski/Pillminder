@@ -110,9 +110,7 @@ export default function ScheduleScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{ headerShown: true, title: t('schedule.editTitle') }}
-      />
+      <Stack.Screen options={{ headerShown: true, title: '' }} />
       <ThemedView style={styles.container}>
         <ScrollView contentContainerStyle={styles.content}>
           <ScheduleProductCard
