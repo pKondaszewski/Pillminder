@@ -1,4 +1,5 @@
 import { addDays, MS_PER_DAY, startOfDay } from '@/config/date-utils';
+import { averageDayShare, dayShareOn } from '@/schedules/rhythm-days';
 import { isPaused } from '@/schedules/schedule-pause';
 import type { Schedule } from '@/schedules/schedule-service';
 
@@ -12,7 +13,7 @@ export function reorderStatus(
   schedules: Schedule[],
   now: Date,
 ): ReorderStatus {
-  const dailyConsumption = totalDailyConsumption(schedules, now);
+  const dailyConsumption = totalConsumption(schedules, now, averageDayShare);
   const daysLeft =
     stock == null
       ? null
@@ -85,7 +86,7 @@ export function consumptionBetween(
     day <= startOfDay(lastDay);
     day = addDays(day, 1)
   ) {
-    units += totalDailyConsumption(schedules, day);
+    units += totalConsumption(schedules, day, dayShareOn);
   }
   return units;
 }
@@ -113,7 +114,11 @@ function simulateDaysUntilEmpty(
   let remaining = stock;
 
   for (let day = 0; day < MAX_SIMULATED_DAYS; day++) {
-    const consumption = totalDailyConsumption(schedules, addDays(today, day));
+    const consumption = totalConsumption(
+      schedules,
+      addDays(today, day),
+      dayShareOn,
+    );
     if (consumption <= 0) continue;
     if (remaining <= consumption) return day + remaining / consumption;
     remaining -= consumption;
@@ -121,16 +126,28 @@ function simulateDaysUntilEmpty(
   return null;
 }
 
-function changesOverTime({ startDate, endDate, pausedAt }: Schedule): boolean {
-  return startDate != null || endDate != null || pausedAt != null;
+function changesOverTime({
+  startDate,
+  endDate,
+  pausedAt,
+  weekdays,
+}: Schedule): boolean {
+  return (
+    startDate != null || endDate != null || pausedAt != null || weekdays != null
+  );
 }
 
-function totalDailyConsumption(schedules: Schedule[], on: Date): number {
+function totalConsumption(
+  schedules: Schedule[],
+  on: Date,
+  dayShare: (schedule: Schedule, day: Date) => number,
+): number {
   return schedules
     .filter((schedule) => isActiveOn(schedule, on))
     .reduce(
-      (units, { intervalDays, timesOfDay, quantity }) =>
-        units + (timesOfDay.length * quantity) / intervalDays,
+      (units, schedule) =>
+        units +
+        schedule.timesOfDay.length * schedule.quantity * dayShare(schedule, on),
       0,
     );
 }

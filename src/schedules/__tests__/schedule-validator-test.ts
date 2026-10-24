@@ -55,3 +55,41 @@ describe('assertValidScheduleInput', () => {
     expect(validate).toThrow();
   });
 });
+
+describe('assertValidScheduleInput weekdays', () => {
+  it('accepts a list of weekdays with a one-day interval', () => {
+    // given
+    const valid = input({ weekdays: [6, 0] });
+
+    // when
+    const validate = () => assertValidScheduleInput(valid);
+
+    // then
+    expect(validate).not.toThrow();
+  });
+
+  it.each([[[]], [[7]], [[-1]], [[1.5]], [[1, 1]]])(
+    'rejects the weekdays %j',
+    (weekdays) => {
+      // given
+      const invalid = input({ weekdays });
+
+      // when
+      const validate = () => assertValidScheduleInput(invalid);
+
+      // then
+      expect(validate).toThrow('Invalid weekdays');
+    },
+  );
+
+  it('rejects weekdays combined with an interval', () => {
+    // given
+    const invalid = input({ weekdays: [1], intervalDays: 2 });
+
+    // when
+    const validate = () => assertValidScheduleInput(invalid);
+
+    // then
+    expect(validate).toThrow('Weekdays cannot be combined');
+  });
+});

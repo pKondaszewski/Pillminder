@@ -135,6 +135,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           id: 's1',
           productId: 'p1',
           intervalDays: 2,
+          weekdays: null,
           timesOfDay: ['08:00', '20:30'],
           quantity: 2,
           startDate: new Date('2026-01-01T00:00:00.000Z'),
@@ -146,6 +147,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           id: 's2',
           productId: 'p2',
           intervalDays: 1,
+          weekdays: [6, 0],
           timesOfDay: ['09:00'],
           quantity: 1,
           startDate: null,
@@ -330,6 +332,61 @@ describe('parseBackup: older schema and unknown fields', () => {
     // then
     expect(rows.schedules[0]).toMatchObject({ pausedAt: null, resumeAt: null });
   });
+
+  it('imports a schedule from a backup made before weekdays as an interval', () => {
+    // given
+    const text = backupText({ version: 3, schedules: [schedule()] });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.schedules[0]).toMatchObject({
+      intervalDays: 1,
+      weekdays: null,
+    });
+  });
+
+  it('keeps weekdays through a round trip', () => {
+    // given
+    const rows = rowsOf(
+      backupText({ schedules: [schedule({ weekdays: [6, 0] })] }),
+    );
+
+    // when
+    const restored = rowsOf(serializeBackup(rows, EXPORTED_AT));
+
+    // then
+    expect(restored.schedules[0]).toMatchObject({ weekdays: [6, 0] });
+  });
+
+  it('writes null weekdays for an interval schedule', () => {
+    // given
+    const rows = rowsOf(backupText());
+
+    // when
+    const file = JSON.parse(serializeBackup(rows, EXPORTED_AT));
+
+    // then
+    expect(file.schedules[0].weekdays).toBeNull();
+  });
+
+  it.each([[[]], [[7]], ['mon'], [[1, 'x']], [[1, 1]]])(
+    'rejects the weekdays %j',
+    (weekdays) => {
+      // given
+      const text = backupText({ schedules: [schedule({ weekdays })] });
+
+      // when
+      const result = parseBackup(text);
+
+      // then
+      expect(result).toEqual({
+        ok: false,
+        error: { code: 'invalidRow', detail: 'schedules[0].weekdays' },
+      });
+    },
+  );
 
   it('keeps pause dates through a round trip', () => {
     // given
@@ -1244,8 +1301,8 @@ describe('parseBackup: as-needed intakes', () => {
     const file = JSON.parse(serializeBackup(rows, EXPORTED_AT));
 
     // then
-    expect(BACKUP_FORMAT_VERSION).toBe(3);
-    expect(file.version).toBe(3);
+    expect(BACKUP_FORMAT_VERSION).toBe(4);
+    expect(file.version).toBe(4);
     expect(file.asNeededIntakes[0].takenAt).toBe('2026-02-11T14:20:00.000Z');
   });
 

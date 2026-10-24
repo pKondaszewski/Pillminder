@@ -31,6 +31,7 @@ export function draftSchedule(input: NewScheduleInput): Schedule {
     id: '',
     productId: input.productId,
     intervalDays: input.intervalDays,
+    weekdays: input.weekdays ?? null,
     timesOfDay: input.timesOfDay,
     quantity: input.quantity ?? 1,
     startDate: input.startDate ?? null,
@@ -44,6 +45,7 @@ export function toScheduleInput(schedule: Schedule): NewScheduleInput {
   return {
     productId: schedule.productId,
     intervalDays: schedule.intervalDays,
+    weekdays: schedule.weekdays,
     timesOfDay: schedule.timesOfDay,
     quantity: schedule.quantity,
     startDate: schedule.startDate,

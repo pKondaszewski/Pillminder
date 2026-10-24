@@ -499,6 +499,7 @@
     "noMatching": "Brak pasujących harmonogramów",
     "noMatchingProducts": "Brak pasujących produktów",
     "noProducts": "Najpierw dodaj produkt",
+    "onWeekdays": "Dni tygodnia",
     "pauseAction": "Wstrzymaj harmonogram",
     "paused": "Wstrzymany",
     "pausedToast": "Wstrzymano harmonogram",
@@ -543,7 +544,8 @@
     "stockLow": "Zapas {{amount}} wystarczy tylko do {{date}}",
     "submit": "Dodaj harmonogram",
     "timesOfDay": "Godziny",
-    "timesRequired": "Dodaj co najmniej jedną godzinę"
+    "timesRequired": "Dodaj co najmniej jedną godzinę",
+    "weeklyOn": "Co tydzień: {{day}}"
   },
   "settings": {
     "aboutLink": "Pillminder na GitHubie",

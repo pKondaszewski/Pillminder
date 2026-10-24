@@ -37,6 +37,7 @@ function schedule(overrides: Partial<Schedule>): Schedule {
     id: 's1',
     productId: 'p1',
     intervalDays: 1,
+    weekdays: null,
     timesOfDay: ['08:00', '20:00'],
     quantity: 1,
     startDate: null,
@@ -169,10 +170,12 @@ describe('supplyHint', () => {
   });
 });
 
+const MONDAY = 1;
+
 describe('rhythmSummary', () => {
   it('has a message for a product without a schedule', () => {
     // when
-    const text = rhythmSummary([], t, joinTimes);
+    const text = rhythmSummary([], t, joinTimes, MONDAY);
 
     // then
     expect(text).toBe('products.noSchedule');
@@ -180,7 +183,7 @@ describe('rhythmSummary', () => {
 
   it('describes a single schedule with its times', () => {
     // when
-    const text = rhythmSummary([schedule({})], t, joinTimes);
+    const text = rhythmSummary([schedule({})], t, joinTimes, MONDAY);
 
     // then
     expect(text).toBe('schedule.daily · 08:00, 20:00');
@@ -188,7 +191,12 @@ describe('rhythmSummary', () => {
 
   it('describes a schedule repeating every few days', () => {
     // when
-    const text = rhythmSummary([schedule({ intervalDays: 3 })], t, joinTimes);
+    const text = rhythmSummary(
+      [schedule({ intervalDays: 3 })],
+      t,
+      joinTimes,
+      MONDAY,
+    );
 
     // then
     expect(text).toBe('schedule.everyXDays {"days":3} · 08:00, 20:00');
@@ -200,6 +208,7 @@ describe('rhythmSummary', () => {
       [schedule({}), schedule({ id: 's2' })],
       t,
       joinTimes,
+      MONDAY,
     );
 
     // then

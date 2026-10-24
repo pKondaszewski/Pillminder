@@ -46,6 +46,7 @@ export const schedules = sqliteTable(
       .notNull()
       .references(() => products.id, { onDelete: 'cascade' }),
     intervalDays: integer('interval_days').notNull(),
+    weekdays: text('weekdays', { mode: 'json' }).$type<number[]>(),
     timesOfDay: text('times_of_day', { mode: 'json' })
       .$type<string[]>()
       .notNull(),

@@ -5,7 +5,11 @@ import { MIN_TOUCH_SIZE, Radius, Spacing } from '@/commons/ui/constants/theme';
 import { ProductAvatar } from '@/commons/ui/product-avatar';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
-import { useFormatDate, useFormatTime } from '@/commons/ui/use-format-date';
+import {
+  useFirstWeekday,
+  useFormatDate,
+  useFormatTime,
+} from '@/commons/ui/use-format-date';
 import {
   courseProgress,
   scheduleProductLabel,
@@ -38,6 +42,7 @@ export function ScheduleRow({
   const { t } = useTranslation();
   const formatDate = useFormatDate();
   const { formatTimes } = useFormatTime();
+  const firstWeekday = useFirstWeekday();
   const progress = courseProgress(item, now);
   const productArchived = item.productStatus === 'archived';
   const dimmed = kind === 'paused' || kind === 'ended';
@@ -70,6 +75,7 @@ export function ScheduleRow({
                 item.productUnit,
                 now,
                 formatTimes,
+                firstWeekday,
               )}
             </ThemedText>
             {productArchived ? (

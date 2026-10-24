@@ -1,9 +1,14 @@
+import type { Rhythm } from '../dto/rhythm';
 import {
   nextOccurrences,
   occurrencesWithin,
   previewOccurrences,
 } from '../schedule-helper';
 
+const every = (intervalDays: number): Rhythm => ({
+  intervalDays,
+  weekdays: null,
+});
 const NOW = new Date(2026, 0, 10, 12, 0);
 
 function at(month: number, day: number, hours: number, minutes = 0): Date {
@@ -16,7 +21,7 @@ describe('occurrencesWithin', () => {
     const timesOfDay = ['18:00'];
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 3, {}, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 3, {}, NOW);
 
     // then
     expect(result).toEqual([at(1, 10, 18), at(1, 11, 18), at(1, 12, 18)]);
@@ -27,7 +32,7 @@ describe('occurrencesWithin', () => {
     const timesOfDay = ['20:00', '08:00', '14:00'];
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 2, {}, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 2, {}, NOW);
 
     // then
     expect(result).toEqual([
@@ -44,7 +49,7 @@ describe('occurrencesWithin', () => {
     const timesOfDay = ['08:00'];
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 2, {}, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 2, {}, NOW);
 
     // then
     expect(result).toEqual([at(1, 11, 8)]);
@@ -55,7 +60,7 @@ describe('occurrencesWithin', () => {
     const timesOfDay = ['13:00'];
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 1, {}, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 1, {}, NOW);
 
     // then
     expect(result).toEqual([at(1, 10, 13)]);
@@ -66,7 +71,7 @@ describe('occurrencesWithin', () => {
     const timesOfDay = ['12:00'];
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 1, {}, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 1, {}, NOW);
 
     // then
     expect(result).toEqual([at(1, 10, 12)]);
@@ -77,7 +82,7 @@ describe('occurrencesWithin', () => {
     const timesOfDay = ['00:00', '23:59'];
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 2, {}, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 2, {}, NOW);
 
     // then
     expect(result).toEqual([
@@ -92,7 +97,7 @@ describe('occurrencesWithin', () => {
     const timesOfDay = ['18:00'];
 
     // when
-    const result = occurrencesWithin(3, timesOfDay, 10, {}, NOW);
+    const result = occurrencesWithin(every(3), timesOfDay, 10, {}, NOW);
 
     // then
     expect(result).toEqual([
@@ -108,7 +113,7 @@ describe('occurrencesWithin', () => {
     const timesOfDay = ['08:00'];
 
     // when
-    const result = occurrencesWithin(3, timesOfDay, 10, {}, NOW);
+    const result = occurrencesWithin(every(3), timesOfDay, 10, {}, NOW);
 
     // then
     expect(result).toEqual([at(1, 13, 8), at(1, 16, 8), at(1, 19, 8)]);
@@ -120,7 +125,7 @@ describe('occurrencesWithin', () => {
     const period = { startDate: at(1, 8, 0) };
 
     // when
-    const result = occurrencesWithin(3, timesOfDay, 6, period, NOW);
+    const result = occurrencesWithin(every(3), timesOfDay, 6, period, NOW);
 
     // then
     expect(result).toEqual([at(1, 11, 18), at(1, 14, 18)]);
@@ -132,7 +137,7 @@ describe('occurrencesWithin', () => {
     const period = { startDate: at(1, 4, 0) };
 
     // when
-    const result = occurrencesWithin(3, timesOfDay, 4, period, NOW);
+    const result = occurrencesWithin(every(3), timesOfDay, 4, period, NOW);
 
     // then
     expect(result).toEqual([at(1, 10, 18), at(1, 13, 18)]);
@@ -144,7 +149,7 @@ describe('occurrencesWithin', () => {
     const period = { startDate: at(1, 12, 0) };
 
     // when
-    const result = occurrencesWithin(2, timesOfDay, 7, period, NOW);
+    const result = occurrencesWithin(every(2), timesOfDay, 7, period, NOW);
 
     // then
     expect(result).toEqual([at(1, 12, 8), at(1, 14, 8), at(1, 16, 8)]);
@@ -156,7 +161,7 @@ describe('occurrencesWithin', () => {
     const period = { endDate: at(1, 12, 0) };
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 10, period, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 10, period, NOW);
 
     // then
     expect(result).toEqual([
@@ -174,7 +179,7 @@ describe('occurrencesWithin', () => {
     const period = { endDate: at(1, 11, 23, 59) };
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 10, period, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 10, period, NOW);
 
     // then
     expect(result).toEqual([at(1, 11, 8)]);
@@ -186,7 +191,7 @@ describe('occurrencesWithin', () => {
     const period = { endDate: at(1, 9, 0) };
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 10, period, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 10, period, NOW);
 
     // then
     expect(result).toEqual([]);
@@ -198,7 +203,7 @@ describe('occurrencesWithin', () => {
     const period = { startDate: at(1, 20, 0), endDate: at(1, 15, 0) };
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 30, period, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 30, period, NOW);
 
     // then
     expect(result).toEqual([]);
@@ -209,7 +214,7 @@ describe('occurrencesWithin', () => {
     const timesOfDay: string[] = [];
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, 5, {}, NOW);
+    const result = occurrencesWithin(every(1), timesOfDay, 5, {}, NOW);
 
     // then
     expect(result).toEqual([]);
@@ -220,7 +225,13 @@ describe('occurrencesWithin', () => {
     const timesOfDay = ['18:00'];
 
     // when
-    const result = occurrencesWithin(1, timesOfDay, horizonDays, {}, NOW);
+    const result = occurrencesWithin(
+      every(1),
+      timesOfDay,
+      horizonDays,
+      {},
+      NOW,
+    );
 
     // then
     expect(result).toEqual([]);
@@ -244,7 +255,7 @@ describe('occurrencesWithin', () => {
       const now = at(3, 27, 12);
 
       // when
-      const result = occurrencesWithin(1, timesOfDay, 5, {}, now);
+      const result = occurrencesWithin(every(1), timesOfDay, 5, {}, now);
 
       // then
       expect(result).toEqual([
@@ -262,7 +273,7 @@ describe('occurrencesWithin', () => {
       const now = at(10, 23, 12);
 
       // when
-      const result = occurrencesWithin(1, timesOfDay, 4, {}, now);
+      const result = occurrencesWithin(every(1), timesOfDay, 4, {}, now);
 
       // then
       expect(result).toEqual([
@@ -283,7 +294,7 @@ describe('occurrencesWithin', () => {
       const now = at(3, 28, 12);
 
       // when
-      const result = occurrencesWithin(2, timesOfDay, 6, period, now);
+      const result = occurrencesWithin(every(2), timesOfDay, 6, period, now);
 
       // then
       expect(result).toEqual([at(3, 29, 8), at(3, 31, 8), at(4, 2, 8)]);
@@ -296,7 +307,7 @@ describe('occurrencesWithin', () => {
       const now = at(10, 25, 12);
 
       // when
-      const result = occurrencesWithin(2, timesOfDay, 5, period, now);
+      const result = occurrencesWithin(every(2), timesOfDay, 5, period, now);
 
       // then
       expect(result).toEqual([at(10, 27, 8), at(10, 29, 8)]);
@@ -309,7 +320,7 @@ describe('occurrencesWithin', () => {
       const now = at(3, 28, 12);
 
       // when
-      const result = occurrencesWithin(1, timesOfDay, 5, period, now);
+      const result = occurrencesWithin(every(1), timesOfDay, 5, period, now);
 
       // then
       expect(result).toEqual([at(3, 29, 8)]);
@@ -321,7 +332,7 @@ describe('occurrencesWithin', () => {
       const now = at(10, 24, 12);
 
       // when
-      const result = occurrencesWithin(1, timesOfDay, 2, {}, now);
+      const result = occurrencesWithin(every(1), timesOfDay, 2, {}, now);
 
       // then
       expect(result).toEqual([at(10, 25, 0)]);
@@ -333,7 +344,7 @@ describe('occurrencesWithin', () => {
       const now = at(3, 28, 12);
 
       // when
-      const result = occurrencesWithin(1, timesOfDay, 3, {}, now);
+      const result = occurrencesWithin(every(1), timesOfDay, 3, {}, now);
 
       // then
       expect(result).toEqual([at(3, 29, 3, 30), at(3, 30, 2, 30)]);
@@ -345,7 +356,7 @@ describe('occurrencesWithin', () => {
       const now = at(3, 29, 0);
 
       // when
-      const result = occurrencesWithin(1, timesOfDay, 1, {}, now);
+      const result = occurrencesWithin(every(1), timesOfDay, 1, {}, now);
 
       // then
       expect(result).toEqual([at(3, 29, 3, 30)]);
@@ -357,7 +368,7 @@ describe('occurrencesWithin', () => {
       const now = at(10, 24, 12);
 
       // when
-      const result = occurrencesWithin(1, timesOfDay, 3, {}, now);
+      const result = occurrencesWithin(every(1), timesOfDay, 3, {}, now);
 
       // then
       expect(result).toEqual([at(10, 25, 2, 30), at(10, 26, 2, 30)]);
@@ -370,7 +381,7 @@ describe('occurrencesWithin', () => {
       const period = { pausedAt: at(1, 9, 8), resumeAt: null };
 
       // when
-      const result = occurrencesWithin(1, ['08:00'], 3, period, NOW);
+      const result = occurrencesWithin(every(1), ['08:00'], 3, period, NOW);
 
       // then
       expect(result).toEqual([]);
@@ -381,7 +392,7 @@ describe('occurrencesWithin', () => {
       const period = { pausedAt: at(1, 9, 8), resumeAt: at(1, 12, 0) };
 
       // when
-      const result = occurrencesWithin(1, ['08:00'], 3, period, NOW);
+      const result = occurrencesWithin(every(1), ['08:00'], 3, period, NOW);
 
       // then
       expect(result).toEqual([at(1, 12, 8), at(1, 13, 8), at(1, 14, 8)]);
@@ -392,7 +403,7 @@ describe('occurrencesWithin', () => {
       const period = { pausedAt: at(1, 9, 8), resumeAt: at(2, 1, 0) };
 
       // when
-      const result = occurrencesWithin(1, ['08:00'], 2, period, NOW);
+      const result = occurrencesWithin(every(1), ['08:00'], 2, period, NOW);
 
       // then
       expect(result).toEqual([at(2, 1, 8), at(2, 2, 8)]);
@@ -403,7 +414,7 @@ describe('occurrencesWithin', () => {
       const period = { pausedAt: at(1, 9, 8), resumeAt: at(1, 15, 0) };
 
       // when
-      const result = occurrencesWithin(3, ['08:00'], 7, period, NOW);
+      const result = occurrencesWithin(every(3), ['08:00'], 7, period, NOW);
 
       // then
       expect(result).toEqual([at(1, 15, 8), at(1, 18, 8), at(1, 21, 8)]);
@@ -418,7 +429,7 @@ describe('occurrencesWithin', () => {
       };
 
       // when
-      const result = occurrencesWithin(3, ['08:00'], 7, period, NOW);
+      const result = occurrencesWithin(every(3), ['08:00'], 7, period, NOW);
 
       // then
       expect(result).toEqual([at(1, 16, 8), at(1, 19, 8)]);
@@ -429,7 +440,7 @@ describe('occurrencesWithin', () => {
       const period = { pausedAt: at(1, 1, 8), resumeAt: at(1, 5, 0) };
 
       // when
-      const result = occurrencesWithin(1, ['08:00'], 3, period, NOW);
+      const result = occurrencesWithin(every(1), ['08:00'], 3, period, NOW);
 
       // then
       expect(result).toEqual([at(1, 11, 8), at(1, 12, 8)]);
@@ -443,7 +454,7 @@ describe('nextOccurrences', () => {
     const timesOfDay = ['08:00', '20:00'];
 
     // when
-    const result = nextOccurrences(1, timesOfDay, 3, {}, NOW);
+    const result = nextOccurrences(every(1), timesOfDay, 3, {}, NOW);
 
     // then
     expect(result).toEqual([at(1, 10, 20), at(1, 11, 8), at(1, 11, 20)]);
@@ -455,7 +466,7 @@ describe('nextOccurrences', () => {
     const period = { endDate: at(1, 11, 0) };
 
     // when
-    const result = nextOccurrences(1, timesOfDay, 5, period, NOW);
+    const result = nextOccurrences(every(1), timesOfDay, 5, period, NOW);
 
     // then
     expect(result).toEqual([at(1, 10, 18), at(1, 11, 18)]);
@@ -467,7 +478,7 @@ describe('nextOccurrences', () => {
     const period = { startDate: at(2, 1, 0) };
 
     // when
-    const result = nextOccurrences(7, timesOfDay, 2, period, NOW);
+    const result = nextOccurrences(every(7), timesOfDay, 2, period, NOW);
 
     // then
     expect(result).toEqual([at(2, 1, 8), at(2, 8, 8)]);
@@ -478,7 +489,7 @@ describe('nextOccurrences', () => {
     const timesOfDay: string[] = [];
 
     // when
-    const result = nextOccurrences(1, timesOfDay, 3, {}, NOW);
+    const result = nextOccurrences(every(1), timesOfDay, 3, {}, NOW);
 
     // then
     expect(result).toEqual([]);
@@ -489,7 +500,7 @@ describe('nextOccurrences', () => {
     const timesOfDay = ['08:00'];
 
     // when
-    const result = nextOccurrences(1, timesOfDay, count, {}, NOW);
+    const result = nextOccurrences(every(1), timesOfDay, count, {}, NOW);
 
     // then
     expect(result).toEqual([]);
@@ -500,7 +511,7 @@ describe('nextOccurrences', () => {
     const timesOfDay = ['08:00'];
 
     // when
-    const result = nextOccurrences(365, timesOfDay, 2, {}, NOW);
+    const result = nextOccurrences(every(365), timesOfDay, 2, {}, NOW);
 
     // then
     expect(result).toEqual([
@@ -516,7 +527,7 @@ describe('previewOccurrences', () => {
     const timesOfDay = ['08:00'];
 
     // when
-    const result = previewOccurrences(1, timesOfDay, {}, NOW);
+    const result = previewOccurrences(every(1), timesOfDay, {}, NOW);
 
     // then
     expect(result).toEqual([at(1, 11, 8), at(1, 12, 8), at(1, 13, 8)]);
@@ -528,9 +539,160 @@ describe('previewOccurrences', () => {
     const period = { startDate: at(1, 20, 0), endDate: at(1, 21, 0) };
 
     // when
-    const result = previewOccurrences(1, timesOfDay, period, NOW);
+    const result = previewOccurrences(every(1), timesOfDay, period, NOW);
 
     // then
     expect(result).toEqual([at(1, 20, 8), at(1, 21, 8)]);
+  });
+});
+
+describe('weekday rhythms', () => {
+  const weekdays = (days: number[]): Rhythm => ({
+    intervalDays: 1,
+    weekdays: days,
+  });
+  const SATURDAY = 6;
+  const SUNDAY = 0;
+  const MONDAY = 1;
+  const WEDNESDAY = 3;
+  const FRIDAY = 5;
+
+  it('plans only the chosen days, in calendar order', () => {
+    // given
+    const rhythm = weekdays([SUNDAY, SATURDAY]);
+
+    // when
+    const result = occurrencesWithin(rhythm, ['09:00'], 14, {}, NOW);
+
+    // then
+    expect(result).toEqual([at(1, 11, 9), at(1, 17, 9), at(1, 18, 9)]);
+  });
+
+  it('skips a chosen day that already passed today', () => {
+    // given
+    const rhythm = weekdays([SATURDAY]);
+
+    // when
+    const result = occurrencesWithin(rhythm, ['08:00'], 8, {}, NOW);
+
+    // then
+    expect(result).toEqual([at(1, 17, 8)]);
+  });
+
+  it('plans a once-a-week schedule across a week boundary', () => {
+    // given
+    const rhythm = weekdays([MONDAY]);
+    const now = at(1, 11, 12);
+
+    // when
+    const result = nextOccurrences(rhythm, ['08:00'], 3, {}, now);
+
+    // then
+    expect(result).toEqual([at(1, 12, 8), at(1, 19, 8), at(1, 26, 8)]);
+  });
+
+  it('keeps the days when the period starts in the middle of a week', () => {
+    // given
+    const rhythm = weekdays([MONDAY, WEDNESDAY, FRIDAY]);
+    const period = { startDate: at(1, 14, 0) };
+
+    // when
+    const result = occurrencesWithin(rhythm, ['08:00'], 10, period, NOW);
+
+    // then
+    expect(result).toEqual([at(1, 14, 8), at(1, 16, 8), at(1, 19, 8)]);
+  });
+
+  it('stops at the end date', () => {
+    // given
+    const rhythm = weekdays([MONDAY, WEDNESDAY, FRIDAY]);
+    const period = { endDate: at(1, 14, 0) };
+
+    // when
+    const result = occurrencesWithin(rhythm, ['08:00'], 14, period, NOW);
+
+    // then
+    expect(result).toEqual([at(1, 12, 8), at(1, 14, 8)]);
+  });
+
+  it('resumes on the next chosen day after a pause', () => {
+    // given
+    const rhythm = weekdays([MONDAY, FRIDAY]);
+    const period = { pausedAt: at(1, 9, 0), resumeAt: at(1, 13, 0) };
+
+    // when
+    const result = occurrencesWithin(rhythm, ['08:00'], 10, period, NOW);
+
+    // then
+    expect(result).toEqual([at(1, 16, 8), at(1, 19, 8)]);
+  });
+
+  it('plans nothing while paused without a resume date', () => {
+    // given
+    const rhythm = weekdays([SATURDAY]);
+    const period = { pausedAt: at(1, 9, 0), resumeAt: null };
+
+    // when
+    const result = occurrencesWithin(rhythm, ['08:00'], 14, period, NOW);
+
+    // then
+    expect(result).toEqual([]);
+  });
+
+  it('plans several times on each chosen day', () => {
+    // given
+    const rhythm = weekdays([SUNDAY]);
+
+    // when
+    const result = nextOccurrences(rhythm, ['20:00', '08:00'], 3, {}, NOW);
+
+    // then
+    expect(result).toEqual([at(1, 11, 8), at(1, 11, 20), at(1, 18, 8)]);
+  });
+
+  it('keeps the wall-clock time across the spring forward weekend', () => {
+    // given
+    const rhythm = weekdays([SATURDAY, SUNDAY]);
+    const now = at(3, 27, 12);
+
+    // when
+    const result = occurrencesWithin(rhythm, ['08:00'], 3, {}, now);
+
+    // then
+    expect(result).toEqual([at(3, 28, 8), at(3, 29, 8)]);
+  });
+
+  it('keeps the wall-clock time across the fall back weekend', () => {
+    // given
+    const rhythm = weekdays([SATURDAY, SUNDAY]);
+    const now = at(10, 23, 12);
+
+    // when
+    const result = occurrencesWithin(rhythm, ['08:00'], 3, {}, now);
+
+    // then
+    expect(result).toEqual([at(10, 24, 8), at(10, 25, 8)]);
+  });
+
+  it('plans every day when all seven days are chosen', () => {
+    // given
+    const rhythm = weekdays([0, 1, 2, 3, 4, 5, 6]);
+
+    // when
+    const result = occurrencesWithin(rhythm, ['08:00'], 4, {}, NOW);
+
+    // then
+    expect(result).toEqual([at(1, 11, 8), at(1, 12, 8), at(1, 13, 8)]);
+  });
+
+  it('plans nothing for an empty day list', () => {
+    // given
+    const rhythm = weekdays([]);
+
+    // when
+    const result = occurrencesWithin(rhythm, ['08:00'], 14, {}, NOW);
+
+    // then
+    expect(result).toEqual([]);
   });
 });

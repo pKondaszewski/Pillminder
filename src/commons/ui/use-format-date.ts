@@ -1,6 +1,7 @@
 import { getLocales } from 'expo-localization';
 import { useTranslation } from 'react-i18next';
 
+import { firstWeekdayOf } from '@/config/calendar-grid';
 import {
   formatDateTime,
   formatLongDate,
@@ -10,6 +11,7 @@ import {
   is24HourClock,
   resolveDateLocale,
 } from '@/config/format-date';
+import type { SupportedLanguage } from '@/config/i18n';
 
 export function useDateLocale(): string {
   const { i18n } = useTranslation();
@@ -20,6 +22,11 @@ export function useFormatDate(): (date: Date, withWeekday?: boolean) => string {
   const locale = useDateLocale();
   return (date, withWeekday) =>
     formatLongDate(date, locale, new Date(), withWeekday);
+}
+
+export function useFirstWeekday(): number {
+  const { language } = useTranslation().i18n;
+  return firstWeekdayOf(language as SupportedLanguage);
 }
 
 export type TimeFormatter = {

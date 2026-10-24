@@ -96,6 +96,7 @@ function scheduleFields(input: NewScheduleInput) {
   return {
     productId: input.productId,
     intervalDays: input.intervalDays,
+    weekdays: input.weekdays ?? null,
     timesOfDay: input.timesOfDay,
     quantity: input.quantity ?? 1,
     startDate: input.startDate ?? null,

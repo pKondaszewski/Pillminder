@@ -1,6 +1,7 @@
 export interface NewScheduleInput {
   productId: string;
   intervalDays: number;
+  weekdays?: number[] | null;
   timesOfDay: string[];
   quantity?: number;
   startDate?: Date | null;
@@ -9,6 +10,7 @@ export interface NewScheduleInput {
 
 export interface ScheduleChange {
   intervalDays?: number;
+  weekdays?: number[] | null;
   timesOfDay?: string[];
   quantity?: number;
   startDate?: Date | null;

@@ -27,6 +27,7 @@ function item(
     id,
     productId: `product-${id}`,
     intervalDays: 1,
+    weekdays: null,
     timesOfDay: ['08:00'],
     quantity: 1,
     startDate: null,

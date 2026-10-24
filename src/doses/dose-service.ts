@@ -212,7 +212,7 @@ export async function syncDosesForSchedules(
       product?.status === 'archived'
         ? []
         : occurrencesWithin(
-            schedule.intervalDays,
+            schedule,
             schedule.timesOfDay,
             DOSE_HORIZON_DAYS,
             schedule,
