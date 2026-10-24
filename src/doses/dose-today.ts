@@ -11,7 +11,9 @@ export function toTodayDose({
 }: TodayDoseRow): TodayDose {
   return {
     ...row,
-    quantity: quantityOn(schedule, schedule.quantity, row.plannedAt),
+    quantity: schedule
+      ? quantityOn(schedule, schedule.quantity, row.plannedAt)
+      : (row.takenQuantity ?? 1),
     productName: productLabel(row.productName, productStrength),
     stockTracked: stock !== null,
   };

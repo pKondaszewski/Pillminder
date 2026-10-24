@@ -18,7 +18,7 @@ export interface TodayDoseRow {
   fasting: boolean;
   stock: number | null;
   profileImageFileName: string | null;
-  schedule: Schedule;
+  schedule: Schedule | null;
 }
 
 export interface TodayDose {

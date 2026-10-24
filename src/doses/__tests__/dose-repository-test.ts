@@ -12,6 +12,7 @@ import {
 
 import {
   deleteFuturePendingDoseRowsForSchedules,
+  dosesBetweenQuery,
   replacePendingDoseRows,
   setDoseStateRow,
 } from '../dose-repository';
@@ -327,6 +328,27 @@ describe('setDoseStateRow', () => {
     expect(productRow()).toMatchObject({ stock: 10, lastUsedAt: null });
   });
 
+  it('takes a dose of a deleted schedule as one unit and gives back what was taken on revert', async () => {
+    // given
+    insertProduct({ id: 'p1', stock: 10 });
+    insertDose({
+      id: 'd1',
+      productId: 'p1',
+      scheduleId: null,
+      plannedAt: YESTERDAY,
+    });
+
+    // when
+    await setDoseStateRow('d1', 'taken');
+    const stockAfterTake = productRow()?.stock;
+    await setDoseStateRow('d1', 'pending');
+
+    // then
+    expect(stockAfterTake).toBe(9);
+    expect(productRow()?.stock).toBe(10);
+    expect(doseRow('d1')?.state).toBe('pending');
+  });
+
   it('ignores a dose that does not exist', async () => {
     // given
     insertProduct({ id: 'p1', stock: 10 });
@@ -511,5 +533,38 @@ describe('deleteFuturePendingDoseRowsForSchedules', () => {
         .map((dose) => dose.id)
         .sort(),
     ).toEqual(['overdue', 'taken']);
+  });
+});
+
+describe('dosesBetweenQuery', () => {
+  beforeEach(() => clearTestDatabase());
+
+  it('returns a dose of a deleted schedule with its product and no schedule', () => {
+    // given
+    insertProduct({ id: 'p1', name: 'Vitamin D' });
+    insertDose({
+      id: 'd1',
+      productId: 'p1',
+      scheduleId: null,
+      plannedAt: YESTERDAY,
+      state: 'taken',
+      takenQuantity: 2,
+    });
+
+    // when
+    const rows = dosesBetweenQuery(
+      new Date('2026-03-09T00:00:00Z'),
+      START_OF_DAY,
+    ).all();
+
+    // then
+    expect(rows).toMatchObject([
+      {
+        id: 'd1',
+        productName: 'Vitamin D',
+        takenQuantity: 2,
+        schedule: null,
+      },
+    ]);
   });
 });

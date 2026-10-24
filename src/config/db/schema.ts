@@ -71,9 +71,9 @@ export const doses = sqliteTable(
     productId: text('product_id')
       .notNull()
       .references(() => products.id, { onDelete: 'cascade' }),
-    scheduleId: text('schedule_id')
-      .notNull()
-      .references(() => schedules.id, { onDelete: 'cascade' }),
+    scheduleId: text('schedule_id').references(() => schedules.id, {
+      onDelete: 'set null',
+    }),
     plannedAt: integer('planned_at', { mode: 'timestamp' }).notNull(),
     state: text('state', { enum: DOSE_STATES }).notNull().default('pending'),
     takenAt: integer('taken_at', { mode: 'timestamp' }),

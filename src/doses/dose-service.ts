@@ -120,7 +120,10 @@ export async function refreshRemindersForProduct(
         { id: dose.id, plannedAt: dose.plannedAt },
         reminderTexts(
           product,
-          quantityOfDose(dose, scheduleById.get(dose.scheduleId)),
+          quantityOfDose(
+            dose,
+            dose.scheduleId ? scheduleById.get(dose.scheduleId) : undefined,
+          ),
         ),
       ),
     ),
@@ -153,10 +156,7 @@ export async function revertDose(id: string): Promise<void> {
 
     await scheduleDoseReminder(
       { id: dose.id, plannedAt: dose.plannedAt },
-      reminderTexts(
-        product,
-        quantityOfDose(dose, await getSchedule(dose.scheduleId)),
-      ),
+      reminderTexts(product, quantityOfDose(dose, await scheduleOfDose(dose))),
     );
   } catch (err) {
     log.error(`Failed to revert dose ${id}`, err);
@@ -183,10 +183,7 @@ export async function snoozeDose(id: string): Promise<void> {
     const when = new Date(Date.now() + snoozeMinutes * 60 * 1000);
     await scheduleDoseReminder(
       { id: dose.id, plannedAt: when },
-      reminderTexts(
-        product,
-        quantityOfDose(dose, await getSchedule(dose.scheduleId)),
-      ),
+      reminderTexts(product, quantityOfDose(dose, await scheduleOfDose(dose))),
     );
     await setDoseSnoozedUntilRow(dose.id, when);
     await dismissDoseReminder(dose.id);
@@ -300,6 +297,14 @@ function reminderTexts(product: Product, quantity: number) {
     first: { title: i18n.t('notification.title'), body },
     retry: { title: i18n.t('notification.retryTitle'), body },
   };
+}
+
+async function scheduleOfDose({
+  scheduleId,
+}: {
+  scheduleId: string | null;
+}): Promise<Schedule | undefined> {
+  return scheduleId ? getSchedule(scheduleId) : undefined;
 }
 
 function quantityOfDose(
