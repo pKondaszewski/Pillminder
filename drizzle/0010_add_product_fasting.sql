@@ -1,1 +1,0 @@
-ALTER TABLE `products` ADD `fasting` integer DEFAULT false NOT NULL;

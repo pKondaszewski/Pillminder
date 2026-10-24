@@ -1,1 +1,0 @@
-ALTER TABLE `products` ADD `pack_size` integer;

@@ -1,1 +1,0 @@
-ALTER TABLE `products` ADD `profile_image_id` text REFERENCES product_images(id) ON DELETE set null;
