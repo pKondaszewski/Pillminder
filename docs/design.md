@@ -290,8 +290,7 @@ The app controls only the small icon, accent color, title, body and actions.
   Lek; feeds the dose row and the notification body.
 - Profile photo: `products.profile_image_id` (nullable, references `product_images.id`,
   on delete set null) or an `is_profile` flag on `product_images`; exactly one per product. The
-  first added photo becomes profile. Backups carry no photos, so the reference is cleared on
-  import.
+  first added photo becomes profile.
 
 ## 6. Removed
 

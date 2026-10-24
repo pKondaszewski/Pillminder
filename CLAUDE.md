@@ -83,7 +83,7 @@ These are settled and should not be re-litigated without a reason:
   queries, migrations generated with `drizzle-kit`
 - **Language (UI)**: **PL + EN** — i18n from the start
 - **Users**: single user, one list (no profiles)
-- **Backup**: simple **JSON export / import** (in scope for v1)
+- **Backup**: **Android Auto Backup**; the app has no export / import
 - **Taking model**: **scheduled slots** — the rhythm generates planned doses,
   each with a state (taken / skipped / pending); doses left unconfirmed past
   their time automatically become "skipped". Enables full history ("22 of 30").
