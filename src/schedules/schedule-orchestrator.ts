@@ -12,9 +12,10 @@ import {
   updateSchedule,
 } from './schedule-service';
 
-export async function addSchedule(input: NewScheduleInput): Promise<void> {
+export async function addSchedule(input: NewScheduleInput): Promise<string> {
   const created = await createSchedule(input);
   await syncDosesForSchedule(created);
+  return created.id;
 }
 
 export async function editSchedule(

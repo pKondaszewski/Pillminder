@@ -1,8 +1,15 @@
-import { useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert } from 'react-native';
 
 import type { UndoableChange } from '@/config/undoable-change';
+
+import {
+  type PendingUndo,
+  setPendingUndo,
+  takePendingUndo,
+} from './pending-undo-store';
 
 export interface UndoSnackbarState {
   key: number;
@@ -35,9 +42,10 @@ export function useUndoSnackbar() {
   const alertFailure = (errorKey: string) =>
     Alert.alert(t('products.errorTitle'), t(errorKey));
 
-  const runWithUndo = async (
+  const runPresentingUndo = async (
     { message, apply, revert }: UndoableChange,
     errorKey: string,
+    presentUndo: (undo: PendingUndo) => void,
     onSuccess?: () => void,
   ) => {
     try {
@@ -46,15 +54,43 @@ export function useUndoSnackbar() {
       alertFailure(errorKey);
       return;
     }
-    onSuccess?.();
-    showUndo(message, async () => {
-      try {
-        await revert();
-      } catch {
-        alertFailure(errorKey);
-      }
+    presentUndo({
+      message,
+      undo: async () => {
+        try {
+          await revert();
+        } catch {
+          alertFailure(errorKey);
+        }
+      },
     });
+    onSuccess?.();
   };
+
+  const runWithUndo = (
+    change: UndoableChange,
+    errorKey: string,
+    onSuccess?: () => void,
+  ) =>
+    runPresentingUndo(
+      change,
+      errorKey,
+      ({ message, undo }) => showUndo(message, undo),
+      onSuccess,
+    );
+
+  const runWithUndoOnNextScreen = (
+    change: UndoableChange,
+    errorKey: string,
+    onSuccess: () => void,
+  ) => runPresentingUndo(change, errorKey, setPendingUndo, onSuccess);
+
+  useFocusEffect(
+    useCallback(() => {
+      const handedOver = takePendingUndo();
+      if (handedOver) showUndo(handedOver.message, handedOver.undo);
+    }, []),
+  );
 
   const snackbar: UndoSnackbarState | null = pending && {
     key: pending.key,
@@ -67,5 +103,11 @@ export function useUndoSnackbar() {
     onDismiss: dismissUndo,
   };
 
-  return { snackbar, showUndo, dismissUndo, runWithUndo };
+  return {
+    snackbar,
+    showUndo,
+    dismissUndo,
+    runWithUndo,
+    runWithUndoOnNextScreen,
+  };
 }

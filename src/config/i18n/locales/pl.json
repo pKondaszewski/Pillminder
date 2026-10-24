@@ -465,6 +465,7 @@
     "amountValue": "{{amount}} naraz",
     "changeNote": "Zmiana dotyczy dawek od teraz. Dzisiejsze wzięte i pominięte zostają w historii",
     "courseDay": "Dzień {{day}} z {{total}}",
+    "created": "Dodano harmonogram",
     "cycle": "Cykle z przerwami",
     "cycleDays_few": "{{count}} dni",
     "cycleDays_many": "{{count}} dni",

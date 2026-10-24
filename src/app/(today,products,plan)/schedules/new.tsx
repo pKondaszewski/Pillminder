@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
 import { ThemedView } from '@/commons/ui/themed-view';
-import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
+import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import { useProducts } from '@/products/ui/use-products';
+import { scheduleCreateChange } from '@/schedules/schedule-undo';
 import { NewScheduleForm } from '@/schedules/ui/new-form';
 import { useSchedules } from '@/schedules/ui/use-schedules';
 
@@ -15,9 +16,8 @@ export default function NewScheduleScreen() {
     locked?: string;
   }>();
   const { products, loaded } = useProducts();
-  const { schedules, addSchedule } = useSchedules();
-
-  const runThenGoBack = useRunWithErrorAlert(() => router.back());
+  const { schedules, addSchedule, removeSchedule } = useSchedules();
+  const { runWithUndoOnNextScreen } = useUndoSnackbar();
 
   if (!loaded) return null;
 
@@ -36,7 +36,16 @@ export default function NewScheduleScreen() {
         selectedProductId={productId}
         productLocked={lockedProduct !== undefined}
         onSubmit={(input) =>
-          runThenGoBack(() => addSchedule(input), 'schedule.errorSave')
+          runWithUndoOnNextScreen(
+            scheduleCreateChange(
+              input,
+              t('schedule.created'),
+              addSchedule,
+              removeSchedule,
+            ),
+            'schedule.errorSave',
+            () => router.back(),
+          )
         }
         onNewProduct={() =>
           router.push({
