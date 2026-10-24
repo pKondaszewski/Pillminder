@@ -1,33 +1,37 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Alert } from 'react-native';
 
-import { useBackupImport } from '@/backup/ui/use-backup-import';
 import { useConfirmation } from '@/commons/ui/use-confirmation';
-import { resetData, restoreFromBackup } from '@/recovery/recovery-service';
+import { createLogger } from '@/config/logger';
+import { resetData } from '@/recovery/recovery-service';
+
+const log = createLogger('use-migration-recovery');
 
 export function useMigrationRecovery(onRerunMigrations: () => void) {
   const { t } = useTranslation();
-  const { busy, run, importData, importConfirmation } = useBackupImport(
-    async (rows) => {
-      await restoreFromBackup(rows);
-      onRerunMigrations();
-    },
-    t('migrationError.restoreFailed'),
-  );
+  const [busy, setBusy] = useState(false);
 
-  const resetConfirmation = useConfirmation(
-    () =>
-      void run(async () => {
-        await resetData();
-        onRerunMigrations();
-      }, t('migrationError.resetFailed')),
-  );
+  const reset = async () => {
+    const title = t('migrationError.resetFailed');
+    setBusy(true);
+    try {
+      await resetData();
+      onRerunMigrations();
+    } catch (err) {
+      log.error(title, err);
+      Alert.alert(title, err instanceof Error ? err.message : '');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const resetConfirmation = useConfirmation(() => void reset());
 
   return {
     busy,
     retry: onRerunMigrations,
-    restore: importData,
     reset: () => resetConfirmation.request(),
-    importConfirmation,
     resetConfirmation,
   };
 }

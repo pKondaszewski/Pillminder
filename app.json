@@ -9,6 +9,7 @@
     "userInterfaceStyle": "automatic",
     "android": {
       "package": "com.pkondaszewski.pillminder",
+      "allowBackup": true,
       "permissions": [
         "android.permission.USE_EXACT_ALARM",
         "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
@@ -57,7 +58,6 @@
         }
       ],
       "expo-status-bar",
-      "expo-sharing",
       [
         "expo-build-properties",
         {

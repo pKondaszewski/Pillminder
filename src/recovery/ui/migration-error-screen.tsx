@@ -3,12 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { BackupImportDialog } from '@/backup/ui/backup-import-dialog';
-import {
-  DestructiveButton,
-  PrimaryButton,
-  SecondaryButton,
-} from '@/commons/ui/button';
+import { DestructiveButton, PrimaryButton } from '@/commons/ui/button';
 import { ConfirmDialog } from '@/commons/ui/confirm-dialog';
 import { Spacing } from '@/commons/ui/constants/theme';
 import { ThemedText } from '@/commons/ui/themed-text';
@@ -22,7 +17,7 @@ type Props = {
 
 export function MigrationErrorScreen({ error, onRerunMigrations }: Props) {
   const { t } = useTranslation();
-  const { busy, retry, restore, reset, importConfirmation, resetConfirmation } =
+  const { busy, retry, reset, resetConfirmation } =
     useMigrationRecovery(onRerunMigrations);
   const [detailsVisible, setDetailsVisible] = useState(false);
 
@@ -39,14 +34,6 @@ export function MigrationErrorScreen({ error, onRerunMigrations }: Props) {
             <PrimaryButton
               label={t('migrationError.retry')}
               onPress={retry}
-              disabled={busy}
-              busy={busy}
-            />
-          </ActionRow>
-          <ActionRow>
-            <SecondaryButton
-              label={t('migrationError.restore')}
-              onPress={restore}
               disabled={busy}
               busy={busy}
             />
@@ -78,7 +65,6 @@ export function MigrationErrorScreen({ error, onRerunMigrations }: Props) {
           )}
         </ScrollView>
       </SafeAreaView>
-      <BackupImportDialog confirmation={importConfirmation} />
       <ConfirmDialog
         visible={resetConfirmation.pending !== null}
         destructive
