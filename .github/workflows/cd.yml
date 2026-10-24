@@ -8,6 +8,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+      RELEASE_LINEAGE_BASE64: ${{ secrets.RELEASE_LINEAGE_BASE64 }}
+      RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+      RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -48,12 +53,48 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Restore release signing key
+        run: |
+          for name in RELEASE_KEYSTORE_BASE64 RELEASE_LINEAGE_BASE64 RELEASE_KEYSTORE_PASSWORD RELEASE_KEY_ALIAS; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Secret $name is not set, refusing to build with the debug key"
+              exit 1
+            fi
+          done
+          key_dir="$RUNNER_TEMP/release-key"
+          mkdir -m 700 "$key_dir"
+          base64 -d <<< "$RELEASE_KEYSTORE_BASE64" > "$key_dir/release.jks"
+          base64 -d <<< "$RELEASE_LINEAGE_BASE64" > "$key_dir/lineage"
+          echo "RELEASE_KEYSTORE_PATH=$key_dir/release.jks" >> "$GITHUB_ENV"
+          echo "RELEASE_LINEAGE_PATH=$key_dir/lineage" >> "$GITHUB_ENV"
+
       - name: Prebuild (generate native android project)
         run: npx expo prebuild --platform android --no-install
 
       - name: Build release APK
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon
+
+      - name: Sign APK with the rotated key (v3 lineage)
+        run: |
+          apksigner=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
+          echo "APKSIGNER=$apksigner" >> "$GITHUB_ENV"
+          "$apksigner" sign --v1-signing-enabled false --v2-signing-enabled false \
+            --ks "$RELEASE_KEYSTORE_PATH" --ks-key-alias "$RELEASE_KEY_ALIAS" --ks-pass env:RELEASE_KEYSTORE_PASSWORD \
+            --lineage "$RELEASE_LINEAGE_PATH" --rotation-min-sdk-version 28 \
+            android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Verify APK signature
+        run: |
+          apk=android/app/build/outputs/apk/release/app-release.apk
+          old_cert=fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c
+          verify=$("$APKSIGNER" verify --print-certs -v "$apk")
+          lineage=$("$APKSIGNER" lineage --in "$apk" --print-certs)
+          echo "$verify" | grep -E 'Verified using v3 |SHA-256'
+          echo "$lineage" | grep 'SHA-256'
+          grep -q 'Verified using v3 scheme (APK Signature Scheme v3): true' <<< "$verify"
+          grep -q "Signer #1 certificate SHA-256 digest: $old_cert" <<< "$verify" && { echo "::error::APK is signed with the old key"; exit 1; }
+          grep -q "certificate SHA-256 digest: $old_cert" <<< "$lineage"
 
       - name: Verify the expo-notifications patch is compiled into the APK
         run: |
