@@ -1,3 +1,4 @@
+import { migrate } from 'drizzle-orm/expo-sqlite/migrator';
 import type {
   NotificationResponse,
   NotificationTaskPayload,
@@ -5,10 +6,12 @@ import type {
 import * as TaskManager from 'expo-task-manager';
 import { AppState } from 'react-native';
 
+import { db } from '@/config/db/database';
 import { createLogger } from '@/config/logger';
 import { snoozeDose, takeDose } from '@/doses/dose-service';
 import { restockPack } from '@/products/product-orchestrator';
 
+import migrations from '../../drizzle/migrations';
 import {
   ADD_PACK_ACTION,
   BACKGROUND_RESPONSE_TASK,
@@ -19,6 +22,8 @@ import { isNotificationsSupported } from './notification-service';
 import { claimResponse } from './reminder-response-router';
 
 const log = createLogger('background-task');
+
+let migrated: Promise<void> | undefined;
 
 if (
   isNotificationsSupported &&
@@ -37,8 +42,24 @@ if (
   );
 }
 
+// Headless launches skip useMigrations in the root layout
+function ensureMigrated(): Promise<void> {
+  migrated ??= migrate(db, migrations).catch((err: unknown) => {
+    migrated = undefined;
+    throw err;
+  });
+  return migrated;
+}
+
 async function handleResponse(response: NotificationResponse): Promise<void> {
   if (AppState.currentState === 'active') return;
+
+  try {
+    await ensureMigrated();
+  } catch (err) {
+    log.error('Migrations failed before a background action', err);
+    return;
+  }
 
   const { actionIdentifier } = response;
   const payload = payloadOf(response);
