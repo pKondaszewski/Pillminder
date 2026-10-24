@@ -250,6 +250,12 @@ export async function syncDosesForSchedule(schedule: Schedule): Promise<void> {
   await syncDosesForSchedules([schedule]);
 }
 
+export async function syncDosesForProductOfDose(doseId: string): Promise<void> {
+  const dose = await getDoseById(doseId);
+  if (!dose) return;
+  await syncDosesForSchedules(await getSchedulesByProduct(dose.productId));
+}
+
 async function applyDoseState(
   id: string,
   state: 'taken' | 'skipped',

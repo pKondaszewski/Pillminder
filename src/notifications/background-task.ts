@@ -8,7 +8,11 @@ import { AppState } from 'react-native';
 
 import { db } from '@/config/db/database';
 import { createLogger } from '@/config/logger';
-import { snoozeDose, takeDose } from '@/doses/dose-service';
+import {
+  snoozeDose,
+  syncDosesForProductOfDose,
+  takeDose,
+} from '@/doses/dose-service';
 import { restockPack } from '@/products/product-orchestrator';
 
 import migrations from '../../drizzle/migrations';
@@ -82,6 +86,16 @@ async function handleResponse(response: NotificationResponse): Promise<void> {
     }
   } catch (err) {
     log.error(`Background ${actionIdentifier} failed for dose ${doseId}`, err);
+  }
+  await extendPlanAfterAction(doseId);
+}
+
+// The app may never be opened, so nothing else extends the dose plan
+async function extendPlanAfterAction(doseId: string): Promise<void> {
+  try {
+    await syncDosesForProductOfDose(doseId);
+  } catch (err) {
+    log.error(`Background dose sync failed after dose ${doseId}`, err);
   }
 }
 
