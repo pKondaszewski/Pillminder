@@ -1,6 +1,11 @@
 import * as ImagePicker from 'expo-image-picker';
 
+import { createLogger } from '@/config/logger';
+
 import type { ImageSource } from './dto/image-source';
+import { shrinkImage } from './image-shrinker';
+
+const log = createLogger('image-picker');
 
 export type PickResult =
   | { status: 'picked'; uris: string[] }
@@ -26,7 +31,18 @@ export async function pickImage(
           allowsMultipleSelection: multiple,
         });
 
-  return result.canceled
-    ? { status: 'cancelled' }
-    : { status: 'picked', uris: result.assets.map((asset) => asset.uri) };
+  if (result.canceled) return { status: 'cancelled' };
+  const uris: string[] = [];
+  for (const asset of result.assets) uris.push(await shrinkOrKeep(asset.uri));
+  return { status: 'picked', uris };
+}
+
+// A photo that cannot be shrunk is still better than no photo
+async function shrinkOrKeep(uri: string): Promise<string> {
+  try {
+    return await shrinkImage(uri);
+  } catch (err) {
+    log.error('Failed to shrink a picked image, keeping the original', err);
+    return uri;
+  }
 }

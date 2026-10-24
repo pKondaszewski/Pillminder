@@ -2,7 +2,10 @@ import { createLogger } from '@/config/logger';
 
 import {
   deleteImageFiles,
+  imageFileSize,
+  imageFileUri,
   listImageFileNames,
+  replaceImageFileIfSmaller,
   storeImageFile,
 } from './image-files';
 import {
@@ -15,6 +18,8 @@ import {
   setProfileImageRow,
 } from './image-repository';
 import type { ImageRole } from './image-role';
+import { shrinkImage } from './image-shrinker';
+import { needsShrinking } from './image-size';
 
 export type { ImageSource } from './dto/image-source';
 export {
@@ -100,6 +105,19 @@ export async function deleteOrphanedImageFiles(): Promise<void> {
   }
 }
 
+// Runs on every start, but only files over the size threshold are touched.
+export async function shrinkOversizedImages(): Promise<void> {
+  try {
+    const referenced = new Set(await getAllImageFileNames());
+    const oversized = listImageFileNames().filter(
+      (name) => referenced.has(name) && needsShrinking(imageFileSize(name)),
+    );
+    for (const name of oversized) await shrinkStoredImage(name);
+  } catch (err) {
+    log.error('Failed to shrink oversized image files', err);
+  }
+}
+
 export async function setProfileImage(
   productId: string,
   imageId: string | null,
@@ -114,5 +132,19 @@ export async function setProfileImage(
   } catch (err) {
     log.error(`Failed to set the profile image of product ${productId}`, err);
     throw err;
+  }
+}
+
+async function shrinkStoredImage(fileName: string): Promise<void> {
+  try {
+    const before = imageFileSize(fileName);
+    const candidateUri = await shrinkImage(imageFileUri(fileName));
+    if (replaceImageFileIfSmaller(fileName, candidateUri)) {
+      log.info(
+        `Shrunk image ${fileName} from ${before} to ${imageFileSize(fileName)} bytes`,
+      );
+    }
+  } catch (err) {
+    log.error(`Failed to shrink image ${fileName}, keeping the original`, err);
   }
 }
