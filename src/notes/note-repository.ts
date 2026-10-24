@@ -42,6 +42,11 @@ export async function updateNoteBodyRow(
     .where(eq(notes.id, id));
 }
 
-export async function deleteNoteRow(id: string): Promise<void> {
-  await db.delete(notes).where(eq(notes.id, id));
+export async function deleteNoteRow(id: string): Promise<Note | undefined> {
+  const [deleted] = await db.delete(notes).where(eq(notes.id, id)).returning();
+  return deleted;
+}
+
+export async function restoreNoteRow(note: Note): Promise<void> {
+  await db.insert(notes).values(note);
 }

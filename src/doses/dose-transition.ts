@@ -39,6 +39,21 @@ export function planDoseTransition(
 
   // Leaving "taken" restores what was actually deducted; doses taken before
   // quantities existed have no snapshot and consumed exactly one unit.
-  const stockDelta = dose.state === 'taken' ? (dose.takenQuantity ?? 1) : 0;
-  return { state: target, takenAt: null, takenQuantity: null, stockDelta };
+  return {
+    state: target,
+    takenAt: null,
+    takenQuantity: null,
+    stockDelta: deductedFrom(dose),
+  };
+}
+
+export function restoreStockDelta(
+  current: TransitionInput,
+  previous: TransitionInput,
+): number {
+  return deductedFrom(current) - deductedFrom(previous);
+}
+
+function deductedFrom({ state, takenQuantity }: TransitionInput): number {
+  return state === 'taken' ? (takenQuantity ?? 1) : 0;
 }

@@ -1,4 +1,8 @@
-import { type DoseState, planDoseTransition } from '../dose-transition';
+import {
+  type DoseState,
+  planDoseTransition,
+  restoreStockDelta,
+} from '../dose-transition';
 
 const NOW = new Date(2026, 0, 10, 12, 0);
 
@@ -155,5 +159,29 @@ describe('planDoseTransition for a past dose correction', () => {
       takenQuantity: null,
       stockDelta: 3,
     });
+  });
+});
+
+describe('restoreStockDelta', () => {
+  it.each<[string, DoseState, number | null, DoseState, number | null, number]>(
+    [
+      ['taken back to pending', 'taken', 2, 'pending', null, 2],
+      ['pending back to taken', 'pending', null, 'taken', 2, -2],
+      ['skipped back to taken', 'skipped', null, 'taken', 3, -3],
+      ['taken back to skipped', 'taken', 3, 'skipped', null, 3],
+      ['taken from an empty stock', 'taken', 0, 'pending', null, 0],
+      ['legacy taken without a snapshot', 'taken', null, 'pending', null, 1],
+      ['skipped back to pending', 'skipped', null, 'pending', null, 0],
+    ],
+  )('%s', (_, current, currentQty, previous, previousQty, expected) => {
+    // given
+    const now = { state: current, takenQuantity: currentQty };
+    const before = { state: previous, takenQuantity: previousQty };
+
+    // when
+    const delta = restoreStockDelta(now, before);
+
+    // then
+    expect(delta).toBe(expected);
   });
 });

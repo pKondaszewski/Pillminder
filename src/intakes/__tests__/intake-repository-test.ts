@@ -14,6 +14,7 @@ import {
   deleteIntakeRow,
   insertIntakeRow,
   intakesBetweenQuery,
+  restoreIntakeRow,
 } from '../intake-repository';
 
 jest.mock('@/config/db/database', () =>
@@ -241,5 +242,62 @@ describe('intakesBetweenQuery', () => {
       unit: 'tablet',
       profileImageFileName: null,
     });
+  });
+});
+
+describe('restoreIntakeRow', () => {
+  beforeEach(() => {
+    jest.useFakeTimers({ now: NOW });
+    clearTestDatabase();
+  });
+  afterEach(() => jest.useRealTimers());
+
+  it('brings back the deleted intake and takes exactly the amount the deletion gave back', () => {
+    // given
+    insertProduct({ id: 'p1', stock: 1 });
+    insertIntakeRow('i1', 'p1', EARLIER_TODAY, 3);
+    const removed = deleteIntakeRow('i1');
+    if (!removed) throw new Error('intake was not removed');
+
+    // when
+    restoreIntakeRow(removed);
+
+    // then
+    expect(db.select().from(asNeededIntakes).all()).toEqual([
+      {
+        id: 'i1',
+        productId: 'p1',
+        takenAt: EARLIER_TODAY,
+        quantity: 3,
+        deductedQuantity: 1,
+      },
+    ]);
+    expect(productRow()).toMatchObject({ stock: 0, lastUsedAt: EARLIER_TODAY });
+  });
+
+  it('leaves an untracked stock empty', () => {
+    // given
+    insertProduct({ id: 'p1', stock: null });
+    insertIntakeRow('i1', 'p1', NOW, 1);
+    const removed = deleteIntakeRow('i1');
+    if (!removed) throw new Error('intake was not removed');
+
+    // when
+    restoreIntakeRow(removed);
+
+    // then
+    expect(productRow()).toMatchObject({ stock: null, lastUsedAt: NOW });
+  });
+});
+
+describe('deleteIntakeRow', () => {
+  beforeEach(() => clearTestDatabase());
+
+  it('returns nothing for an unknown intake', () => {
+    // when
+    const removed = deleteIntakeRow('missing');
+
+    // then
+    expect(removed).toBeUndefined();
   });
 });

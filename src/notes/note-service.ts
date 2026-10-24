@@ -3,7 +3,9 @@ import { createLogger } from '@/config/logger';
 import {
   createNoteRow,
   deleteNoteRow,
+  type Note,
   notesByProductQuery,
+  restoreNoteRow,
   updateNoteBodyRow,
 } from './note-repository';
 
@@ -42,12 +44,22 @@ export async function editNote(id: string, body: string): Promise<void> {
   }
 }
 
-export async function removeNote(id: string): Promise<void> {
+export async function removeNote(id: string): Promise<Note | undefined> {
   log.info(`Deleting note ${id}`);
   try {
-    await deleteNoteRow(id);
+    return await deleteNoteRow(id);
   } catch (err) {
     log.error(`Failed to delete note ${id}`, err);
+    throw err;
+  }
+}
+
+export async function restoreNote(note: Note): Promise<void> {
+  log.info(`Restoring note ${note.id}`);
+  try {
+    await restoreNoteRow(note);
+  } catch (err) {
+    log.error(`Failed to restore note ${note.id}`, err);
     throw err;
   }
 }
