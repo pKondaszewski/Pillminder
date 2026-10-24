@@ -14,7 +14,7 @@ import {
 import { type FilterToken, SearchField } from '@/commons/ui/search-field';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
-import { useFormatTime } from '@/commons/ui/use-format-date';
+import { useFirstWeekday, useFormatTime } from '@/commons/ui/use-format-date';
 import { categoryLabel } from '@/products/category';
 import {
   categoryFilterIfListed,
@@ -38,6 +38,7 @@ import { useSchedules } from '@/schedules/ui/use-schedules';
 export default function ProductListScreen() {
   const { t, i18n } = useTranslation();
   const { formatTimes } = useFormatTime();
+  const firstWeekday = useFirstWeekday();
   const { products } = useProducts();
   const { schedules } = useSchedules();
   const reorderStatuses = useReorderStatuses();
@@ -65,6 +66,7 @@ export default function ProductListScreen() {
         schedules.filter((schedule) => schedule.productId === item.id),
         t,
         formatTimes,
+        firstWeekday,
       )}
       stock={stockSummary(item, reorderStatuses[item.id], t)}
       onPress={() => openProduct(item.id)}

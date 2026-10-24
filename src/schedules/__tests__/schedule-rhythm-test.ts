@@ -6,6 +6,12 @@ import { describeCourse, describeRhythm } from '../schedule-rhythm';
 const PL: Record<string, string> = {
   'schedule.daily': 'Codziennie',
   'schedule.everyXDays': 'Co {{days}} dni',
+  'schedule.weeklyOn': 'Co tydzień: {{day}}',
+  'calendar.weekday.mon': 'Pn',
+  'calendar.weekday.wed': 'Śr',
+  'calendar.weekday.fri': 'Pt',
+  'calendar.weekday.sat': 'So',
+  'calendar.weekday.sun': 'Nd',
   'schedule.quantityValue': '{{count}} na dawkę',
   'schedule.periodRange': '{{from}} – {{to}}',
   'schedule.periodFrom': 'od {{date}}',
@@ -20,6 +26,7 @@ const t: Translate = (key, options = {}) =>
     (text, [name, value]) => text.replace(`{{${name}}}`, String(value)),
     PL[key] ?? key,
   );
+const MONDAY = 1;
 const NOW = new Date(2026, 0, 10, 12, 0);
 const joinTimes = (times: string[]) => times.join(', ');
 const formatDate = (date: Date) => date.toISOString().slice(0, 10);
@@ -29,6 +36,7 @@ function schedule(overrides: Partial<Schedule>): Schedule {
     id: 'schedule-1',
     productId: 'product-1',
     intervalDays: 1,
+    weekdays: null,
     timesOfDay: ['08:00'],
     quantity: 1,
     startDate: null,
@@ -40,12 +48,88 @@ function schedule(overrides: Partial<Schedule>): Schedule {
 }
 
 describe('describeRhythm', () => {
+  it('lists the weekdays with the times', () => {
+    // given
+    const input = schedule({ weekdays: [0, 6], timesOfDay: ['09:00'] });
+
+    // when
+    const text = describeRhythm(
+      input,
+      t,
+      formatDate,
+      null,
+      NOW,
+      joinTimes,
+      MONDAY,
+    );
+
+    // then
+    expect(text).toBe('So, Nd · 09:00');
+  });
+
+  it('puts Sunday first when the week starts on Sunday', () => {
+    // given
+    const input = schedule({ weekdays: [6, 0, 3], timesOfDay: ['09:00'] });
+
+    // when
+    const text = describeRhythm(input, t, formatDate, null, NOW, joinTimes, 0);
+
+    // then
+    expect(text).toBe('Nd, Śr, So · 09:00');
+  });
+
+  it('names the day of a once-a-week schedule', () => {
+    // given
+    const input = schedule({ weekdays: [1] });
+
+    // when
+    const text = describeRhythm(
+      input,
+      t,
+      formatDate,
+      null,
+      NOW,
+      joinTimes,
+      MONDAY,
+    );
+
+    // then
+    expect(text).toBe('Co tydzień: Pn · 08:00');
+  });
+
+  it('calls a schedule with all seven days daily', () => {
+    // given
+    const input = schedule({ weekdays: [0, 1, 2, 3, 4, 5, 6] });
+
+    // when
+    const text = describeRhythm(
+      input,
+      t,
+      formatDate,
+      null,
+      NOW,
+      joinTimes,
+      MONDAY,
+    );
+
+    // then
+    expect(text).toBe('Codziennie · 08:00');
+  });
+
   it('describes a daily schedule with several times', () => {
     // given
     const input = schedule({ timesOfDay: ['08:00', '20:00'] });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, NOW, joinTimes);
+    const text = describeRhythm(
+      input,
+      t,
+      formatDate,
+      null,
+      NOW,
+      joinTimes,
+      MONDAY,
+    );
 
     // then
     expect(text).toBe('Codziennie · 08:00, 20:00');
@@ -60,7 +144,15 @@ describe('describeRhythm', () => {
     });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, NOW, joinTimes);
+    const text = describeRhythm(
+      input,
+      t,
+      formatDate,
+      null,
+      NOW,
+      joinTimes,
+      MONDAY,
+    );
 
     // then
     expect(text).toBe('Co 3 dni · 09:00 · 2 na dawkę');
@@ -75,7 +167,15 @@ describe('describeRhythm', () => {
     const input = schedule({ startDate, endDate });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, NOW, joinTimes);
+    const text = describeRhythm(
+      input,
+      t,
+      formatDate,
+      null,
+      NOW,
+      joinTimes,
+      MONDAY,
+    );
 
     // then
     expect(text).toBe(`Codziennie · 08:00 · ${period}`);
@@ -90,7 +190,15 @@ describe('describeRhythm', () => {
     });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, now, joinTimes);
+    const text = describeRhythm(
+      input,
+      t,
+      formatDate,
+      null,
+      now,
+      joinTimes,
+      MONDAY,
+    );
 
     // then
     expect(text).toBe('Wstrzymany · Codziennie · 08:00');
@@ -103,7 +211,15 @@ describe('describeRhythm', () => {
     const input = schedule({ pausedAt: new Date(2026, 4, 8, 9), resumeAt });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, now, joinTimes);
+    const text = describeRhythm(
+      input,
+      t,
+      formatDate,
+      null,
+      now,
+      joinTimes,
+      MONDAY,
+    );
 
     // then
     expect(text).toBe('Wstrzymany do 2026-05-20 · Codziennie · 08:00');
@@ -118,7 +234,15 @@ describe('describeRhythm', () => {
     });
 
     // when
-    const text = describeRhythm(input, t, formatDate, null, now, joinTimes);
+    const text = describeRhythm(
+      input,
+      t,
+      formatDate,
+      null,
+      now,
+      joinTimes,
+      MONDAY,
+    );
 
     // then
     expect(text).toBe('Codziennie · 08:00');

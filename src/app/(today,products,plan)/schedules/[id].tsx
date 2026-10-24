@@ -10,7 +10,11 @@ import { FieldRow } from '@/commons/ui/field-row';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
-import { useFormatDate, useFormatTime } from '@/commons/ui/use-format-date';
+import {
+  useFirstWeekday,
+  useFormatDate,
+  useFormatTime,
+} from '@/commons/ui/use-format-date';
 import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
 import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import type { Translate } from '@/config/translate';
@@ -21,7 +25,7 @@ import { useProducts } from '@/products/ui/use-products';
 import { courseProgress } from '@/schedules/schedule-list';
 import {
   describeCourse,
-  describeInterval,
+  describeDays,
   describePeriod,
   isPaused,
   previewOccurrences,
@@ -42,6 +46,7 @@ export default function ScheduleScreen() {
   const { t } = useTranslation();
   const formatDate = useFormatDate();
   const { formatTimes } = useFormatTime();
+  const firstWeekday = useFirstWeekday();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { products, restoreProduct } = useProducts();
   const { schedules, removeSchedule } = useSchedules();
@@ -96,7 +101,7 @@ export default function ScheduleScreen() {
           onPress: () => setField('pause'),
         };
   const doses = previewOccurrences(
-    schedule.intervalDays,
+    schedule,
     schedule.timesOfDay,
     schedule,
     now,
@@ -138,7 +143,7 @@ export default function ScheduleScreen() {
             <ThemedText type="label">{t('schedule.fieldsHint')}</ThemedText>
             <FieldRow
               label={t('schedule.intervalDays')}
-              value={describeInterval(schedule.intervalDays, t)}
+              value={describeDays(schedule, t, firstWeekday)}
               onPress={() => setField('rhythm')}
             />
             <FieldRow

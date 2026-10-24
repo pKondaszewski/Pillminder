@@ -39,6 +39,7 @@ function schedule(overrides: Partial<Schedule> = {}): Schedule {
     id: 'schedule-1',
     productId: 'p1',
     intervalDays: 1,
+    weekdays: null,
     timesOfDay: ['08:00'],
     quantity: 1,
     startDate: null,

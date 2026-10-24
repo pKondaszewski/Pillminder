@@ -1,12 +1,14 @@
-import { addDays, daysBetween, startOfDay } from '@/config/date-utils';
+import { addDays, startOfDay } from '@/config/date-utils';
 
+import type { Rhythm } from './dto/rhythm';
+import { isRhythmDay } from './rhythm-days';
 import { isPaused, type SchedulePeriod } from './schedule-pause';
 
 const PREVIEW_COUNT = 3;
 const MAX_SCAN_DAYS = 3660;
 
 export function nextOccurrences(
-  intervalDays: number,
+  rhythm: Rhythm,
   timesOfDay: string[],
   count: number,
   period: SchedulePeriod,
@@ -15,12 +17,7 @@ export function nextOccurrences(
   if (timesOfDay.length === 0 || count <= 0) return [];
 
   const result: Date[] = [];
-  for (const occurrence of occurrenceStream(
-    intervalDays,
-    timesOfDay,
-    period,
-    now,
-  )) {
+  for (const occurrence of occurrenceStream(rhythm, timesOfDay, period, now)) {
     result.push(occurrence);
     if (result.length >= count) break;
   }
@@ -28,16 +25,16 @@ export function nextOccurrences(
 }
 
 export function previewOccurrences(
-  intervalDays: number,
+  rhythm: Rhythm,
   timesOfDay: string[],
   period: SchedulePeriod,
   now: Date,
 ): Date[] {
-  return nextOccurrences(intervalDays, timesOfDay, PREVIEW_COUNT, period, now);
+  return nextOccurrences(rhythm, timesOfDay, PREVIEW_COUNT, period, now);
 }
 
 export function occurrencesWithin(
-  intervalDays: number,
+  rhythm: Rhythm,
   timesOfDay: string[],
   horizonDays: number,
   period: SchedulePeriod,
@@ -50,12 +47,7 @@ export function occurrencesWithin(
 
   const until = addDays(first, horizonDays);
   const result: Date[] = [];
-  for (const occurrence of occurrenceStream(
-    intervalDays,
-    timesOfDay,
-    period,
-    now,
-  )) {
+  for (const occurrence of occurrenceStream(rhythm, timesOfDay, period, now)) {
     if (occurrence >= until) break;
     result.push(occurrence);
   }
@@ -64,9 +56,9 @@ export function occurrencesWithin(
 
 // Without a start date the rhythm is anchored to today (rolling window), or to
 // the resume day of a pause; with one, every N-th day counts from the start so
-// the rhythm stays stable across a pause.
+// the rhythm stays stable across a pause. Weekdays ignore the anchor.
 function* occurrenceStream(
-  intervalDays: number,
+  rhythm: Rhythm,
   timesOfDay: string[],
   period: SchedulePeriod,
   now: Date,
@@ -77,23 +69,22 @@ function* occurrenceStream(
   const { startDate, endDate } = period;
   const times = [...timesOfDay].sort();
   const lastDay = endDate ? startOfDay(endDate) : null;
+  const anchor = startDate ? startOfDay(startDate) : earliest;
 
-  let day = firstDay(
-    startDate ? startOfDay(startDate) : earliest,
-    earliest,
-    intervalDays,
-  );
-  for (let scanned = 0; scanned < MAX_SCAN_DAYS; scanned += intervalDays) {
+  let day = anchor >= earliest ? anchor : earliest;
+  for (let scanned = 0; scanned < MAX_SCAN_DAYS; scanned++) {
     if (lastDay && day > lastDay) return;
-    let previous: Date | null = null;
-    for (const time of times) {
-      const occurrence = atTime(day, time);
-      // Times inside a spring-forward gap both land on the first valid instant.
-      const isCollapsed = previous?.getTime() === occurrence.getTime();
-      previous = occurrence;
-      if (occurrence >= now && !isCollapsed) yield occurrence;
+    if (isRhythmDay(rhythm, anchor, day)) {
+      let previous: Date | null = null;
+      for (const time of times) {
+        const occurrence = atTime(day, time);
+        // Times inside a spring-forward gap both land on the first valid instant.
+        const isCollapsed = previous?.getTime() === occurrence.getTime();
+        previous = occurrence;
+        if (occurrence >= now && !isCollapsed) yield occurrence;
+      }
     }
-    day = addDays(day, intervalDays);
+    day = addDays(day, 1);
   }
 }
 
@@ -101,12 +92,6 @@ function* occurrenceStream(
 function earliestDay(period: SchedulePeriod, now: Date): Date | null {
   if (!isPaused(period, now)) return startOfDay(now);
   return period.resumeAt ? startOfDay(period.resumeAt) : null;
-}
-
-function firstDay(anchor: Date, earliest: Date, step: number): Date {
-  if (anchor >= earliest) return anchor;
-  const elapsed = daysBetween(anchor, earliest);
-  return addDays(anchor, Math.ceil(elapsed / step) * step);
 }
 
 function atTime(day: Date, time: string): Date {

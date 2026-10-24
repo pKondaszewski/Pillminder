@@ -1,6 +1,10 @@
 import type { Schedule } from '@/schedules/schedule-service';
 
-import { productReorderStatus, reorderStatus } from '../reorder';
+import {
+  consumptionBetween,
+  productReorderStatus,
+  reorderStatus,
+} from '../reorder';
 
 const NOW = new Date(2026, 0, 10, 12, 0);
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -10,6 +14,7 @@ function rhythm(overrides: Partial<Schedule>): Schedule {
     id: 'schedule-1',
     productId: 'product-1',
     intervalDays: 1,
+    weekdays: null,
     timesOfDay: ['08:00'],
     quantity: 1,
     startDate: null,
@@ -426,5 +431,74 @@ describe('productReorderStatus', () => {
 
     // then
     expect(status.isLow).toBe(true);
+  });
+});
+
+describe('reorderStatus on weekdays', () => {
+  const weekendly = rhythm({ weekdays: [0, 6], timesOfDay: ['08:00'] });
+
+  it('averages the consumption over the week', () => {
+    // given
+    const schedules = [weekendly];
+
+    // when
+    const status = reorderStatus(null, schedules, NOW);
+
+    // then
+    expect(status.dailyConsumption).toBeCloseTo(2 / 7);
+  });
+
+  it('runs out at the end of the last chosen day the stock covers', () => {
+    // given
+    const stock = 4;
+
+    // when
+    const status = reorderStatus(stock, [weekendly], NOW);
+
+    // then
+    expect(status.daysLeft).toBeCloseTo(9);
+  });
+
+  it('spends one unit a week on a once-a-week schedule', () => {
+    // given
+    const weekly = rhythm({ weekdays: [1] });
+
+    // when
+    const status = reorderStatus(3, [weekly], NOW);
+
+    // then
+    expect(status.daysLeft).toBeCloseTo(17);
+  });
+});
+
+describe('consumptionBetween on weekdays', () => {
+  it('counts the chosen days inside a trip', () => {
+    // given
+    const schedules = [rhythm({ weekdays: [0, 6], quantity: 2 })];
+
+    // when
+    const units = consumptionBetween(
+      schedules,
+      new Date(2026, 0, 12),
+      new Date(2026, 0, 18),
+    );
+
+    // then
+    expect(units).toBe(4);
+  });
+
+  it('is zero for a trip that misses the chosen days', () => {
+    // given
+    const schedules = [rhythm({ weekdays: [0, 6] })];
+
+    // when
+    const units = consumptionBetween(
+      schedules,
+      new Date(2026, 0, 12),
+      new Date(2026, 0, 16),
+    );
+
+    // then
+    expect(units).toBe(0);
   });
 });

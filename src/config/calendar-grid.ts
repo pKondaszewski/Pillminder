@@ -15,6 +15,10 @@ export function firstWeekdayOf(language: SupportedLanguage): number {
   return FIRST_WEEKDAY[language];
 }
 
+export function weekdayKeyOf(weekday: number): string {
+  return WEEKDAY_KEYS[weekday];
+}
+
 export function weekdayKeysFrom(firstWeekday: number): string[] {
   return [
     ...WEEKDAY_KEYS.slice(firstWeekday),

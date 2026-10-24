@@ -22,6 +22,7 @@ import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
 import { draftSchedule, scheduleDraftErrors } from '@/schedules/schedule-draft';
 import {
   previewOccurrences,
+  type Rhythm,
   type Schedule,
 } from '@/schedules/schedule-service';
 import { describeStockSufficiency } from '@/schedules/stock-sufficiency';
@@ -65,7 +66,10 @@ export function NewScheduleForm({
     setSeenProductId(selectedProductId);
     if (selectedProductId) setProductId(selectedProductId);
   }
-  const [intervalDays, setIntervalDays] = useState(1);
+  const [rhythm, setRhythm] = useState<Rhythm>({
+    intervalDays: 1,
+    weekdays: null,
+  });
   const [timesOfDay, setTimesOfDay] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [period, setPeriod] = useState<Period>({
@@ -82,7 +86,7 @@ export function NewScheduleForm({
   const product = products.find((p) => p.id === productId);
   const input: NewScheduleInput = {
     productId,
-    intervalDays,
+    ...rhythm,
     timesOfDay,
     quantity,
     ...period,
@@ -91,7 +95,7 @@ export function NewScheduleForm({
   const shownErrors = submitted ? errors : {};
   const doses = errors.period
     ? []
-    : previewOccurrences(intervalDays, timesOfDay, period, now);
+    : previewOccurrences(rhythm, timesOfDay, period, now);
   const stockLine = errors.period
     ? null
     : describeStock(input, product, schedules, now, t, formatDate);
@@ -145,10 +149,7 @@ export function NewScheduleForm({
         </Section>
 
         <Section label={t('schedule.intervalDays')}>
-          <RhythmPicker
-            intervalDays={intervalDays}
-            onChange={setIntervalDays}
-          />
+          <RhythmPicker rhythm={rhythm} onChange={setRhythm} />
         </Section>
 
         <Section

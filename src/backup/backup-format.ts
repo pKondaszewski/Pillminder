@@ -8,7 +8,10 @@ import {
   products,
   schedules,
 } from '@/config/db/schema';
-import { isPositiveInteger } from '@/schedules/schedule-validator';
+import {
+  isPositiveInteger,
+  isValidWeekdays,
+} from '@/schedules/schedule-validator';
 
 import {
   BACKUP_TABLES,
@@ -26,7 +29,7 @@ export type { BackupRows } from './dto/backup-data';
 export type { BackupError } from './dto/backup-parse-result';
 export type { BackupParseResult } from './dto/backup-parse-result';
 
-export const BACKUP_FORMAT_VERSION = 3;
+export const BACKUP_FORMAT_VERSION = 4;
 
 const FIRST_TEXT_PRICE_VERSION = 2;
 
@@ -172,6 +175,9 @@ function isValidValue(
       Array.isArray(value) &&
       value.every((time) => typeof time === 'string' && TIME_OF_DAY.test(time))
     );
+  }
+  if (table === 'schedules' && key === 'weekdays') {
+    return isValidWeekdays(value);
   }
   if (table === 'schedules' && (key === 'intervalDays' || key === 'quantity')) {
     return isPositiveInteger(value);

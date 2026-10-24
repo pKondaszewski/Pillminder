@@ -16,6 +16,7 @@ import m0011 from './0011_add_product_profile_image.sql';
 import m0012 from './0012_price_as_text.sql';
 import m0013 from './0013_add_as_needed_intakes.sql';
 import m0014 from './0014_add_product_store_link_target.sql';
+import m0015 from './0015_add_schedule_weekdays.sql';
 
 export default {
   journal,
@@ -35,5 +36,6 @@ export default {
     m0012,
     m0013,
     m0014,
+    m0015,
   },
 };

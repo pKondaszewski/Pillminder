@@ -1,5 +1,6 @@
 import { daysBetween, startOfDay } from '@/config/date-utils';
 import type { Translate } from '@/config/translate';
+import { describeDays } from '@/schedules/schedule-rhythm';
 import type { Schedule } from '@/schedules/schedule-service';
 
 import type { ReorderStatus } from './dto/reorder-status';
@@ -65,17 +66,14 @@ export function rhythmSummary(
   schedules: Schedule[],
   t: Translate,
   formatTimes: (times: string[]) => string,
+  firstWeekday: number,
 ): string {
   if (schedules.length === 0) return t('products.noSchedule');
   if (schedules.length > 1) {
     return t('products.schedulesCount', { count: schedules.length });
   }
-  const { intervalDays, timesOfDay } = schedules[0];
-  const base =
-    intervalDays === 1
-      ? t('schedule.daily')
-      : t('schedule.everyXDays', { days: intervalDays });
-  return `${base} · ${formatTimes(timesOfDay)}`;
+  const [schedule] = schedules;
+  return `${describeDays(schedule, t, firstWeekday)} · ${formatTimes(schedule.timesOfDay)}`;
 }
 
 export function lastUsedText(

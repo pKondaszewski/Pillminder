@@ -5,7 +5,11 @@ import { Radius, Spacing } from '@/commons/ui/constants/theme';
 import { Icon } from '@/commons/ui/icon';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
-import { useFormatDate, useFormatTime } from '@/commons/ui/use-format-date';
+import {
+  useFirstWeekday,
+  useFormatDate,
+  useFormatTime,
+} from '@/commons/ui/use-format-date';
 import { useTheme } from '@/commons/ui/use-theme';
 import type { Product } from '@/products/product-service';
 import { ProductSection } from '@/products/ui/section';
@@ -31,6 +35,7 @@ export function ScheduleSection({
   const { t } = useTranslation();
   const formatDate = useFormatDate();
   const { formatTimes } = useFormatTime();
+  const firstWeekday = useFirstWeekday();
   const theme = useTheme();
 
   return (
@@ -76,6 +81,7 @@ export function ScheduleSection({
                   unit,
                   now,
                   formatTimes,
+                  firstWeekday,
                 )}
               </ThemedText>
             </ThemedView>

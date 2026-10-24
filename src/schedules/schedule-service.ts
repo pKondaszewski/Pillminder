@@ -16,6 +16,7 @@ import {
 import { assertValidScheduleInput } from './schedule-validator';
 
 export type { CourseProgress } from './dto/course-progress';
+export type { Rhythm } from './dto/rhythm';
 export type {
   ScheduleKind,
   ScheduleListFilters,
@@ -25,7 +26,7 @@ export { isPaused } from './schedule-pause';
 export type { Schedule, ScheduleListItem } from './schedule-repository';
 export {
   describeCourse,
-  describeInterval,
+  describeDays,
   describePause,
   describePeriod,
   describeRhythm,

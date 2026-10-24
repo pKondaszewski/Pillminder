@@ -469,6 +469,7 @@
     "noMatching": "No matching schedules",
     "noMatchingProducts": "No products match",
     "noProducts": "Add a product first",
+    "onWeekdays": "Days of week",
     "pauseAction": "Pause schedule",
     "paused": "Paused",
     "pausedToast": "Schedule paused",
@@ -511,7 +512,8 @@
     "stockLow": "Stock of {{amount}} lasts only until {{date}}",
     "submit": "Add schedule",
     "timesOfDay": "Times",
-    "timesRequired": "Add at least one time"
+    "timesRequired": "Add at least one time",
+    "weeklyOn": "Weekly on {{day}}"
   },
   "settings": {
     "aboutLink": "Pillminder on GitHub",

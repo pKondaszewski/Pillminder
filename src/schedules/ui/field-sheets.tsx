@@ -13,7 +13,7 @@ import { addDays, startOfDay } from '@/config/date-utils';
 import type { ProductUnit } from '@/products/product-service';
 import type { ScheduleChange } from '@/schedules/dto/new-schedule-input';
 import { scheduleDraftErrors } from '@/schedules/schedule-draft';
-import type { Schedule } from '@/schedules/schedule-service';
+import type { Rhythm, Schedule } from '@/schedules/schedule-service';
 import { PeriodFields } from '@/schedules/ui/period-fields';
 import { QuantityStepper } from '@/schedules/ui/quantity-stepper';
 import { RhythmPicker } from '@/schedules/ui/rhythm-picker';
@@ -71,16 +71,19 @@ export function ScheduleFieldSheet({ field, onPause, ...props }: Props) {
 
 function RhythmSheet({ schedule, onSave, onClose }: SheetProps) {
   const { t } = useTranslation();
-  const [intervalDays, setIntervalDays] = useState(schedule.intervalDays);
+  const [rhythm, setRhythm] = useState<Rhythm>({
+    intervalDays: schedule.intervalDays,
+    weekdays: schedule.weekdays,
+  });
 
   return (
     <BottomSheet
       visible
       title={t('schedule.intervalDays')}
       onClose={onClose}
-      onSave={() => onSave({ intervalDays })}
+      onSave={() => onSave(rhythm)}
     >
-      <RhythmPicker intervalDays={intervalDays} onChange={setIntervalDays} />
+      <RhythmPicker rhythm={rhythm} onChange={setRhythm} />
       <ChangeNote />
     </BottomSheet>
   );
