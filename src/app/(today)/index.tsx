@@ -16,15 +16,10 @@ import { EmptyState } from '@/commons/ui/empty-state';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
 import { useConfirmation } from '@/commons/ui/use-confirmation';
-import { useFormatDate } from '@/commons/ui/use-format-date';
+import { useFirstWeekday, useFormatDate } from '@/commons/ui/use-format-date';
 import { useNow } from '@/commons/ui/use-now';
-import {
-  firstWeekdayOf,
-  monthGridDays,
-  weekdayKeysFrom,
-} from '@/config/calendar-grid';
+import { monthGridDays, weekdayKeysFrom } from '@/config/calendar-grid';
 import { addDays, addMonths, isoDay, startOfDay } from '@/config/date-utils';
-import type { SupportedLanguage } from '@/config/i18n';
 import {
   buildTimeline,
   type CorrectionTarget,
@@ -67,7 +62,7 @@ import { useCelebration } from '@/scene/ui/use-celebration';
 import { useSeason } from '@/scene/ui/use-season';
 
 export default function HomeScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const formatDate = useFormatDate();
   const now = useNow();
   const coords = useSunCoords();
@@ -118,7 +113,7 @@ export default function HomeScreen() {
     ? DOSE_ACTION_TEXT_KEYS[undoableKindOf(revertedDose)]
     : null;
 
-  const firstWeekday = firstWeekdayOf(i18n.language as SupportedLanguage);
+  const firstWeekday = useFirstWeekday();
   const calendarDays = monthGridDays(calendarMonth, firstWeekday);
   const monthDoses = useDosesBetween(
     calendarDays[0],

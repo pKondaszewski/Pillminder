@@ -5,14 +5,9 @@ import { BottomSheet } from '@/commons/ui/bottom-sheet';
 import type { ThemeColor } from '@/commons/ui/constants/theme';
 import { type DayCellState, MonthGrid } from '@/commons/ui/month-grid';
 import { MonthHeader } from '@/commons/ui/month-header';
-import { useFormatDate } from '@/commons/ui/use-format-date';
-import {
-  firstWeekdayOf,
-  monthGridDays,
-  weekdayKeysFrom,
-} from '@/config/calendar-grid';
+import { useFirstWeekday, useFormatDate } from '@/commons/ui/use-format-date';
+import { monthGridDays, weekdayKeysFrom } from '@/config/calendar-grid';
 import { addMonths, type DateRange } from '@/config/date-utils';
-import type { SupportedLanguage } from '@/config/i18n';
 import type { RangeDraft } from '@/products/product-service';
 import { isEdgeOfRange, isInsideRange, tapDay } from '@/products/trip-range';
 
@@ -24,12 +19,12 @@ type Props = {
 };
 
 export function TripRangeSheet({ visible, range, onClose, onSave }: Props) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const formatDate = useFormatDate();
   const [draft, setDraft] = useState<RangeDraft>(range);
   const [month, setMonth] = useState(range.from);
   const now = new Date();
-  const firstWeekday = firstWeekdayOf(i18n.language as SupportedLanguage);
+  const firstWeekday = useFirstWeekday();
   const { to } = draft;
 
   const cellState = (day: Date): DayCellState => {
