@@ -92,7 +92,7 @@ export async function addProduct(input: NewProductInput): Promise<string> {
   log.info(`Adding product "${input.name}"`);
   try {
     const created = await createProductRow(input);
-    log.info(`Created product ${JSON.stringify(created)}`);
+    log.info(`Created product ${created.id}`);
     return created.id;
   } catch (err) {
     log.error(`Failed to add product "${input.name}"`, err);
@@ -107,7 +107,7 @@ export async function updateProduct(
   log.info(`Updating product with id ${id}`);
   try {
     const updated = await updateProductRow(id, input);
-    log.info(`Updated product ${JSON.stringify(updated)}`);
+    log.info(`Updated product ${updated.id}`);
   } catch (err) {
     log.error(`Failed to update product with id ${id}`, err);
     throw err;

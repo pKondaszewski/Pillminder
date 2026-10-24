@@ -187,7 +187,7 @@ describe('timeSlotLayout', () => {
       kind: 'list',
       visible: entriesOf(doses),
       collapsible: true,
-      overflowCount: null,
+      totalCount: null,
     });
   });
 
@@ -217,7 +217,7 @@ describe('timeSlotLayout', () => {
       kind: 'list',
       visible: entriesOf(doses),
       collapsible: false,
-      overflowCount: null,
+      totalCount: null,
     });
   });
 
@@ -231,7 +231,7 @@ describe('timeSlotLayout', () => {
     // then
     expect(layout).toMatchObject({
       visible: entriesOf(doses),
-      overflowCount: null,
+      totalCount: null,
     });
   });
 
@@ -247,7 +247,7 @@ describe('timeSlotLayout', () => {
     expect(layout).toMatchObject({
       kind: 'list',
       visible: entriesOf(active.slice(0, 4)),
-      overflowCount: 7,
+      totalCount: 7,
     });
   });
 
@@ -261,7 +261,7 @@ describe('timeSlotLayout', () => {
     // then
     expect(layout).toMatchObject({
       visible: entriesOf(doses),
-      overflowCount: 6,
+      totalCount: 6,
     });
   });
 
@@ -293,7 +293,7 @@ describe('timeSlotLayout', () => {
       kind: 'list',
       visible: entries,
       collapsible: true,
-      overflowCount: null,
+      totalCount: null,
     });
   });
 
@@ -324,7 +324,7 @@ describe('timeSlotLayout', () => {
     // then
     expect(layout).toMatchObject({
       visible: entries.slice(1, 5),
-      overflowCount: 7,
+      totalCount: 7,
     });
   });
 });

@@ -19,5 +19,5 @@ export type TimeSlotLayout =
       kind: 'list';
       visible: TimeSlotEntry[];
       collapsible: boolean;
-      overflowCount: number | null;
+      totalCount: number | null;
     };

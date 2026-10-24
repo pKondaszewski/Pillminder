@@ -22,7 +22,6 @@ export function reorderStatus(
 
   if (daysLeft === null) {
     return {
-      dailyConsumption,
       daysLeft: null,
       runOutAt: null,
       reorderAt: null,
@@ -36,7 +35,6 @@ export function reorderStatus(
   );
 
   return {
-    dailyConsumption,
     daysLeft,
     runOutAt,
     reorderAt,
@@ -69,7 +67,6 @@ export function productReorderStatus(
 
   const isLow = stock <= reorderThreshold;
   return {
-    dailyConsumption: 0,
     daysLeft: null,
     runOutAt: null,
     reorderAt: isLow ? now : null,

@@ -6,11 +6,6 @@ export interface Logger {
 
 type Level = 'INFO' | 'WARN' | 'ERROR';
 
-function format(level: Level, scope: string, message: string): string {
-  const timestamp = new Date().toISOString();
-  return `${timestamp}  ${level.padEnd(5)} --- [${scope}] : ${message}`;
-}
-
 export function createLogger(scope: string): Logger {
   return {
     info: (message, ...args) =>
@@ -20,4 +15,9 @@ export function createLogger(scope: string): Logger {
     error: (message, ...args) =>
       console.error(format('ERROR', scope, message), ...args),
   };
+}
+
+function format(level: Level, scope: string, message: string): string {
+  const timestamp = new Date().toISOString();
+  return `${timestamp}  ${level.padEnd(5)} --- [${scope}] : ${message}`;
 }

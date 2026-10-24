@@ -46,7 +46,6 @@ describe('reorderStatus', () => {
 
     // then
     expect(status).toEqual({
-      dailyConsumption: 1,
       daysLeft: null,
       runOutAt: null,
       reorderAt: null,
@@ -79,7 +78,6 @@ describe('reorderStatus', () => {
 
     // then
     expect(status).toEqual({
-      dailyConsumption: 0,
       daysLeft: null,
       runOutAt: null,
       reorderAt: null,
@@ -98,7 +96,6 @@ describe('reorderStatus', () => {
     const status = reorderStatus(stock, schedules, NOW);
 
     // then
-    expect(status.dailyConsumption).toBe(1);
     expect(status.daysLeft).toBe(20);
     expect(status.runOutAt).toEqual(daysFromNow(20));
     expect(status.reorderAt).toEqual(daysFromNow(13));
@@ -116,7 +113,6 @@ describe('reorderStatus', () => {
     const status = reorderStatus(stock, schedules, NOW);
 
     // then
-    expect(status.dailyConsumption).toBe(2);
     expect(status.daysLeft).toBe(10);
   });
 
@@ -131,7 +127,6 @@ describe('reorderStatus', () => {
     const status = reorderStatus(stock, schedules, NOW);
 
     // then
-    expect(status.dailyConsumption).toBe(2);
     expect(status.daysLeft).toBe(10);
   });
 
@@ -146,7 +141,6 @@ describe('reorderStatus', () => {
     const status = reorderStatus(stock, schedules, NOW);
 
     // then
-    expect(status.dailyConsumption).toBe(0.5);
     expect(status.daysLeft).toBe(20);
   });
 
@@ -162,7 +156,6 @@ describe('reorderStatus', () => {
     const status = reorderStatus(stock, schedules, NOW);
 
     // then
-    expect(status.dailyConsumption).toBe(2);
     expect(status.daysLeft).toBe(10);
   });
 
@@ -181,7 +174,6 @@ describe('reorderStatus', () => {
     const status = reorderStatus(stock, schedules, NOW);
 
     // then
-    expect(status.dailyConsumption).toBe(0);
     expect(status.daysLeft).toBe(5 + 10);
   });
 
@@ -305,7 +297,6 @@ describe('reorderStatus with a paused schedule', () => {
 
     // then
     expect(status).toMatchObject({
-      dailyConsumption: 0,
       daysLeft: null,
       isLow: false,
     });
@@ -441,17 +432,6 @@ describe('productReorderStatus', () => {
 describe('reorderStatus on weekdays', () => {
   const weekendly = rhythm({ weekdays: [0, 6], timesOfDay: ['08:00'] });
 
-  it('averages the consumption over the week', () => {
-    // given
-    const schedules = [weekendly];
-
-    // when
-    const status = reorderStatus(null, schedules, NOW);
-
-    // then
-    expect(status.dailyConsumption).toBeCloseTo(2 / 7);
-  });
-
   it('runs out at the end of the last chosen day the stock covers', () => {
     // given
     const stock = 4;
@@ -514,17 +494,6 @@ describe('reorderStatus with a cycle', () => {
       rhythmAnchor: new Date(2026, 0, 10),
       ...overrides,
     });
-
-  it('averages the consumption over the on and off days', () => {
-    // given
-    const schedules = [cycled()];
-
-    // when
-    const status = reorderStatus(null, schedules, NOW);
-
-    // then
-    expect(status.dailyConsumption).toBeCloseTo(3 / 5);
-  });
 
   it('spends nothing on the off days', () => {
     // given
@@ -619,15 +588,15 @@ describe('reorderStatus with steps', () => {
     expect(status.daysLeft).toBeCloseTo(3);
   });
 
-  it('reports the quantity of the current step as the daily consumption', () => {
+  it('spends the quantity of the current step per day', () => {
     // given
     const schedules = [prednisone({ rhythmAnchor: new Date(2026, 0, 7) })];
 
     // when
-    const status = reorderStatus(null, schedules, NOW);
+    const status = reorderStatus(2, schedules, NOW);
 
     // then
-    expect(status.dailyConsumption).toBe(2);
+    expect(status.daysLeft).toBe(1);
   });
 
   it('counts the quantity of each day inside a trip', () => {

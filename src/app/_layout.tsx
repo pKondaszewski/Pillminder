@@ -38,14 +38,14 @@ export default function RootLayout() {
 
   // useMigrations runs once per mount, so a new key is what re-runs them
   return (
-    <TabLayout
+    <AppShell
       key={attempt}
       onRerunMigrations={() => setAttempt((n) => n + 1)}
     />
   );
 }
 
-function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
+function AppShell({ onRerunMigrations }: { onRerunMigrations: () => void }) {
   const colorScheme = useColorScheme();
   const { success: migrationsReady, error: migrationError } = useMigrations(
     db,

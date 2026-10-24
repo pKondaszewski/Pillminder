@@ -44,7 +44,7 @@ describe('sunTimes', () => {
     ).toBeLessThanOrEqual(TOLERANCE_MS);
   });
 
-  it('puts solar noon between sunrise and sunset', () => {
+  it('puts sunrise before sunset', () => {
     // given
     const date = new Date(2026, 8, 10);
 
@@ -52,8 +52,7 @@ describe('sunTimes', () => {
     const result = sunTimes(date, WARSAW);
 
     // then
-    expect(result!.sunrise.getTime()).toBeLessThan(result!.noon.getTime());
-    expect(result!.noon.getTime()).toBeLessThan(result!.sunset.getTime());
+    expect(result!.sunrise.getTime()).toBeLessThan(result!.sunset.getTime());
   });
 
   it('gives a day of about 12 hours on the equator at the equinox', () => {

@@ -13,12 +13,11 @@ describe('dayPhases', () => {
     // then
     expect(phases).toEqual({
       sunrise: new Date(2026, 9, 10, 6),
-      noon: new Date(2026, 9, 10, 12),
       sunset: new Date(2026, 9, 10, 18),
     });
   });
 
-  it('uses sunrise, noon and sunset of the location when coordinates are given', () => {
+  it('uses sunrise and sunset of the location when coordinates are given', () => {
     // given
     const date = new Date(2026, 5, 21, 15);
     const warsaw = { latitude: 52.23, longitude: 21.01 };
@@ -44,7 +43,6 @@ describe('dayPhases', () => {
     // then
     expect(phases).toEqual({
       sunrise: new Date(2026, 5, 21, 6),
-      noon: new Date(2026, 5, 21, 12),
       sunset: new Date(2026, 5, 21, 18),
     });
   });

@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, AppState } from 'react-native';
+import { Alert } from 'react-native';
 
 import {
   isBatteryOptimizationEnabled,
   openBatteryOptimizationSettings,
 } from '@/battery/battery-service';
+import { useRefreshOnForeground } from '@/commons/ui/use-refresh-on-foreground';
 import { createLogger } from '@/config/logger';
 
 const log = createLogger('use-battery-optimization');
@@ -24,13 +25,7 @@ export function useBatteryOptimization() {
   );
 
   // The user changes the setting on a system screen and comes back
-  useEffect(() => {
-    void refresh();
-    const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') void refresh();
-    });
-    return () => subscription.remove();
-  }, [refresh]);
+  useRefreshOnForeground(refresh);
 
   const openSettings = async (): Promise<boolean> => {
     setBusy(true);

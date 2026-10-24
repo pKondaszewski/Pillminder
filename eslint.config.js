@@ -15,6 +15,14 @@ const uiNeverReachesData = {
     'ui/ talks to the module service and DTOs only. Repositories, helpers and the db are data-layer code, also via a relative path.',
 };
 
+// ui/ may own a store (pending-undo-store), so a relative path only counts when
+// it climbs out of ui/ into the module root.
+const uiNeverReachesStores = (moduleRootPath) => ({
+  group: ['@/*/*-store', moduleRootPath],
+  message:
+    'ui/ talks to the module service only. A module store is data-layer code, also via a relative path - re-export what you need from the service.',
+});
+
 const nothingImportsUi = {
   group: ['@/*/ui', '@/*/ui/**', '**/ui', '**/ui/**'],
   message:
@@ -46,7 +54,28 @@ module.exports = defineConfig([
     rules: {
       '@typescript-eslint/no-restricted-imports': [
         'error',
-        { patterns: [moduleFacadePattern, uiNeverReachesData] },
+        {
+          patterns: [
+            moduleFacadePattern,
+            uiNeverReachesData,
+            uiNeverReachesStores('../*-store'),
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/*/ui/__tests__/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            moduleFacadePattern,
+            uiNeverReachesData,
+            uiNeverReachesStores('../../*-store'),
+          ],
+        },
       ],
     },
   },
