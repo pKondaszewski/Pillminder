@@ -601,7 +601,10 @@
     "moreEnough": "+{{count}} enough",
     "moreRibbons": "+{{count}} more",
     "pack": "Pack: {{amount}}",
+    "packs_one": "Pack: {{count}} pack ({{amount}})",
+    "packs_other": "Pack: {{count}} packs ({{amount}})",
     "pieces": "{{count}} pcs",
+    "reserve": "Pack a reserve of {{amount}}",
     "runsOutAfterReturn": "Buy a refill before you go: the stock runs out within a week after you return",
     "runsOutDuringTrip": "Buy a refill before you go: the stock runs out during the trip",
     "title": "Trip planner"

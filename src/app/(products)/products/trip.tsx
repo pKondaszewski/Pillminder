@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { TravelPlan } from '@/products/ui/travel-plan';
@@ -8,7 +8,7 @@ export default function TripScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: true, title: t('travel.title') }} />
-      <TravelPlan />
+      <TravelPlan onOpenProduct={(id) => router.push(`/products/${id}`)} />
     </>
   );
 }

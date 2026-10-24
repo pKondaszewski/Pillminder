@@ -639,7 +639,12 @@
     "moreEnough": "+{{count}} wystarczy",
     "moreRibbons": "+{{count}} więcej",
     "pack": "Spakuj: {{amount}}",
+    "packs_few": "Spakuj: {{count}} opakowania ({{amount}})",
+    "packs_many": "Spakuj: {{count}} opakowań ({{amount}})",
+    "packs_one": "Spakuj: {{count}} opakowanie ({{amount}})",
+    "packs_other": "Spakuj: {{count}} opakowania ({{amount}})",
     "pieces": "{{count}} szt.",
+    "reserve": "Spakuj zapas na {{amount}}",
     "runsOutAfterReturn": "Kup przed wyjazdem: zapas skończy się w ciągu tygodnia po powrocie",
     "runsOutDuringTrip": "Kup przed wyjazdem: zapas skończy się w trakcie wyjazdu",
     "title": "Planer wyjazdu"
