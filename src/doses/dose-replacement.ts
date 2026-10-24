@@ -6,16 +6,13 @@ export function planPendingReplacement(
   existing: Dose[],
   slots: NewDoseSlot[],
   now: Date,
-): { kept: Dose[]; removedIds: string[]; newSlots: NewDoseSlot[] } {
+): { removedIds: string[]; newSlots: NewDoseSlot[] } {
   const wanted = new Set(slots.map((slot) => slot.plannedAt.getTime()));
   const existingTimes = new Set(
     existing.map((dose) => dose.plannedAt.getTime()),
   );
 
   return {
-    kept: existing.filter(
-      (dose) => wanted.has(dose.plannedAt.getTime()) && dose.plannedAt >= now,
-    ),
     removedIds: existing
       .filter((dose) => !wanted.has(dose.plannedAt.getTime()))
       .map((dose) => dose.id),

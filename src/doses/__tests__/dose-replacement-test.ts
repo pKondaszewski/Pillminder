@@ -31,7 +31,6 @@ describe('planPendingReplacement', () => {
 
     // then
     expect(plan.removedIds).toEqual(['old']);
-    expect(plan.kept).toEqual([]);
     expect(plan.newSlots).toEqual(slots);
   });
 
@@ -45,7 +44,6 @@ describe('planPendingReplacement', () => {
 
     // then
     expect(plan.removedIds).toEqual([]);
-    expect(plan.kept).toEqual([]);
     expect(plan.newSlots).toEqual([]);
   });
 
@@ -78,7 +76,6 @@ describe('planPendingReplacement', () => {
 
     // then
     expect(plan.removedIds).toEqual(['old']);
-    expect(plan.kept).toEqual([upcomingSame]);
     expect(plan.newSlots).toEqual([slots[1]]);
   });
 });

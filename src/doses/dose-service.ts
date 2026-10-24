@@ -20,6 +20,7 @@ import {
   getSchedule,
   getSchedules,
   getSchedulesByProduct,
+  isPaused,
   occurrencesWithin,
   quantityOn,
   type Schedule,
@@ -212,16 +213,17 @@ export async function syncDosesForSchedules(
     const now = new Date();
     const from = startOfDay(now);
 
-    const slots =
-      product?.status === 'archived'
-        ? []
-        : occurrencesWithin(
-            schedule,
-            schedule.timesOfDay,
-            DOSE_HORIZON_DAYS,
-            schedule,
-            from,
-          );
+    const archived = product?.status === 'archived';
+    const inactive = archived || isPaused(schedule, now);
+    const slots = archived
+      ? []
+      : occurrencesWithin(
+          schedule,
+          schedule.timesOfDay,
+          DOSE_HORIZON_DAYS,
+          schedule,
+          from,
+        );
 
     log.info(
       `Syncing ${slots.length} dose slot(s) for schedule ${schedule.id}`,
@@ -229,7 +231,7 @@ export async function syncDosesForSchedules(
     try {
       const { removedIds } = await replacePendingDoseRows(
         schedule.id,
-        from,
+        inactive ? now : from,
         now,
         slots.map((plannedAt) => ({
           productId: schedule.productId,
