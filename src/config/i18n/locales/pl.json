@@ -61,6 +61,9 @@
     "nasal-spray": "Spray do nosa",
     "eye-drops": "Krople do oczu"
   },
+  "common": {
+    "errorTitle": "Coś poszło nie tak"
+  },
   "editor": {
     "newCategoryTitle": "Nowa kategoria",
     "editCategory": "Edytuj kategorię",
@@ -125,9 +128,6 @@
   },
   "filters": {
     "clear": "Wyczyść"
-  },
-  "history": {
-    "errorCorrect": "Nie udało się zmienić dawki. Spróbuj ponownie."
   },
   "home": {
     "bulkTake": "Wziąłem zaległe ({{count}})",
@@ -209,6 +209,7 @@
       "message": "Dodaj lek lub suplement i ustaw harmonogram, a resztą zajmie się aplikacja.",
       "title": "Zacznij od pierwszego produktu"
     },
+    "errorChangeDose": "Nie udało się zmienić dawki. Spróbuj ponownie.",
     "expandSlot": "Rozwiń: {{slot}}",
     "pager": {
       "backToToday": "Wróć do dziś",
@@ -392,8 +393,11 @@
     },
     "emptyMessage": "Dodaj lek albo suplement, a aplikacja przypomni o dawkach i przypilnuje zapasu.",
     "emptyTitle": "Nie masz jeszcze produktów",
+    "errorArchive": "Nie udało się zarchiwizować produktu. Spróbuj ponownie.",
+    "errorDelete": "Nie udało się usunąć produktu. Spróbuj ponownie.",
+    "errorRestore": "Nie udało się przywrócić produktu. Spróbuj ponownie.",
+    "errorSave": "Nie udało się zapisać produktu. Spróbuj ponownie.",
     "errorStock": "Nie udało się zmienić zapasu. Spróbuj ponownie.",
-    "errorTitle": "Coś poszło nie tak",
     "filterActive": "Aktywne",
     "filterArchived": "Archiwum",
     "filterCategory": "Kategoria",

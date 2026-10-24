@@ -23,7 +23,7 @@ export function useUndoableDoseAction(
 
   const reportFailure = (what: string, err: unknown) => {
     log.error(`Failed to ${what}`, err);
-    Alert.alert(t('products.errorTitle'), t('history.errorCorrect'));
+    Alert.alert(t('common.errorTitle'), t('home.errorChangeDose'));
   };
 
   const applyWithUndo = async (
@@ -53,7 +53,7 @@ export function useUndoableDoseAction(
       }
     }
     if (failed > 0) {
-      Alert.alert(t('products.errorTitle'), t('home.bulkTakeError'));
+      Alert.alert(t('common.errorTitle'), t('home.bulkTakeError'));
     }
   };
 

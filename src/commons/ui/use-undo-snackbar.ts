@@ -40,7 +40,7 @@ export function useUndoSnackbar() {
   };
 
   const alertFailure = (errorKey: string) =>
-    Alert.alert(t('products.errorTitle'), t(errorKey));
+    Alert.alert(t('common.errorTitle'), t(errorKey));
 
   const runPresentingUndo = async (
     { message, apply, revert }: UndoableChange,

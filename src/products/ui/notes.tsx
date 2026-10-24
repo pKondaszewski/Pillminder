@@ -26,7 +26,7 @@ export function ProductNotes({ productId }: { productId: string }) {
       await removeNote(note.id);
       if (note.id === editingId) reset();
     } catch {
-      Alert.alert(t('products.errorTitle'), t('notes.errorDelete'));
+      Alert.alert(t('common.errorTitle'), t('notes.errorDelete'));
     }
   });
 
@@ -34,7 +34,7 @@ export function ProductNotes({ productId }: { productId: string }) {
     try {
       await submit();
     } catch {
-      Alert.alert(t('products.errorTitle'), t('notes.errorSave'));
+      Alert.alert(t('common.errorTitle'), t('notes.errorSave'));
     }
   };
 

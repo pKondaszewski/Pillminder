@@ -10,6 +10,6 @@ export function useRunWithErrorAlert<T = unknown>(
 
   return (action: () => Promise<T>, errorKey: string) =>
     runReportingErrors(action, onSuccess, () =>
-      Alert.alert(t('products.errorTitle'), t(errorKey)),
+      Alert.alert(t('common.errorTitle'), t(errorKey)),
     );
 }

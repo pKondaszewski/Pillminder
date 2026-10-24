@@ -180,7 +180,7 @@ export default function HomeScreen() {
     try {
       await correctDoseState(dose.id, target);
     } catch {
-      Alert.alert(t('products.errorTitle'), t('history.errorCorrect'));
+      Alert.alert(t('common.errorTitle'), t('home.errorChangeDose'));
     }
   };
 

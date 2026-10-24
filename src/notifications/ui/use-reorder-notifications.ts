@@ -9,6 +9,7 @@ import {
   showReorderAlert,
 } from '@/notifications/notification-service';
 import { reorderAlertAction } from '@/notifications/reorder-alert-action';
+import { reorderAlertTime } from '@/notifications/reorder-alert-time';
 import { reorderNotificationText } from '@/notifications/reorder-text';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
 import type { Product } from '@/products/product-service';
@@ -33,9 +34,11 @@ function syncReorderAlerts(
   const now = new Date();
   return Promise.all(
     products.map(async (product) => {
-      const reorderAt = statuses[product.id]?.reorderAt ?? null;
+      const alertTime = reorderAlertTime(
+        statuses[product.id]?.reorderAt ?? null,
+      );
       const alertedAt = getReorderAlertedAt(product.id);
-      const action = reorderAlertAction(reorderAt, alertedAt, now);
+      const action = reorderAlertAction(alertTime, alertedAt, now);
       if (action.kind === 'keep') return;
       if (action.kind === 'cancel') return cancelReorderAlert(product.id);
 

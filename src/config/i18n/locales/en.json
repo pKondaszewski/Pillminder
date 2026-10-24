@@ -57,6 +57,9 @@
     "nasal-spray": "Nasal spray",
     "eye-drops": "Eye drops"
   },
+  "common": {
+    "errorTitle": "Something went wrong"
+  },
   "editor": {
     "newCategoryTitle": "New category",
     "editCategory": "Edit category",
@@ -119,9 +122,6 @@
   },
   "filters": {
     "clear": "Clear"
-  },
-  "history": {
-    "errorCorrect": "Could not change the dose. Try again."
   },
   "home": {
     "bulkTake": "Take overdue ({{count}})",
@@ -187,6 +187,7 @@
       "message": "Add a medication or supplement and set a schedule, the app handles the rest.",
       "title": "Start with your first product"
     },
+    "errorChangeDose": "Could not change the dose. Try again.",
     "expandSlot": "Expand: {{slot}}",
     "pager": {
       "backToToday": "Back to today",
@@ -366,8 +367,11 @@
     },
     "emptyMessage": "Add a medication or supplement and the app will remind you of doses and keep an eye on your stock.",
     "emptyTitle": "You have no products yet",
+    "errorArchive": "Could not archive the product. Try again.",
+    "errorDelete": "Could not delete the product. Try again.",
+    "errorRestore": "Could not restore the product. Try again.",
+    "errorSave": "Could not save the product. Try again.",
     "errorStock": "Could not change the stock. Try again.",
-    "errorTitle": "Something went wrong",
     "filterActive": "Active",
     "filterArchived": "Archived",
     "filterCategory": "Category",
