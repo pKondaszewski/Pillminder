@@ -367,6 +367,7 @@
   "products": {
     "active": "Aktywny",
     "add": "Dodaj produkt",
+    "added": "Dodano produkt",
     "all": "Wszystkie",
     "archived": "Archiwum",
     "daysCount_few": "{{count}} dni",

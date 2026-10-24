@@ -14,7 +14,9 @@ import {
 import { type FilterToken, SearchField } from '@/commons/ui/search-field';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
+import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
 import { useFirstWeekday, useFormatTime } from '@/commons/ui/use-format-date';
+import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import { categoryLabel } from '@/products/category';
 import {
   categoryFilterIfListed,
@@ -43,6 +45,7 @@ export default function ProductListScreen() {
   const { schedules } = useSchedules();
   const reorderStatuses = useReorderStatuses();
   const { openStore, storeTargetSheet } = useOpenStore();
+  const { snackbar } = useUndoSnackbar();
 
   const [filters, setFilters] = useState(DEFAULT_PRODUCT_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -128,6 +131,8 @@ export default function ProductListScreen() {
           </>
         )}
       </SafeAreaView>
+
+      <UndoSnackbar snackbar={snackbar} />
 
       <ProductFilterSheet
         visible={filtersOpen}

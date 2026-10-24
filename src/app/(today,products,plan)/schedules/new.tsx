@@ -4,8 +4,8 @@ import { StyleSheet } from 'react-native';
 
 import { ThemedView } from '@/commons/ui/themed-view';
 import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
+import { creationChange } from '@/config/undoable-change';
 import { useProducts } from '@/products/ui/use-products';
-import { scheduleCreateChange } from '@/schedules/schedule-undo';
 import { NewScheduleForm } from '@/schedules/ui/new-form';
 import { useSchedules } from '@/schedules/ui/use-schedules';
 
@@ -37,10 +37,9 @@ export default function NewScheduleScreen() {
         productLocked={lockedProduct !== undefined}
         onSubmit={(input) =>
           runWithUndoOnNextScreen(
-            scheduleCreateChange(
-              input,
+            creationChange(
               t('schedule.created'),
-              addSchedule,
+              () => addSchedule(input),
               removeSchedule,
             ),
             'schedule.errorSave',
