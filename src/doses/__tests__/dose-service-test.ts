@@ -43,6 +43,7 @@ jest.mock('@/settings/settings-service', () => ({
 
 const NOW = new Date('2026-03-10T10:00:00Z');
 const YESTERDAY = new Date('2026-03-09T19:00:00Z');
+const TODAY_MORNING = new Date('2026-03-10T06:00:00Z');
 const TODAY_EVENING = new Date('2026-03-10T19:00:00Z');
 const TOMORROW_EVENING = new Date('2026-03-11T19:00:00Z');
 
@@ -196,6 +197,71 @@ describe('dose service on a real database', () => {
       // then
       expect(db.select().from(doses).all()).toEqual([]);
       expect(scheduleDoseReminders).toHaveBeenCalledWith([]);
+    });
+
+    it("keeps today's overdue pending dose of an archived product as missed history and removes the future ones", async () => {
+      // given
+      const product = insertProduct({ id: 'p1', status: 'archived' });
+      const schedule = insertSchedule({
+        id: 's1',
+        productId: product.id,
+        timesOfDay: ['07:00', '20:00'],
+      });
+      insertDose({
+        id: 'missed',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: TODAY_MORNING,
+      });
+      insertDose({
+        id: 'upcoming',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: TODAY_EVENING,
+      });
+
+      // when
+      await syncDosesForSchedules([schedule]);
+
+      // then
+      expect(plannedTimes()).toEqual([TODAY_MORNING.toISOString()]);
+      expect(cancelDoseReminders).toHaveBeenCalledWith(['upcoming']);
+    });
+
+    it("keeps today's overdue pending dose of a paused schedule and does not duplicate it after the resume", async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      const paused = insertSchedule({
+        id: 's1',
+        productId: 'p1',
+        timesOfDay: ['07:00', '20:00'],
+        pausedAt: NOW,
+      });
+      insertDose({
+        id: 'missed',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: TODAY_MORNING,
+      });
+      insertDose({
+        id: 'upcoming',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: TODAY_EVENING,
+      });
+      await syncDosesForSchedules([paused]);
+      const whilePaused = plannedTimes();
+
+      // when
+      await syncDosesForSchedules([{ ...paused, pausedAt: null }]);
+
+      // then
+      expect(whilePaused).toEqual([TODAY_MORNING.toISOString()]);
+      const times = plannedTimes();
+      expect(
+        times.filter((t) => t === TODAY_MORNING.toISOString()),
+      ).toHaveLength(1);
+      expect(times).toContain(TODAY_EVENING.toISOString());
     });
 
     it('plans the reminders of all products together, not only of the synced schedule', async () => {
