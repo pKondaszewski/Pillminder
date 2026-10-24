@@ -73,7 +73,8 @@ export type { TodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');
 
-// Alarms are budgeted across all products, so every re-plan runs one at a time.
+// Alarms are budgeted across all products, so every reminder change (re-plan or
+// cancel) runs one at a time.
 let reminderPlanning: Promise<void> = Promise.resolve();
 
 export function getDosesBetweenQuery(from: Date, to: Date) {
@@ -93,7 +94,9 @@ export async function cancelPendingReminders(
 ): Promise<void> {
   const scheduleList = scheduleIds.join(', ');
   try {
-    await cancelDoseReminders(await getPendingDoseIdsForSchedules(scheduleIds));
+    await inReminderQueue(async () =>
+      cancelDoseReminders(await getPendingDoseIdsForSchedules(scheduleIds)),
+    );
   } catch (err) {
     log.error(
       `Failed to cancel pending reminders for schedule(s) ${scheduleList}`,
@@ -114,7 +117,7 @@ export async function cancelFutureDosesForSchedules(
       scheduleIds,
       new Date(),
     );
-    await cancelDoseReminders(removedIds);
+    await inReminderQueue(() => cancelDoseReminders(removedIds));
   } catch (err) {
     log.error(
       `Failed to cancel future doses for schedule(s) ${scheduleList}`,
@@ -125,9 +128,7 @@ export async function cancelFutureDosesForSchedules(
 }
 
 export async function refreshAllReminders(): Promise<void> {
-  const run = reminderPlanning.then(planAllReminders);
-  reminderPlanning = run.catch(() => {});
-  await run;
+  await inReminderQueue(planAllReminders);
 }
 
 export async function takeDose(id: string): Promise<void> {
@@ -155,7 +156,7 @@ export async function restoreDose(snapshot: DoseSnapshot): Promise<void> {
   try {
     await restoreDoseRow(snapshot);
     if (state === 'pending') await rescheduleReminderIfDue(id);
-    else await cancelDoseReminder(id);
+    else await inReminderQueue(() => cancelDoseReminder(id));
   } catch (err) {
     log.error(`Failed to restore dose ${id}`, err);
     throw err;
@@ -237,7 +238,7 @@ export async function syncDosesForSchedules(
         })),
       );
 
-      await cancelDoseReminders(removedIds);
+      await inReminderQueue(() => cancelDoseReminders(removedIds));
     } catch (err) {
       log.error(`Failed to sync doses for schedule ${schedule.id}`, err);
       throw err;
@@ -265,11 +266,18 @@ async function applyDoseState(
   log.info(`Setting ${change}`);
   try {
     await setDoseStateRow(id, state, { backdated });
-    await cancelDoseReminder(id);
+    // A re-plan that read the dose as pending would bring its alarms back.
+    await inReminderQueue(() => cancelDoseReminder(id));
   } catch (err) {
     log.error(`Failed to set ${change}`, err);
     throw err;
   }
+}
+
+async function inReminderQueue(task: () => Promise<void>): Promise<void> {
+  const run = reminderPlanning.then(task);
+  reminderPlanning = run.catch(() => {});
+  await run;
 }
 
 async function rescheduleReminderIfDue(id: string): Promise<void> {
