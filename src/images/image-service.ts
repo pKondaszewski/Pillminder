@@ -11,6 +11,7 @@ import {
 import {
   createImageRow,
   deleteImageRow,
+  deleteImageRowsByFileNames,
   getAllImageFileNames,
   imagesByProductQuery,
   type ProductImage,
@@ -99,6 +100,22 @@ export async function deleteOrphanedImageFiles(): Promise<void> {
     deleteImageFiles(orphans);
   } catch (err) {
     log.error('Failed to delete orphaned image files', err);
+  }
+}
+
+// Photos are left out of the cloud backup, so after a restore the rows are
+// back but the files are not.
+export async function deleteImageRowsWithoutFile(): Promise<void> {
+  try {
+    const existing = new Set(listImageFileNames());
+    const missing = (await getAllImageFileNames()).filter(
+      (name) => !existing.has(name),
+    );
+    if (missing.length === 0) return;
+    log.info(`Deleting ${missing.length} image rows without a file`);
+    await deleteImageRowsByFileNames(missing);
+  } catch (err) {
+    log.error('Failed to delete image rows without a file', err);
   }
 }
 

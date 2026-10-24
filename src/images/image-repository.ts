@@ -87,3 +87,23 @@ export async function deleteImageRow(id: string): Promise<void> {
     tx.delete(productImages).where(eq(productImages.id, id)).run();
   });
 }
+
+export async function deleteImageRowsByFileNames(
+  fileNames: string[],
+): Promise<void> {
+  db.transaction((tx) => {
+    for (const fileName of fileNames) {
+      const row = tx
+        .select({ id: productImages.id })
+        .from(productImages)
+        .where(eq(productImages.fileName, fileName))
+        .get();
+      if (!row) continue;
+      tx.update(products)
+        .set({ profileImageId: null })
+        .where(eq(products.profileImageId, row.id))
+        .run();
+      tx.delete(productImages).where(eq(productImages.id, row.id)).run();
+    }
+  });
+}

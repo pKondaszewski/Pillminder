@@ -11,6 +11,7 @@ import {
 import {
   createImageRow,
   deleteImageRow,
+  deleteImageRowsByFileNames,
   restoreImageRow,
 } from '../image-repository';
 
@@ -108,5 +109,21 @@ describe('image repository', () => {
     // then
     expect(profileImageId()).toBeNull();
     expect(db.select().from(productImages).all()).toHaveLength(1);
+  });
+
+  it('deletes only the rows with the given file names and clears the profile reference', async () => {
+    // given
+    insertProduct({ id: 'p1' });
+    await createImageRow('p1', 'lost.jpg');
+    await createImageRow('p1', 'kept.jpg');
+
+    // when
+    await deleteImageRowsByFileNames(['lost.jpg', 'unknown.jpg']);
+
+    // then
+    expect(profileImageId()).toBeNull();
+    expect(
+      db.select({ fileName: productImages.fileName }).from(productImages).all(),
+    ).toEqual([{ fileName: 'kept.jpg' }]);
   });
 });
