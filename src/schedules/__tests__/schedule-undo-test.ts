@@ -19,28 +19,24 @@ const schedule: Schedule = {
 };
 
 describe('scheduleEditChange', () => {
-  it('saves the change through the save function and reverts to the previous input', async () => {
+  it('saves the change through save and reverts by restoring the snapshot', async () => {
     // given
     const save = jest.fn().mockResolvedValue(undefined);
-    const change = scheduleEditChange(
-      schedule,
-      { intervalDays: 2 },
-      'Saved',
+    const restore = jest.fn().mockResolvedValue(undefined);
+    const change = scheduleEditChange(schedule, { intervalDays: 2 }, 'Saved', {
       save,
-    );
+      restore,
+    });
 
     // when
     await change.apply();
     await change.revert();
 
     // then
-    expect(save.mock.calls[0]).toEqual([
+    expect(save).toHaveBeenCalledWith(
       's1',
       expect.objectContaining({ intervalDays: 2, timesOfDay: ['08:00'] }),
-    ]);
-    expect(save.mock.calls[1]).toEqual([
-      's1',
-      expect.objectContaining({ intervalDays: 1 }),
-    ]);
+    );
+    expect(restore).toHaveBeenCalledWith(schedule);
   });
 });

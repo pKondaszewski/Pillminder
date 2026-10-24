@@ -5,6 +5,7 @@ import {
   editSchedule,
   pauseSchedule,
   removeSchedule,
+  restoreSchedule,
   resumeSchedule,
 } from '@/schedules/schedule-orchestrator';
 import { getSchedulesQuery } from '@/schedules/schedule-service';
@@ -16,6 +17,7 @@ export function useSchedules() {
     schedules: data,
     addSchedule,
     editSchedule,
+    restoreSchedule,
     removeSchedule,
     pauseSchedule,
     resumeSchedule,

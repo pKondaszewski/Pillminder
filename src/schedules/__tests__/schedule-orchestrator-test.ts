@@ -8,13 +8,16 @@ import {
 } from '@/config/db/test-database';
 import { cancelDoseReminders } from '@/notifications/notification-service';
 
+import { toScheduleInput } from '../schedule-draft';
 import {
   addSchedule,
   editSchedule,
   pauseSchedule,
   removeSchedule,
+  restoreSchedule,
   resumeSchedule,
 } from '../schedule-orchestrator';
+import { getSchedule } from '../schedule-service';
 
 jest.mock('@/config/db/database', () =>
   jest.requireActual('@/config/db/test-database'),
@@ -83,6 +86,54 @@ describe('schedule orchestrator on a real database', () => {
 
     // then
     expect(doseCount()).toBe(15);
+  });
+
+  it('restoreSchedule brings back the rhythm anchor and paused days that an edit dropped', async () => {
+    // given
+    const anchor = new Date(2026, 1, 24);
+    const cycle = { onDays: 21, offDays: 7, unit: 'days' as const };
+    const { id } = insertSchedule({
+      id: 's1',
+      productId: 'p1',
+      cycle,
+      rhythmAnchor: anchor,
+      rhythmPausedDays: 3,
+    });
+    const snapshot = (await getSchedule(id))!;
+    await editSchedule(id, { ...toScheduleInput(snapshot), cycle: null });
+
+    // when
+    await restoreSchedule(snapshot);
+
+    // then
+    const restored = await getSchedule(id);
+    expect(restored?.cycle).toEqual(cycle);
+    expect(restored?.rhythmAnchor).toEqual(anchor);
+    expect(restored?.rhythmPausedDays).toBe(3);
+  });
+
+  it('pausing and resuming again keeps the paused days and the anchor', async () => {
+    // given
+    const id = await addSchedule({
+      productId: 'p1',
+      intervalDays: 1,
+      timesOfDay: ['20:00'],
+      cycle: { onDays: 21, offDays: 7, unit: 'days' },
+    });
+    await pauseSchedule(id, null);
+    jest.setSystemTime(new Date('2026-03-15T10:00:00Z'));
+    await resumeSchedule(id);
+    const resumed = (await getSchedule(id))!;
+
+    // when
+    await pauseSchedule(id, null);
+    await resumeSchedule(id);
+
+    // then
+    const again = await getSchedule(id);
+    expect(resumed.rhythmPausedDays).toBe(5);
+    expect(again?.rhythmPausedDays).toBe(5);
+    expect(again?.rhythmAnchor).toEqual(resumed.rhythmAnchor);
   });
 
   it('pauseSchedule removes the pending doses and resumeSchedule plans them again', async () => {

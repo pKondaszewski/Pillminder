@@ -4,6 +4,7 @@ import { createLogger } from '@/config/logger';
 import { pausedDaysBefore } from './cycle-days';
 import type { NewScheduleInput } from './dto/new-schedule-input';
 import { rhythmStateOf } from './rhythm-state';
+import { toScheduleInput } from './schedule-draft';
 import {
   createScheduleRow,
   deleteScheduleRow,
@@ -100,6 +101,21 @@ export async function updateSchedule(
     return updated;
   } catch (err) {
     log.error(`Failed to update schedule with id ${id}`, err);
+    throw err;
+  }
+}
+
+export async function restoreScheduleSnapshot(
+  snapshot: Schedule,
+): Promise<Schedule> {
+  log.info(`Restoring schedule ${snapshot.id}`);
+  try {
+    return await updateScheduleRow(snapshot.id, toScheduleInput(snapshot), {
+      rhythmAnchor: snapshot.rhythmAnchor,
+      rhythmPausedDays: snapshot.rhythmPausedDays,
+    });
+  } catch (err) {
+    log.error(`Failed to restore schedule ${snapshot.id}`, err);
     throw err;
   }
 }

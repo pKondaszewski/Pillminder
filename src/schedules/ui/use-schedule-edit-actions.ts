@@ -13,7 +13,8 @@ import { useSchedules } from './use-schedules';
 
 export function useScheduleEditActions(runWithUndo: RunWithUndo) {
   const { t } = useTranslation();
-  const { editSchedule, pauseSchedule, resumeSchedule } = useSchedules();
+  const { editSchedule, restoreSchedule, pauseSchedule, resumeSchedule } =
+    useSchedules();
 
   const saveChange = (
     schedule: Schedule,
@@ -26,7 +27,7 @@ export function useScheduleEditActions(runWithUndo: RunWithUndo) {
         schedule,
         change,
         t('editor.saved', { field: t(SCHEDULE_FIELD_LABEL_KEYS[field]) }),
-        editSchedule,
+        { save: editSchedule, restore: restoreSchedule },
       ),
       'schedule.errorSave',
       onSuccess,
