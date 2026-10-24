@@ -30,7 +30,7 @@ export function TimeSlotSection({ group, renderDose, renderIntake }: Props) {
   const overflowToggleLabel = expanded
     ? t('home.showLess')
     : t('home.showAll', {
-        count: layout.kind === 'list' ? layout.overflowCount : null,
+        count: layout.kind === 'list' ? layout.totalCount : null,
       });
 
   const plainHeader = (
@@ -83,7 +83,7 @@ export function TimeSlotSection({ group, renderDose, renderIntake }: Props) {
             ),
           )
         : null}
-      {layout.kind === 'list' && layout.overflowCount !== null ? (
+      {layout.kind === 'list' && layout.totalCount !== null ? (
         <Pressable
           onPress={() => setExpanded(!expanded)}
           accessibilityRole="button"

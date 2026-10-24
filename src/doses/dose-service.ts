@@ -40,7 +40,6 @@ import {
 import { isDueInFuture, isPending } from './dose-validator';
 
 export { dayPhases } from './day-phases';
-export { correctionStockDelta } from './dose-correction';
 export { dayStatus, lastPlannedDay } from './dose-day';
 export {
   dayCountsText,
@@ -59,13 +58,12 @@ export { buildTimeline, nowPosition } from './dose-timeline';
 export { toTodayDose } from './dose-today';
 export { BULK_TAKE_MIN_OVERDUE, todayCardState } from './dose-today-card';
 export type { CorrectionTarget } from './dto/correction-target';
-export type { DayPhases } from './dto/day-phases';
 export type { DayStatus } from './dto/day-status';
 export type { DoseStatus } from './dto/dose-status';
-export type { RecentDays, StripDay } from './dto/recent-days-output';
-export type { TimeSlotGroup, TimeSlotLayout } from './dto/time-slot-output';
+export type { RecentDays } from './dto/recent-days-output';
+export type { TimeSlotGroup } from './dto/time-slot-output';
 export type { TimelineMark } from './dto/timeline-mark';
-export type { DayCounts, TodayCardState } from './dto/today-card-state';
+export type { TodayCardState } from './dto/today-card-state';
 export type { TodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');

@@ -55,7 +55,7 @@ export function timeSlotLayout(
         ? active.slice(0, SLOT_ACTIVE_DOSES_SHOWN)
         : entries,
     collapsible: active.length === 0,
-    overflowCount: overflows ? entries.length : null,
+    totalCount: overflows ? entries.length : null,
   };
 }
 

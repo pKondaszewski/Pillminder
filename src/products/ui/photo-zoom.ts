@@ -15,6 +15,7 @@ export function doubleTapScale(currentScale: number): number {
   return currentScale > MIN_SCALE ? MIN_SCALE : DOUBLE_TAP_SCALE;
 }
 
+// Stays above its callers: the worklet transform turns functions into consts, so they are not hoisted
 function maxTranslation(scale: number, view: Size): Point {
   'worklet';
   return {

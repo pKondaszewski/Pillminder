@@ -155,7 +155,7 @@ Toolchain (Apple Silicon Mac): Temurin JDK 17, Android cmdline-tools, SDK at
   effect (e.g. `notifications/ui`).
 - **UI boundary** — enforced by ESLint (`no-restricted-imports`):
   `ui/` imports the service, DTOs and pure logic of modules, never a
-  repository, helper or the db (also not via a relative path like
+  repository, helper, store or the db (also not via a relative path like
   `../product-repository`). Nothing outside `ui/` imports from `ui/`, except
   the routes in `src/app`. Pure logic files must not import `ui/` or native
   modules, so they stay testable in Jest.
@@ -176,7 +176,7 @@ Toolchain (Apple Silicon Mac): Temurin JDK 17, Android cmdline-tools, SDK at
   only re-exported from the service.
 - **Migrations** — generate with a descriptive snake_case name, e.g.
   `npx drizzle-kit generate --name add_dose_note` (the file becomes
-  `0005_add_dose_note.sql`; without `--name` drizzle picks a random one).
+  `NNNN_add_dose_note.sql`; without `--name` drizzle picks a random one).
   The migrations were squashed into `0000_init` before the first release; its
   `when` matches the last pre-squash migration, so existing devices skip it.
 - **Transactions** — the body of `db.transaction(...)` must not be `async` or

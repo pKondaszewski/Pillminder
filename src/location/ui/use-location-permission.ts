@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, AppState } from 'react-native';
+import { Alert } from 'react-native';
 
+import { useRefreshOnForeground } from '@/commons/ui/use-refresh-on-foreground';
 import { createLogger } from '@/config/logger';
 import type { LocationPermission } from '@/location/location-service';
 import {
@@ -26,13 +27,7 @@ export function useLocationPermission() {
   );
 
   // The user may change the permission in system settings and come back
-  useEffect(() => {
-    void refresh();
-    const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') void refresh();
-    });
-    return () => subscription.remove();
-  }, [refresh]);
+  useRefreshOnForeground(refresh);
 
   const enable = async (): Promise<boolean> => {
     setBusy(true);

@@ -19,7 +19,13 @@ export {
   THEME_OPTIONS,
   type ThemePreference,
 } from './dto/settings';
-export { subscribeToSettings } from './settings-store';
+export {
+  getSettings,
+  isValidSnoozeMinutes,
+  SNOOZE_MINUTES_MAX,
+  SNOOZE_MINUTES_MIN,
+  subscribeToSettings,
+} from './settings-store';
 
 export function applyStoredTheme(): void {
   applyTheme(getSettings().theme);

@@ -21,7 +21,6 @@ import { assertValidScheduleInput } from './schedule-validator';
 export { cycleUnitKey, daysPerUnit } from './cycle-days';
 export type { CourseProgress } from './dto/course-progress';
 export type { Rhythm } from './dto/rhythm';
-export type { RhythmState } from './dto/rhythm-state';
 export {
   type CycleUnit,
   MAX_CYCLE_DAYS,
@@ -39,7 +38,6 @@ export {
   describeAmount,
   describeCourse,
   describeDays,
-  describePause,
   describePeriod,
   describeRhythm,
 } from './schedule-rhythm';
@@ -77,7 +75,7 @@ export async function createSchedule(
       input,
       rhythmStateOf(input, undefined, new Date()),
     );
-    log.info(`Created schedule ${JSON.stringify(created)}`);
+    log.info(`Created schedule ${created.id}`);
     return created;
   } catch (err) {
     log.error(`Failed to add schedule for product ${input.productId}`, err);
@@ -98,7 +96,7 @@ export async function updateSchedule(
       input,
       rhythmStateOf(input, existing, new Date()),
     );
-    log.info(`Updated schedule ${JSON.stringify(updated)}`);
+    log.info(`Updated schedule ${updated.id}`);
     return updated;
   } catch (err) {
     log.error(`Failed to update schedule with id ${id}`, err);
