@@ -85,8 +85,10 @@ These are settled and should not be re-litigated without a reason:
 - **Users**: single user, one list (no profiles)
 - **Backup**: **Android Auto Backup**; the app has no export / import
 - **Taking model**: **scheduled slots** — the rhythm generates planned doses,
-  each with a state (taken / skipped / pending); doses left unconfirmed past
-  their time automatically become "skipped". Enables full history ("22 of 30").
+  each with a state (taken / skipped / pending). A dose is "skipped" only when
+  the user skips it; one left unconfirmed past its time stays pending and is
+  shown as overdue / missed, derived from the time. Enables full history
+  ("22 of 30").
 - **Reminders**: **notification actions** — "Taken" / "Snooze" buttons directly
   on the notification, no need to open the app.
 

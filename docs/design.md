@@ -2,8 +2,8 @@
 
 This is the source of truth for the redesign. The mockups live on a Claude Design canvas
 (https://claude.ai/artifact/WB4NtDkvGumGVsztNsGTas); sandbox agents cannot open it, so everything
-needed to build the screens is written down here. Where this document and the current app
-disagree, this document wins.
+needed to build the screens is written down here. The redesign is merged: the code is the
+reference, update this document with it.
 
 Style: clean and clinical ("A · Klinika"). White ground, one blue accent, status colors only
 where something needs attention, generous spacing, no emoji in UI copy, no em dashes ("—") in
@@ -35,7 +35,7 @@ The accent is fixed. The "Kolor akcentu" setting is removed (see §6).
 
 ### 1.2 Dose status colors
 
-Status colors are never the accent. They mean the same thing everywhere: timeline dots, calendar
+Status colors are never the accent. They mean the same thing everywhere: meadow plants, calendar
 dots, the 14-day strip, row labels.
 
 | Status                                       | Dot / fill            | Text            | Soft background                                | Dark dot / text       |
@@ -50,12 +50,16 @@ taken, dimmed avatar) instead of getting their own color fills.
 
 ### 1.3 Category colors (product avatars without a profile photo)
 
-| Category    | Tile      | Icon      | Glyph  |
-| ----------- | --------- | --------- | ------ |
-| Lek         | `#E3F1F8` | `#0B6E99` | plus   |
-| Suplement   | `#E9F4EE` | `#1F7A4D` | leaf   |
-| Pielęgnacja | `#F1EEF8` | `#5B3FC4` | bottle |
-| custom      | `#F1F3F5` | `#4A5562` | tag    |
+Spray do nosa and Krople do oczu are medicines: they share the Lek colors and differ only in the glyph.
+
+| Category       | Tile      | Icon      | Glyph  |
+| -------------- | --------- | --------- | ------ |
+| Lek            | `#E3F1F8` | `#0B6E99` | plus   |
+| Suplement      | `#E9F4EE` | `#1F7A4D` | leaf   |
+| Pielęgnacja    | `#F1EEF8` | `#5B3FC4` | bottle |
+| Spray do nosa  | `#E3F1F8` | `#0B6E99` | bottle |
+| Krople do oczu | `#E3F1F8` | `#0B6E99` | drop   |
+| custom         | `#F1F3F5` | `#4A5562` | tag    |
 
 ### 1.4 Typography
 
@@ -90,33 +94,42 @@ Build these once and reuse them; every screen below is made of them.
 - **DayPager** - header `‹  <date>  ›`: arrow buttons (44 px, outlined) on the edges, bold date
   in the middle, no "Dziś" title, no chevron, no background. Tapping the date opens the
   calendar sheet. Days change only with the arrows, never with a swipe (horizontal swipe already
-  switches tabs, `TabSwipe`). On another day a small "Wróć do dziś" chip shows under the header.
-- **TodayCard** - the card at the top of Dziś, three states:
-  - calm (white, `border`): "Zgodnie z planem", "Następna za 1 h 50 min", next dose and time,
+  switches tabs). On another day a small "Wróć do dziś" chip shows under the header.
+- **TodayCard** - the translucent card (`cardGlass`, `border`) under the pager on the Start
+  screen, centered text, the title colored by state:
+  - calm: "Zgodnie z planem", "Następna za 1 h 50 min", next dose and time, "Zebrane 2 z 5",
     no action;
-  - overdue (overdue soft background): "Spóźniona 1 h 10 min" + product + "Weź", or with 2+
+  - overdue (title in `overdueText`): "Spóźniona 1 h 10 min" + product + "Weź", or with 2+
     overdue (`BULK_TAKE_MIN_OVERDUE`) "N zaległe · najstarsza X", at most 2 names + "i N inne",
-    and "Wziąłem zaległe (N)";
-  - done (green soft): "Dobra robota!" + "Wszystkie N dawek na dziś wzięte" when everything is
-    taken, "Gotowe na dziś" + "4 wzięte · 1 pominięta" when the day is closed with skips. No
-    "tomorrow's first dose" line.
-  - past day: gray `surface` card "Podsumowanie dnia" + counts, no action.
-    The card always contains the DayTimeline and a count line ("1 z 5 wzięta · 1 pominięta ·
-    1 zaległa · 2 później"). There is no progress ring and no streak.
-- **DayTimeline** - the day as a half circle over a horizon line: arc from 06:00 (left end)
-  through 15:00 (top) to 24:00 (right end), ticks 06/12/18/24 in mono. The track is dashed; the
-  part already travelled (06 → now) is solid. On today a "now" symbol sits on the arc at the
-  current hour, by phase of the day: rising sun (sunrise → noon), sun (noon → sunset), moon
-  (sunset → sunrise). The phases come from the saved location when there is one, otherwise
-  they are fixed at 06 / 12 / 18 (also on polar day and night). The axis stays 06-24. The sky under the travelled part (down to the horizon) is filled with the
-  day state: `accentSoft` calm by day, `nightSoft` calm after sunset, `overdueSoft` when
-  something is overdue, `takenSoft` when everything is handled. Past and future days: arc and
-  dots only, no symbol and no sky. The card title and the next-dose line sit inside the half
-  circle; the counts line stays below. One dot per dose on the arc in its status color; planned
-  doses are hollow rings. Doses less than an hour apart merge into one bigger dot split into pie
-  slices, one per dose, each in its status color; more than 4 doses in one dot show the count and
-  the most urgent color (overdue > skipped > taken). Phases come from `dayPhases(date, coords)`
-  (fixed 06/12/18 without a location).
+    and "Wziąłem zaległe (N)" behind a confirmation; also "Zebrane 2 z 5";
+  - done (title in `takenText`): "Dobra robota!" + "Wszystkie N dawek na dziś wzięte" when
+    everything is taken, "Gotowe na dziś" + "4 wzięte · 1 pominięta" when the day is closed with
+    skips. No "tomorrow's first dose" line;
+  - past day: "Podsumowanie dnia" + counts ("1 z 5 wzięta · 1 pominięta · 1 zaległa"), no action;
+  - future day: "Plan dnia" + "Zaplanowane dawki: N", no action.
+
+  The card has no timeline, progress ring or streak: the day is drawn by the meadow above it.
+
+- **DayScene and meadow** - a canvas behind the top of the Start screen (`src/scene`), drawn with
+  Skia.
+  - Sky: gradient by phase (dawn / day / dusk / night) from `dayPhases(date, coords)`: real
+    sunrise and sunset from the saved location, fixed 06 / 12 / 18 without one (also on polar day
+    and night). On today the sun (day) or the moon (night) moves along an arc with the time;
+    other days show a still midday sun. Clouds by day, stars and shooting stars at night.
+  - Season: hills and weather by season, chosen in Settings (Auto = month of the year, mirrored
+    for a southern latitude): petals in spring, fireflies at summer night, leaves in autumn,
+    snow in winter.
+  - Meadow: one plant per dose mark, placed by planned time on the 06-24 axis. Doses closer
+    than about 44 px merge into one clump of up to 3 plants. The species follows the season:
+    snowdrop, sunflower, mushroom, pebble. A skipped dose wilts its plant. A taken dose is
+    picked: the plant is gone, a small leftover stays, and it flies into the basket at the
+    right edge (the basket counts the collected doses). On today a creature stands at the current
+    time and sleeps at night.
+  - Mood from the card state: overdue makes the sky "breathe" with a warning tint, and the moment
+    the day turns "done" plays a celebration wave with a haptic.
+  - Tapping a plant opens a popup (closes itself after 6 s, or on a second tap) with one row per
+    dose in the clump (at most 5, pending first, then "+N"): "name · time" and a "Weź" button on
+    pending doses, today only.
 - **DoseRow** - time (mono) · avatar · name + quantity line (+ "· na czczo" when the product has
   it) · trailing part by state:
   - pending: outlined "Weź";
@@ -125,8 +138,10 @@ Build these once and reuse them; every screen below is made of them.
   - skipped: no strikethrough, plain text "Pominięto" in skipped gray (no pill background);
   - past day: status text + `›`, no buttons, overdue shown as orange "Nieodhaczona" without row
     tint; tapping opens the correction sheet.
-- **TimeSlotSection** - "Rano / Po południu / Wieczorem / W nocy". A section where every dose is
-  handled collapses to one row ("Rano · 3 wzięte · 1 pominięta ›"); a section with more than 5
+- **TimeSlotSection** - "Rano / Po południu / Wieczorem / W nocy". As-needed intakes (see the
+  product screen) sit in the slot of their time, after the planned doses, with the label
+  "doraźnie"; past days show them read-only, today a tap offers to undo. A section where every
+  dose is handled collapses to one row ("Rano · 3 wzięte · 1 pominięta ›"); a section with more than 5
   active doses shows 4 and "Pokaż wszystkie (N)".
 - **UndoSnackbar** - dark pill above the tab bar: green check, "Wzięto: <name>" / "Pominięto:
   <name>", "Cofnij" in light blue.
@@ -162,18 +177,18 @@ Build these once and reuse them; every screen below is made of them.
 
 ## 3. Screens
 
-Tabs: **Dziś, Produkty, Plan, Ustawienia**. There is no History tab.
+Tabs: **Start, Produkty, Plan, Ustawienia**. There is no History tab.
 
-### 3.1 Dziś (day view)
+### 3.1 Start (day view)
 
-- DayPager + TodayCard (title and next dose inside the DayTimeline half circle) + doses grouped
-  by TimeSlotSection.
+- DayScene (sky and meadow) behind DayPager, then TodayCard, then doses grouped by
+  TimeSlotSection.
 - Past day: summary card, rows read-only with `›`, tap → correction sheet ("Co się stało z tą
   dawką?" with Wzięta / Pominięta tiles showing the stock effect, Anuluj / Zapisz). The sheet does
   not ask for the time taken.
 - Future day: planned doses read-only, up to the 30-day dose horizon.
 - Calendar: MonthCalendarSheet from the date.
-- Empty: no products → "Zacznij od pierwszego produktu" + "Dodaj produkt" (no import link); a day
+- Empty: no products → "Zacznij od pierwszego produktu" + "Dodaj produkt"; a day
   without doses → "Dziś bez dawek · Na ten dzień nic nie zaplanowano" + "Zobacz Plan".
 
 ### 3.2 Produkty
@@ -186,18 +201,27 @@ Tabs: **Dziś, Produkty, Plan, Ustawienia**. There is no History tab.
 - Product screen (one scrollable view, no "Edytuj" and no "Zapisz"):
   1. header: avatar with a photo-count badge (tap → photos screen), name with strength (tap →
      rename sheet), category and status chips, "Ostatnio: dziś, 07:58";
-  2. Zapas card: days big, units, StockBar, "Wystarczy do … · zamów do …", − / + and
-     "+ Opakowanie (50 tabl.)" (applied immediately, undo snackbar), store link row;
-  3. Harmonogram: schedule card(s) → schedule screen, "+ Dodaj";
-  4. "Ostatnie 14 dni": status strip, each day tappable → that day's view, counts,
+  2. "Weź lek doraźnie" button (not for archived products): records an as-needed intake now,
+     outside any schedule, and takes it from stock;
+  3. Zapas card: days big, units, StockBar, "Wystarczy do … · zamów do …", − / + and
+     "+ Opakowanie (50 tabl.)" (applied immediately, undo snackbar), store link row; without an
+     active schedule also a "Powiadom, gdy zostanie ≤" row (reorder threshold in units);
+  4. Harmonogram: schedule card(s) → schedule screen, "+ Dodaj";
+  5. "Ostatnie 14 dni": status strip, each day tappable → that day's view, counts,
      "Cała historia w kalendarzu ›" (calendar filtered to this product). No entry list and no
      "Pokaż więcej";
-  5. Notatki: notes with date, Edytuj / Usuń, add field;
-  6. Szczegóły: FieldRows Kategoria, Moc / dawka, Jednostka, Rozmiar opakowania, Cena, Sklep,
-     plus "Na czczo" for Lek; each opens its BottomSheet;
-  7. Archiwizuj and Usuń produkt side by side.
-- Price sheet: whole złote (price is an integer column), "Puste pole = bez ceny", no delete
-  button. Store sheet: link or name, category suggestions (`BUILT_IN_STORE_SUGGESTIONS`).
+  6. "Przyjęte doraźnie": number of as-needed intakes in the last 14 days (the intakes themselves
+     show in the day view and the calendar);
+  7. Notatki: notes with date, Edytuj / Usuń, add field;
+  8. Szczegóły: FieldRows Kategoria, Dawka w sztuce (not for care, nasal spray and eye drops,
+     `supportsStrength`), Postać, Rozmiar opakowania (Pojemność opakowania in ml for eye drops),
+     Cena, Gdzie kupić, plus the "Na czczo" switch for Lek; each row opens its BottomSheet;
+  9. Archiwizuj and Usuń produkt side by side.
+- Price sheet: free text (the `products.price` column is text, up to `PRICE_MAX_LENGTH`
+  characters; the user types the currency, e.g. "12,99 zł"), "Puste pole = bez ceny", no delete
+  button. Store sheet: link or name, category suggestions (`BUILT_IN_STORE_SUGGESTIONS`). A plain
+  name (not an `http(s)` link) opens a search in Maps or in the browser; the sheet "Gdzie
+  otworzyć?" can remember the choice per product (`storeLinkTarget`).
 - Archive (bottom sheet): "Przypomnienia i przyszłe dawki zostaną wyłączone", "Harmonogram,
   historia, zdjęcia i notatki zostają", "Możesz go przywrócić z filtra Archiwum", optional
   "Dlaczego?" note. Matches `archiveProduct` (schedules are kept).
@@ -207,11 +231,20 @@ Tabs: **Dziś, Produkty, Plan, Ustawienia**. There is no History tab.
   each, "Dodaj zdjęcie" tile (camera or gallery). Starring another photo moves the profile. The
   first added photo becomes profile automatically; deleting the profile photo falls back to the
   category icon.
-- New product: one form (the only full form for products): optional photo tile, Nazwa, Kategoria,
-  Moc / dawka (hidden for care, `supportsStrength`), Jednostka chips (tablet / capsule / drop /
-  ml), "Na czczo" switch only for Lek, Zapas (stepper + pack size), Zakupy (price + store with
-  suggestions), pinned "Dodaj produkt".
+- New product: one form (the only full form for products): optional photos (several, the
+  first becomes the profile one), Nazwa, Kategoria, Dawka w sztuce (hidden as in the product
+  screen, see `supportsStrength`),
+  Postać chips (none / tablet / capsule / drop / ml / spray; nasal spray fixes spray, eye drops
+  fix drop), "Na czczo" switch only for Lek, Zapas (stepper + pack size), Zakupy (price + store
+  with suggestions), pinned "Dodaj produkt".
 - Empty: "Nie masz jeszcze produktów" + "Dodaj produkt".
+- Trip planner (`/products/trip`, "Planer wyjazdu", opened by "Wyjazd"): a scene with a road and
+  a car on top (`scene/road.ts`, `scene-car.tsx`), the "Daty" field (default: tomorrow plus 7
+  days) and a block per active product that has a schedule in the range: "Spakuj: N" and, when
+  stock is tracked, a verdict ("Kup przed wyjazdem: ..." or "Zapas wystarczy na wyjazd"). The
+  "Daty" sheet is one month calendar: the first tap sets the start, the second the end. Under the
+  road, one ribbon per product runs to the day its stock runs out (at most 4, warnings first,
+  the rest as "+N więcej" / "+N wystarczy"). Empty: "Nic do spakowania na ten wyjazd".
 
 ### 3.3 Plan
 
@@ -221,13 +254,20 @@ Tabs: **Dziś, Produkty, Plan, Ustawienia**. There is no History tab.
 - Filters: Rodzaj chips Stałe / Na określony czas / Wstrzymane / Zakończone (default shows the
   first three; ended schedules only when chosen), Kategoria produktu chips.
 - Schedule screen (no whole-screen Save): product card (→ product), course progress and stock
-  warning, FieldRows Jak często / Godziny / Na dawkę / Okres, each opening a BottomSheet saved at
+  warning, FieldRows Jak często / Godziny / Ile naraz / Okres, each opening a BottomSheet saved at
   once ("Zmiana dotyczy dawek od teraz. Dzisiejsze wzięte i pominięte zostają w historii"),
   next doses preview, Wstrzymaj and Usuń side by side. Times sheet: time chips with ×,
   "+ Dodaj godzinę", quick chips (08:00 / 14:00 / 20:00). Okres sheet validates end ≥ start.
+  Jak często sheet: Codziennie / Co kilka dni (stepper, from 2) / Dni tygodnia (day chips, at
+  least one stays selected), plus "Cykle z przerwami" for daily and weekday rhythms ("Stosuj
+  przez" N days or weeks, "Potem przerwa" N days or weeks). Ile naraz sheet: one stepper, or
+  "Zmieniaj ilość etapami": 2-10 steps, each with a number of days and a quantity, the last one
+  either "Potem do końca harmonogramu" or "Zakończ po ostatnim etapie".
 - New schedule: one form, title "Nowy harmonogram", product radio list with search (+ "Nowy
-  produkt"), Codziennie / Co kilka dni, time chips + quick times, per-dose stepper, Od (default
-  today) / Do (default "Bez końca", presets 5 / 7 / 10 dni), stock line ("Zapas 64 kaps. wystarczy
+  produkt"), the same Jak często picker (Codziennie / Co kilka dni /
+  Dni tygodnia, cycles), time chips +
+  quick times, Ile naraz (stepper or steps), Od (default today) / Do (default "Bez końca",
+  presets 5 / 7 / 10 dni), stock line ("Zapas 64 kaps. wystarczy
   do 20 grudnia" or a warning), next doses preview, pinned "Dodaj harmonogram". Opened from a
   product, the product is preselected and the list is hidden.
 - Empty: "Brak harmonogramów" + "Dodaj harmonogram" (without products it goes to "Dodaj produkt"
@@ -235,17 +275,23 @@ Tabs: **Dziś, Produkty, Plan, Ustawienia**. There is no History tab.
 
 ### 3.4 Ustawienia
 
-Sections: **Przypomnienia** (StatusCards for notification permission and battery optimization,
-Czas drzemki row), **Wygląd** (Język, Motyw), **Zakupy** (Waluta, e.g. "zł (PLN)"), **Kopia
-zapasowa** (description + Eksportuj / Importuj side by side; import exists only here), about line
-(app icon, "Pillminder 1.0.0", author).
+Sections: **Uprawnienia** (StatusCards for notification permission, battery optimization,
+location (optional, "Włącz" / "Wyłącz") and Google backup (optional; "Sprawdź, czy jest
+włączona" opens the phone's backup settings and asks whether it is on)), **Przypomnienia**
+(Czas drzemki row), **Wygląd** (Język, Motyw, Pora roku: Auto / Wiosna / Lato / Jesień / Zima),
+**Prywatność** (Blokada aplikacji switch, only when the phone has a screen lock or biometrics),
+about line ("Pillminder 1.0.0", author, link to the repository). Data is backed up by Android Auto
+Backup.
 
 ### 3.5 First run
 
-Logo lockup and "1 z 2 / 2 z 2" at the top, primary button + text button at the bottom.
+Logo lockup and "1 z 3 / 2 z 3 / 3 z 3" at the top, primary button + text button at the
+bottom. Only the steps still needed are shown, so the total can be lower (notifications when not
+granted, battery when optimization is on, location when it can still be asked).
 Notifications ask (sample reminder card with Wziąłem / Drzemka, two benefits), blocked state
 (three steps to enable in system settings, "Kontynuuj bez powiadomień"), battery (mock of the
-Android choice with "Bez ograniczeń" highlighted). Copy follows `onboarding.*`.
+Android choice with "Bez ograniczeń" highlighted), location (optional, approximate, used only
+for sunrise and sunset). Copy follows `onboarding.*`.
 
 ### 3.6 Notifications
 
@@ -257,8 +303,8 @@ The app controls only the small icon, accent color, title, body and actions.
   opakowanie when the pack size is known.
 - Status-bar icon `ic_notification` (24 dp): monochrome simplified mark, calendar with four dots,
   the last one hollow. Not the full logo.
-- Prices everywhere use the currency symbol, not the code: `Intl.NumberFormat` with
-  `currencyDisplay: 'symbol'` in the app language ("25 zł", "25 €", "$25").
+- A price is shown exactly as the user typed it (free text, see the price sheet), in the
+  reorder notification and wherever else it appears.
 - Times follow the app language, not the phone clock: Polish is always 24 h ("20:00"), English
   always 12 h ("8:00 PM"), also in the time picker.
 - English dates carry ordinal suffixes on the day ("14th October" in en-GB, "October 14th" in
@@ -281,7 +327,7 @@ The app controls only the small icon, accent color, title, body and actions.
   the screen scrolls to the first one, and the error clears once the field is fixed. Same for
   every form and sheet (product, time, Okres end before start, price, stock, pack size).
 - **Many doses:** no limit on medicines; the thresholds in TodayCard, TimeSlotSection and
-  DayTimeline above apply.
+  the meadow clumps above apply.
 - **Corrections** happen only in the day view; the calendar only navigates.
 
 ## 5. Data changes
@@ -289,8 +335,7 @@ The app controls only the small icon, accent color, title, body and actions.
 - `products.fasting` (boolean, default false), migration e.g. `add_product_fasting`. Shown only for
   Lek; feeds the dose row and the notification body.
 - Profile photo: `products.profile_image_id` (nullable, references `product_images.id`,
-  on delete set null) or an `is_profile` flag on `product_images`; exactly one per product. The
-  first added photo becomes profile.
+  on delete set null); at most one per product. The first added photo becomes profile.
 
 ## 6. Removed
 
@@ -303,6 +348,9 @@ The app controls only the small icon, accent color, title, body and actions.
   the section in `settings.tsx`, `settings.accent*` strings. An old stored value is ignored.
 - Streak ("N dni z rzędu", `home.statsStreak`) and the progress ring.
 - "Nic na dziś, wolne 🎉" (replaced by the empty state above).
+- DayTimeline, the half-circle timeline in TodayCard (replaced by the meadow, see DayScene).
+- Currency setting ("Waluta") and the JSON export / import ("Kopia zapasowa"): backup is Android
+  Auto Backup, with an optional Google backup card in Settings.
 
 ## 7. App icon
 
