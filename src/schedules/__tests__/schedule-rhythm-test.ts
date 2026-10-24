@@ -1,11 +1,18 @@
 import type { Translate } from '@/config/translate';
 
 import type { Schedule } from '../schedule-repository';
-import { describeCourse, describeRhythm } from '../schedule-rhythm';
+import {
+  describeCourse,
+  describeDays,
+  describeRhythm,
+} from '../schedule-rhythm';
 
 const PL: Record<string, string> = {
   'schedule.daily': 'Codziennie',
   'schedule.everyXDays': 'Co {{days}} dni',
+  'schedule.cycleDays': '{{count}} dni',
+  'schedule.cycleWeeks': '{{count}} tyg.',
+  'schedule.cycleOnOff': '{{on}} stosowania / {{off}} przerwy',
   'schedule.weeklyOn': 'Co tydzień: {{day}}',
   'calendar.weekday.mon': 'Pn',
   'calendar.weekday.wed': 'Śr',
@@ -37,6 +44,9 @@ function schedule(overrides: Partial<Schedule>): Schedule {
     productId: 'product-1',
     intervalDays: 1,
     weekdays: null,
+    cycle: null,
+    cycleAnchor: null,
+    cyclePausedDays: 0,
     timesOfDay: ['08:00'],
     quantity: 1,
     startDate: null,
@@ -271,5 +281,50 @@ describe('describeCourse', () => {
 
     // then
     expect(result).toBe(`do ${formatDate(endDate)}`);
+  });
+});
+
+describe('describeDays with a cycle', () => {
+  const cycleOf = (
+    onDays: number,
+    offDays: number,
+    unit: 'days' | 'weeks',
+  ) => ({
+    intervalDays: 1,
+    weekdays: null,
+    cycle: { onDays, offDays, unit },
+  });
+
+  it('reads a cycle in days without the daily prefix', () => {
+    // given
+    const rhythm = cycleOf(21, 7, 'days');
+
+    // when
+    const result = describeDays(rhythm, t, MONDAY);
+
+    // then
+    expect(result).toBe('21 dni stosowania / 7 dni przerwy');
+  });
+
+  it('reads a cycle entered in weeks back as weeks', () => {
+    // given
+    const rhythm = cycleOf(56, 28, 'weeks');
+
+    // when
+    const result = describeDays(rhythm, t, MONDAY);
+
+    // then
+    expect(result).toBe('8 tyg. stosowania / 4 tyg. przerwy');
+  });
+
+  it('puts the weekdays before the cycle', () => {
+    // given
+    const rhythm = { ...cycleOf(56, 28, 'weeks'), weekdays: [6, 0] };
+
+    // when
+    const result = describeDays(rhythm, t, MONDAY);
+
+    // then
+    expect(result).toBe('So, Nd · 8 tyg. stosowania / 4 tyg. przerwy');
   });
 });

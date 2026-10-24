@@ -93,3 +93,70 @@ describe('assertValidScheduleInput weekdays', () => {
     expect(validate).toThrow('Weekdays cannot be combined');
   });
 });
+
+describe('assertValidScheduleInput with a cycle', () => {
+  it.each([
+    [{ onDays: 21, offDays: 7, unit: 'days' }],
+    [{ onDays: 56, offDays: 28, unit: 'weeks' }],
+    [{ onDays: 365, offDays: 1, unit: 'days' }],
+  ])('accepts the cycle %j', (cycle) => {
+    // given
+    const valid = input({ cycle: cycle as NewScheduleInput['cycle'] });
+
+    // when
+    const validate = () => assertValidScheduleInput(valid);
+
+    // then
+    expect(validate).not.toThrow();
+  });
+
+  it.each([
+    [{ onDays: 0, offDays: 7, unit: 'days' }],
+    [{ onDays: 21, offDays: 0, unit: 'days' }],
+    [{ onDays: 1.5, offDays: 7, unit: 'days' }],
+    [{ onDays: 366, offDays: 7, unit: 'days' }],
+    [{ onDays: 21, offDays: 7, unit: 'months' }],
+    [{ onDays: 10, offDays: 7, unit: 'weeks' }],
+    [{ onDays: 21, offDays: 7 }],
+    ['21/7'],
+  ])('rejects the cycle %j', (cycle) => {
+    // given
+    const invalid = input({
+      cycle: cycle as unknown as NewScheduleInput['cycle'],
+    });
+
+    // when
+    const validate = () => assertValidScheduleInput(invalid);
+
+    // then
+    expect(validate).toThrow('Invalid cycle');
+  });
+
+  it('rejects a cycle combined with an interval', () => {
+    // given
+    const invalid = input({
+      intervalDays: 2,
+      cycle: { onDays: 21, offDays: 7, unit: 'days' },
+    });
+
+    // when
+    const validate = () => assertValidScheduleInput(invalid);
+
+    // then
+    expect(validate).toThrow('Cycle cannot be combined');
+  });
+
+  it('accepts a cycle with weekdays', () => {
+    // given
+    const valid = input({
+      weekdays: [6, 0],
+      cycle: { onDays: 56, offDays: 28, unit: 'weeks' },
+    });
+
+    // when
+    const validate = () => assertValidScheduleInput(valid);
+
+    // then
+    expect(validate).not.toThrow();
+  });
+});

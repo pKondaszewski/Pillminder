@@ -69,6 +69,7 @@ export function NewScheduleForm({
   const [rhythm, setRhythm] = useState<Rhythm>({
     intervalDays: 1,
     weekdays: null,
+    cycle: null,
   });
   const [timesOfDay, setTimesOfDay] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
@@ -93,12 +94,13 @@ export function NewScheduleForm({
   };
   const errors = scheduleDraftErrors(input);
   const shownErrors = submitted ? errors : {};
+  const draft = draftSchedule(input, now);
   const doses = errors.period
     ? []
-    : previewOccurrences(rhythm, timesOfDay, period, now);
+    : previewOccurrences(draft, timesOfDay, period, now);
   const stockLine = errors.period
     ? null
-    : describeStock(input, product, schedules, now, t, formatDate);
+    : describeStock(draft, product, schedules, now, t, formatDate);
 
   const submit = () => {
     setSubmitted(true);
@@ -222,25 +224,21 @@ function Section({
 }
 
 function describeStock(
-  input: NewScheduleInput,
+  draft: Schedule,
   product: Product | undefined,
   schedules: Schedule[],
   now: Date,
   t: Translate,
   formatDate: (date: Date) => string,
 ) {
-  if (!product || input.timesOfDay.length === 0) return null;
+  if (!product || draft.timesOfDay.length === 0) return null;
   const productSchedules = schedules.filter((s) => s.productId === product.id);
   return describeStockSufficiency(
     {
       stock: product.stock,
       unit: product.unit,
-      status: reorderStatus(
-        product.stock,
-        [...productSchedules, draftSchedule(input)],
-        now,
-      ),
-      hasEndDate: input.endDate != null,
+      status: reorderStatus(product.stock, [...productSchedules, draft], now),
+      hasEndDate: draft.endDate != null,
     },
     t,
     formatDate,

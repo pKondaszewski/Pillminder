@@ -3,8 +3,10 @@ import type { Translate } from '@/config/translate';
 import type { ProductUnit } from '@/products/product-service';
 import { formatAmount } from '@/products/product-unit';
 
+import { cycleUnitKey, daysPerUnit } from './cycle-days';
 import type { CourseProgress } from './dto/course-progress';
 import type { Rhythm } from './dto/rhythm';
+import type { ScheduleCycle } from './dto/schedule-cycle';
 import { isPaused } from './schedule-pause';
 import type { Schedule } from './schedule-repository';
 
@@ -27,21 +29,15 @@ export function describeRhythm(
 }
 
 export function describeDays(
-  { intervalDays, weekdays }: Rhythm,
+  rhythm: Rhythm,
   t: Translate,
   firstWeekday: number,
 ): string {
-  if (weekdays && weekdays.length < DAYS_IN_WEEK) {
-    const names = inWeekOrder(weekdays, firstWeekday).map((day) =>
-      t(`calendar.weekday.${weekdayKeyOf(day)}`),
-    );
-    return weekdays.length === 1
-      ? t('schedule.weeklyOn', { day: names[0] })
-      : names.join(', ');
-  }
-  return !weekdays && intervalDays > 1
-    ? t('schedule.everyXDays', { days: intervalDays })
-    : t('schedule.daily');
+  const { cycle } = rhythm;
+  const days = describeBaseDays(rhythm, t, firstWeekday);
+  if (!cycle) return days;
+  const cycleText = describeCycle(cycle, t);
+  return isEveryDay(rhythm) ? cycleText : `${days} · ${cycleText}`;
 }
 
 export function describePause(
@@ -100,4 +96,39 @@ function inWeekOrder(weekdays: number[], firstWeekday: number): number[] {
   const offset = (day: number) =>
     (day - firstWeekday + DAYS_IN_WEEK) % DAYS_IN_WEEK;
   return [...weekdays].sort((a, b) => offset(a) - offset(b));
+}
+
+function describeBaseDays(
+  { intervalDays, weekdays }: Rhythm,
+  t: Translate,
+  firstWeekday: number,
+): string {
+  if (weekdays && weekdays.length < DAYS_IN_WEEK) {
+    const names = inWeekOrder(weekdays, firstWeekday).map((day) =>
+      t(`calendar.weekday.${weekdayKeyOf(day)}`),
+    );
+    return weekdays.length === 1
+      ? t('schedule.weeklyOn', { day: names[0] })
+      : names.join(', ');
+  }
+  return !weekdays && intervalDays > 1
+    ? t('schedule.everyXDays', { days: intervalDays })
+    : t('schedule.daily');
+}
+
+function describeCycle(
+  { onDays, offDays, unit }: ScheduleCycle,
+  t: Translate,
+): string {
+  const perUnit = daysPerUnit(unit);
+  const key = cycleUnitKey(unit);
+  return t('schedule.cycleOnOff', {
+    on: t(key, { count: onDays / perUnit }),
+    off: t(key, { count: offDays / perUnit }),
+    offCount: offDays / perUnit,
+  });
+}
+
+function isEveryDay({ intervalDays, weekdays }: Rhythm): boolean {
+  return weekdays ? weekdays.length === DAYS_IN_WEEK : intervalDays === 1;
 }

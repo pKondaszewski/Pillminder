@@ -113,6 +113,13 @@
       "when": 1792843718997,
       "tag": "0015_add_schedule_weekdays",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1792844989093,
+      "tag": "0016_add_schedule_cycle",
+      "breakpoints": true
     }
   ]
 }
