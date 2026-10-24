@@ -8,6 +8,8 @@ import type { ReorderStatus } from './dto/reorder-status';
 
 export const REORDER_THRESHOLD_DAYS = 7;
 const MAX_SIMULATED_DAYS = 3660;
+// A threshold episode has no known start, so it is always already due
+const THRESHOLD_REORDER_AT = new Date(0);
 
 export function reorderStatus(
   stock: number | null | undefined,
@@ -69,7 +71,7 @@ export function productReorderStatus(
   return {
     daysLeft: null,
     runOutAt: null,
-    reorderAt: isLow ? now : null,
+    reorderAt: isLow ? THRESHOLD_REORDER_AT : null,
     isLow,
   };
 }

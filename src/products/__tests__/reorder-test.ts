@@ -353,8 +353,21 @@ describe('productReorderStatus', () => {
 
     // then
     expect(status.isLow).toBe(true);
-    expect(status.reorderAt).toEqual(NOW);
+    expect(status.reorderAt).toEqual(new Date(0));
     expect(status.daysLeft).toBeNull();
+  });
+
+  it('keeps the same reorderAt on every day of a threshold episode', () => {
+    // given
+    const product = { stock: 3, reorderThreshold: 5 };
+    const nextDay = new Date(NOW.getTime() + MS_PER_DAY);
+
+    // when
+    const today = productReorderStatus(product, noRhythm, NOW);
+    const tomorrow = productReorderStatus(product, noRhythm, nextDay);
+
+    // then
+    expect(tomorrow.reorderAt).toEqual(today.reorderAt);
   });
 
   it('is not low while the stock is above the threshold', () => {
