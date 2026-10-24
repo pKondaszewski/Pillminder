@@ -34,10 +34,12 @@ import {
   getFuturePendingDosesByProduct,
   productDosesBetweenQuery,
   replacePendingDoseRows,
+  restoreDoseRow,
   setDoseSnoozedUntilRow,
   setDoseStateRow,
 } from './dose-repository';
 import { isDueInFuture, isPending } from './dose-validator';
+import type { DoseSnapshot } from './dto/dose-snapshot';
 
 export { dayPhases } from './day-phases';
 export { correctionStockDelta } from './dose-correction';
@@ -61,6 +63,7 @@ export { BULK_TAKE_MIN_OVERDUE, todayCardState } from './dose-today-card';
 export type { CorrectionTarget } from './dto/correction-target';
 export type { DayPhases } from './dto/day-phases';
 export type { DayStatus } from './dto/day-status';
+export type { DoseSnapshot } from './dto/dose-snapshot';
 export type { DoseStatus } from './dto/dose-status';
 export type { RecentDays, StripDay } from './dto/recent-days-output';
 export type { TimeSlotGroup, TimeSlotLayout } from './dto/time-slot-output';
@@ -144,22 +147,22 @@ export async function revertDose(id: string): Promise<void> {
   log.info(`Reverting dose ${id} to pending`);
   try {
     await setDoseStateRow(id, 'pending');
-
-    const dose = await getDoseById(id);
-    if (!dose || !isDueInFuture(dose, new Date())) return;
-
-    const product = await getProduct(dose.productId);
-    if (!product) return;
-
-    await scheduleDoseReminder(
-      { id: dose.id, plannedAt: dose.plannedAt },
-      reminderTexts(
-        product,
-        quantityOfDose(dose, await getSchedule(dose.scheduleId)),
-      ),
-    );
+    await rescheduleReminderIfDue(id);
   } catch (err) {
     log.error(`Failed to revert dose ${id}`, err);
+    throw err;
+  }
+}
+
+export async function restoreDose(snapshot: DoseSnapshot): Promise<void> {
+  const { id, state } = snapshot;
+  log.info(`Restoring dose ${id} to ${state}`);
+  try {
+    await restoreDoseRow(snapshot);
+    if (state === 'pending') await rescheduleReminderIfDue(id);
+    else await cancelDoseReminder(id);
+  } catch (err) {
+    log.error(`Failed to restore dose ${id}`, err);
     throw err;
   }
 }
@@ -285,6 +288,22 @@ async function applyDoseState(
     log.error(`Failed to set ${change}`, err);
     throw err;
   }
+}
+
+async function rescheduleReminderIfDue(id: string): Promise<void> {
+  const dose = await getDoseById(id);
+  if (!dose || !isDueInFuture(dose, new Date())) return;
+
+  const product = await getProduct(dose.productId);
+  if (!product) return;
+
+  await scheduleDoseReminder(
+    { id: dose.id, plannedAt: dose.plannedAt },
+    reminderTexts(
+      product,
+      quantityOfDose(dose, await getSchedule(dose.scheduleId)),
+    ),
+  );
 }
 
 function reminderTexts(product: Product, quantity: number) {

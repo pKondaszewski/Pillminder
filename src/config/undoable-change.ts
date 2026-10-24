@@ -20,3 +20,20 @@ export function creationChange(
     },
   };
 }
+
+export function deletionChange<T>(
+  message: string,
+  remove: () => Promise<T | undefined> | T | undefined,
+  restore: (removed: T) => Promise<void> | void,
+): UndoableChange {
+  let removed: T | undefined;
+  return {
+    message,
+    apply: async () => {
+      removed = await remove();
+    },
+    revert: async () => {
+      if (removed !== undefined) await restore(removed);
+    },
+  };
+}

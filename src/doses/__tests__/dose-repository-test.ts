@@ -13,6 +13,7 @@ import {
 import {
   deleteFuturePendingDoseRowsForSchedules,
   replacePendingDoseRows,
+  restoreDoseRow,
   setDoseStateRow,
 } from '../dose-repository';
 import type { DoseState } from '../dose-transition';
@@ -511,5 +512,105 @@ describe('deleteFuturePendingDoseRowsForSchedules', () => {
         .map((dose) => dose.id)
         .sort(),
     ).toEqual(['overdue', 'taken']);
+  });
+});
+
+describe('restoreDoseRow', () => {
+  beforeEach(() => {
+    jest.useFakeTimers({ now: NOW });
+    clearTestDatabase();
+  });
+  afterEach(() => jest.useRealTimers());
+
+  it('gives back exactly the deducted amounts of a bulk take from a low stock', async () => {
+    // given
+    insertProduct({ id: 'p1', stock: 3 });
+    insertSchedule({ id: 's1', productId: 'p1', quantity: 2 });
+    ['d1', 'd2'].forEach((id, index) =>
+      insertDose({
+        id,
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: new Date(EARLIER_TODAY.getTime() + index * 60_000),
+      }),
+    );
+    await setDoseStateRow('d1', 'taken');
+    await setDoseStateRow('d2', 'taken');
+    const pending = {
+      state: 'pending' as const,
+      takenAt: null,
+      takenQuantity: null,
+    };
+
+    // when
+    await restoreDoseRow({ id: 'd1', ...pending });
+    await restoreDoseRow({ id: 'd2', ...pending });
+
+    // then
+    expect(productRow()?.stock).toBe(3);
+    expect(doseRow('d1')).toMatchObject(pending);
+    expect(doseRow('d2')).toMatchObject(pending);
+    expect(productRow()?.lastUsedAt).toBeNull();
+  });
+
+  it('restores a taken dose with its original time and takes its stock again', async () => {
+    // given
+    insertProduct({ id: 'p1', stock: 10 });
+    insertSchedule({ id: 's1', productId: 'p1', quantity: 2 });
+    insertDose({
+      id: 'd1',
+      productId: 'p1',
+      scheduleId: 's1',
+      plannedAt: YESTERDAY,
+      state: 'taken',
+      takenAt: EARLIER_TODAY,
+      takenQuantity: 2,
+    });
+    await setDoseStateRow('d1', 'skipped', { backdated: true });
+
+    // when
+    await restoreDoseRow({
+      id: 'd1',
+      state: 'taken',
+      takenAt: EARLIER_TODAY,
+      takenQuantity: 2,
+    });
+
+    // then
+    expect(doseRow('d1')).toMatchObject({
+      state: 'taken',
+      takenAt: EARLIER_TODAY,
+      takenQuantity: 2,
+    });
+    expect(productRow()).toMatchObject({
+      stock: 10,
+      lastUsedAt: EARLIER_TODAY,
+    });
+  });
+
+  it('restores a skipped dose after it was corrected to taken', async () => {
+    // given
+    insertProduct({ id: 'p1', stock: 10 });
+    insertSchedule({ id: 's1', productId: 'p1', quantity: 2 });
+    insertDose({
+      id: 'd1',
+      productId: 'p1',
+      scheduleId: 's1',
+      plannedAt: YESTERDAY,
+      state: 'skipped',
+    });
+    await setDoseStateRow('d1', 'taken', { backdated: true });
+
+    // when
+    await restoreDoseRow({
+      id: 'd1',
+      state: 'skipped',
+      takenAt: null,
+      takenQuantity: null,
+    });
+
+    // then
+    expect(doseRow('d1')).toMatchObject({ state: 'skipped', takenAt: null });
+    expect(productRow()).toMatchObject({ stock: 10, lastUsedAt: null });
   });
 });

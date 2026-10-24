@@ -9,3 +9,5 @@ const expo = openDatabaseSync(DATABASE_NAME, { enableChangeListener: true });
 expo.execSync('PRAGMA foreign_keys = ON');
 
 export const db = drizzle(expo, { schema });
+
+export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];

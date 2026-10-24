@@ -7,11 +7,13 @@ import {
   insertIntakeRow,
   intakesBetweenQuery,
   productIntakesQuery,
+  restoreIntakeRow,
+  type StoredIntake,
 } from './intake-repository';
 
 export type { Intake } from './dto/intake-output';
 export { intakeDayKeys, recentIntakeCount } from './intake-history';
-export { latestUseAt } from './intake-repository';
+export { latestUseAt, type StoredIntake } from './intake-repository';
 
 const log = createLogger('intake-service');
 
@@ -37,12 +39,22 @@ export function takeNow(id: string, productId: string, now: Date): void {
   }
 }
 
-export function removeIntake(id: string): void {
+export function removeIntake(id: string): StoredIntake | undefined {
   log.info(`Removing intake ${id}`);
   try {
-    deleteIntakeRow(id);
+    return deleteIntakeRow(id);
   } catch (err) {
     log.error(`Failed to remove intake ${id}`, err);
+    throw err;
+  }
+}
+
+export function restoreIntake(intake: StoredIntake): void {
+  log.info(`Restoring intake ${intake.id}`);
+  try {
+    restoreIntakeRow(intake);
+  } catch (err) {
+    log.error(`Failed to restore intake ${intake.id}`, err);
     throw err;
   }
 }

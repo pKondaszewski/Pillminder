@@ -2,7 +2,6 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   useWindowDimensions,
@@ -46,9 +45,8 @@ import {
   type UndoableKind,
   useUndoableDoseAction,
 } from '@/doses/ui/use-undoable-dose-action';
-import type { Intake } from '@/intakes/intake-service';
 import { IntakeRow } from '@/intakes/ui/intake-row';
-import { useIntakesBetween, useRevertIntake } from '@/intakes/ui/use-intakes';
+import { useIntakesBetween, useRemoveIntake } from '@/intakes/ui/use-intakes';
 import { useSunCoords } from '@/location/ui/use-sun-coords';
 import { useProducts } from '@/products/ui/use-products';
 import {
@@ -85,22 +83,34 @@ export default function HomeScreen() {
 
   const day = pickedDay ?? today;
   const mode = dayMode(day, today);
-  const { doses, takeDose, skipDose, revertDose, correctDoseState } =
-    useDayDoses(day);
-  const { snackbar, applyWithUndo, takeAll, revert } = useUndoableDoseAction({
-    taken: { apply: takeDose, revert: revertDose },
-    skipped: { apply: skipDose, revert: revertDose },
-  });
+  const {
+    doses,
+    takeDose,
+    skipDose,
+    revertDose,
+    correctDoseState,
+    restoreDose,
+  } = useDayDoses(day);
+  const {
+    snackbar,
+    runWithUndo,
+    applyWithUndo,
+    correctWithUndo,
+    takeAll,
+    revert,
+  } = useUndoableDoseAction(
+    {
+      taken: { apply: takeDose, revert: revertDose },
+      skipped: { apply: skipDose, revert: revertDose },
+    },
+    { correct: correctDoseState, restore: restoreDose },
+  );
   const dayIntakes = useIntakesBetween(day, addDays(day, 1));
   const handleTake = (dose: TodayDose) => applyWithUndo('taken', dose);
   const revertConfirmation = useConfirmation<TodayDose>((dose) =>
     revert(undoableKindOf(dose), dose.id),
   );
-  const revertIntake = useRevertIntake();
-  const revertIntakeConfirmation = useConfirmation<Intake>(revertIntake);
-  const takeOverdueConfirmation = useConfirmation<TodayDose[]>((overdue) =>
-    takeAll(overdue.map(({ id }) => id)),
-  );
+  const removeIntake = useRemoveIntake(runWithUndo);
 
   const revertedDose = revertConfirmation.pending?.value;
   const revertTexts = revertedDose
@@ -169,13 +179,9 @@ export default function HomeScreen() {
   };
   const changeMonth = (offset: number) =>
     setCalendarMonth(addMonths(calendarMonth, offset));
-  const saveCorrection = async (dose: TodayDose, target: CorrectionTarget) => {
+  const saveCorrection = (dose: TodayDose, target: CorrectionTarget) => {
     setCorrecting(null);
-    try {
-      await correctDoseState(dose.id, target);
-    } catch {
-      Alert.alert(t('common.errorTitle'), t('home.errorChangeDose'));
-    }
+    return correctWithUndo(dose, target);
   };
 
   const isToday = mode === 'today';
@@ -261,7 +267,7 @@ export default function HomeScreen() {
               key={isoDay(day)}
               state={cardState}
               onTake={handleTake}
-              onTakeOverdue={takeOverdueConfirmation.request}
+              onTakeOverdue={takeAll}
             />
           ) : null}
           {groupDosesByTimeSlot(doses, dayIntakes).map((group) => (
@@ -284,7 +290,7 @@ export default function HomeScreen() {
                 <IntakeRow
                   intake={intake}
                   mode={mode}
-                  onRevert={revertIntakeConfirmation.request}
+                  onRevert={removeIntake}
                   onOpenProduct={openProduct}
                 />
               )}
@@ -312,26 +318,6 @@ export default function HomeScreen() {
         confirmLabel={t('home.undo')}
         onConfirm={revertConfirmation.confirm}
         onCancel={revertConfirmation.cancel}
-      />
-      <ConfirmDialog
-        visible={revertIntakeConfirmation.pending !== null}
-        title={t(DOSE_ACTION_TEXT_KEYS.taken.title)}
-        message={t(DOSE_ACTION_TEXT_KEYS.taken.message, {
-          name: revertIntakeConfirmation.pending?.value.productName,
-        })}
-        confirmLabel={t('home.undo')}
-        onConfirm={revertIntakeConfirmation.confirm}
-        onCancel={revertIntakeConfirmation.cancel}
-      />
-      <ConfirmDialog
-        visible={takeOverdueConfirmation.pending !== null}
-        title={t('home.bulkTakeTitle')}
-        message={t('home.bulkTakeConfirm', {
-          count: takeOverdueConfirmation.pending?.value.length ?? 0,
-        })}
-        confirmLabel={t('home.take')}
-        onConfirm={takeOverdueConfirmation.confirm}
-        onCancel={takeOverdueConfirmation.cancel}
       />
       <MonthCalendarSheet
         visible={calendarOpen}
