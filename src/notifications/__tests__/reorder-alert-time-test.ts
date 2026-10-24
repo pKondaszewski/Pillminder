@@ -1,3 +1,5 @@
+import { productReorderStatus } from '@/products/reorder';
+
 import { reorderAlertAction } from '../reorder-alert-action';
 import { reorderAlertTime } from '../reorder-alert-time';
 
@@ -69,5 +71,33 @@ describe('reorder alert at 09:00 of the reorder day', () => {
 
     // then
     expect(action).toEqual({ kind: 'notifyNow' });
+  });
+});
+
+describe('reorder alert of a product with a threshold and no schedule', () => {
+  const product = { stock: 3, reorderThreshold: 5 };
+
+  it('is posted once and kept when the app is opened before 09:00 the next day', () => {
+    // given
+    const firstDay = new Date(2026, 0, 10, 0, 0);
+    const nextDay = new Date(2026, 0, 11, 0, 0);
+    const nextOpened = new Date(2026, 0, 11, 7, 30);
+    const alertedAt = new Date(2026, 0, 10, 9, 0);
+
+    // when
+    const first = reorderAlertAction(
+      reorderAlertTime(productReorderStatus(product, [], firstDay).reorderAt),
+      null,
+      new Date(2026, 0, 10, 7, 30),
+    );
+    const next = reorderAlertAction(
+      reorderAlertTime(productReorderStatus(product, [], nextDay).reorderAt),
+      alertedAt,
+      nextOpened,
+    );
+
+    // then
+    expect(first).toEqual({ kind: 'notifyNow' });
+    expect(next).toEqual({ kind: 'keep' });
   });
 });
