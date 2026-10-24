@@ -2,33 +2,33 @@ import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, StyleSheet } from 'react-native';
 
 import { SecondaryButton } from '@/commons/ui/button';
-import { ConfirmDialog } from '@/commons/ui/confirm-dialog';
 import { Radius, Spacing } from '@/commons/ui/constants/theme';
 import { TextField } from '@/commons/ui/text-field';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
-import { useConfirmation } from '@/commons/ui/use-confirmation';
 import { useFormatTime } from '@/commons/ui/use-format-date';
+import type { RunWithUndo } from '@/commons/ui/use-undo-snackbar';
 import type { Note } from '@/notes/note-service';
 import { ProductSection } from '@/products/ui/section';
 import { useNoteDraft } from '@/products/ui/use-note-draft';
 import { useNotes } from '@/products/ui/use-notes';
 
-export function ProductNotes({ productId }: { productId: string }) {
+interface Props {
+  productId: string;
+  runWithUndo: RunWithUndo;
+}
+
+export function ProductNotes({ productId, runWithUndo }: Props) {
   const { t } = useTranslation();
   const { formatDateTime } = useFormatTime();
-  const { notes, removeNote } = useNotes(productId);
+  const { notes, deleteNote } = useNotes(productId, runWithUndo);
   const { draft, editingId, canSubmit, setDraft, startEditing, reset, submit } =
     useNoteDraft(productId);
 
-  const deletion = useConfirmation<Note>(async (note) => {
-    try {
-      await removeNote(note.id);
+  const handleDelete = (note: Note) =>
+    deleteNote(note, () => {
       if (note.id === editingId) reset();
-    } catch {
-      Alert.alert(t('common.errorTitle'), t('notes.errorDelete'));
-    }
-  });
+    });
 
   const handleSubmit = async () => {
     try {
@@ -63,7 +63,7 @@ export function ProductNotes({ productId }: { productId: string }) {
                 </ThemedText>
               </Pressable>
               <Pressable
-                onPress={() => deletion.request(note)}
+                onPress={() => handleDelete(note)}
                 hitSlop={Spacing.eight}
                 style={({ pressed }) => pressed && styles.pressed}
               >
@@ -92,15 +92,6 @@ export function ProductNotes({ productId }: { productId: string }) {
           disabled={!canSubmit}
         />
       </ThemedView>
-      <ConfirmDialog
-        visible={deletion.pending !== null}
-        destructive
-        title={t('notes.deleteTitle')}
-        message={t('notes.deleteConfirm')}
-        confirmLabel={t('editor.delete')}
-        onConfirm={deletion.confirm}
-        onCancel={deletion.cancel}
-      />
     </ProductSection>
   );
 }

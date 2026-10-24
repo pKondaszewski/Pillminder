@@ -152,7 +152,7 @@ function ProductDetail({
           onCalendarPress={openCalendar}
         />
         <AsNeededSection intakes={intakes} now={now} />
-        <ProductNotes productId={product.id} />
+        <ProductNotes productId={product.id} runWithUndo={runWithUndo} />
         <DetailsSection
           product={product}
           onEdit={editField}

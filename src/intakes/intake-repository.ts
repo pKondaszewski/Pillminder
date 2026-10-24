@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, lt, max } from 'drizzle-orm';
 
-import { db } from '@/config/db/database';
+import { db, type Transaction } from '@/config/db/database';
 import {
   asNeededIntakes,
   doses,
@@ -10,7 +10,7 @@ import {
 
 import { adjustedStock, deductedQuantity } from './intake-stock';
 
-export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+export type StoredIntake = typeof asNeededIntakes.$inferSelect;
 
 export function intakesBetweenQuery(from: Date, to: Date) {
   return intakesQuery().where(
@@ -43,14 +43,14 @@ export function insertIntakeRow(
   });
 }
 
-export function deleteIntakeRow(id: string): void {
-  db.transaction((tx) => {
+export function deleteIntakeRow(id: string): StoredIntake | undefined {
+  return db.transaction((tx) => {
     const intake = tx
       .select()
       .from(asNeededIntakes)
       .where(eq(asNeededIntakes.id, id))
       .get();
-    if (!intake) return;
+    if (!intake) return undefined;
 
     tx.delete(asNeededIntakes).where(eq(asNeededIntakes.id, id)).run();
     // Rows from before deductedQuantity existed gave back the full quantity.
@@ -58,6 +58,20 @@ export function deleteIntakeRow(id: string): void {
       tx,
       intake.productId,
       intake.deductedQuantity ?? intake.quantity,
+    );
+    refreshLastUsedAt(tx, intake.productId);
+    return intake;
+  });
+}
+
+export function restoreIntakeRow(intake: StoredIntake): void {
+  db.transaction((tx) => {
+    tx.insert(asNeededIntakes).values(intake).run();
+    // Takes back exactly what the deletion gave back.
+    shiftStock(
+      tx,
+      intake.productId,
+      -(intake.deductedQuantity ?? intake.quantity),
     );
     refreshLastUsedAt(tx, intake.productId);
   });

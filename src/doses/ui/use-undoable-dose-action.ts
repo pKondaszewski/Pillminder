@@ -3,9 +3,20 @@ import { Alert } from 'react-native';
 
 import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import { createLogger } from '@/config/logger';
-import type { TodayDose } from '@/doses/dose-service';
+import type {
+  CorrectionTarget,
+  DoseSnapshot,
+  TodayDose,
+} from '@/doses/dose-service';
+import { bulkTakeChange, doseCorrectionChange } from '@/doses/dose-undo';
 
 type DoseFn = (id: string) => Promise<void>;
+
+interface Corrections {
+  correct: (id: string, target: CorrectionTarget) => Promise<void>;
+  restore: (snapshot: DoseSnapshot) => Promise<void>;
+}
+
 export type UndoableKind = 'taken' | 'skipped';
 
 const DOSE_ACTION_TOAST_KEYS: Record<UndoableKind, string> = {
@@ -17,9 +28,10 @@ const log = createLogger('use-undoable-dose-action');
 
 export function useUndoableDoseAction(
   actions: Record<UndoableKind, { apply: DoseFn; revert: DoseFn }>,
+  { correct, restore }: Corrections,
 ) {
   const { t } = useTranslation();
-  const { snackbar, showUndo, dismissUndo } = useUndoSnackbar();
+  const { snackbar, showUndo, runWithUndo } = useUndoSnackbar();
 
   const reportFailure = (what: string, err: unknown) => {
     log.error(`Failed to ${what}`, err);
@@ -41,21 +53,28 @@ export function useUndoableDoseAction(
     );
   };
 
-  const takeAll = async (ids: string[]) => {
-    dismissUndo();
-    let failed = 0;
-    for (const id of ids) {
-      try {
-        await actions.taken.apply(id);
-      } catch (err) {
-        failed += 1;
-        log.error(`Failed to mark dose ${id} as taken`, err);
-      }
-    }
-    if (failed > 0) {
-      Alert.alert(t('common.errorTitle'), t('home.bulkTakeError'));
-    }
-  };
+  const correctWithUndo = (dose: TodayDose, target: CorrectionTarget) =>
+    runWithUndo(
+      doseCorrectionChange(
+        dose,
+        target,
+        t(DOSE_ACTION_TOAST_KEYS[target], { name: dose.productName }),
+        correct,
+        restore,
+      ),
+      'home.errorChangeDose',
+    );
+
+  const takeAll = (doses: TodayDose[]) =>
+    runWithUndo(
+      bulkTakeChange(
+        doses,
+        t('home.bulkTakenToast', { count: doses.length }),
+        actions.taken.apply,
+        restore,
+      ),
+      'home.bulkTakeError',
+    );
 
   const revert = async (kind: UndoableKind, id: string) => {
     try {
@@ -65,5 +84,12 @@ export function useUndoableDoseAction(
     }
   };
 
-  return { snackbar, applyWithUndo, takeAll, revert };
+  return {
+    snackbar,
+    runWithUndo,
+    applyWithUndo,
+    correctWithUndo,
+    takeAll,
+    revert,
+  };
 }

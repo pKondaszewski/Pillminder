@@ -1,14 +1,15 @@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { useTranslation } from 'react-i18next';
 
-import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
 import type { RunWithUndo } from '@/commons/ui/use-undo-snackbar';
+import { deletionChange } from '@/config/undoable-change';
 import {
   getIntakesBetweenQuery,
   getProductIntakesQuery,
   type Intake,
   newIntakeId,
   removeIntake,
+  restoreIntake,
   takeNow,
 } from '@/intakes/intake-service';
 import type { Product } from '@/products/product-service';
@@ -44,16 +45,25 @@ export function useTakeNow({ id, name }: Product, runWithUndo: RunWithUndo) {
       {
         message: t('intake.takenToast', { name }),
         apply: () => takeNow(intakeId, id, new Date()),
-        revert: () => removeIntake(intakeId),
+        revert: () => {
+          removeIntake(intakeId);
+        },
       },
       'intake.errorSave',
     );
   };
 }
 
-export function useRevertIntake() {
-  const runWithAlert = useRunWithErrorAlert();
+export function useRemoveIntake(runWithUndo: RunWithUndo) {
+  const { t } = useTranslation();
 
-  return ({ id }: Intake) =>
-    runWithAlert(async () => removeIntake(id), 'intake.errorSave');
+  return ({ id, productName }: Intake) =>
+    runWithUndo(
+      deletionChange(
+        t('intake.removedToast', { name: productName }),
+        () => removeIntake(id),
+        restoreIntake,
+      ),
+      'intake.errorSave',
+    );
 }

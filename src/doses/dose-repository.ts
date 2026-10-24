@@ -1,14 +1,19 @@
 import { and, eq, getTableColumns, gte, inArray, lt } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
-import { db } from '@/config/db/database';
+import { db, type Transaction } from '@/config/db/database';
 import { doses, productImages, products, schedules } from '@/config/db/schema';
 import { latestUseAt } from '@/intakes/intake-service';
 import { adjustedStock } from '@/intakes/intake-stock';
 import { quantityOn } from '@/schedules/step-days';
 
 import { planPendingReplacement } from './dose-replacement';
-import { type DoseState, planDoseTransition } from './dose-transition';
+import {
+  type DoseState,
+  planDoseTransition,
+  restoreStockDelta,
+} from './dose-transition';
+import type { DoseSnapshot } from './dto/dose-snapshot';
 import type { ReplaceDosesQueryResult } from './dto/replace-doses-query-result';
 
 export type Dose = typeof doses.$inferSelect;
@@ -107,27 +112,42 @@ export async function setDoseStateRow(
       .where(eq(doses.id, id))
       .run();
 
-    if (!product) return;
+    syncProductAfterDoseChange(
+      tx,
+      dose.productId,
+      product,
+      transition.stockDelta,
+    );
+  });
+}
 
-    const lastUsedAt = latestUseAt(tx, dose.productId);
-    const stock =
-      product.stock == null
-        ? null
-        : adjustedStock(product.stock, transition.stockDelta);
-    const stockChanged = stock !== product.stock;
-    const lastUsedChanged =
-      (lastUsedAt?.getTime() ?? null) !==
-      (product.lastUsedAt?.getTime() ?? null);
-    if (!stockChanged && !lastUsedChanged) return;
+export async function restoreDoseRow({
+  id,
+  state,
+  takenAt,
+  takenQuantity,
+}: DoseSnapshot): Promise<void> {
+  db.transaction((tx) => {
+    const dose = tx.select().from(doses).where(eq(doses.id, id)).get();
+    if (!dose) return;
 
-    tx.update(products)
-      .set({
-        lastUsedAt,
-        ...(stockChanged ? { stock } : {}),
-        updatedAt: new Date(),
-      })
+    const product = tx
+      .select({ stock: products.stock, lastUsedAt: products.lastUsedAt })
+      .from(products)
       .where(eq(products.id, dose.productId))
+      .get();
+
+    tx.update(doses)
+      .set({ state, takenAt, takenQuantity, snoozedUntil: null })
+      .where(eq(doses.id, id))
       .run();
+
+    syncProductAfterDoseChange(
+      tx,
+      dose.productId,
+      product,
+      restoreStockDelta(dose, { state, takenQuantity }),
+    );
   });
 }
 
@@ -234,4 +254,30 @@ export async function replacePendingDoseRows(
 
     return { removedIds, inserted, kept };
   });
+}
+
+function syncProductAfterDoseChange(
+  tx: Transaction,
+  productId: string,
+  product: { stock: number | null; lastUsedAt: Date | null } | undefined,
+  stockDelta: number,
+): void {
+  if (!product) return;
+
+  const lastUsedAt = latestUseAt(tx, productId);
+  const stock =
+    product.stock == null ? null : adjustedStock(product.stock, stockDelta);
+  const stockChanged = stock !== product.stock;
+  const lastUsedChanged =
+    (lastUsedAt?.getTime() ?? null) !== (product.lastUsedAt?.getTime() ?? null);
+  if (!stockChanged && !lastUsedChanged) return;
+
+  tx.update(products)
+    .set({
+      lastUsedAt,
+      ...(stockChanged ? { stock } : {}),
+      updatedAt: new Date(),
+    })
+    .where(eq(products.id, productId))
+    .run();
 }
