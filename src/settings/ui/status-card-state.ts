@@ -39,6 +39,31 @@ export function batteryCardState(
     : { ok: true, statusKey: 'settings.batteryUnrestricted' };
 }
 
+export type GoogleBackupCardState = {
+  ok: boolean;
+  neutral: boolean;
+  statusKey: string;
+  actionKey: string;
+};
+
+export function googleBackupCardState(
+  confirmed: boolean,
+): GoogleBackupCardState {
+  return confirmed
+    ? {
+        ok: true,
+        neutral: false,
+        statusKey: 'settings.googleBackupOn',
+        actionKey: 'settings.googleBackupTurnOff',
+      }
+    : {
+        ok: false,
+        neutral: true,
+        statusKey: 'settings.googleBackupCheck',
+        actionKey: 'settings.fix',
+      };
+}
+
 export type LocationCardState = {
   ok: boolean;
   neutral: boolean;

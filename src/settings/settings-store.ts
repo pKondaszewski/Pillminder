@@ -22,6 +22,7 @@ const DEFAULT_SETTINGS: Settings = {
   notificationsPromptDismissed: false,
   batteryPromptDismissed: false,
   locationPromptDismissed: false,
+  googleBackupConfirmed: false,
   location: null,
   appLockEnabled: false,
 };
@@ -35,6 +36,7 @@ const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
   notificationsPromptDismissed: (value) => typeof value === 'boolean',
   batteryPromptDismissed: (value) => typeof value === 'boolean',
   locationPromptDismissed: (value) => typeof value === 'boolean',
+  googleBackupConfirmed: (value) => typeof value === 'boolean',
   location: isValidStoredLocation,
   appLockEnabled: (value) => typeof value === 'boolean',
 };
@@ -80,6 +82,7 @@ function readStoredSettings(): Settings {
       ),
       batteryPromptDismissed: pick('batteryPromptDismissed', stored),
       locationPromptDismissed: pick('locationPromptDismissed', stored),
+      googleBackupConfirmed: pick('googleBackupConfirmed', stored),
       location: pick('location', stored),
       appLockEnabled: pick('appLockEnabled', stored),
     };

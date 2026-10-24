@@ -8,6 +8,7 @@ import { useAppLockSetting } from '@/applock/ui/use-app-lock-setting';
 import { BackupImportDialog } from '@/backup/ui/backup-import-dialog';
 import { useBackup } from '@/backup/ui/use-backup';
 import { useBatteryOptimization } from '@/battery/ui/use-battery-optimization';
+import { ConfirmDialog } from '@/commons/ui/confirm-dialog';
 import { Spacing } from '@/commons/ui/constants/theme';
 import { FieldRow } from '@/commons/ui/field-row';
 import { ScreenTitle } from '@/commons/ui/screen-title';
@@ -17,6 +18,7 @@ import { ThemedView } from '@/commons/ui/themed-view';
 import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
 import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import { AUTHOR_NAME } from '@/config/app-info';
+import { useGoogleBackupSettings } from '@/google-backup/ui/use-google-backup-settings';
 import { useLocationPermission } from '@/location/ui/use-location-permission';
 import { useNotificationPermission } from '@/notifications/ui/use-notification-permission';
 import { permissionStep } from '@/onboarding/onboarding-service';
@@ -42,6 +44,7 @@ import { SnoozeSheet } from '@/settings/ui/snooze-sheet';
 import { StatusCard } from '@/settings/ui/status-card';
 import {
   batteryCardState,
+  googleBackupCardState,
   locationCardState,
   notificationCardState,
 } from '@/settings/ui/status-card-state';
@@ -55,6 +58,7 @@ export default function SettingsScreen() {
   const { permission, request } = useNotificationPermission();
   const battery = useBatteryOptimization();
   const location = useLocationPermission();
+  const googleBackup = useGoogleBackupSettings();
   const backup = useBackup();
   const appLock = useAppLockSetting();
   const [sheet, setSheet] = useState<Sheet | null>(null);
@@ -65,6 +69,9 @@ export default function SettingsScreen() {
     : null;
   const batteryState =
     battery.enabled === null ? null : batteryCardState(battery.enabled);
+  const googleBackupState = googleBackupCardState(
+    settings.googleBackupConfirmed,
+  );
   const notificationsFix =
     notifications?.fix === 'request'
       ? request
@@ -124,6 +131,18 @@ export default function SettingsScreen() {
                   onFix={locationActions[locationState.action]}
                 />
               ) : null}
+              <StatusCard
+                ok={googleBackupState.ok}
+                neutral={googleBackupState.neutral}
+                title={t('settings.googleBackup')}
+                status={t(googleBackupState.statusKey)}
+                fixLabel={t(googleBackupState.actionKey)}
+                onFix={() =>
+                  void googleBackup.openSettings(
+                    !settings.googleBackupConfirmed,
+                  )
+                }
+              />
             </SettingsSection>
 
             <SettingsSection title={t('settings.reminders')}>
@@ -197,6 +216,18 @@ export default function SettingsScreen() {
       </ThemedView>
 
       <BackupImportDialog confirmation={backup.importConfirmation} />
+      <ConfirmDialog
+        visible={googleBackup.question.pending !== null}
+        title={t(
+          googleBackup.question.pending?.value
+            ? 'settings.googleBackupTurnedOnQuestion'
+            : 'settings.googleBackupTurnedOffQuestion',
+        )}
+        confirmLabel={t('settings.googleBackupTurnedOnYes')}
+        cancelLabel={t('settings.googleBackupTurnedOnNo')}
+        onConfirm={googleBackup.question.confirm}
+        onCancel={googleBackup.question.cancel}
+      />
       {sheet === 'snooze' ? (
         <SnoozeSheet
           minutes={settings.snoozeMinutes}
