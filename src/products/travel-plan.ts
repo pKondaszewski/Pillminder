@@ -2,6 +2,7 @@ import { addDays, MS_PER_DAY, startOfDay } from '@/config/date-utils';
 import type { Translate } from '@/config/translate';
 import type { Schedule } from '@/schedules/schedule-service';
 
+import type { ProductUnit } from './dto/product-unit';
 import type {
   TravelPlanEntry,
   TravelStockVerdict,
@@ -10,6 +11,8 @@ import { productLabel } from './product-label';
 import type { Product } from './product-service';
 import { formatAmount } from './product-unit';
 import { consumptionBetween, reorderStatus } from './reorder';
+
+const CONTAINER_UNITS: readonly ProductUnit[] = ['drop', 'ml', 'spray'];
 
 export interface TravelPlanContext {
   t: Translate;
@@ -36,6 +39,8 @@ export function buildTravelPlan(
         {
           id: product.id,
           name: product.name,
+          category: product.category,
+          profileImageFileName: product.profileImageFileName,
           title: productLabel(product.name, product.strength),
           pack: describePack(needed, product, t),
           ...stockOutlook(product.stock, rhythm, departure, returnDay, now),
@@ -50,9 +55,19 @@ export function buildTravelPlan(
 
 function describePack(needed: number, product: Product, t: Translate): string {
   const count = Math.ceil(needed);
-  return product.unit
-    ? formatAmount(count, product.unit, t)
-    : t('travel.pieces', { count });
+  if (!product.unit)
+    return t('travel.pack', { amount: t('travel.pieces', { count }) });
+  const amount = formatAmount(count, product.unit, t);
+  if (!isContainerUnit(product.unit)) return t('travel.pack', { amount });
+  if (!product.packSize) return t('travel.reserve', { amount });
+  return t('travel.packs', {
+    count: Math.ceil(needed / product.packSize),
+    amount,
+  });
+}
+
+function isContainerUnit(unit: ProductUnit): boolean {
+  return CONTAINER_UNITS.includes(unit);
 }
 
 function stockOutlook(

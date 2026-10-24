@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Radius, Spacing } from '@/commons/ui/constants/theme';
+import { ProductAvatar } from '@/commons/ui/product-avatar';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
 import { useDateLocale } from '@/commons/ui/use-format-date';
@@ -22,7 +23,11 @@ import { useTravelPlan } from '@/products/ui/use-travel-plan';
 
 const DEFAULT_TRIP_LENGTH_DAYS = 7;
 
-export function TravelPlan() {
+type TravelPlanProps = {
+  onOpenProduct: (id: string) => void;
+};
+
+export function TravelPlan({ onOpenProduct }: TravelPlanProps) {
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
   const [range, setRange] = useState<DateRange>(() => ({
@@ -60,7 +65,7 @@ export function TravelPlan() {
               </ThemedText>
             </ThemedView>
           </Pressable>
-          <TravelResults entries={plan} />
+          <TravelResults entries={plan} onOpenProduct={onOpenProduct} />
         </View>
       </ScrollView>
       <TripRangeSheet
@@ -73,7 +78,13 @@ export function TravelPlan() {
   );
 }
 
-function TravelResults({ entries }: { entries: TravelPlanEntry[] }) {
+function TravelResults({
+  entries,
+  onOpenProduct,
+}: {
+  entries: TravelPlanEntry[];
+  onOpenProduct: (id: string) => void;
+}) {
   const { t } = useTranslation();
   if (entries.length === 0) {
     return (
@@ -88,32 +99,55 @@ function TravelResults({ entries }: { entries: TravelPlanEntry[] }) {
   return (
     <>
       {entries.map((entry) => (
-        <ProductBlock key={entry.id} entry={entry} />
+        <ProductBlock
+          key={entry.id}
+          entry={entry}
+          onPress={() => onOpenProduct(entry.id)}
+        />
       ))}
     </>
   );
 }
 
-function ProductBlock({ entry }: { entry: TravelPlanEntry }) {
+function ProductBlock({
+  entry,
+  onPress,
+}: {
+  entry: TravelPlanEntry;
+  onPress: () => void;
+}) {
   const { t } = useTranslation();
   const theme = useTheme();
   const { verdict } = entry;
   const needsRefill = verdict !== null && verdict !== 'enough';
   return (
-    <ThemedView style={[styles.block, { borderColor: theme.border }]}>
-      <ThemedText type="headline">{entry.title}</ThemedText>
-      <ThemedText type="small" themeColor="textSecondary">
-        {t('travel.pack', { amount: entry.pack })}
-      </ThemedText>
-      {verdict ? (
-        <ThemedText
-          type={needsRefill ? 'smallBold' : 'small'}
-          themeColor={needsRefill ? 'overdueText' : 'textSecondary'}
-        >
-          {t(`travel.${verdict}`)}
-        </ThemedText>
-      ) : null}
-    </ThemedView>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      style={({ pressed }) => pressed && styles.pressed}
+    >
+      <ThemedView style={[styles.block, { borderColor: theme.border }]}>
+        <ProductAvatar
+          category={entry.category}
+          size={40}
+          imageFileName={entry.profileImageFileName}
+        />
+        <View style={styles.texts}>
+          <ThemedText type="headline">{entry.title}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            {entry.pack}
+          </ThemedText>
+          {verdict ? (
+            <ThemedText
+              type={needsRefill ? 'smallBold' : 'small'}
+              themeColor={needsRefill ? 'overdueText' : 'textSecondary'}
+            >
+              {t(`travel.${verdict}`)}
+            </ThemedText>
+          ) : null}
+        </View>
+      </ThemedView>
+    </Pressable>
   );
 }
 
@@ -130,11 +164,14 @@ const styles = StyleSheet.create({
     gap: Spacing.four,
   },
   pressed: { opacity: 0.7 },
+  texts: { flex: 1, gap: Spacing.four },
   empty: { gap: Spacing.four, paddingVertical: Spacing.sixteen },
   block: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.twelve,
     padding: Spacing.sixteen,
     borderWidth: 1,
     borderRadius: Radius.card,
-    gap: Spacing.four,
   },
 });

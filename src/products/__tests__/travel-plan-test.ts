@@ -1,3 +1,6 @@
+import en from '@/config/i18n/locales/en.json';
+import pl from '@/config/i18n/locales/pl.json';
+import type { Translate } from '@/config/translate';
 import type { Product } from '@/products/product-service';
 import type { Schedule } from '@/schedules/schedule-service';
 
@@ -8,9 +11,38 @@ const DEPARTURE = new Date(2026, 0, 11);
 const RETURN_DAY = new Date(2026, 0, 17);
 
 const MESSAGES: Record<string, string> = {
+  'travel.pack': 'Spakuj: {{amount}}',
   'travel.pieces': '{{count}} szt.',
   'unit.tablet': '{{count}} tabl.',
 };
+
+function translatorFor(language: 'pl' | 'en'): Translate {
+  const locale = language === 'pl' ? pl : en;
+  const messages = {
+    ...flatten('travel', locale.travel),
+    ...flatten('unit', locale.unit),
+  };
+  const plurals = new Intl.PluralRules(language);
+  return (key, options = {}) => {
+    const form =
+      typeof options.count === 'number'
+        ? `${key}_${plurals.select(options.count)}`
+        : key;
+    return Object.entries(options).reduce(
+      (text, [name, value]) => text.replace(`{{${name}}}`, String(value)),
+      messages[form] ?? messages[key] ?? key,
+    );
+  };
+}
+
+function flatten(
+  prefix: string,
+  entries: Record<string, string>,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(entries).map(([name, text]) => [`${prefix}.${name}`, text]),
+  );
+}
 
 const context: TravelPlanContext = {
   t: (key, options = {}) =>
@@ -27,7 +59,9 @@ function product(overrides: Partial<Product> & { id: string }): Product {
     name: 'Product',
     category: 'medication',
     strength: null,
+    profileImageFileName: null,
     unit: null,
+    packSize: null,
     status: 'active',
     stock: null,
     ...overrides,
@@ -73,12 +107,40 @@ describe('buildTravelPlan', () => {
       {
         id: 'p1',
         name: 'Product',
+        category: 'medication',
+        profileImageFileName: null,
         title: 'Product',
-        pack: '7 szt.',
+        pack: 'Spakuj: 7 szt.',
         verdict: 'enough',
         runOutOffsetDays: 29.5,
       },
     ]);
+  });
+
+  it('carries what the avatar needs', () => {
+    // given
+    const products = [
+      product({
+        id: 'p1',
+        category: 'supplement',
+        profileImageFileName: 'p1.jpg',
+      }),
+    ];
+
+    // when
+    const plan = buildTravelPlan(
+      products,
+      [schedule()],
+      DEPARTURE,
+      RETURN_DAY,
+      context,
+    );
+
+    // then
+    expect(plan[0]).toMatchObject({
+      category: 'supplement',
+      profileImageFileName: 'p1.jpg',
+    });
   });
 
   it('warns when the stock runs out during the trip', () => {
@@ -96,7 +158,7 @@ describe('buildTravelPlan', () => {
 
     // then
     expect(plan[0]).toMatchObject({
-      pack: '7 tabl.',
+      pack: 'Spakuj: 7 tabl.',
       verdict: 'runsOutDuringTrip',
     });
   });
@@ -133,7 +195,7 @@ describe('buildTravelPlan', () => {
     );
 
     // then
-    expect(plan[0].pack).toBe('3 szt.');
+    expect(plan[0].pack).toBe('Spakuj: 3 szt.');
     expect(plan[0].verdict).toBe('enough');
   });
 
@@ -152,7 +214,7 @@ describe('buildTravelPlan', () => {
 
     // then
     expect(plan[0]).toMatchObject({
-      pack: '14 szt.',
+      pack: 'Spakuj: 14 szt.',
       verdict: null,
       runOutOffsetDays: null,
     });
@@ -215,5 +277,116 @@ describe('buildTravelPlan', () => {
 
     // then
     expect(plan).toEqual([]);
+  });
+
+  it.each([
+    [14, 'Spakuj: 1 opakowanie (14 psiknięć)'],
+    [7, 'Spakuj: 2 opakowania (14 psiknięć)'],
+    [3, 'Spakuj: 5 opakowań (14 psiknięć)'],
+  ])(
+    'packs a container in whole packs of %i sprays in Polish',
+    (packSize, expected) => {
+      // given
+      const products = [
+        product({ id: 'p1', category: 'nasal-spray', unit: 'spray', packSize }),
+      ];
+
+      // when
+      const plan = buildTravelPlan(
+        products,
+        [schedule({ quantity: 2 })],
+        DEPARTURE,
+        RETURN_DAY,
+        { ...context, t: translatorFor('pl') },
+      );
+
+      // then
+      expect(plan[0].pack).toBe(expected);
+    },
+  );
+
+  it.each([
+    [14, 'Pack: 1 pack (14 sprays)'],
+    [7, 'Pack: 2 packs (14 sprays)'],
+  ])(
+    'packs a container in whole packs of %i sprays in English',
+    (packSize, expected) => {
+      // given
+      const products = [
+        product({ id: 'p1', category: 'nasal-spray', unit: 'spray', packSize }),
+      ];
+
+      // when
+      const plan = buildTravelPlan(
+        products,
+        [schedule({ quantity: 2 })],
+        DEPARTURE,
+        RETURN_DAY,
+        { ...context, t: translatorFor('en') },
+      );
+
+      // then
+      expect(plan[0].pack).toBe(expected);
+    },
+  );
+
+  it('counts eye drop packs in drops, the unit the pack size is stored in', () => {
+    // given
+    const products = [
+      product({
+        id: 'p1',
+        category: 'eye-drops',
+        unit: 'drop',
+        packSize: 200,
+      }),
+    ];
+
+    // when
+    const plan = buildTravelPlan(
+      products,
+      [schedule({ quantity: 30 })],
+      DEPARTURE,
+      RETURN_DAY,
+      { ...context, t: translatorFor('pl') },
+    );
+
+    // then
+    expect(plan[0].pack).toBe('Spakuj: 2 opakowania (210 kropli)');
+  });
+
+  it('packs a reserve for a container without a pack size', () => {
+    // given
+    const products = [
+      product({ id: 'p1', category: 'nasal-spray', unit: 'spray' }),
+    ];
+
+    // when
+    const plan = buildTravelPlan(
+      products,
+      [schedule({ quantity: 2 })],
+      DEPARTURE,
+      RETURN_DAY,
+      { ...context, t: translatorFor('pl') },
+    );
+
+    // then
+    expect(plan[0].pack).toBe('Spakuj zapas na 14 psiknięć');
+  });
+
+  it('keeps counting tablets one by one even with a pack size', () => {
+    // given
+    const products = [product({ id: 'p1', unit: 'tablet', packSize: 10 })];
+
+    // when
+    const plan = buildTravelPlan(
+      products,
+      [schedule()],
+      DEPARTURE,
+      RETURN_DAY,
+      { ...context, t: translatorFor('pl') },
+    );
+
+    // then
+    expect(plan[0].pack).toBe('Spakuj: 7 tabletek');
   });
 });
