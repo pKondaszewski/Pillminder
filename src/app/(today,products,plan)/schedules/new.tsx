@@ -7,8 +7,6 @@ import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
 import { useProducts } from '@/products/ui/use-products';
 import { NewScheduleForm } from '@/schedules/ui/new-form';
 import { useSchedules } from '@/schedules/ui/use-schedules';
-import { TutorialBanner } from '@/tutorial/ui/tutorial-banner';
-import { useTutorial } from '@/tutorial/ui/use-tutorial';
 
 export default function NewScheduleScreen() {
   const { t } = useTranslation();
@@ -19,12 +17,7 @@ export default function NewScheduleScreen() {
   const { products, loaded } = useProducts();
   const { schedules, addSchedule } = useSchedules();
 
-  const tutorial = useTutorial();
-
-  const runThenGoBack = useRunWithErrorAlert(() => {
-    if (tutorial.step === 'schedule') tutorial.advance();
-    router.back();
-  });
+  const runThenGoBack = useRunWithErrorAlert(() => router.back());
 
   if (!loaded) return null;
 
@@ -37,7 +30,6 @@ export default function NewScheduleScreen() {
       <Stack.Screen
         options={{ headerShown: true, title: t('schedule.newTitle') }}
       />
-      <TutorialBanner step="schedule" />
       <NewScheduleForm
         products={lockedProduct ? [lockedProduct] : products}
         schedules={schedules}

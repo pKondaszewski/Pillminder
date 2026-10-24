@@ -13,16 +13,6 @@ export type ThemePreference = (typeof THEME_OPTIONS)[number];
 
 export type SeasonPreference = (typeof SEASON_OPTIONS)[number];
 
-export const TUTORIAL_STEPS = [
-  'intro',
-  'product',
-  'schedule',
-  'practice',
-  'done',
-] as const;
-
-export type TutorialStep = (typeof TUTORIAL_STEPS)[number];
-
 export interface Settings {
   language: LanguagePreference;
   theme: ThemePreference;
@@ -32,6 +22,5 @@ export interface Settings {
   batteryPromptDismissed: boolean;
   locationPromptDismissed: boolean;
   location: StoredLocation | null;
-  tutorialStep: TutorialStep;
   appLockEnabled: boolean;
 }

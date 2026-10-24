@@ -26,8 +26,6 @@ import { OnboardingScreen } from '@/onboarding/ui/onboarding-screen';
 import { useOnboarding } from '@/onboarding/ui/use-onboarding';
 import { MigrationErrorScreen } from '@/recovery/ui/migration-error-screen';
 import { applyStoredTheme } from '@/settings/settings-service';
-import { TutorialIntroScreen } from '@/tutorial/ui/tutorial-intro-screen';
-import { useTutorial, useTutorialStart } from '@/tutorial/ui/use-tutorial';
 
 import migrations from '../../drizzle/migrations';
 
@@ -54,10 +52,6 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
   const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
   useNotificationSetup();
   const onboarding = useOnboarding(migrationsReady);
-  const tutorialReady = useTutorialStart(
-    migrationsReady && onboarding.ready && onboarding.step === null,
-  );
-  const tutorial = useTutorial();
   const appLock = useAppLock();
 
   if (migrationError) {
@@ -70,12 +64,7 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
   }
 
   // A failed font load falls back to the system font instead of blocking the app
-  if (
-    !migrationsReady ||
-    !onboarding.ready ||
-    (onboarding.step === null && !tutorialReady) ||
-    !(fontsLoaded || fontError)
-  ) {
+  if (!migrationsReady || !onboarding.ready || !(fontsLoaded || fontError)) {
     return null;
   }
 
@@ -93,11 +82,6 @@ function TabLayout({ onRerunMigrations }: { onRerunMigrations: () => void }) {
               progress={onboarding.progress}
               onAdvance={onboarding.advance}
               onDismiss={onboarding.dismiss}
-            />
-          ) : tutorial.step === 'intro' ? (
-            <TutorialIntroScreen
-              onStart={tutorial.advance}
-              onSkip={tutorial.skip}
             />
           ) : (
             <AppTabs />

@@ -7,13 +7,12 @@ import {
   SNOOZE_ACTION,
   TAKE_ACTION,
 } from './identifiers';
-import { isPracticeData, practiceTexts } from './practice-reminder';
 
 const handledResponses = new Set<string>();
 
 // The app listener and the background task can both see one response when the
 // app is alive in the background; adding a pack is not idempotent. The delivery
-// date is in the key because the practice reminder reuses one identifier.
+// date is in the key because a rescheduled dose reminder reuses its identifier.
 export function claimResponse(response: NotificationResponse): boolean {
   const key = responseKey(response);
   if (handledResponses.has(key)) return false;
@@ -29,21 +28,7 @@ export function processReminderResponse(
   if (data.type === 'reorder') {
     return processReorderResponse(response, data, handlers);
   }
-  return isPracticeData(data)
-    ? processPracticeResponse(response, handlers)
-    : processDoseResponse(response, data, handlers);
-}
-
-function processPracticeResponse(
-  response: NotificationResponse,
-  handlers: ReminderResponseHandlers,
-): boolean {
-  if (response.actionIdentifier === TAKE_ACTION) {
-    return runHandlerOnce(response, handlers.onPracticeTake);
-  }
-  if (response.actionIdentifier !== SNOOZE_ACTION) return false;
-  const texts = practiceTexts(response.notification.request.content);
-  return runHandlerOnce(response, () => handlers.onPracticeSnooze(texts));
+  return processDoseResponse(response, data, handlers);
 }
 
 function processReorderResponse(

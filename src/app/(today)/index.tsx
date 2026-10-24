@@ -65,12 +65,6 @@ import {
 import { DayScene } from '@/scene/ui/day-scene';
 import { useCelebration } from '@/scene/ui/use-celebration';
 import { useSeason } from '@/scene/ui/use-season';
-import { TutorialPracticeCard } from '@/tutorial/ui/tutorial-practice-card';
-import {
-  usePracticeReminder,
-  useTutorial,
-  useTutorialFormPrompt,
-} from '@/tutorial/ui/use-tutorial';
 
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
@@ -82,9 +76,6 @@ export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const today = startOfDay(now);
   const { products, loaded } = useProducts();
-  const tutorial = useTutorial();
-  useTutorialFormPrompt(tutorial.step);
-  const practice = usePracticeReminder(tutorial.step === 'practice');
 
   const [pickedDay, setPickedDay] = useState<Date | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -253,7 +244,12 @@ export default function HomeScreen() {
               title={t('home.emptyProducts.title')}
               message={t('home.emptyProducts.message')}
               actionLabel={t('home.emptyProducts.action')}
-              onAction={() => router.push('/products/new')}
+              onAction={() =>
+                router.push({
+                  pathname: '/products/new',
+                  params: { forSchedule: '1' },
+                })
+              }
             />
           ) : null}
           {products.length > 0 &&
@@ -269,13 +265,6 @@ export default function HomeScreen() {
               message={t('home.emptyDay.message')}
               actionLabel={t('home.emptyDay.action')}
               onAction={() => router.navigate('/schedules')}
-            />
-          ) : null}
-          {practice && isToday ? (
-            <TutorialPracticeCard
-              reminder={practice}
-              onTake={tutorial.completePractice}
-              onSkip={tutorial.skip}
             />
           ) : null}
           {cardState ? (

@@ -5,9 +5,7 @@ import {
   SEASON_OPTIONS,
   type Settings,
   THEME_OPTIONS,
-  TUTORIAL_STEPS,
 } from './dto/settings';
-import { withoutRetiredTutorialStep } from './retired-tutorial-step';
 import { isValidStoredLocation } from './stored-location-validation';
 
 export const SNOOZE_MINUTES_MIN = 1;
@@ -25,7 +23,6 @@ const DEFAULT_SETTINGS: Settings = {
   batteryPromptDismissed: false,
   locationPromptDismissed: false,
   location: null,
-  tutorialStep: 'intro',
   appLockEnabled: false,
 };
 
@@ -39,7 +36,6 @@ const IS_VALID: { [K in keyof Settings]: (value: unknown) => boolean } = {
   batteryPromptDismissed: (value) => typeof value === 'boolean',
   locationPromptDismissed: (value) => typeof value === 'boolean',
   location: isValidStoredLocation,
-  tutorialStep: (value) => TUTORIAL_STEPS.some((step) => step === value),
   appLockEnabled: (value) => typeof value === 'boolean',
 };
 
@@ -85,7 +81,6 @@ function readStoredSettings(): Settings {
       batteryPromptDismissed: pick('batteryPromptDismissed', stored),
       locationPromptDismissed: pick('locationPromptDismissed', stored),
       location: pick('location', stored),
-      tutorialStep: pick('tutorialStep', withoutRetiredTutorialStep(stored)),
       appLockEnabled: pick('appLockEnabled', stored),
     };
   } catch {

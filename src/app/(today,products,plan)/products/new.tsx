@@ -10,14 +10,11 @@ import type { NewProductInput } from '@/products/dto/new-product-input';
 import { NewProductForm } from '@/products/ui/new-product-form';
 import { clearPendingUris } from '@/products/ui/pending-photos-store';
 import { useProducts } from '@/products/ui/use-products';
-import { TutorialBanner } from '@/tutorial/ui/tutorial-banner';
-import { useTutorial } from '@/tutorial/ui/use-tutorial';
 
 export default function NewProductScreen() {
   const { t } = useTranslation();
   const { forSchedule } = useLocalSearchParams<{ forSchedule?: string }>();
   const { addProduct } = useProducts();
-  const tutorial = useTutorial();
 
   useEffect(() => {
     clearPendingUris();
@@ -25,10 +22,7 @@ export default function NewProductScreen() {
   }, []);
 
   const runThenLeave = useRunWithErrorAlert((createdId: string) => {
-    const inTutorial = tutorial.step === 'product';
-    if (inTutorial) tutorial.advance();
-    const goToSchedule = inTutorial || forSchedule;
-    if (!goToSchedule) {
+    if (!forSchedule) {
       router.back();
       return;
     }
@@ -59,7 +53,6 @@ export default function NewProductScreen() {
       <Stack.Screen
         options={{ headerShown: true, title: t('editor.newTitle') }}
       />
-      <TutorialBanner step="product" />
       <NewProductForm
         onPhotosPress={() => router.push('/products/new-photos')}
         onSubmit={(input, photoUris) =>

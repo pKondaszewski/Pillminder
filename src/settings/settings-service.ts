@@ -7,7 +7,6 @@ import type {
   LanguagePreference,
   SeasonPreference,
   ThemePreference,
-  TutorialStep,
 } from './dto/settings';
 import { getSettings, updateSettings } from './settings-store';
 
@@ -19,8 +18,6 @@ export {
   type Settings,
   THEME_OPTIONS,
   type ThemePreference,
-  TUTORIAL_STEPS,
-  type TutorialStep,
 } from './dto/settings';
 export { subscribeToSettings } from './settings-store';
 
@@ -68,14 +65,6 @@ export function dismissLocationPrompt(): void {
 
 export function isLocationPromptDismissed(): boolean {
   return getSettings().locationPromptDismissed;
-}
-
-export function getTutorialStep(): TutorialStep {
-  return getSettings().tutorialStep;
-}
-
-export function setTutorialStep(tutorialStep: TutorialStep): void {
-  updateSettings({ tutorialStep });
 }
 
 export function saveLocation(coords: Coords, now: number): void {
