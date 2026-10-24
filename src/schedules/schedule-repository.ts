@@ -4,8 +4,8 @@ import * as Crypto from 'expo-crypto';
 import { db } from '@/config/db/database';
 import { productImages, products, schedules } from '@/config/db/schema';
 
-import type { CycleState } from './dto/cycle-state';
 import type { NewScheduleInput } from './dto/new-schedule-input';
+import type { RhythmState } from './dto/rhythm-state';
 
 export type Schedule = typeof schedules.$inferSelect;
 export type ScheduleListItem = Awaited<
@@ -54,13 +54,13 @@ export async function getSchedulesByProductId(
 
 export async function createScheduleRow(
   input: NewScheduleInput,
-  cycleState: CycleState,
+  rhythmState: RhythmState,
 ): Promise<Schedule> {
   const [created] = await db
     .insert(schedules)
     .values({
       id: Crypto.randomUUID(),
-      ...scheduleFields(input, cycleState),
+      ...scheduleFields(input, rhythmState),
     })
     .returning();
   return created;
@@ -69,11 +69,11 @@ export async function createScheduleRow(
 export async function updateScheduleRow(
   id: string,
   input: NewScheduleInput,
-  cycleState: CycleState,
+  rhythmState: RhythmState,
 ): Promise<Schedule> {
   const [updated] = await db
     .update(schedules)
-    .set(scheduleFields(input, cycleState))
+    .set(scheduleFields(input, rhythmState))
     .where(eq(schedules.id, id))
     .returning();
   return updated;
@@ -84,7 +84,7 @@ export async function setSchedulePauseRow(
   pause: {
     pausedAt: Date | null;
     resumeAt: Date | null;
-    cyclePausedDays: number;
+    rhythmPausedDays: number;
   },
 ): Promise<Schedule> {
   const [updated] = await db
@@ -99,13 +99,13 @@ export async function deleteScheduleRow(id: string): Promise<void> {
   await db.delete(schedules).where(eq(schedules.id, id));
 }
 
-function scheduleFields(input: NewScheduleInput, cycleState: CycleState) {
+function scheduleFields(input: NewScheduleInput, rhythmState: RhythmState) {
   return {
     productId: input.productId,
     intervalDays: input.intervalDays,
     weekdays: input.weekdays ?? null,
     cycle: input.cycle ?? null,
-    ...cycleState,
+    ...rhythmState,
     timesOfDay: input.timesOfDay,
     quantity: input.quantity ?? 1,
     steps: input.steps ?? null,

@@ -5,10 +5,10 @@ import type { Rhythm } from './dto/rhythm';
 import type { CycleUnit, ScheduleCycle } from './dto/schedule-cycle';
 
 export function isCycleOnDay(rhythm: Rhythm, day: Date): boolean {
-  const { cycle, cycleAnchor } = rhythm;
-  if (!cycle || !cycleAnchor) return true;
+  const { cycle, rhythmAnchor } = rhythm;
+  if (!cycle || !rhythmAnchor) return true;
 
-  const position = daysCountedUntil(rhythm, cycleAnchor, day);
+  const position = daysCountedUntil(rhythm, rhythmAnchor, day);
   return position >= 0 && position % cycleLength(cycle) < cycle.onDays;
 }
 
@@ -41,13 +41,13 @@ export function cycleOnShare(cycle: ScheduleCycle): number {
 // The counter holds the closed pauses; the current (or last, if it ended by
 // itself) pause is still in pausedAt/resumeAt and is counted up to `day`.
 export function pausedDaysBefore(rhythm: Rhythm, day: Date): number {
-  const { cycleAnchor, cyclePausedDays = 0, pausedAt, resumeAt } = rhythm;
-  if (!cycleAnchor) return 0;
-  if (!pausedAt) return cyclePausedDays;
+  const { rhythmAnchor, rhythmPausedDays = 0, pausedAt, resumeAt } = rhythm;
+  if (!rhythmAnchor) return 0;
+  if (!pausedAt) return rhythmPausedDays;
 
-  const from = laterOf(startOfDay(pausedAt), startOfDay(cycleAnchor));
+  const from = laterOf(startOfDay(pausedAt), startOfDay(rhythmAnchor));
   const until = resumeAt ? earlierOf(startOfDay(resumeAt), day) : day;
-  return cyclePausedDays + Math.max(0, daysBetween(from, until));
+  return rhythmPausedDays + Math.max(0, daysBetween(from, until));
 }
 
 function cycleLength({ onDays, offDays }: ScheduleCycle): number {

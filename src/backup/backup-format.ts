@@ -31,9 +31,10 @@ export type { BackupRows } from './dto/backup-data';
 export type { BackupError } from './dto/backup-parse-result';
 export type { BackupParseResult } from './dto/backup-parse-result';
 
-export const BACKUP_FORMAT_VERSION = 6;
+export const BACKUP_FORMAT_VERSION = 7;
 
 const FIRST_TEXT_PRICE_VERSION = 2;
+const FIRST_RHYTHM_ANCHOR_VERSION = 7;
 
 const TABLES: Record<BackupTable, SQLiteTable> = {
   products,
@@ -85,10 +86,7 @@ export function parseBackup(text: string): BackupParseResult {
     if (!Array.isArray(raw)) return fail('notBackup', table);
 
     const parsed: BackupRow[] = [];
-    const rawRows =
-      table === 'products' && version < FIRST_TEXT_PRICE_VERSION
-        ? raw.map(withLegacyPrice)
-        : raw;
+    const rawRows = migrateLegacyRows(table, raw, version);
     for (const [index, rawRow] of rawRows.entries()) {
       const field = firstInvalidField(table, rawRow);
       if (field) return fail('invalidRow', `${table}[${index}].${field}`);
@@ -100,12 +98,36 @@ export function parseBackup(text: string): BackupParseResult {
   return validateRelations(rows);
 }
 
+function migrateLegacyRows(
+  table: BackupTable,
+  raw: unknown[],
+  version: number,
+): unknown[] {
+  if (table === 'products' && version < FIRST_TEXT_PRICE_VERSION) {
+    return raw.map(withLegacyPrice);
+  }
+  if (table === 'schedules' && version < FIRST_RHYTHM_ANCHOR_VERSION) {
+    return raw.map(withLegacyRhythmState);
+  }
+  return raw;
+}
+
 function withLegacyPrice(raw: unknown): unknown {
   if (!isRecord(raw)) return raw;
   const { price } = raw;
   return Number.isInteger(price) && (price as number) >= 0
     ? { ...raw, price: String(price) }
     : raw;
+}
+
+function withLegacyRhythmState(raw: unknown): unknown {
+  if (!isRecord(raw)) return raw;
+  const { cycleAnchor, cyclePausedDays, ...rest } = raw;
+  return {
+    ...rest,
+    rhythmAnchor: cycleAnchor,
+    rhythmPausedDays: cyclePausedDays,
+  };
 }
 
 function fail(code: BackupErrorCode, detail?: string): BackupParseResult {
@@ -167,9 +189,9 @@ function firstInvalidField(table: BackupTable, raw: unknown): string | null {
   if (
     table === 'schedules' &&
     (raw.cycle != null || raw.steps != null) &&
-    raw.cycleAnchor == null
+    raw.rhythmAnchor == null
   ) {
-    return 'cycleAnchor';
+    return 'rhythmAnchor';
   }
   return null;
 }
@@ -195,7 +217,7 @@ function isValidValue(
   if (table === 'schedules' && key === 'steps') {
     return isValidSteps(value);
   }
-  if (table === 'schedules' && key === 'cyclePausedDays') {
+  if (table === 'schedules' && key === 'rhythmPausedDays') {
     return Number.isInteger(value) && (value as number) >= 0;
   }
   if (table === 'schedules' && (key === 'intervalDays' || key === 'quantity')) {

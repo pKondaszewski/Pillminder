@@ -31,8 +31,8 @@ function tapered(
     weekdays: null,
     quantity: 9,
     steps,
-    cycleAnchor: ANCHOR,
-    cyclePausedDays: 0,
+    rhythmAnchor: ANCHOR,
+    rhythmPausedDays: 0,
     ...overrides,
   };
 }
@@ -94,7 +94,7 @@ describe('quantityOn', () => {
 
   it('uses the first step before a start date in the future', () => {
     // given
-    const schedule = tapered(PREDNISONE, { cycleAnchor: january(20) });
+    const schedule = tapered(PREDNISONE, { rhythmAnchor: january(20) });
 
     // when
     const result = quantityOn(schedule, schedule.quantity, january(10));
@@ -121,7 +121,7 @@ describe('quantityOn', () => {
 
   it('counts a paused period moved into the counter the same way', () => {
     // given
-    const schedule = tapered(PREDNISONE, { cyclePausedDays: 4 });
+    const schedule = tapered(PREDNISONE, { rhythmPausedDays: 4 });
 
     // when
     const result = [6, 7, 8].map((day) =>
@@ -136,7 +136,7 @@ describe('quantityOn', () => {
     // given
     const schedule = tapered(RAMP_UP, {
       weekdays: [1, 3, 5],
-      cycleAnchor: january(5),
+      rhythmAnchor: january(5),
     });
 
     // when

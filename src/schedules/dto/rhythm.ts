@@ -8,6 +8,6 @@ export interface Rhythm {
   resumeAt?: Date | null;
   cycle?: ScheduleCycle | null;
   steps?: ScheduleStep[] | null;
-  cycleAnchor?: Date | null;
-  cyclePausedDays?: number;
+  rhythmAnchor?: Date | null;
+  rhythmPausedDays?: number;
 }

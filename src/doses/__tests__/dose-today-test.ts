@@ -9,8 +9,8 @@ const schedule: Schedule = {
   intervalDays: 1,
   weekdays: null,
   cycle: null,
-  cycleAnchor: null,
-  cyclePausedDays: 0,
+  rhythmAnchor: null,
+  rhythmPausedDays: 0,
   timesOfDay: ['08:00'],
   quantity: 2,
   steps: null,
@@ -90,7 +90,7 @@ describe('toTodayDose with steps', () => {
     ...row,
     schedule: {
       ...schedule,
-      cycleAnchor: new Date(2026, 9, 10),
+      rhythmAnchor: new Date(2026, 9, 10),
       steps: [
         { days: 3, quantity: 4 },
         { days: null, quantity: 1 },

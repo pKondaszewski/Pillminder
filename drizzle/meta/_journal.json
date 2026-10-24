@@ -127,6 +127,13 @@
       "when": 1792847037895,
       "tag": "0017_add_schedule_steps",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1792848039999,
+      "tag": "0018_rename_cycle_anchor_to_rhythm_anchor",
+      "breakpoints": true
     }
   ]
 }

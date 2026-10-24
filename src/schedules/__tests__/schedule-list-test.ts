@@ -29,8 +29,8 @@ function item(
     intervalDays: 1,
     weekdays: null,
     cycle: null,
-    cycleAnchor: null,
-    cyclePausedDays: 0,
+    rhythmAnchor: null,
+    rhythmPausedDays: 0,
     timesOfDay: ['08:00'],
     quantity: 1,
     steps: null,
@@ -357,7 +357,7 @@ describe('scheduleKind with steps', () => {
 
   it('is timed while a stopping taper runs', () => {
     // given
-    const schedule = item('1', { steps, cycleAnchor: day(10, 18) });
+    const schedule = item('1', { steps, rhythmAnchor: day(10, 18) });
 
     // when
     const result = scheduleKind(schedule, NOW);
@@ -368,7 +368,7 @@ describe('scheduleKind with steps', () => {
 
   it('is ended the day after the taper', () => {
     // given
-    const schedule = item('1', { steps, cycleAnchor: day(10, 14) });
+    const schedule = item('1', { steps, rhythmAnchor: day(10, 14) });
 
     // when
     const result = scheduleKind(schedule, NOW);
@@ -380,7 +380,7 @@ describe('scheduleKind with steps', () => {
   it('stays ongoing with an open-ended last step', () => {
     // given
     const open = [steps[0], { days: null, quantity: 3 }];
-    const schedule = item('1', { steps: open, cycleAnchor: day(10, 1) });
+    const schedule = item('1', { steps: open, rhythmAnchor: day(10, 1) });
 
     // when
     const result = scheduleKind(schedule, NOW);
