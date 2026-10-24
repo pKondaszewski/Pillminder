@@ -18,6 +18,26 @@ export function storeImageFile(sourceUri: string): string {
   return fileName;
 }
 
+export function imageFileSize(fileName: string): number {
+  return new File(imagesDirectory, fileName).size;
+}
+
+// Overwrites in place, so the name in the database stays valid; the original is
+// replaced only when the candidate is smaller, otherwise the candidate goes.
+export function replaceImageFileIfSmaller(
+  fileName: string,
+  candidateUri: string,
+): boolean {
+  const candidate = new File(candidateUri);
+  const original = new File(imagesDirectory, fileName);
+  if (candidate.size >= original.size) {
+    candidate.delete();
+    return false;
+  }
+  candidate.moveSync(original, { overwrite: true });
+  return true;
+}
+
 export function deleteImageFiles(fileNames: string[]): void {
   fileNames
     .map((fileName) => new File(imagesDirectory, fileName))

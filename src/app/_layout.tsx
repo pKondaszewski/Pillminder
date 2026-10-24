@@ -16,6 +16,7 @@ import AppTabs from '@/commons/ui/navigation/app-tabs';
 import { db } from '@/config/db/database';
 import { useDoseSync } from '@/doses/ui/use-dose-sync';
 import { useOrphanedImageCleanup } from '@/images/ui/use-orphaned-image-cleanup';
+import { useOversizedImageShrink } from '@/images/ui/use-oversized-image-shrink';
 import { useLocationRefresh } from '@/location/ui/use-location-refresh';
 import {
   useNotificationSetup,
@@ -100,6 +101,7 @@ function DatabaseBoundEffects() {
   useDoseSync();
   useLocationRefresh();
   useOrphanedImageCleanup();
+  useOversizedImageShrink();
   useCategoryMerge();
   return null;
 }
