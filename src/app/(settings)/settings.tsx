@@ -5,8 +5,6 @@ import { Linking, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppLockSetting } from '@/applock/ui/use-app-lock-setting';
-import { BackupImportDialog } from '@/backup/ui/backup-import-dialog';
-import { useBackup } from '@/backup/ui/use-backup';
 import { useBatteryOptimization } from '@/battery/ui/use-battery-optimization';
 import { Spacing } from '@/commons/ui/constants/theme';
 import { FieldRow } from '@/commons/ui/field-row';
@@ -36,7 +34,6 @@ import {
 } from '@/settings/settings-service';
 import { AboutLine } from '@/settings/ui/about-line';
 import { AppLockSection } from '@/settings/ui/app-lock-section';
-import { BackupSection } from '@/settings/ui/backup-section';
 import { SettingsSection } from '@/settings/ui/settings-section';
 import { SnoozeSheet } from '@/settings/ui/snooze-sheet';
 import { StatusCard } from '@/settings/ui/status-card';
@@ -55,7 +52,6 @@ export default function SettingsScreen() {
   const { permission, request } = useNotificationPermission();
   const battery = useBatteryOptimization();
   const location = useLocationPermission();
-  const backup = useBackup();
   const appLock = useAppLockSetting();
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const { snackbar, runWithUndo } = useUndoSnackbar();
@@ -178,12 +174,6 @@ export default function SettingsScreen() {
               />
             )}
 
-            <BackupSection
-              busy={backup.busy}
-              onExport={backup.exportData}
-              onImport={backup.importData}
-            />
-
             <AboutLine
               appName={Constants.expoConfig?.name ?? ''}
               version={Constants.expoConfig?.version ?? ''}
@@ -196,7 +186,6 @@ export default function SettingsScreen() {
         </SafeAreaView>
       </ThemedView>
 
-      <BackupImportDialog confirmation={backup.importConfirmation} />
       {sheet === 'snooze' ? (
         <SnoozeSheet
           minutes={settings.snoozeMinutes}

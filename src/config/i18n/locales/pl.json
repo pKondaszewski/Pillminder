@@ -4,31 +4,6 @@
     "unlock": "Odblokuj",
     "unlockPrompt": "Odblokuj Pillminder"
   },
-  "backup": {
-    "cancel": "Anuluj",
-    "confirmAction": "Zastąp wszystko",
-    "confirmMessage": "Wszystkie obecne dane zostaną usunięte i zastąpione zawartością pliku: produkty: {{products}}, harmonogramy: {{schedules}}, dawki: {{doses}}, notatki: {{notes}}. Zdjęcia produktów też zostaną usunięte.\n\nUstawienia nie są zmieniane. Tej operacji nie można cofnąć.",
-    "confirmTitle": "Zastąpić wszystkie dane?",
-    "description": "Eksport zapisuje produkty, harmonogramy, historię dawek i notatki do pliku JSON. Import zastępuje wszystkie obecne dane zawartością takiego pliku. Zdjęcia i ustawienia nie są uwzględniane.",
-    "export": "Eksportuj dane",
-    "exportFailed": "Eksport nie powiódł się",
-    "import": "Importuj dane",
-    "importDone": "✓ Dane zaimportowane",
-    "importFailed": "Import nie powiódł się",
-    "importInvalidTitle": "Nieprawidłowy plik kopii",
-    "shareTitle": "Zapisz kopię zapasową",
-    "title": "Kopia zapasowa",
-    "error": {
-      "brokenReference": "Rekord wskazuje na nieistniejący produkt lub harmonogram.",
-      "duplicateId": "Plik zawiera zduplikowane rekordy.",
-      "duplicateSlot": "Plik zawiera zduplikowane dawki.",
-      "invalidRow": "W rekordzie brakuje pola lub ma ono błędną wartość.",
-      "newerVersion": "Plik pochodzi z nowszej wersji aplikacji.",
-      "notBackup": "To nie jest kopia zapasowa Pillminder.",
-      "notJson": "Plik nie jest poprawnym JSON-em.",
-      "productMismatch": "Dawka należy do innego produktu niż jej harmonogram."
-    }
-  },
   "calendar": {
     "allProducts": "Wszystkie produkty",
     "backToProduct": "Wróć do produktu",
@@ -292,14 +267,12 @@
   "migrationError": {
     "details": "Szczegóły techniczne",
     "hideDetails": "Ukryj szczegóły techniczne",
-    "message": "Nie udało się przygotować bazy danych aplikacji. Zwykle pomaga ponowna próba. Jeśli to nie działa, możesz przywrócić dane z kopii zapasowej albo zacząć od zera.",
+    "message": "Nie udało się przygotować bazy danych aplikacji. Zwykle pomaga ponowna próba. Jeśli to nie działa, możesz zacząć od zera.",
     "reset": "Wyczyść dane",
     "resetConfirmAction": "Usuń wszystko",
     "resetConfirmMessage": "Wszystkie produkty, harmonogramy, historia dawek, notatki i zdjęcia zostaną usunięte. Ustawienia zostają.\n\nTej operacji nie można cofnąć.",
     "resetConfirmTitle": "Wyczyścić wszystkie dane?",
     "resetFailed": "Nie udało się wyczyścić danych",
-    "restore": "Przywróć z kopii",
-    "restoreFailed": "Nie udało się przywrócić danych",
     "retry": "Spróbuj ponownie",
     "title": "Aplikacja nie może otworzyć danych"
   },
