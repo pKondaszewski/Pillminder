@@ -39,6 +39,7 @@ import {
   setDoseSnoozedUntilRow,
   setDoseStateRow,
 } from './dose-repository';
+import { activeSnoozeEnd } from './dose-status';
 import { isDueInFuture, isPending } from './dose-validator';
 import type { DoseSnapshot } from './dto/dose-snapshot';
 
@@ -264,7 +265,11 @@ export async function syncDosesForSchedules(
 
       const toSchedule = [
         ...inserted,
-        ...kept.filter(({ plannedAt }) => isWithinRetryHorizon(plannedAt, now)),
+        ...kept.filter(
+          (dose) =>
+            !activeSnoozeEnd(dose, now) &&
+            isWithinRetryHorizon(dose.plannedAt, now),
+        ),
       ];
       await Promise.all(
         toSchedule.map((dose) =>
@@ -286,6 +291,12 @@ export async function syncDosesForSchedules(
 
 export async function syncDosesForSchedule(schedule: Schedule): Promise<void> {
   await syncDosesForSchedules([schedule]);
+}
+
+export async function syncDosesForProductOfDose(doseId: string): Promise<void> {
+  const dose = await getDoseById(doseId);
+  if (!dose) return;
+  await syncDosesForSchedules(await getSchedulesByProduct(dose.productId));
 }
 
 async function applyDoseState(

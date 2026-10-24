@@ -15,6 +15,7 @@ import {
 import {
   revertDose,
   skipDose,
+  syncDosesForProductOfDose,
   syncDosesForSchedules,
   takeDose,
 } from '../dose-service';
@@ -210,6 +211,113 @@ describe('dose service on a real database', () => {
 
       // then
       expect(plannedTimes()).toEqual([TODAY_EVENING.toISOString()]);
+    });
+
+    it('does not reschedule a kept dose whose snooze is still active', async () => {
+      // given
+      const schedule = insertSchedule({
+        id: 's1',
+        productId: insertProduct({ id: 'p1' }).id,
+        timesOfDay: ['20:00'],
+      });
+      insertDose({
+        id: 'd1',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: TODAY_EVENING,
+        snoozedUntil: new Date('2026-03-10T10:10:00Z'),
+      });
+
+      // when
+      await syncDosesForSchedules([schedule]);
+
+      // then
+      expect(scheduleDoseReminder).not.toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'd1' }),
+        expect.anything(),
+      );
+    });
+
+    it('reschedules a kept dose whose snooze has passed', async () => {
+      // given
+      const schedule = insertSchedule({
+        id: 's1',
+        productId: insertProduct({ id: 'p1' }).id,
+        timesOfDay: ['20:00'],
+      });
+      insertDose({
+        id: 'd1',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: TODAY_EVENING,
+        snoozedUntil: new Date('2026-03-10T09:30:00Z'),
+      });
+
+      // when
+      await syncDosesForSchedules([schedule]);
+
+      // then
+      expect(scheduleDoseReminder).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'd1' }),
+        expect.anything(),
+      );
+    });
+  });
+
+  describe('syncDosesForProductOfDose', () => {
+    it('extends the plan of the dose product to the full window', async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      insertSchedule({ id: 's1', productId: 'p1', timesOfDay: ['20:00'] });
+      insertDose({
+        id: 'd1',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: TODAY_EVENING,
+      });
+
+      // when
+      await syncDosesForProductOfDose('d1');
+
+      // then
+      expect(plannedTimes()).toHaveLength(30);
+    });
+
+    it('leaves the doses of other products alone', async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      insertProduct({ id: 'p2' });
+      insertSchedule({ id: 's1', productId: 'p1', timesOfDay: ['20:00'] });
+      insertSchedule({ id: 's2', productId: 'p2', timesOfDay: ['20:00'] });
+      insertDose({
+        id: 'd1',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: TODAY_EVENING,
+      });
+
+      // when
+      await syncDosesForProductOfDose('d1');
+
+      // then
+      const otherProductDoses = db
+        .select()
+        .from(doses)
+        .all()
+        .filter((dose) => dose.productId === 'p2');
+      expect(otherProductDoses).toEqual([]);
+    });
+
+    it('does nothing for an unknown dose', async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      insertSchedule({ id: 's1', productId: 'p1', timesOfDay: ['20:00'] });
+
+      // when
+      await syncDosesForProductOfDose('missing');
+
+      // then
+      expect(plannedTimes()).toEqual([]);
     });
   });
 
