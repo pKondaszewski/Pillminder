@@ -96,6 +96,7 @@ export const asNeededIntakes = sqliteTable(
       .references(() => products.id, { onDelete: 'cascade' }),
     takenAt: integer('taken_at', { mode: 'timestamp' }).notNull(),
     quantity: integer('quantity').notNull().default(1),
+    deductedQuantity: integer('deducted_quantity'),
   },
   (table) => [
     index('idx_as_needed_intakes_product').on(table.productId),

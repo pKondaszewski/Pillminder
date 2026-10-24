@@ -8,6 +8,13 @@
       "when": 1792848039999,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1792858799264,
+      "tag": "0001_add_intake_deducted_quantity",
+      "breakpoints": true
     }
   ]
 }

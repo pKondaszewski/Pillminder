@@ -15,6 +15,7 @@ import {
   replacePendingDoseRows,
   setDoseStateRow,
 } from '../dose-repository';
+import type { DoseState } from '../dose-transition';
 
 jest.mock('@/config/db/database', () =>
   jest.requireActual('@/config/db/test-database'),
@@ -167,7 +168,7 @@ describe('setDoseStateRow', () => {
     expect(productRow()).toMatchObject({ stock: 6, lastUsedAt: null });
   });
 
-  it('does not take the stock below zero', async () => {
+  it('does not take the stock below zero and records only what was deducted', async () => {
     // given
     insertProduct({ id: 'p1', stock: 1 });
     insertSchedule({ id: 's1', productId: 'p1', quantity: 3 });
@@ -183,6 +184,91 @@ describe('setDoseStateRow', () => {
 
     // then
     expect(productRow()?.stock).toBe(0);
+    expect(doseRow('d1')?.takenQuantity).toBe(1);
+  });
+
+  it.each<DoseState>(['pending', 'skipped'])(
+    'gives back only what was deducted when a dose taken from too little stock goes to %s',
+    async (target) => {
+      // given
+      insertProduct({ id: 'p1', stock: 1 });
+      insertSchedule({ id: 's1', productId: 'p1', quantity: 3 });
+      insertDose({
+        id: 'd1',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: EARLIER_TODAY,
+      });
+      await setDoseStateRow('d1', 'taken');
+
+      // when
+      await setDoseStateRow('d1', target);
+
+      // then
+      expect(productRow()?.stock).toBe(1);
+      expect(doseRow('d1')?.takenQuantity).toBeNull();
+    },
+  );
+
+  it('takes and reverts the full quantity when the stock is enough', async () => {
+    // given
+    insertProduct({ id: 'p1', stock: 5 });
+    insertSchedule({ id: 's1', productId: 'p1', quantity: 3 });
+    insertDose({
+      id: 'd1',
+      productId: 'p1',
+      scheduleId: 's1',
+      plannedAt: EARLIER_TODAY,
+    });
+
+    // when
+    await setDoseStateRow('d1', 'taken');
+    const stockAfterTaking = productRow()?.stock;
+    await setDoseStateRow('d1', 'pending');
+
+    // then
+    expect(stockAfterTaking).toBe(2);
+    expect(productRow()?.stock).toBe(5);
+  });
+
+  it('gives nothing back when a dose was taken from an empty stock', async () => {
+    // given
+    insertProduct({ id: 'p1', stock: 0 });
+    insertSchedule({ id: 's1', productId: 'p1', quantity: 3 });
+    insertDose({
+      id: 'd1',
+      productId: 'p1',
+      scheduleId: 's1',
+      plannedAt: EARLIER_TODAY,
+    });
+
+    // when
+    await setDoseStateRow('d1', 'taken');
+    await setDoseStateRow('d1', 'pending');
+
+    // then
+    expect(productRow()?.stock).toBe(0);
+  });
+
+  it('keeps an untracked stock untracked through take and revert', async () => {
+    // given
+    insertProduct({ id: 'p1', stock: null });
+    insertSchedule({ id: 's1', productId: 'p1', quantity: 3 });
+    insertDose({
+      id: 'd1',
+      productId: 'p1',
+      scheduleId: 's1',
+      plannedAt: EARLIER_TODAY,
+    });
+
+    // when
+    await setDoseStateRow('d1', 'taken');
+    const takenQuantity = doseRow('d1')?.takenQuantity;
+    await setDoseStateRow('d1', 'pending');
+
+    // then
+    expect(takenQuantity).toBe(3);
+    expect(productRow()?.stock).toBeNull();
   });
 
   it('leaves the stock empty for a product that does not track it', async () => {

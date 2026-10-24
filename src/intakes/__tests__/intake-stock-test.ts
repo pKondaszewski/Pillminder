@@ -1,4 +1,4 @@
-import { adjustedStock } from '../intake-stock';
+import { adjustedStock, deductedQuantity } from '../intake-stock';
 
 describe('adjustedStock', () => {
   it('lowers a tracked stock', () => {
@@ -23,5 +23,20 @@ describe('adjustedStock', () => {
 
     // then
     expect(stock).toBe(0);
+  });
+});
+
+describe('deductedQuantity', () => {
+  it.each<[string, number | null, number | null]>([
+    ['enough stock', 10, 3],
+    ['too little stock', 1, 1],
+    ['empty stock', 0, 0],
+    ['untracked stock', null, null],
+  ])('with %s and a quantity of 3', (_, stock, expected) => {
+    // when
+    const deducted = deductedQuantity(stock, 3);
+
+    // then
+    expect(deducted).toBe(expected);
   });
 });

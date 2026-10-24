@@ -8,7 +8,7 @@ describe('planDoseTransition', () => {
     const dose = { state: 'skipped' as const, takenQuantity: null };
 
     // when
-    const transition = planDoseTransition(dose, 'skipped', 1, NOW);
+    const transition = planDoseTransition(dose, 'skipped', 1, NOW, null);
 
     // then
     expect(transition).toBeNull();
@@ -21,7 +21,7 @@ describe('planDoseTransition', () => {
       const dose = { state: from, takenQuantity: null };
 
       // when
-      const transition = planDoseTransition(dose, 'taken', 2, NOW);
+      const transition = planDoseTransition(dose, 'taken', 2, NOW, null);
 
       // then
       expect(transition).toEqual({
@@ -33,12 +33,43 @@ describe('planDoseTransition', () => {
     },
   );
 
+  it.each<[string, number | null, number | null, number]>([
+    ['enough stock', 10, 3, -3],
+    ['exactly the stock', 3, 3, -3],
+    ['too little stock', 1, 1, -1],
+    ['empty stock', 0, 0, -0],
+    ['untracked stock', null, 3, -3],
+  ])(
+    'records what the stock allowed when taking a dose of 3 with %s',
+    (_, stock, takenQuantity, stockDelta) => {
+      // given
+      const dose = { state: 'pending' as const, takenQuantity: null };
+
+      // when
+      const transition = planDoseTransition(dose, 'taken', 3, NOW, stock);
+
+      // then
+      expect(transition).toMatchObject({ takenQuantity, stockDelta });
+    },
+  );
+
+  it('gives back zero when a dose was taken from an empty stock', () => {
+    // given
+    const dose = { state: 'taken' as const, takenQuantity: 0 };
+
+    // when
+    const transition = planDoseTransition(dose, 'pending', 3, NOW, 0);
+
+    // then
+    expect(transition?.stockDelta).toBe(0);
+  });
+
   it('does not touch stock when skipping a pending dose', () => {
     // given
     const dose = { state: 'pending' as const, takenQuantity: null };
 
     // when
-    const transition = planDoseTransition(dose, 'skipped', 2, NOW);
+    const transition = planDoseTransition(dose, 'skipped', 2, NOW, null);
 
     // then
     expect(transition).toEqual({
@@ -54,7 +85,7 @@ describe('planDoseTransition', () => {
     const dose = { state: 'skipped' as const, takenQuantity: null };
 
     // when
-    const transition = planDoseTransition(dose, 'pending', 2, NOW);
+    const transition = planDoseTransition(dose, 'pending', 2, NOW, null);
 
     // then
     expect(transition?.stockDelta).toBe(0);
@@ -68,7 +99,7 @@ describe('planDoseTransition', () => {
       const dose = { state: 'taken' as const, takenQuantity: 3 };
 
       // when
-      const transition = planDoseTransition(dose, target, 1, NOW);
+      const transition = planDoseTransition(dose, target, 1, NOW, null);
 
       // then
       expect(transition).toEqual({
@@ -85,7 +116,7 @@ describe('planDoseTransition', () => {
     const dose = { state: 'taken' as const, takenQuantity: null };
 
     // when
-    const transition = planDoseTransition(dose, 'pending', 5, NOW);
+    const transition = planDoseTransition(dose, 'pending', 5, NOW, null);
 
     // then
     expect(transition?.stockDelta).toBe(1);
@@ -102,7 +133,7 @@ describe('planDoseTransition for a past dose correction', () => {
       const dose = { state: from, takenQuantity: null };
 
       // when
-      const transition = planDoseTransition(dose, 'taken', 2, PLANNED_AT);
+      const transition = planDoseTransition(dose, 'taken', 2, PLANNED_AT, null);
 
       // then
       expect(transition?.takenAt).toEqual(PLANNED_AT);
@@ -115,7 +146,7 @@ describe('planDoseTransition for a past dose correction', () => {
     const dose = { state: 'taken' as const, takenQuantity: 3 };
 
     // when
-    const transition = planDoseTransition(dose, 'skipped', 1, PLANNED_AT);
+    const transition = planDoseTransition(dose, 'skipped', 1, PLANNED_AT, null);
 
     // then
     expect(transition).toEqual({
