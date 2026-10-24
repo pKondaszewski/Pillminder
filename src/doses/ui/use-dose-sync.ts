@@ -8,15 +8,22 @@ const log = createLogger('use-dose-sync');
 
 export function useDoseSync() {
   useEffect(() => {
-    const sync = () =>
-      syncAllSchedules().catch((err) => log.error('Dose sync failed', err));
+    let running = false;
+    const sync = () => {
+      if (running) return Promise.resolve();
+      running = true;
+      return syncAllSchedules().finally(() => {
+        running = false;
+      });
+    };
 
     // Alarms can be gone while the database is not (e.g. after a restore), so the first start re-plans all.
-    syncAllSchedules()
+    sync()
       .then(refreshAllReminders)
       .catch((err) => log.error('Dose sync failed', err));
     const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') sync();
+      if (state === 'active')
+        sync().catch((err) => log.error('Dose sync failed', err));
     });
 
     return () => subscription.remove();
