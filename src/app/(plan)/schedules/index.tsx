@@ -14,7 +14,9 @@ import { ScreenTitle } from '@/commons/ui/screen-title';
 import { type FilterToken, SearchField } from '@/commons/ui/search-field';
 import { ThemedText } from '@/commons/ui/themed-text';
 import { ThemedView } from '@/commons/ui/themed-view';
+import { UndoSnackbar } from '@/commons/ui/undo-snackbar';
 import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
+import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import { categoryLabel } from '@/products/category';
 import { useProducts } from '@/products/ui/use-products';
 import {
@@ -41,6 +43,7 @@ export default function ScheduleListScreen() {
   const [filters, setFilters] = useState(NO_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const runWithAlert = useRunWithErrorAlert();
+  const { snackbar } = useUndoSnackbar();
 
   const now = new Date();
   const categories = listedScheduleCategories(items);
@@ -134,6 +137,8 @@ export default function ScheduleListScreen() {
           />
         ) : null}
       </SafeAreaView>
+
+      <UndoSnackbar snackbar={snackbar} />
 
       <ScheduleListFilterSheet
         visible={filtersOpen}

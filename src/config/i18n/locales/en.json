@@ -435,6 +435,7 @@
     "amountValue": "{{amount}} at a time",
     "changeNote": "The change applies to doses from now on. Doses already taken or skipped today stay in the history",
     "courseDay": "Day {{day}} of {{total}}",
+    "created": "Schedule created",
     "cycle": "Cycles with breaks",
     "cycleDays_one": "{{count}} day",
     "cycleDays_other": "{{count}} days",
