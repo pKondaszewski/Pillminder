@@ -16,6 +16,7 @@ type Props = {
   bullets?: string[];
   children?: ReactNode;
   confirmLabel: string;
+  cancelLabel?: string;
   destructive?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
@@ -28,6 +29,7 @@ export function ConfirmDialog({
   bullets = [],
   children,
   confirmLabel,
+  cancelLabel,
   destructive,
   onConfirm,
   onCancel,
@@ -47,7 +49,10 @@ export function ConfirmDialog({
       ))}
       {children}
       <ThemedView style={styles.actions}>
-        <SecondaryButton label={t('editor.cancel')} onPress={onCancel} />
+        <SecondaryButton
+          label={cancelLabel ?? t('editor.cancel')}
+          onPress={onCancel}
+        />
         <PrimaryButton
           label={confirmLabel}
           onPress={onConfirm}

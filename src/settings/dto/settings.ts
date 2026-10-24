@@ -21,6 +21,7 @@ export interface Settings {
   notificationsPromptDismissed: boolean;
   batteryPromptDismissed: boolean;
   locationPromptDismissed: boolean;
+  googleBackupConfirmed: boolean;
   location: StoredLocation | null;
   appLockEnabled: boolean;
 }

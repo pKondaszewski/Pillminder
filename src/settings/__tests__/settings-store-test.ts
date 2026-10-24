@@ -32,4 +32,29 @@ describe('settings store', () => {
     expect(settings.theme).toBe('dark');
     expect(settings).not.toHaveProperty('tutorialStep');
   });
+
+  it('falls back to false for a non-boolean', () => {
+    // given
+    mockStorage.set(
+      'settings',
+      JSON.stringify({ googleBackupConfirmed: 'yes' }),
+    );
+
+    // when
+    const settings = loadStore().getSettings();
+
+    // then
+    expect(settings.googleBackupConfirmed).toBe(false);
+  });
+
+  it('remembers the confirmed Google backup', () => {
+    // given
+    const store = loadStore();
+
+    // when
+    store.updateSettings({ googleBackupConfirmed: true });
+
+    // then
+    expect(loadStore().getSettings().googleBackupConfirmed).toBe(true);
+  });
 });

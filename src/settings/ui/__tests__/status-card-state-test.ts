@@ -1,5 +1,6 @@
 import {
   batteryCardState,
+  googleBackupCardState,
   locationCardState,
   notificationCardState,
 } from '../status-card-state';
@@ -54,6 +55,34 @@ describe('batteryCardState', () => {
     expect(state).toEqual({
       ok: false,
       statusKey: 'settings.batteryRestricted',
+    });
+  });
+});
+
+describe('googleBackupCardState', () => {
+  it('is fine and offers turning off once the user confirmed backup is on', () => {
+    // when
+    const state = googleBackupCardState(true);
+
+    // then
+    expect(state).toEqual({
+      ok: true,
+      neutral: false,
+      statusKey: 'settings.googleBackupOn',
+      actionKey: 'settings.googleBackupTurnOff',
+    });
+  });
+
+  it('is neutral and offers the fix before the confirmation', () => {
+    // when
+    const state = googleBackupCardState(false);
+
+    // then
+    expect(state).toEqual({
+      ok: false,
+      neutral: true,
+      statusKey: 'settings.googleBackupCheck',
+      actionKey: 'settings.fix',
     });
   });
 });

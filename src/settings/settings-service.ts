@@ -67,6 +67,10 @@ export function isLocationPromptDismissed(): boolean {
   return getSettings().locationPromptDismissed;
 }
 
+export function setGoogleBackupConfirmed(confirmed: boolean): void {
+  updateSettings({ googleBackupConfirmed: confirmed });
+}
+
 export function saveLocation(coords: Coords, now: number): void {
   updateSettings({ location: { ...coords, savedAt: now } });
 }
