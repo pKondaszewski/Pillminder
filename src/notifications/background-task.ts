@@ -8,11 +8,7 @@ import { AppState } from 'react-native';
 
 import { db } from '@/config/db/database';
 import { createLogger } from '@/config/logger';
-import {
-  snoozeDose,
-  syncDosesForProductOfDose,
-  takeDose,
-} from '@/doses/dose-service';
+import { snoozeDose, syncAllSchedules, takeDose } from '@/doses/dose-service';
 import { restockPack } from '@/products/product-orchestrator';
 
 import migrations from '../../drizzle/migrations';
@@ -93,7 +89,7 @@ async function handleResponse(response: NotificationResponse): Promise<void> {
 // The app may never be opened, so nothing else extends the dose plan
 async function extendPlanAfterAction(doseId: string): Promise<void> {
   try {
-    await syncDosesForProductOfDose(doseId);
+    await syncAllSchedules();
   } catch (err) {
     log.error(`Background dose sync failed after dose ${doseId}`, err);
   }
