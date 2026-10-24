@@ -11,6 +11,8 @@ export function correctionStockDelta(
     target,
     dose.quantity,
     dose.plannedAt,
+    // The preview does not know the stock, so a take from a too-low stock may show more than is deducted.
+    null,
   );
   return transition?.stockDelta ?? 0;
 }

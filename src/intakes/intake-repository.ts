@@ -8,7 +8,7 @@ import {
   products,
 } from '@/config/db/schema';
 
-import { adjustedStock } from './intake-stock';
+import { adjustedStock, deductedQuantity } from './intake-stock';
 
 export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -29,10 +29,16 @@ export function insertIntakeRow(
   quantity: number,
 ): void {
   db.transaction((tx) => {
+    const stockBefore = shiftStock(tx, productId, -quantity);
     tx.insert(asNeededIntakes)
-      .values({ id, productId, takenAt, quantity })
+      .values({
+        id,
+        productId,
+        takenAt,
+        quantity,
+        deductedQuantity: deductedQuantity(stockBefore, quantity),
+      })
       .run();
-    shiftStock(tx, productId, -quantity);
     refreshLastUsedAt(tx, productId);
   });
 }
@@ -47,7 +53,12 @@ export function deleteIntakeRow(id: string): void {
     if (!intake) return;
 
     tx.delete(asNeededIntakes).where(eq(asNeededIntakes.id, id)).run();
-    shiftStock(tx, intake.productId, intake.quantity);
+    // Rows from before deductedQuantity existed gave back the full quantity.
+    shiftStock(
+      tx,
+      intake.productId,
+      intake.deductedQuantity ?? intake.quantity,
+    );
     refreshLastUsedAt(tx, intake.productId);
   });
 }
@@ -88,13 +99,17 @@ function intakesQuery() {
     .orderBy(desc(asNeededIntakes.takenAt));
 }
 
-function shiftStock(tx: Transaction, productId: string, delta: number): void {
+function shiftStock(
+  tx: Transaction,
+  productId: string,
+  delta: number,
+): number | null {
   const product = tx
     .select({ stock: products.stock })
     .from(products)
     .where(eq(products.id, productId))
     .get();
-  if (!product || product.stock === null) return;
+  if (!product || product.stock === null) return null;
 
   tx.update(products)
     .set({
@@ -103,6 +118,7 @@ function shiftStock(tx: Transaction, productId: string, delta: number): void {
     })
     .where(eq(products.id, productId))
     .run();
+  return product.stock;
 }
 
 function refreshLastUsedAt(tx: Transaction, productId: string): void {

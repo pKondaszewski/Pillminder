@@ -1,0 +1,1 @@
+ALTER TABLE `as_needed_intakes` ADD `deducted_quantity` integer;

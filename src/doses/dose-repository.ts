@@ -81,6 +81,11 @@ export async function setDoseStateRow(
       .from(schedules)
       .where(eq(schedules.id, dose.scheduleId))
       .get();
+    const product = tx
+      .select({ stock: products.stock, lastUsedAt: products.lastUsedAt })
+      .from(products)
+      .where(eq(products.id, dose.productId))
+      .get();
     const now = new Date();
     const takenAt = backdated && dose.plannedAt < now ? dose.plannedAt : now;
     const transition = planDoseTransition(
@@ -88,6 +93,7 @@ export async function setDoseStateRow(
       state,
       schedule ? quantityOn(schedule, schedule.quantity, dose.plannedAt) : 1,
       takenAt,
+      product?.stock ?? null,
     );
     if (!transition) return;
 
@@ -101,11 +107,6 @@ export async function setDoseStateRow(
       .where(eq(doses.id, id))
       .run();
 
-    const product = tx
-      .select({ stock: products.stock, lastUsedAt: products.lastUsedAt })
-      .from(products)
-      .where(eq(products.id, dose.productId))
-      .get();
     if (!product) return;
 
     const lastUsedAt = latestUseAt(tx, dose.productId);

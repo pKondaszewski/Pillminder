@@ -44,7 +44,13 @@ describe('insertIntakeRow', () => {
 
     // then
     expect(db.select().from(asNeededIntakes).all()).toEqual([
-      { id: 'i1', productId: 'p1', takenAt: NOW, quantity: 2 },
+      {
+        id: 'i1',
+        productId: 'p1',
+        takenAt: NOW,
+        quantity: 2,
+        deductedQuantity: 2,
+      },
     ]);
     expect(productRow()).toMatchObject({ stock: 8, lastUsedAt: NOW });
   });
@@ -85,6 +91,34 @@ describe('insertIntakeRow', () => {
     ).toBeNull();
   });
 
+  it('keeps the quantity and records the smaller deducted one when the stock is too low', () => {
+    // given
+    insertProduct({ id: 'p1', stock: 1 });
+
+    // when
+    insertIntakeRow('i1', 'p1', NOW, 5);
+
+    // then
+    expect(db.select().from(asNeededIntakes).get()).toMatchObject({
+      quantity: 5,
+      deductedQuantity: 1,
+    });
+  });
+
+  it('records no deducted quantity for an untracked stock', () => {
+    // given
+    insertProduct({ id: 'p1', stock: null });
+
+    // when
+    insertIntakeRow('i1', 'p1', NOW, 2);
+
+    // then
+    expect(db.select().from(asNeededIntakes).get()).toMatchObject({
+      quantity: 2,
+      deductedQuantity: null,
+    });
+  });
+
   it('rolls back the whole intake when the product does not exist', () => {
     // when
     const recording = () => insertIntakeRow('i1', 'missing', NOW, 1);
@@ -110,6 +144,54 @@ describe('deleteIntakeRow', () => {
     // then
     expect(db.select().from(asNeededIntakes).all()).toHaveLength(1);
     expect(productRow()).toMatchObject({ stock: 5, lastUsedAt: YESTERDAY });
+  });
+
+  it('gives back only what was deducted when the intake was larger than the stock', () => {
+    // given
+    insertProduct({ id: 'p1', stock: 1 });
+    insertIntakeRow('i1', 'p1', NOW, 5);
+
+    // when
+    deleteIntakeRow('i1');
+
+    // then
+    expect(productRow()?.stock).toBe(1);
+  });
+
+  it('gives back the full quantity when the stock was enough', () => {
+    // given
+    insertProduct({ id: 'p1', stock: 10 });
+    insertIntakeRow('i1', 'p1', NOW, 5);
+
+    // when
+    deleteIntakeRow('i1');
+
+    // then
+    expect(productRow()?.stock).toBe(10);
+  });
+
+  it('leaves an untracked stock untracked on delete', () => {
+    // given
+    insertProduct({ id: 'p1', stock: null });
+    insertIntakeRow('i1', 'p1', NOW, 5);
+
+    // when
+    deleteIntakeRow('i1');
+
+    // then
+    expect(productRow()?.stock).toBeNull();
+  });
+
+  it('gives back the full quantity for an intake recorded before the deducted amount existed', () => {
+    // given
+    insertProduct({ id: 'p1', stock: 3 });
+    insertIntake({ id: 'i1', productId: 'p1', takenAt: NOW, quantity: 2 });
+
+    // when
+    deleteIntakeRow('i1');
+
+    // then
+    expect(productRow()?.stock).toBe(5);
   });
 
   it('clears the last use when nothing else was taken', () => {
