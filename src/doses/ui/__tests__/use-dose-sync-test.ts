@@ -67,6 +67,24 @@ describe('useDoseSync', () => {
     expect(refreshAllReminders).toHaveBeenCalledTimes(1);
   });
 
+  it('does not start a second sync when the app reports active while the first one runs', async () => {
+    // given
+    let finishFirstSync: () => void = () => {};
+    jest.mocked(syncAllSchedules).mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishFirstSync = resolve;
+      }),
+    );
+    renderHook(() => useDoseSync());
+
+    // when
+    changeAppState('active');
+
+    // then
+    expect(syncAllSchedules).toHaveBeenCalledTimes(1);
+    await act(async () => finishFirstSync());
+  });
+
   it('ignores the app going to the background', async () => {
     // given
     await renderDoseSync();
