@@ -13,6 +13,8 @@ import {
 } from '@/notifications/notification-service';
 
 import {
+  cancelFutureDosesForSchedules,
+  refreshAllReminders,
   revertDose,
   skipDose,
   syncDosesForProductOfDose,
@@ -324,6 +326,58 @@ describe('dose service on a real database', () => {
       expect(db.select().from(doses).get()?.state).toBe('taken');
       expect(db.select().from(products).get()?.stock).toBe(9);
       expect(cancelDoseReminder).toHaveBeenCalledWith('d1');
+    });
+
+    it('takeDose during a re-plan cancels the reminder only after the plan is scheduled', async () => {
+      // given
+      seedPendingDose(TODAY_EVENING);
+      let finishPlan: () => void = () => {};
+      jest
+        .mocked(scheduleDoseReminders)
+        .mockImplementationOnce(
+          () => new Promise<void>((resolve) => (finishPlan = resolve)),
+        );
+      const plan = refreshAllReminders();
+      await jest.advanceTimersByTimeAsync(0);
+
+      // when
+      const take = takeDose('d1');
+      await jest.advanceTimersByTimeAsync(0);
+      const cancelledDuringPlan = [
+        ...jest.mocked(cancelDoseReminder).mock.calls,
+      ];
+      finishPlan();
+      await Promise.all([plan, take]);
+
+      // then
+      expect(cancelledDuringPlan).toEqual([]);
+      expect(cancelDoseReminder).toHaveBeenCalledWith('d1');
+    });
+
+    it('cancelFutureDosesForSchedules during a re-plan cancels the reminders only after the plan is scheduled', async () => {
+      // given
+      seedPendingDose(TOMORROW_EVENING);
+      let finishPlan: () => void = () => {};
+      jest
+        .mocked(scheduleDoseReminders)
+        .mockImplementationOnce(
+          () => new Promise<void>((resolve) => (finishPlan = resolve)),
+        );
+      const plan = refreshAllReminders();
+      await jest.advanceTimersByTimeAsync(0);
+
+      // when
+      const cancel = cancelFutureDosesForSchedules(['s1']);
+      await jest.advanceTimersByTimeAsync(0);
+      const cancelledDuringPlan = [
+        ...jest.mocked(cancelDoseReminders).mock.calls,
+      ];
+      finishPlan();
+      await Promise.all([plan, cancel]);
+
+      // then
+      expect(cancelledDuringPlan).toEqual([]);
+      expect(cancelDoseReminders).toHaveBeenCalledWith(['d1']);
     });
 
     it('skipDose marks the dose skipped and leaves the stock alone', async () => {
