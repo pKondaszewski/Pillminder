@@ -10,6 +10,7 @@ import { ThemedView } from '@/commons/ui/themed-view';
 import { useFormatTime } from '@/commons/ui/use-format-date';
 import { useTheme } from '@/commons/ui/use-theme';
 import {
+  activeSnoozeEnd,
   doseDetailsText,
   type DoseStatus,
   doseStatus,
@@ -52,6 +53,7 @@ export function DoseRow({
   const { t } = useTranslation();
   const { formatTime } = useFormatTime();
   const status = doseStatus(dose, now);
+  const snoozeEnd = activeSnoozeEnd(dose, now);
   const details = doseDetailsText(dose, t);
   const tinted = mode === 'today' && status === 'overdue';
   const handled = status === 'taken' || status === 'skipped';
@@ -99,10 +101,10 @@ export function DoseRow({
               {details}
             </ThemedText>
           ) : null}
-          {dose.snoozedUntil && status !== 'taken' ? (
+          {snoozeEnd ? (
             <ThemedText type="small" themeColor="textSecondary">
               {t('home.snoozed', {
-                time: formatTime(dose.snoozedUntil),
+                time: formatTime(snoozeEnd),
               })}
             </ThemedText>
           ) : null}

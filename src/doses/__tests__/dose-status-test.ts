@@ -1,4 +1,4 @@
-import { doseStatus } from '../dose-status';
+import { activeSnoozeEnd, doseStatus } from '../dose-status';
 import type { TodayDose } from '../dto/today-dose-output';
 
 const NOW = new Date(2026, 9, 10, 12, 0);
@@ -39,4 +39,38 @@ describe('doseStatus', () => {
       expect(status).toBe(expected);
     },
   );
+});
+
+describe('activeSnoozeEnd', () => {
+  const snoozed = (
+    state: TodayDose['state'],
+    snoozedUntil: Date | null,
+  ): TodayDose => ({
+    ...dose(state, new Date(2026, 9, 10, 8)),
+    snoozedUntil,
+  });
+
+  it('returns the snooze end while it is still ahead', () => {
+    // given
+    const until = new Date(2026, 9, 10, 12, 10);
+
+    // when
+    const end = activeSnoozeEnd(snoozed('pending', until), NOW);
+
+    // then
+    expect(end).toEqual(until);
+  });
+
+  it.each([
+    ['has passed', 'pending', new Date(2026, 9, 10, 11, 50)],
+    ['is exactly now', 'pending', NOW],
+    ['was never set', 'pending', null],
+    ['is left on a taken dose', 'taken', new Date(2026, 9, 10, 12, 10)],
+  ] as const)('returns null when the snooze %s', (_, state, until) => {
+    // when
+    const end = activeSnoozeEnd(snoozed(state, until), NOW);
+
+    // then
+    expect(end).toBeNull();
+  });
 });

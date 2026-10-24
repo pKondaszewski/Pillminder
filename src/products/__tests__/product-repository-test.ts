@@ -11,6 +11,7 @@ import {
   addPackToStockRow,
   createProductRow,
   mergeBuiltInDuplicateCategoryRows,
+  shiftStockRow,
   updateProductRow,
 } from '../product-repository';
 
@@ -183,7 +184,7 @@ describe('createProductRow and updateProductRow', () => {
     expect(db.select().from(products).all()).toEqual([]);
   });
 
-  it('updates the fields and clears the optional ones that are not given', async () => {
+  it('updates the fields and clears the optional ones that are not given, except the stock', async () => {
     // given
     insertProduct({ id: 'p1', strength: '500 mg', stock: 5, price: '10' });
 
@@ -197,9 +198,61 @@ describe('createProductRow and updateProductRow', () => {
     expect(updated).toMatchObject({
       name: 'Renamed',
       strength: null,
-      stock: null,
+      stock: 5,
       price: null,
       updatedAt: NOW,
     });
+  });
+
+  it('writes the stock on update when it is given, also a cleared one', async () => {
+    // given
+    insertProduct({ id: 'p1', stock: 5 });
+
+    // when
+    await updateProductRow('p1', {
+      name: 'A',
+      category: 'medication',
+      stock: 9,
+    });
+    const withStock = productRow('p1')?.stock;
+    await updateProductRow('p1', {
+      name: 'A',
+      category: 'medication',
+      stock: null,
+    });
+
+    // then
+    expect(withStock).toBe(9);
+    expect(productRow('p1')?.stock).toBeNull();
+  });
+});
+
+describe('shiftStockRow', () => {
+  beforeEach(() => clearTestDatabase());
+
+  it.each([
+    [10, 5, 15],
+    [10, -4, 6],
+    [3, -10, 0],
+  ])('moves a stock of %i by %i to %i', async (stock, delta, expected) => {
+    // given
+    insertProduct({ id: 'p1', stock });
+
+    // when
+    await shiftStockRow('p1', delta);
+
+    // then
+    expect(productRow('p1')?.stock).toBe(expected);
+  });
+
+  it('leaves an untracked stock untracked', async () => {
+    // given
+    insertProduct({ id: 'p1', stock: null });
+
+    // when
+    await shiftStockRow('p1', 5);
+
+    // then
+    expect(productRow('p1')?.stock).toBeNull();
   });
 });

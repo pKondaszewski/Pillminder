@@ -226,6 +226,30 @@ describe('mostUrgentLowStock', () => {
     expect(result).toEqual({ product: products[1], daysLeft: 2 });
   });
 
+  it('includes a low product without days left, after those that have them', () => {
+    // given
+    const products = [product('1', 'Iron'), product('2', 'Zinc')];
+    const statuses = { '1': status(null, true), '2': status(9, true) };
+
+    // when
+    const result = mostUrgentLowStock(products, statuses);
+
+    // then
+    expect(result).toEqual({ product: products[1], daysLeft: 9 });
+  });
+
+  it('picks a low product without days left when it is the only one', () => {
+    // given
+    const products = [product('1', 'Iron')];
+    const statuses = { '1': status(null, true) };
+
+    // when
+    const result = mostUrgentLowStock(products, statuses);
+
+    // then
+    expect(result).toEqual({ product: products[0], daysLeft: null });
+  });
+
   it('ignores products that are not low or have no status', () => {
     // given
     const products = [product('1', 'Iron'), product('2', 'Zinc')];

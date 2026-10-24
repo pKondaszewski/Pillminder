@@ -32,6 +32,7 @@ import {
   dosesBetweenQuery,
   getDoseById,
   getFuturePendingDosesByProduct,
+  getPendingDoseIdsForSchedules,
   productDosesBetweenQuery,
   replacePendingDoseRows,
   setDoseSnoozedUntilRow,
@@ -52,7 +53,7 @@ export {
   stockEffectText,
 } from './dose-label';
 export { monthSummary } from './dose-month';
-export { doseStatus } from './dose-status';
+export { activeSnoozeEnd, doseStatus } from './dose-status';
 export { buildRecentDays, recentDaysRange } from './dose-strip';
 export { groupDosesByTimeSlot, timeSlotLayout } from './dose-time-slot';
 export { buildTimeline, nowPosition } from './dose-timeline';
@@ -80,6 +81,21 @@ export function getProductDosesBetweenQuery(
   to: Date,
 ) {
   return productDosesBetweenQuery(productId, from, to);
+}
+
+export async function cancelPendingReminders(
+  scheduleIds: string[],
+): Promise<void> {
+  const scheduleList = scheduleIds.join(', ');
+  try {
+    await cancelDoseReminders(await getPendingDoseIdsForSchedules(scheduleIds));
+  } catch (err) {
+    log.error(
+      `Failed to cancel pending reminders for schedule(s) ${scheduleList}`,
+      err,
+    );
+    throw err;
+  }
 }
 
 export async function cancelFutureDosesForSchedules(

@@ -158,6 +158,19 @@ export async function getFuturePendingDosesByProduct(
     );
 }
 
+export async function getPendingDoseIdsForSchedules(
+  scheduleIds: string[],
+): Promise<string[]> {
+  if (scheduleIds.length === 0) return [];
+  const rows = await db
+    .select({ id: doses.id })
+    .from(doses)
+    .where(
+      and(inArray(doses.scheduleId, scheduleIds), eq(doses.state, 'pending')),
+    );
+  return rows.map((row) => row.id);
+}
+
 export async function deleteFuturePendingDoseRowsForSchedules(
   scheduleIds: string[],
   from: Date,
