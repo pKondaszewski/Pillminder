@@ -17,5 +17,5 @@ export function buildRecentDays(doses: AdherenceDose[], now: Date): RecentDays {
     const day = addDays(from, index);
     return { day, status: dayStatus(day, doses, now) };
   });
-  return { days, counts: calculateAdherence(doses, from, to, now).total };
+  return { days, counts: calculateAdherence(doses, from, to, now) };
 }

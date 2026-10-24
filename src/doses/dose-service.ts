@@ -70,21 +70,6 @@ export type { TodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');
 
-function reminderTexts(product: Product, quantity: number) {
-  const name = productLabel(product.name, product.strength);
-  const body = reminderBody(
-    name,
-    quantity,
-    product.unit,
-    product.fasting,
-    (key, options) => i18n.t(key, options),
-  );
-  return {
-    first: { title: i18n.t('notification.title'), body },
-    retry: { title: i18n.t('notification.retryTitle'), body },
-  };
-}
-
 export function getDosesBetweenQuery(from: Date, to: Date) {
   return dosesBetweenQuery(from, to);
 }
@@ -132,7 +117,7 @@ export async function refreshRemindersForProduct(
   await Promise.all(
     pending.map((dose) =>
       scheduleDoseReminder(
-        { id: dose.id, productName: product.name, plannedAt: dose.plannedAt },
+        { id: dose.id, plannedAt: dose.plannedAt },
         reminderTexts(
           product,
           quantityOfDose(dose, scheduleById.get(dose.scheduleId)),
@@ -151,16 +136,32 @@ export async function takeDose(id: string): Promise<void> {
   await applyDoseState(id, 'taken');
 }
 
-export async function untakeDose(id: string): Promise<void> {
-  await revertDoseToPending(id);
-}
-
 export async function skipDose(id: string): Promise<void> {
   await applyDoseState(id, 'skipped');
 }
 
-export async function unskipDose(id: string): Promise<void> {
-  await revertDoseToPending(id);
+export async function revertDose(id: string): Promise<void> {
+  log.info(`Reverting dose ${id} to pending`);
+  try {
+    await setDoseStateRow(id, 'pending');
+
+    const dose = await getDoseById(id);
+    if (!dose || !isDueInFuture(dose, new Date())) return;
+
+    const product = await getProduct(dose.productId);
+    if (!product) return;
+
+    await scheduleDoseReminder(
+      { id: dose.id, plannedAt: dose.plannedAt },
+      reminderTexts(
+        product,
+        quantityOfDose(dose, await getSchedule(dose.scheduleId)),
+      ),
+    );
+  } catch (err) {
+    log.error(`Failed to revert dose ${id}`, err);
+    throw err;
+  }
 }
 
 export async function correctDoseState(
@@ -181,7 +182,7 @@ export async function snoozeDose(id: string): Promise<void> {
 
     const when = new Date(Date.now() + snoozeMinutes * 60 * 1000);
     await scheduleDoseReminder(
-      { id: dose.id, productName: product.name, plannedAt: when },
+      { id: dose.id, plannedAt: when },
       reminderTexts(
         product,
         quantityOfDose(dose, await getSchedule(dose.scheduleId)),
@@ -253,7 +254,6 @@ export async function syncDosesForSchedules(
           scheduleDoseReminder(
             {
               id: dose.id,
-              productName: product.name,
               plannedAt: dose.plannedAt,
             },
             reminderTexts(product, quantityOfDose(dose, schedule)),
@@ -287,33 +287,24 @@ async function applyDoseState(
   }
 }
 
+function reminderTexts(product: Product, quantity: number) {
+  const name = productLabel(product.name, product.strength);
+  const body = reminderBody(
+    name,
+    quantity,
+    product.unit,
+    product.fasting,
+    (key, options) => i18n.t(key, options),
+  );
+  return {
+    first: { title: i18n.t('notification.title'), body },
+    retry: { title: i18n.t('notification.retryTitle'), body },
+  };
+}
+
 function quantityOfDose(
   { plannedAt }: { plannedAt: Date },
   schedule: Schedule | undefined,
 ): number {
   return schedule ? quantityOn(schedule, schedule.quantity, plannedAt) : 1;
-}
-
-async function revertDoseToPending(id: string): Promise<void> {
-  log.info(`Reverting dose ${id} to pending`);
-  try {
-    await setDoseStateRow(id, 'pending');
-
-    const dose = await getDoseById(id);
-    if (!dose || !isDueInFuture(dose)) return;
-
-    const product = await getProduct(dose.productId);
-    if (!product) return;
-
-    await scheduleDoseReminder(
-      { id: dose.id, productName: product.name, plannedAt: dose.plannedAt },
-      reminderTexts(
-        product,
-        quantityOfDose(dose, await getSchedule(dose.scheduleId)),
-      ),
-    );
-  } catch (err) {
-    log.error(`Failed to revert dose ${id}`, err);
-    throw err;
-  }
 }

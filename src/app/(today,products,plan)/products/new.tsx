@@ -7,7 +7,7 @@ import { ThemedView } from '@/commons/ui/themed-view';
 import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
 import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import { creationChange } from '@/config/undoable-change';
-import { addImage, DEFAULT_IMAGE_ROLE } from '@/images/image-service';
+import { addImage } from '@/images/image-service';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import { NewProductForm } from '@/products/ui/new-product-form';
 import { clearPendingUris } from '@/products/ui/pending-photos-store';
@@ -57,7 +57,7 @@ export default function NewProductScreen() {
   const addPhotos = async (productId: string, uris: string[]) => {
     try {
       for (const uri of uris) {
-        await addImage(productId, uri, DEFAULT_IMAGE_ROLE);
+        await addImage(productId, uri);
       }
     } catch {
       Alert.alert(t('common.errorTitle'), t('images.errorSave'));

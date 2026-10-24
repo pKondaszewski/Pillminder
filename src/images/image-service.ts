@@ -17,7 +17,6 @@ import {
   restoreImageRow,
   setProfileImageRow,
 } from './image-repository';
-import type { ImageRole } from './image-role';
 import { shrinkImage } from './image-shrinker';
 import { needsShrinking } from './image-size';
 
@@ -30,7 +29,6 @@ export {
 export { pickImage } from './image-picker';
 export type { ProductImage } from './image-repository';
 export { getImageFileNamesByProduct } from './image-repository';
-export { DEFAULT_IMAGE_ROLE, IMAGE_ROLES, type ImageRole } from './image-role';
 export { orderPhotos } from './order-photos';
 
 const log = createLogger('image-service');
@@ -42,12 +40,11 @@ export function getImagesQuery(productId: string) {
 export async function addImage(
   productId: string,
   sourceUri: string,
-  role: ImageRole,
 ): Promise<ProductImage> {
-  log.info(`Adding ${role} image to product ${productId}`);
+  log.info(`Adding image to product ${productId}`);
   const fileName = storeImageFile(sourceUri);
   try {
-    return await createImageRow(productId, fileName, role);
+    return await createImageRow(productId, fileName);
   } catch (err) {
     log.error(`Failed to add image to product ${productId}`, err);
     deleteImageFiles([fileName]);

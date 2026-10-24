@@ -25,14 +25,12 @@ import {
   type LanguagePreference,
   SEASON_OPTIONS,
   type SeasonPreference,
-  THEME_OPTIONS,
-  type ThemePreference,
-} from '@/settings/settings-service';
-import {
   setLanguage,
   setSeasonPreference,
   setSnoozeMinutes,
   setTheme,
+  THEME_OPTIONS,
+  type ThemePreference,
 } from '@/settings/settings-service';
 import { AboutLine } from '@/settings/ui/about-line';
 import { AppLockSection } from '@/settings/ui/app-lock-section';
@@ -47,8 +45,6 @@ import {
 } from '@/settings/ui/status-card-state';
 import { useSettings } from '@/settings/ui/use-settings';
 
-type Sheet = 'snooze';
-
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const settings = useSettings();
@@ -57,7 +53,7 @@ export default function SettingsScreen() {
   const location = useLocationPermission();
   const googleBackup = useGoogleBackupSettings();
   const appLock = useAppLockSetting();
-  const [sheet, setSheet] = useState<Sheet | null>(null);
+  const [snoozeSheetOpen, setSnoozeSheetOpen] = useState(false);
   const { snackbar, runWithUndo } = useUndoSnackbar();
 
   const notifications = permission
@@ -85,7 +81,7 @@ export default function SettingsScreen() {
     disable: location.disable,
     openSettings: () => void Linking.openSettings(),
   };
-  const closeSheet = () => setSheet(null);
+  const closeSnoozeSheet = () => setSnoozeSheetOpen(false);
 
   return (
     <>
@@ -145,7 +141,7 @@ export default function SettingsScreen() {
               <FieldRow
                 label={t('settings.snooze')}
                 value={`${settings.snoozeMinutes} ${t('settings.minutesUnit')}`}
-                onPress={() => setSheet('snooze')}
+                onPress={() => setSnoozeSheetOpen(true)}
               />
             </SettingsSection>
 
@@ -217,7 +213,7 @@ export default function SettingsScreen() {
         onConfirm={googleBackup.question.confirm}
         onCancel={googleBackup.question.cancel}
       />
-      {sheet === 'snooze' ? (
+      {snoozeSheetOpen ? (
         <SnoozeSheet
           minutes={settings.snoozeMinutes}
           onSave={(minutes) => {
@@ -229,10 +225,10 @@ export default function SettingsScreen() {
                 revert: () => setSnoozeMinutes(previous),
               },
               'settings.errorSave',
-              closeSheet,
+              closeSnoozeSheet,
             );
           }}
-          onClose={closeSheet}
+          onClose={closeSnoozeSheet}
         />
       ) : null}
       <UndoSnackbar snackbar={snackbar} />

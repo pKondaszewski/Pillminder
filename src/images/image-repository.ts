@@ -4,8 +4,6 @@ import * as Crypto from 'expo-crypto';
 import { db } from '@/config/db/database';
 import { productImages, products } from '@/config/db/schema';
 
-import type { ImageRole } from './image-role';
-
 export type ProductImage = typeof productImages.$inferSelect;
 
 export function imagesByProductQuery(productId: string) {
@@ -35,13 +33,12 @@ export async function getAllImageFileNames(): Promise<string[]> {
 export async function createImageRow(
   productId: string,
   fileName: string,
-  role: ImageRole,
 ): Promise<ProductImage> {
   const image: ProductImage = {
     id: Crypto.randomUUID(),
     productId,
     fileName,
-    role,
+    role: 'box',
     createdAt: new Date(),
   };
   db.transaction((tx) => {

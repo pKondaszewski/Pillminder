@@ -16,10 +16,6 @@ export function daysBetween(from: Date, to: Date): number {
   return Math.round((to.getTime() - from.getTime()) / MS_PER_DAY);
 }
 
-export function msUntilNextDay(now: Date): number {
-  return addDays(startOfDay(now), 1).getTime() - now.getTime();
-}
-
 export interface DateRange {
   from: Date;
   to: Date;

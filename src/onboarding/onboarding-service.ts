@@ -12,11 +12,6 @@ import { decideOnboardingSteps, permissionStep } from './onboarding-helper';
 
 export type { OnboardingStep, PermissionStep } from './dto/onboarding-step';
 export { permissionStep } from './onboarding-helper';
-export type { NotificationPermission } from '@/notifications/notification-service';
-export {
-  getNotificationPermission,
-  requestNotificationPermission,
-} from '@/notifications/notification-service';
 export {
   dismissBatteryPrompt,
   dismissLocationPrompt,

@@ -1,10 +1,9 @@
 import { addDays } from '@/config/date-utils';
 import {
   correctDoseState,
+  revertDose,
   skipDose,
   takeDose,
-  unskipDose,
-  untakeDose,
 } from '@/doses/dose-service';
 
 import { useDosesBetween } from './use-doses-between';
@@ -15,9 +14,8 @@ export function useDayDoses(day: Date) {
   return {
     doses,
     takeDose,
-    untakeDose,
     skipDose,
-    unskipDose,
+    revertDose,
     correctDoseState,
   };
 }
