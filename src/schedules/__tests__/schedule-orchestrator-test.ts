@@ -6,6 +6,7 @@ import {
   insertProduct,
   insertSchedule,
 } from '@/config/db/test-database';
+import { cancelDoseReminders } from '@/notifications/notification-service';
 
 import {
   addSchedule,
@@ -45,6 +46,7 @@ function doseCount() {
 describe('schedule orchestrator on a real database', () => {
   beforeEach(() => {
     jest.useFakeTimers({ now: NOW });
+    jest.clearAllMocks();
     clearTestDatabase();
     insertProduct({ id: 'p1' });
   });
@@ -104,7 +106,7 @@ describe('schedule orchestrator on a real database', () => {
     });
   });
 
-  it('removeSchedule deletes the schedule with all its doses, history included', async () => {
+  it('removeSchedule keeps the taken, skipped and overdue doses and removes the future pending ones', async () => {
     // given
     const id = await addSchedule({
       productId: 'p1',
@@ -112,12 +114,26 @@ describe('schedule orchestrator on a real database', () => {
       timesOfDay: ['20:00'],
     });
     insertDose({
-      id: 'history',
+      id: 'taken',
+      productId: 'p1',
+      scheduleId: id,
+      plannedAt: new Date('2026-03-08T19:00:00Z'),
+      state: 'taken',
+      takenAt: NOW,
+      takenQuantity: 2,
+    });
+    insertDose({
+      id: 'skipped',
       productId: 'p1',
       scheduleId: id,
       plannedAt: new Date('2026-03-09T19:00:00Z'),
-      state: 'taken',
-      takenAt: NOW,
+      state: 'skipped',
+    });
+    insertDose({
+      id: 'overdue',
+      productId: 'p1',
+      scheduleId: id,
+      plannedAt: new Date('2026-03-10T06:00:00Z'),
     });
     insertSchedule({ id: 'other', productId: 'p1' });
     insertDose({
@@ -140,10 +156,40 @@ describe('schedule orchestrator on a real database', () => {
     ).toEqual(['other']);
     expect(
       db
-        .select()
+        .select({ id: doses.id, scheduleId: doses.scheduleId })
         .from(doses)
-        .all()
-        .map((d) => d.id),
-    ).toEqual(['other-dose']);
+        .orderBy(doses.plannedAt)
+        .all(),
+    ).toEqual([
+      { id: 'taken', scheduleId: null },
+      { id: 'skipped', scheduleId: null },
+      { id: 'overdue', scheduleId: null },
+      { id: 'other-dose', scheduleId: 'other' },
+    ]);
+  });
+
+  it('removeSchedule cancels the reminders of its overdue pending doses', async () => {
+    // given
+    insertSchedule({ id: 's1', productId: 'p1' });
+    insertDose({
+      id: 'overdue',
+      productId: 'p1',
+      scheduleId: 's1',
+      plannedAt: new Date('2026-03-09T19:00:00Z'),
+    });
+    insertDose({
+      id: 'taken',
+      productId: 'p1',
+      scheduleId: 's1',
+      plannedAt: new Date('2026-03-09T07:00:00Z'),
+      state: 'taken',
+      takenAt: NOW,
+    });
+
+    // when
+    await removeSchedule('s1');
+
+    // then
+    expect(cancelDoseReminders).toHaveBeenCalledWith(['overdue']);
   });
 });

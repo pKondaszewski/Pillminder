@@ -113,3 +113,32 @@ describe('toTodayDose with steps', () => {
     expect(quantities).toEqual([4, 4, 1, 1]);
   });
 });
+
+describe('toTodayDose without a schedule', () => {
+  it('shows the taken quantity of a dose whose schedule was deleted', () => {
+    // given
+    const kept: TodayDoseRow = {
+      ...row,
+      state: 'taken',
+      takenQuantity: 3,
+      schedule: null,
+    };
+
+    // when
+    const dose = toTodayDose(kept);
+
+    // then
+    expect(dose.quantity).toBe(3);
+  });
+
+  it('falls back to one unit for a pending dose of a deleted schedule', () => {
+    // given
+    const overdue: TodayDoseRow = { ...row, schedule: null };
+
+    // when
+    const dose = toTodayDose(overdue);
+
+    // then
+    expect(dose.quantity).toBe(1);
+  });
+});

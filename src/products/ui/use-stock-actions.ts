@@ -11,15 +11,16 @@ export function useStockActions(
   runWithUndo: RunWithUndo,
 ) {
   const { t } = useTranslation();
-  const { setStock, restockPack } = useProducts();
+  const { shiftStock, restockPack } = useProducts();
 
   const step = (delta: number) => {
     if (stock === null) return;
+    const applied = Math.max(0, stock + delta) - stock;
     void runWithUndo(
       {
         message: t('editor.saved', { field: t('editor.stock') }),
-        apply: () => setStock(id, Math.max(0, stock + delta)),
-        revert: () => setStock(id, stock),
+        apply: () => shiftStock(id, applied),
+        revert: () => shiftStock(id, -applied),
       },
       'products.errorStock',
     );
@@ -33,7 +34,7 @@ export function useStockActions(
           amount: stockAmountText(packSize, unit, t),
         }),
         apply: () => restockPack(id),
-        revert: () => setStock(id, stock),
+        revert: () => shiftStock(id, -packSize),
       },
       'products.errorStock',
     );

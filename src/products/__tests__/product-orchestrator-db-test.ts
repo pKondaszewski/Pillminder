@@ -29,6 +29,7 @@ import {
   removeProduct,
   restockPack,
   restoreProduct,
+  undoArchiveProduct,
 } from '../product-orchestrator';
 
 jest.mock('@/config/db/database', () =>
@@ -119,6 +120,24 @@ describe('product orchestrator on a real database', () => {
       expect(db.select().from(products).get()?.id).toBe('other');
     });
 
+    it('deletes the doses kept after their schedule was deleted', async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      insertDose({
+        id: 'kept',
+        productId: 'p1',
+        scheduleId: null,
+        plannedAt: NOW,
+        state: 'taken',
+      });
+
+      // when
+      await removeProduct('p1');
+
+      // then
+      expect(db.select().from(doses).all()).toEqual([]);
+    });
+
     it('deletes the image files of the product and cancels its reorder alert', async () => {
       // given
       insertFullProduct('p1');
@@ -131,7 +150,7 @@ describe('product orchestrator on a real database', () => {
       expect(cancelReorderAlert).toHaveBeenCalledWith('p1');
     });
 
-    it('cancels the reminders of the future pending doses only', async () => {
+    it('cancels the reminders of all pending doses, overdue ones included', async () => {
       // given
       insertFullProduct('p1');
       insertDose({
@@ -145,7 +164,29 @@ describe('product orchestrator on a real database', () => {
       await removeProduct('p1');
 
       // then
-      expect(cancelDoseReminders).toHaveBeenCalledWith(['p1-d']);
+      expect(cancelDoseReminders).toHaveBeenCalledWith(
+        expect.arrayContaining(['overdue', 'p1-d']),
+      );
+    });
+
+    it('does not cancel the reminders of taken or skipped doses', async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      insertSchedule({ id: 's1', productId: 'p1' });
+      insertDose({
+        id: 'taken',
+        productId: 'p1',
+        scheduleId: 's1',
+        plannedAt: YESTERDAY,
+        state: 'taken',
+        takenAt: YESTERDAY,
+      });
+
+      // when
+      await removeProduct('p1');
+
+      // then
+      expect(cancelDoseReminders).not.toHaveBeenCalledWith(['taken']);
     });
   });
 
@@ -228,6 +269,41 @@ describe('product orchestrator on a real database', () => {
       // then
       expect(db.select().from(products).get()?.status).toBe('active');
       expect(db.select().from(doses).all()).toHaveLength(30);
+    });
+
+    it('undoes the archive: the product is active again and only the completion note is gone', async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      db.insert(notes)
+        .values({
+          id: 'old',
+          productId: 'p1',
+          body: 'Earlier note',
+          createdAt: NOW,
+          updatedAt: NOW,
+        })
+        .run();
+      const noteId = await archiveProduct('p1', 'Course finished');
+
+      // when
+      await undoArchiveProduct('p1', noteId);
+
+      // then
+      expect(db.select().from(products).get()?.status).toBe('active');
+      expect(db.select().from(notes).all()).toMatchObject([{ id: 'old' }]);
+    });
+
+    it('undoes an archive without a completion note', async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      const noteId = await archiveProduct('p1');
+
+      // when
+      await undoArchiveProduct('p1', noteId);
+
+      // then
+      expect(noteId).toBeNull();
+      expect(db.select().from(products).get()?.status).toBe('active');
     });
   });
 });

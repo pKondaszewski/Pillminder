@@ -252,10 +252,19 @@ describe('editedProductInput', () => {
       unit: 'tablet',
       price: null,
       storeLink: 'pharmacy',
-      stock: 30,
       packSize: 60,
       fasting: true,
     });
+  });
+
+  it('leaves the stock out unless it is edited', () => {
+    // when
+    const untouched = editedProductInput(PRODUCT, { price: null });
+    const edited = editedProductInput(PRODUCT, { stock: 12 });
+
+    // then
+    expect(untouched).not.toHaveProperty('stock');
+    expect(edited.stock).toBe(12);
   });
 
   it('clears the strength when the category cannot have one', () => {

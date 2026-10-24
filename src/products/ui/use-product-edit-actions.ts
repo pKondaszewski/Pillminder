@@ -16,7 +16,13 @@ export function useProductEditActions(
   runWithUndo: RunWithUndo,
 ) {
   const { t } = useTranslation();
-  const { editProduct, archiveProduct, restoreProduct } = useProducts();
+  const {
+    editProduct,
+    shiftStock,
+    archiveProduct,
+    restoreProduct,
+    undoArchiveProduct,
+  } = useProducts();
 
   const saveField = (
     field: ProductEditedField,
@@ -28,29 +34,38 @@ export function useProductEditActions(
         product,
         patch,
         t('editor.saved', { field: t(PRODUCT_FIELD_LABEL_KEYS[field]) }),
-        editProduct,
+        { save: editProduct, shiftStock },
       ),
       'products.errorSave',
       onSuccess,
     );
 
-  const archive = (completionNote: string | undefined, onSuccess: () => void) =>
-    runWithUndo(
+  const archive = (
+    completionNote: string | undefined,
+    onSuccess: () => void,
+  ) => {
+    let completionNoteId: string | null = null;
+    return runWithUndo(
       {
         message: t('products.detail.archivedToast', { name: product.name }),
-        apply: () => archiveProduct(product.id, completionNote),
-        revert: () => restoreProduct(product.id),
+        apply: async () => {
+          completionNoteId = await archiveProduct(product.id, completionNote);
+        },
+        revert: () => undoArchiveProduct(product.id, completionNoteId),
       },
       'products.errorArchive',
       onSuccess,
     );
+  };
 
   const restore = () =>
     runWithUndo(
       {
         message: t('products.detail.restoredToast', { name: product.name }),
         apply: () => restoreProduct(product.id),
-        revert: () => archiveProduct(product.id),
+        revert: async () => {
+          await archiveProduct(product.id);
+        },
       },
       'products.errorRestore',
     );

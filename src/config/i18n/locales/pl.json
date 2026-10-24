@@ -402,6 +402,7 @@
     "lastUsedToday": "Ostatnio: dziś, {{time}}",
     "lastUsedYesterday": "Ostatnio: wczoraj, {{time}}",
     "lowStockBanner": "{{name}} skończy się za {{days}}",
+    "lowStockBannerNoDays": "{{name}} się kończy",
     "lowStockOrder": "Zamów",
     "neverUsed": "Jeszcze nie używano",
     "noMatching": "Brak pasujących produktów",

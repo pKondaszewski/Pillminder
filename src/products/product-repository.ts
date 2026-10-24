@@ -123,6 +123,7 @@ export async function updateProductRow(
     .update(products)
     .set({
       ...productFields(input, category),
+      stock: input.stock,
       updatedAt: new Date(),
     })
     .where(eq(products.id, id))
@@ -130,14 +131,14 @@ export async function updateProductRow(
   return updated;
 }
 
-export async function setStockRow(
-  id: string,
-  stock: number | null,
-): Promise<void> {
+export async function shiftStockRow(id: string, delta: number): Promise<void> {
   await db
     .update(products)
-    .set({ stock, updatedAt: new Date() })
-    .where(eq(products.id, id));
+    .set({
+      stock: sql`max(0, ${products.stock} + ${delta})`,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(products.id, id), isNotNull(products.stock)));
 }
 
 export async function addPackToStockRow(id: string): Promise<void> {

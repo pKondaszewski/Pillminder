@@ -17,12 +17,15 @@ export function getNotesQuery(productId: string) {
   return notesByProductQuery(productId);
 }
 
-export async function addNote(productId: string, body: string): Promise<void> {
+export async function addNote(
+  productId: string,
+  body: string,
+): Promise<string | null> {
   const trimmed = body.trim();
-  if (trimmed === '') return;
+  if (trimmed === '') return null;
   log.info(`Adding note to product ${productId}`);
   try {
-    await createNoteRow(productId, trimmed);
+    return (await createNoteRow(productId, trimmed)).id;
   } catch (err) {
     log.error(`Failed to add note to product ${productId}`, err);
     throw err;

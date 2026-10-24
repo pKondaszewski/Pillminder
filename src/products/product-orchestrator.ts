@@ -1,5 +1,6 @@
 import {
   cancelFutureDosesForSchedules,
+  cancelPendingReminders,
   refreshRemindersForProduct,
   syncDosesForSchedules,
 } from '@/doses/dose-service';
@@ -7,7 +8,7 @@ import {
   deleteImageFiles,
   getImageFileNamesByProduct,
 } from '@/images/image-service';
-import { addNote } from '@/notes/note-service';
+import { addNote, removeNote } from '@/notes/note-service';
 import { cancelReorderAlert } from '@/notifications/notification-service';
 import { getSchedulesByProduct } from '@/schedules/schedule-service';
 
@@ -34,8 +35,8 @@ export async function restockPack(id: string): Promise<void> {
 }
 
 export async function removeProduct(id: string): Promise<void> {
-  const schedules = await getSchedulesByProduct(id);
-  await cancelFutureDosesForSchedules(schedules.map((s) => s.id));
+  const scheduleIds = (await getSchedulesByProduct(id)).map((s) => s.id);
+  await cancelPendingReminders(scheduleIds);
   await cancelReorderAlert(id);
   const imageFileNames = await getImageFileNamesByProduct(id);
   await deleteProduct(id);
@@ -53,11 +54,19 @@ export async function removeCategoryProducts(
 export async function archiveProduct(
   id: string,
   completionNote?: string,
-): Promise<void> {
+): Promise<string | null> {
   await setProductStatus(id, 'archived');
   const schedules = await getSchedulesByProduct(id);
   await cancelFutureDosesForSchedules(schedules.map((s) => s.id));
-  if (completionNote) await addNote(id, completionNote);
+  return completionNote ? addNote(id, completionNote) : null;
+}
+
+export async function undoArchiveProduct(
+  id: string,
+  completionNoteId: string | null,
+): Promise<void> {
+  await restoreProduct(id);
+  if (completionNoteId) await removeNote(completionNoteId);
 }
 
 export async function restoreProduct(id: string): Promise<void> {

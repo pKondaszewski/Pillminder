@@ -6,11 +6,12 @@ import {
   removeProduct,
   restockPack,
   restoreProduct,
+  undoArchiveProduct,
 } from '@/products/product-orchestrator';
 import {
   addProduct,
   getProductsQuery,
-  setStock,
+  shiftStock,
 } from '@/products/product-service';
 
 export function useProducts() {
@@ -24,7 +25,8 @@ export function useProducts() {
     removeProduct,
     archiveProduct,
     restoreProduct,
+    undoArchiveProduct,
     restockPack,
-    setStock,
+    shiftStock,
   };
 }
