@@ -12,7 +12,11 @@ import * as Crypto from 'expo-crypto';
 import { db } from '@/config/db/database';
 import { productImages, products } from '@/config/db/schema';
 
-import { BUILT_IN_CATEGORIES, normalizeCategory } from './category';
+import {
+  BUILT_IN_CATEGORIES,
+  builtInForName,
+  normalizeCategory,
+} from './category';
 import type { NewProductInput } from './dto/new-product-input';
 
 type ProductRow = typeof products.$inferSelect;
@@ -66,6 +70,29 @@ export async function renameCategoryRows(
     .update(products)
     .set({ category: to, updatedAt: new Date() })
     .where(eq(products.category, from));
+}
+
+export function mergeBuiltInDuplicateCategoryRows(): number {
+  // Synchronous on purpose: see the Transactions rule in CLAUDE.md.
+  return db.transaction((tx) => {
+    const custom = tx
+      .selectDistinct({ category: products.category })
+      .from(products)
+      .where(notInArray(products.category, BUILT_IN_CATEGORIES))
+      .all();
+    const duplicates = custom.flatMap(({ category }) => {
+      const builtIn = builtInForName(category);
+      return builtIn ? [{ category, builtIn }] : [];
+    });
+    duplicates.forEach(({ category, builtIn }) =>
+      tx
+        .update(products)
+        .set({ category: builtIn, updatedAt: new Date() })
+        .where(eq(products.category, category))
+        .run(),
+    );
+    return duplicates.length;
+  });
 }
 
 export async function createProductRow(
