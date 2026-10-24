@@ -10,11 +10,11 @@ export function usePickImage() {
     try {
       const result = await pickImage(source, multiple);
       if (result.status === 'permissionDenied') {
-        Alert.alert(t('products.errorTitle'), t('images.cameraDenied'));
+        Alert.alert(t('common.errorTitle'), t('images.cameraDenied'));
       }
       return result.status === 'picked' ? result.uris : [];
     } catch {
-      Alert.alert(t('products.errorTitle'), t('images.errorSave'));
+      Alert.alert(t('common.errorTitle'), t('images.errorSave'));
       return [];
     }
   };

@@ -60,7 +60,7 @@ export default function NewProductScreen() {
         await addImage(productId, uri, DEFAULT_IMAGE_ROLE);
       }
     } catch {
-      Alert.alert(t('products.errorTitle'), t('images.errorSave'));
+      Alert.alert(t('common.errorTitle'), t('images.errorSave'));
     }
   };
 

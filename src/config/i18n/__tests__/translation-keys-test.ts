@@ -9,6 +9,7 @@ import pl from '../locales/pl.json';
 const SRC_DIR = join(__dirname, '../../..');
 const PLURAL_SUFFIXES = ['one', 'few', 'many', 'other'];
 const LITERAL_KEY_CALL = /\bt\(\s*(['"])([^'"`$\n]+)\1/g;
+const DOTTED_STRING = /(['"])((?:[a-z][A-Za-z]*\.)+[A-Za-z]+)\1/g;
 
 describe('translation keys used in code', () => {
   const sources = listSourceFiles(SRC_DIR).map((file) => ({
@@ -18,12 +19,17 @@ describe('translation keys used in code', () => {
 
   it('exist in pl.json and en.json', () => {
     // given
-    const usages = sources.flatMap(({ file, content }) =>
-      [...content.matchAll(LITERAL_KEY_CALL)].map((match) => ({
+    const sections = Object.keys(pl);
+    const usages = sources.flatMap(({ file, content }) => [
+      ...[...content.matchAll(LITERAL_KEY_CALL)].map((match) => ({
         file,
         key: match[2],
       })),
-    );
+      // keys passed on as arguments (e.g. errorKey) and translated elsewhere
+      ...[...content.matchAll(DOTTED_STRING)]
+        .filter((match) => sections.includes(match[2].split('.')[0]))
+        .map((match) => ({ file, key: match[2] })),
+    ]);
 
     // when
     const missing = usages

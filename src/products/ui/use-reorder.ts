@@ -1,3 +1,7 @@
+import { useMemo } from 'react';
+
+import { useNow } from '@/commons/ui/use-now';
+import { startOfDay } from '@/config/date-utils';
 import type { ReorderStatus } from '@/products/dto/reorder-status';
 import type { Product } from '@/products/product-service';
 import { productReorderStatus } from '@/products/reorder';
@@ -10,7 +14,12 @@ export function useReorderStatuses(): Record<string, ReorderStatus> {
   const { products } = useProducts();
   const { schedules } = useSchedules();
 
-  return buildReorderStatuses(products, schedules, new Date());
+  const today = startOfDay(useNow()).getTime();
+
+  return useMemo(
+    () => buildReorderStatuses(products, schedules, new Date(today)),
+    [products, schedules, today],
+  );
 }
 
 function buildReorderStatuses(
