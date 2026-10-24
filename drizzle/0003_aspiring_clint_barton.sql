@@ -1,1 +1,0 @@
-ALTER TABLE `doses` ADD `snoozed_until` integer;

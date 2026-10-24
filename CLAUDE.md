@@ -175,8 +175,8 @@ Toolchain (Apple Silicon Mac): Temurin JDK 17, Android cmdline-tools, SDK at
 - **Migrations** — generate with a descriptive snake_case name, e.g.
   `npx drizzle-kit generate --name add_dose_note` (the file becomes
   `0005_add_dose_note.sql`; without `--name` drizzle picks a random one).
-  Already-applied migrations (0000–0004) keep their names — they are on
-  devices.
+  The migrations were squashed into `0000_init` before the first release; its
+  `when` matches the last pre-squash migration, so existing devices skip it.
 - **Transactions** — the body of `db.transaction(...)` must not be `async` or
   contain `await`. The expo-sqlite driver in drizzle is synchronous and
   commits as soon as the callback returns, so awaited work would run outside
