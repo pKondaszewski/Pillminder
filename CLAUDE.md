@@ -139,6 +139,32 @@ If the app hangs on the splash / "Unable to load script" after an
 Toolchain (Apple Silicon Mac): Temurin JDK 17, Android cmdline-tools, SDK at
 `~/Library/Android/sdk`; env in `~/.zprofile`. RN 0.86 needs JDK 17 (AGP 8.x).
 
+## Release signing
+
+CD (`.github/workflows/cd.yml`) signs the release APK with our own key. Until
+#352 every APK was signed with the React Native template debug key (cert SHA-256
+`fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c`), so the new
+key is attached by **APK Signature Scheme v3 key rotation**: the lineage file
+(old key -> new key) lets devices with the old key update in place, data intact.
+
+- The keystore and the lineage live **outside the repo** (owner's backup and
+  GitHub secrets), never commit them. Create them once on the host with
+  `scripts/create-release-key.sh <android/app/debug.keystore>`.
+- Secrets: `RELEASE_KEYSTORE_BASE64`, `RELEASE_LINEAGE_BASE64`,
+  `RELEASE_KEYSTORE_PASSWORD` (also the key password), `RELEASE_KEY_ALIAS`.
+  CD fails when any is missing; it never falls back to the debug key.
+- Gradle still signs the release APK with the debug key; CD then re-signs it
+  with `apksigner --lineage` (v3 only, minSdk is 33) and verifies it. AGP has
+  no lineage support, so there is no signingConfig for the release key.
+- The old key has the **rollback capability** in the lineage: a build signed
+  with the public debug key (local / sandbox builds) still installs over a CD
+  APK with the data kept, which device checks rely on. The price: anyone with
+  the public debug key can sign an update that installs over a CD APK, as
+  before #352. Only CD APKs carry the new key.
+- Release cert SHA-256: `1c59c92cb667f29a69a3058e8e03d66dac52daee2e314e512c45fa7ab8aa2b71`
+- **Losing the keystore or the lineage = no more in-place updates** (uninstall
+  and data loss on every device). Keep a backup.
+
 ## Conventions
 
 - **Expo has changed** — read the exact versioned docs at
