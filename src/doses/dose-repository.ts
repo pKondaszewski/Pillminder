@@ -41,7 +41,7 @@ export function dosesBetweenQuery(from: Date, to: Date) {
     .from(doses)
     .innerJoin(products, eq(doses.productId, products.id))
     .leftJoin(productImages, eq(products.profileImageId, productImages.id))
-    .innerJoin(schedules, eq(doses.scheduleId, schedules.id))
+    .leftJoin(schedules, eq(doses.scheduleId, schedules.id))
     .where(and(gte(doses.plannedAt, from), lt(doses.plannedAt, to)))
     .orderBy(doses.plannedAt);
 }
@@ -76,11 +76,13 @@ export async function setDoseStateRow(
     const dose = tx.select().from(doses).where(eq(doses.id, id)).get();
     if (!dose) return;
 
-    const schedule = tx
-      .select()
-      .from(schedules)
-      .where(eq(schedules.id, dose.scheduleId))
-      .get();
+    const schedule = dose.scheduleId
+      ? tx
+          .select()
+          .from(schedules)
+          .where(eq(schedules.id, dose.scheduleId))
+          .get()
+      : undefined;
     const product = tx
       .select({ stock: products.stock, lastUsedAt: products.lastUsedAt })
       .from(products)

@@ -120,6 +120,24 @@ describe('product orchestrator on a real database', () => {
       expect(db.select().from(products).get()?.id).toBe('other');
     });
 
+    it('deletes the doses kept after their schedule was deleted', async () => {
+      // given
+      insertProduct({ id: 'p1' });
+      insertDose({
+        id: 'kept',
+        productId: 'p1',
+        scheduleId: null,
+        plannedAt: NOW,
+        state: 'taken',
+      });
+
+      // when
+      await removeProduct('p1');
+
+      // then
+      expect(db.select().from(doses).all()).toEqual([]);
+    });
+
     it('deletes the image files of the product and cancels its reorder alert', async () => {
       // given
       insertFullProduct('p1');
