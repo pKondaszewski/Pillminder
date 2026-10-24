@@ -11,7 +11,7 @@ export function doseStatus(
 }
 
 export function activeSnoozeEnd(
-  { state, snoozedUntil }: Pick<TodayDose, 'state' | 'snoozedUntil'>,
+  { state, snoozedUntil }: TodayDose,
   now: Date,
 ): Date | null {
   return state === 'pending' && snoozedUntil && snoozedUntil > now

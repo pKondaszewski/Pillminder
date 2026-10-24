@@ -23,6 +23,11 @@ jest.mock('react-native', () => {
 jest.mock('@/config/logger', () => ({
   createLogger: () => ({ info: jest.fn(), warn: jest.fn(), error: jest.fn() }),
 }));
+jest.mock('@/config/db/database', () => ({ db: {} }));
+jest.mock('drizzle-orm/expo-sqlite/migrator', () => ({
+  migrate: jest.fn().mockResolvedValue(undefined),
+}));
+jest.mock('../../../drizzle/migrations', () => ({}));
 jest.mock('@/doses/dose-service', () => ({
   snoozeDose: jest.fn().mockResolvedValue(undefined),
   takeDose: jest.fn().mockResolvedValue(undefined),

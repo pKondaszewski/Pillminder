@@ -1,13 +1,14 @@
 import { startOfDay } from '@/config/date-utils';
 import i18n from '@/config/i18n';
 import { createLogger } from '@/config/logger';
+import type { DoseReminderInput } from '@/notifications/dto/dose-reminder-input';
 import {
   cancelDoseReminder,
   cancelDoseReminders,
   dismissDoseReminder,
   scheduleDoseReminder,
+  scheduleDoseReminders,
 } from '@/notifications/notification-service';
-import { isWithinRetryHorizon } from '@/notifications/reminder-plan';
 import { productLabel } from '@/products/product-label';
 import {
   getProduct,
@@ -39,7 +40,6 @@ import {
   setDoseSnoozedUntilRow,
   setDoseStateRow,
 } from './dose-repository';
-import { activeSnoozeEnd } from './dose-status';
 import { isDueInFuture, isPending } from './dose-validator';
 import type { DoseSnapshot } from './dto/dose-snapshot';
 
@@ -72,6 +72,9 @@ export type { TodayCardState } from './dto/today-card-state';
 export type { TodayDose } from './dto/today-dose-output';
 
 const log = createLogger('dose-service');
+
+// Alarms are budgeted across all products, so every re-plan runs one at a time.
+let reminderPlanning: Promise<void> = Promise.resolve();
 
 export function getDosesBetweenQuery(from: Date, to: Date) {
   return dosesBetweenQuery(from, to);
@@ -121,36 +124,10 @@ export async function cancelFutureDosesForSchedules(
   }
 }
 
-export async function refreshRemindersForProduct(
-  productId: string,
-): Promise<void> {
-  const product = await getProduct(productId);
-  if (!product || product.status === 'archived') return;
-
-  const pending = await getFuturePendingDosesByProduct(productId);
-  const scheduleById = new Map(
-    (await getSchedulesByProduct(productId)).map((s) => [s.id, s]),
-  );
-  log.info(`Refreshing ${pending.length} reminder(s) for product ${productId}`);
-  await Promise.all(
-    pending.map((dose) =>
-      scheduleDoseReminder(
-        { id: dose.id, plannedAt: dose.plannedAt },
-        reminderTexts(
-          product,
-          quantityOfDose(
-            dose,
-            dose.scheduleId ? scheduleById.get(dose.scheduleId) : undefined,
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
 export async function refreshAllReminders(): Promise<void> {
-  const products = await getProductsQuery();
-  await Promise.all(products.map((p) => refreshRemindersForProduct(p.id)));
+  const run = reminderPlanning.then(planAllReminders);
+  reminderPlanning = run.catch(() => {});
+  await run;
 }
 
 export async function takeDose(id: string): Promise<void> {
@@ -249,7 +226,7 @@ export async function syncDosesForSchedules(
       `Syncing ${slots.length} dose slot(s) for schedule ${schedule.id}`,
     );
     try {
-      const { removedIds, inserted, kept } = await replacePendingDoseRows(
+      const { removedIds } = await replacePendingDoseRows(
         schedule.id,
         from,
         now,
@@ -261,32 +238,12 @@ export async function syncDosesForSchedules(
       );
 
       await cancelDoseReminders(removedIds);
-      if (!product) continue;
-
-      const toSchedule = [
-        ...inserted,
-        ...kept.filter(
-          (dose) =>
-            !activeSnoozeEnd(dose, now) &&
-            isWithinRetryHorizon(dose.plannedAt, now),
-        ),
-      ];
-      await Promise.all(
-        toSchedule.map((dose) =>
-          scheduleDoseReminder(
-            {
-              id: dose.id,
-              plannedAt: dose.plannedAt,
-            },
-            reminderTexts(product, quantityOfDose(dose, schedule)),
-          ),
-        ),
-      );
     } catch (err) {
       log.error(`Failed to sync doses for schedule ${schedule.id}`, err);
       throw err;
     }
   }
+  await refreshAllReminders();
 }
 
 export async function syncDosesForSchedule(schedule: Schedule): Promise<void> {
@@ -319,13 +276,37 @@ async function rescheduleReminderIfDue(id: string): Promise<void> {
   const dose = await getDoseById(id);
   if (!dose || !isDueInFuture(dose, new Date())) return;
 
-  const product = await getProduct(dose.productId);
-  if (!product) return;
+  await refreshAllReminders();
+}
 
-  await scheduleDoseReminder(
-    { id: dose.id, plannedAt: dose.plannedAt },
-    reminderTexts(product, quantityOfDose(dose, await scheduleOfDose(dose))),
+async function planAllReminders(): Promise<void> {
+  const products = await getProductsQuery();
+  const inputs = (
+    await Promise.all(products.map((p) => reminderInputsForProduct(p.id)))
+  ).flat();
+  log.info(`Planning reminders for ${inputs.length} dose(s)`);
+  await scheduleDoseReminders(inputs);
+}
+
+async function reminderInputsForProduct(
+  productId: string,
+): Promise<DoseReminderInput[]> {
+  const product = await getProduct(productId);
+  if (!product || product.status === 'archived') return [];
+
+  const scheduleById = new Map(
+    (await getSchedulesByProduct(productId)).map((s) => [s.id, s]),
   );
+  return (await getFuturePendingDosesByProduct(productId)).map((dose) => ({
+    reminder: { id: dose.id, plannedAt: dose.plannedAt },
+    texts: reminderTexts(
+      product,
+      quantityOfDose(
+        dose,
+        dose.scheduleId ? scheduleById.get(dose.scheduleId) : undefined,
+      ),
+    ),
+  }));
 }
 
 function reminderTexts(product: Product, quantity: number) {
