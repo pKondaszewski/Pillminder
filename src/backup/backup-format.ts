@@ -11,6 +11,7 @@ import {
 import {
   isPositiveInteger,
   isValidCycle,
+  isValidSteps,
   isValidWeekdays,
 } from '@/schedules/schedule-validator';
 
@@ -30,7 +31,7 @@ export type { BackupRows } from './dto/backup-data';
 export type { BackupError } from './dto/backup-parse-result';
 export type { BackupParseResult } from './dto/backup-parse-result';
 
-export const BACKUP_FORMAT_VERSION = 5;
+export const BACKUP_FORMAT_VERSION = 6;
 
 const FIRST_TEXT_PRICE_VERSION = 2;
 
@@ -162,8 +163,12 @@ function firstInvalidField(table: BackupTable, raw: unknown): string | null {
     }
     if (!isValidValue(table, key, column, value)) return key;
   }
-  // A cycle without its anchor day cannot be counted.
-  if (table === 'schedules' && raw.cycle != null && raw.cycleAnchor == null) {
+  // A cycle or steps without their anchor day cannot be counted.
+  if (
+    table === 'schedules' &&
+    (raw.cycle != null || raw.steps != null) &&
+    raw.cycleAnchor == null
+  ) {
     return 'cycleAnchor';
   }
   return null;
@@ -186,6 +191,9 @@ function isValidValue(
   }
   if (table === 'schedules' && key === 'cycle') {
     return isValidCycle(value);
+  }
+  if (table === 'schedules' && key === 'steps') {
+    return isValidSteps(value);
   }
   if (table === 'schedules' && key === 'cyclePausedDays') {
     return Number.isInteger(value) && (value as number) >= 0;

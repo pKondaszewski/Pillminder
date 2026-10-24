@@ -160,3 +160,104 @@ describe('assertValidScheduleInput with a cycle', () => {
     expect(validate).not.toThrow();
   });
 });
+
+describe('assertValidScheduleInput with steps', () => {
+  it.each([
+    [
+      [
+        { days: 3, quantity: 4 },
+        { days: 3, quantity: 1 },
+      ],
+    ],
+    [
+      [
+        { days: 7, quantity: 1 },
+        { days: null, quantity: 2 },
+      ],
+    ],
+    [
+      [
+        { days: 365, quantity: 1 },
+        { days: 365, quantity: 2 },
+      ],
+    ],
+  ])('accepts the steps %j', (steps) => {
+    // given
+    const valid = input({ steps });
+
+    // when
+    const validate = () => assertValidScheduleInput(valid);
+
+    // then
+    expect(validate).not.toThrow();
+  });
+
+  it.each([
+    [[{ days: 7, quantity: 1 }]],
+    [
+      [
+        { days: 0, quantity: 1 },
+        { days: 3, quantity: 1 },
+      ],
+    ],
+    [
+      [
+        { days: 366, quantity: 1 },
+        { days: 3, quantity: 1 },
+      ],
+    ],
+    [
+      [
+        { days: 1.5, quantity: 1 },
+        { days: 3, quantity: 1 },
+      ],
+    ],
+    [
+      [
+        { days: 3, quantity: 0 },
+        { days: 3, quantity: 1 },
+      ],
+    ],
+    [
+      [
+        { days: null, quantity: 1 },
+        { days: 3, quantity: 2 },
+      ],
+    ],
+    [[{ days: 3, quantity: 1 }, { quantity: 2 }]],
+    [Array.from({ length: 11 }, () => ({ days: 1, quantity: 1 }))],
+    ['3 days'],
+  ])('rejects the steps %j', (steps) => {
+    // given
+    const invalid = input({
+      steps: steps as unknown as NewScheduleInput['steps'],
+    });
+
+    // when
+    const validate = () => assertValidScheduleInput(invalid);
+
+    // then
+    expect(validate).toThrow('Invalid steps');
+  });
+
+  it('accepts steps with weekdays, a cycle and an interval', () => {
+    // given
+    const steps = [
+      { days: 3, quantity: 2 },
+      { days: null, quantity: 1 },
+    ];
+    const onWeekdays = input({ steps, weekdays: [1, 3] });
+    const inCycle = input({
+      steps,
+      cycle: { onDays: 21, offDays: 7, unit: 'days' },
+    });
+    const everyOtherDay = input({ steps, intervalDays: 2 });
+
+    // when
+    const validate = () =>
+      [onWeekdays, inCycle, everyOtherDay].forEach(assertValidScheduleInput);
+
+    // then
+    expect(validate).not.toThrow();
+  });
+});

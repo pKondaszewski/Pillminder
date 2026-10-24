@@ -20,6 +20,7 @@ import {
   getSchedules,
   getSchedulesByProduct,
   occurrencesWithin,
+  quantityOn,
   type Schedule,
 } from '@/schedules/schedule-service';
 import { getSnoozeMinutes } from '@/settings/settings-service';
@@ -124,15 +125,18 @@ export async function refreshRemindersForProduct(
   if (!product || product.status === 'archived') return;
 
   const pending = await getFuturePendingDosesByProduct(productId);
-  const quantityByScheduleId = new Map(
-    (await getSchedulesByProduct(productId)).map((s) => [s.id, s.quantity]),
+  const scheduleById = new Map(
+    (await getSchedulesByProduct(productId)).map((s) => [s.id, s]),
   );
   log.info(`Refreshing ${pending.length} reminder(s) for product ${productId}`);
   await Promise.all(
     pending.map((dose) =>
       scheduleDoseReminder(
         { id: dose.id, productName: product.name, plannedAt: dose.plannedAt },
-        reminderTexts(product, quantityByScheduleId.get(dose.scheduleId) ?? 1),
+        reminderTexts(
+          product,
+          quantityOfDose(dose, scheduleById.get(dose.scheduleId)),
+        ),
       ),
     ),
   );
@@ -178,7 +182,10 @@ export async function snoozeDose(id: string): Promise<void> {
     const when = new Date(Date.now() + snoozeMinutes * 60 * 1000);
     await scheduleDoseReminder(
       { id: dose.id, productName: product.name, plannedAt: when },
-      reminderTexts(product, await quantityForDose(dose.scheduleId)),
+      reminderTexts(
+        product,
+        quantityOfDose(dose, await getSchedule(dose.scheduleId)),
+      ),
     );
     await setDoseSnoozedUntilRow(dose.id, when);
     await dismissDoseReminder(dose.id);
@@ -249,7 +256,7 @@ export async function syncDosesForSchedules(
               productName: product.name,
               plannedAt: dose.plannedAt,
             },
-            reminderTexts(product, schedule.quantity),
+            reminderTexts(product, quantityOfDose(dose, schedule)),
           ),
         ),
       );
@@ -280,8 +287,11 @@ async function applyDoseState(
   }
 }
 
-async function quantityForDose(scheduleId: string): Promise<number> {
-  return (await getSchedule(scheduleId))?.quantity ?? 1;
+function quantityOfDose(
+  { plannedAt }: { plannedAt: Date },
+  schedule: Schedule | undefined,
+): number {
+  return schedule ? quantityOn(schedule, schedule.quantity, plannedAt) : 1;
 }
 
 async function revertDoseToPending(id: string): Promise<void> {
@@ -297,7 +307,10 @@ async function revertDoseToPending(id: string): Promise<void> {
 
     await scheduleDoseReminder(
       { id: dose.id, productName: product.name, plannedAt: dose.plannedAt },
-      reminderTexts(product, await quantityForDose(dose.scheduleId)),
+      reminderTexts(
+        product,
+        quantityOfDose(dose, await getSchedule(dose.scheduleId)),
+      ),
     );
   } catch (err) {
     log.error(`Failed to revert dose ${id}`, err);

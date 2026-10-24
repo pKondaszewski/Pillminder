@@ -9,6 +9,7 @@ import type {
 } from './dto/schedule-list-filters';
 import { isPaused } from './schedule-pause';
 import type { Schedule, ScheduleListItem } from './schedule-repository';
+import { hasFiniteTaper, isTaperOver } from './step-days';
 
 export type ScheduleGroup = {
   kind: ScheduleKind;
@@ -24,14 +25,13 @@ export const SCHEDULE_KINDS: readonly ScheduleKind[] = [
 
 const DEFAULT_KINDS: readonly ScheduleKind[] = ['ongoing', 'timed', 'paused'];
 
-export function scheduleKind(
-  { endDate, pausedAt, resumeAt, productStatus }: ScheduleListItem,
-  now: Date,
-): ScheduleKind {
+export function scheduleKind(item: ScheduleListItem, now: Date): ScheduleKind {
+  const { endDate, pausedAt, resumeAt, productStatus } = item;
   if (productStatus === 'archived') return 'paused';
   if (endDate && startOfDay(endDate) < startOfDay(now)) return 'ended';
+  if (isTaperOver(item, now)) return 'ended';
   if (isPaused({ pausedAt, resumeAt }, now)) return 'paused';
-  return endDate ? 'timed' : 'ongoing';
+  return endDate || hasFiniteTaper(item) ? 'timed' : 'ongoing';
 }
 
 export function groupSchedules(

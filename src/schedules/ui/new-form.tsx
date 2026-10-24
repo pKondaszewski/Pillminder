@@ -21,15 +21,17 @@ import { reorderStatus } from '@/products/reorder';
 import type { NewScheduleInput } from '@/schedules/dto/new-schedule-input';
 import { draftSchedule, scheduleDraftErrors } from '@/schedules/schedule-draft';
 import {
+  hasFiniteTaper,
   previewOccurrences,
   type Rhythm,
   type Schedule,
+  type ScheduleStep,
 } from '@/schedules/schedule-service';
 import { describeStockSufficiency } from '@/schedules/stock-sufficiency';
 import { DosePreview } from '@/schedules/ui/dose-preview';
 import { type Period, PeriodFields } from '@/schedules/ui/period-fields';
 import { ProductPicker } from '@/schedules/ui/product-picker';
-import { QuantityStepper } from '@/schedules/ui/quantity-stepper';
+import { QuantityPicker } from '@/schedules/ui/quantity-picker';
 import { RhythmPicker } from '@/schedules/ui/rhythm-picker';
 import { TimeChips } from '@/schedules/ui/time-chips';
 
@@ -72,7 +74,10 @@ export function NewScheduleForm({
     cycle: null,
   });
   const [timesOfDay, setTimesOfDay] = useState<string[]>([]);
-  const [quantity, setQuantity] = useState(1);
+  const [amount, setAmount] = useState<{
+    quantity: number;
+    steps: ScheduleStep[] | null;
+  }>({ quantity: 1, steps: null });
   const [period, setPeriod] = useState<Period>({
     startDate: startOfDay(now),
     endDate: null,
@@ -89,7 +94,7 @@ export function NewScheduleForm({
     productId,
     ...rhythm,
     timesOfDay,
-    quantity,
+    ...amount,
     ...period,
   };
   const errors = scheduleDraftErrors(input);
@@ -166,10 +171,10 @@ export function NewScheduleForm({
         </Section>
 
         <Section label={t('schedule.quantity')}>
-          <QuantityStepper
-            quantity={quantity}
+          <QuantityPicker
+            {...amount}
             unit={product?.unit ?? null}
-            onChange={setQuantity}
+            onChange={setAmount}
           />
         </Section>
 
@@ -238,7 +243,7 @@ function describeStock(
       stock: product.stock,
       unit: product.unit,
       status: reorderStatus(product.stock, [...productSchedules, draft], now),
-      hasEndDate: draft.endDate != null,
+      hasEndDate: draft.endDate != null || hasFiniteTaper(draft),
     },
     t,
     formatDate,

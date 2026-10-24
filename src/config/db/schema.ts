@@ -13,6 +13,7 @@ import { IMAGE_ROLES } from '../../images/image-role';
 import { PRODUCT_UNITS } from '../../products/dto/product-unit';
 import { STORE_LINK_TARGETS } from '../../products/dto/store-link-target';
 import type { ScheduleCycle } from '../../schedules/dto/schedule-cycle';
+import type { ScheduleStep } from '../../schedules/dto/schedule-step';
 
 export const products = sqliteTable('products', {
   id: text('id').primaryKey(),
@@ -55,6 +56,7 @@ export const schedules = sqliteTable(
       .$type<string[]>()
       .notNull(),
     quantity: integer('quantity').notNull().default(1),
+    steps: text('steps', { mode: 'json' }).$type<ScheduleStep[]>(),
     startDate: integer('start_date', { mode: 'timestamp' }),
     endDate: integer('end_date', { mode: 'timestamp' }),
     pausedAt: integer('paused_at', { mode: 'timestamp' }),

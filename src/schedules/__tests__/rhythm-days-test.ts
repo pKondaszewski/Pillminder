@@ -1,3 +1,4 @@
+import type { Rhythm } from '../dto/rhythm';
 import { averageDayShare, dayShareOn, isRhythmDay } from '../rhythm-days';
 
 const SATURDAY = 6;
@@ -150,5 +151,28 @@ describe('cycle consumption', () => {
 
     // then
     expect(shares).toEqual([1, 0, 1]);
+  });
+});
+
+describe('dayShareOn with steps', () => {
+  const taper: Rhythm = {
+    intervalDays: 1,
+    weekdays: null,
+    steps: [
+      { days: 2, quantity: 3 },
+      { days: 2, quantity: 1 },
+    ],
+    cycleAnchor: new Date(2026, 0, 1),
+    cyclePausedDays: 0,
+  };
+
+  it('is 1 inside the steps and 0 after the last finite one', () => {
+    // when
+    const result = [1, 4, 5].map((day) =>
+      dayShareOn(taper, new Date(2026, 0, day)),
+    );
+
+    // then
+    expect(result).toEqual([1, 1, 0]);
   });
 });

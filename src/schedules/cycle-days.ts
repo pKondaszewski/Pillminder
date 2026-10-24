@@ -8,11 +8,21 @@ export function isCycleOnDay(rhythm: Rhythm, day: Date): boolean {
   const { cycle, cycleAnchor } = rhythm;
   if (!cycle || !cycleAnchor) return true;
 
-  const target = startOfDay(day);
-  const position =
-    daysBetween(startOfDay(cycleAnchor), target) -
-    pausedDaysBefore(rhythm, target);
+  const position = daysCountedUntil(rhythm, cycleAnchor, day);
   return position >= 0 && position % cycleLength(cycle) < cycle.onDays;
+}
+
+// Days from the anchor to `day`, not counting the paused ones. Shared by the
+// cycle and the steps, so a pause freezes both.
+export function daysCountedUntil(
+  rhythm: Rhythm,
+  anchor: Date,
+  day: Date,
+): number {
+  const target = startOfDay(day);
+  return (
+    daysBetween(startOfDay(anchor), target) - pausedDaysBefore(rhythm, target)
+  );
 }
 
 export function daysPerUnit(unit: CycleUnit): number {
@@ -31,14 +41,8 @@ export function cycleOnShare(cycle: ScheduleCycle): number {
 // The counter holds the closed pauses; the current (or last, if it ended by
 // itself) pause is still in pausedAt/resumeAt and is counted up to `day`.
 export function pausedDaysBefore(rhythm: Rhythm, day: Date): number {
-  const {
-    cycle,
-    cycleAnchor,
-    cyclePausedDays = 0,
-    pausedAt,
-    resumeAt,
-  } = rhythm;
-  if (!cycle || !cycleAnchor) return 0;
+  const { cycleAnchor, cyclePausedDays = 0, pausedAt, resumeAt } = rhythm;
+  if (!cycleAnchor) return 0;
   if (!pausedAt) return cyclePausedDays;
 
   const from = laterOf(startOfDay(pausedAt), startOfDay(cycleAnchor));

@@ -7,8 +7,10 @@ import { cycleUnitKey, daysPerUnit } from './cycle-days';
 import type { CourseProgress } from './dto/course-progress';
 import type { Rhythm } from './dto/rhythm';
 import type { ScheduleCycle } from './dto/schedule-cycle';
+import type { ScheduleStep } from './dto/schedule-step';
 import { isPaused } from './schedule-pause';
 import type { Schedule } from './schedule-repository';
+import { totalStepDays } from './step-days';
 
 export function describeRhythm(
   schedule: Schedule,
@@ -19,10 +21,12 @@ export function describeRhythm(
   formatTimes: (times: string[]) => string,
   firstWeekday: number,
 ): string {
-  const { timesOfDay, quantity } = schedule;
-  const quantityText = describeQuantity(quantity, unit, t);
+  const { timesOfDay, quantity, steps } = schedule;
+  const amountText = steps
+    ? ` · ${describeAmount(quantity, steps, unit, t)}`
+    : describeFlatQuantity(quantity, unit, t);
   const period = describePeriod(schedule, t, formatDate);
-  const rhythm = `${describeDays(schedule, t, firstWeekday)} · ${formatTimes(timesOfDay)}${quantityText}${period && ` · ${period}`}`;
+  const rhythm = `${describeDays(schedule, t, firstWeekday)} · ${formatTimes(timesOfDay)}${amountText}${period && ` · ${period}`}`;
   return isPaused(schedule, now)
     ? `${describePause(schedule, t, formatDate)} · ${rhythm}`
     : rhythm;
@@ -38,6 +42,16 @@ export function describeDays(
   if (!cycle) return days;
   const cycleText = describeCycle(cycle, t);
   return isEveryDay(rhythm) ? cycleText : `${days} · ${cycleText}`;
+}
+
+export function describeAmount(
+  quantity: number,
+  steps: ScheduleStep[] | null,
+  unit: ProductUnit | null,
+  t: Translate,
+): string {
+  if (steps) return describeTaper(steps, unit, t);
+  return unit ? formatAmount(quantity, unit, t) : String(quantity);
 }
 
 export function describePause(
@@ -62,17 +76,38 @@ export function describeCourse(
     : until;
 }
 
-function describeQuantity(
+function describeFlatQuantity(
   quantity: number,
   unit: ProductUnit | null,
   t: Translate,
 ): string {
   if (unit) {
-    return ` · ${t('schedule.amountValue', { amount: formatAmount(quantity, unit, t) })}`;
+    const amount = describeAmount(quantity, null, unit, t);
+    return ` · ${t('schedule.amountValue', { amount })}`;
   }
-  return quantity !== 1
-    ? ` · ${t('schedule.quantityValue', { count: quantity })}`
-    : '';
+  return quantity === 1
+    ? ''
+    : ` · ${t('schedule.quantityValue', { count: quantity })}`;
+}
+
+function describeTaper(
+  steps: ScheduleStep[],
+  unit: ProductUnit | null,
+  t: Translate,
+): string {
+  const amountOf = (quantity: number) =>
+    unit ? formatAmount(quantity, unit, t) : String(quantity);
+  const amounts = {
+    from: amountOf(steps[0].quantity),
+    to: amountOf(steps[steps.length - 1].quantity),
+  };
+  const totalDays = totalStepDays(steps);
+  return steps[steps.length - 1].days === null
+    ? t('schedule.taperStays', { ...amounts, day: totalDays + 1 })
+    : t('schedule.taperStops', {
+        ...amounts,
+        days: t('schedule.stepDays', { count: totalDays }),
+      });
 }
 
 export function describePeriod(

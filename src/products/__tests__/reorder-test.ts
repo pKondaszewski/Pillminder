@@ -20,6 +20,7 @@ function rhythm(overrides: Partial<Schedule>): Schedule {
     cyclePausedDays: 0,
     timesOfDay: ['08:00'],
     quantity: 1,
+    steps: null,
     startDate: null,
     endDate: null,
     pausedAt: null,
@@ -564,5 +565,104 @@ describe('reorderStatus with a cycle', () => {
 
     // then
     expect(units).toBe(0);
+  });
+});
+
+describe('reorderStatus with steps', () => {
+  const prednisone = (overrides: Partial<Schedule> = {}) =>
+    rhythm({
+      steps: [
+        { days: 3, quantity: 4 },
+        { days: 3, quantity: 2 },
+      ],
+      cycleAnchor: new Date(2026, 0, 10),
+      ...overrides,
+    });
+
+  it('runs out inside the taper using the quantity of each day', () => {
+    // given
+    const stock = 14;
+
+    // when
+    const status = reorderStatus(stock, [prednisone()], NOW);
+
+    // then
+    expect(status.daysLeft).toBeCloseTo(4);
+  });
+
+  it('never runs out when the stock covers the whole taper', () => {
+    // given
+    const stock = 100;
+
+    // when
+    const status = reorderStatus(stock, [prednisone()], NOW);
+
+    // then
+    expect(status.daysLeft).toBeNull();
+  });
+
+  it('keeps consuming the last quantity of an open-ended taper', () => {
+    // given
+    const schedules = [
+      prednisone({
+        steps: [
+          { days: 1, quantity: 1 },
+          { days: null, quantity: 2 },
+        ],
+      }),
+    ];
+
+    // when
+    const status = reorderStatus(5, schedules, NOW);
+
+    // then
+    expect(status.daysLeft).toBeCloseTo(3);
+  });
+
+  it('reports the quantity of the current step as the daily consumption', () => {
+    // given
+    const schedules = [prednisone({ cycleAnchor: new Date(2026, 0, 7) })];
+
+    // when
+    const status = reorderStatus(null, schedules, NOW);
+
+    // then
+    expect(status.dailyConsumption).toBe(2);
+  });
+
+  it('counts the quantity of each day inside a trip', () => {
+    // when
+    const units = consumptionBetween(
+      [prednisone()],
+      new Date(2026, 0, 11),
+      new Date(2026, 0, 14),
+    );
+
+    // then
+    expect(units).toBe(4 + 4 + 2 + 2);
+  });
+
+  it('counts nothing for a trip after the taper', () => {
+    // when
+    const units = consumptionBetween(
+      [prednisone()],
+      new Date(2026, 0, 16),
+      new Date(2026, 0, 20),
+    );
+
+    // then
+    expect(units).toBe(0);
+  });
+
+  it('treats a finished taper as no active schedule', () => {
+    // given
+    const product = { stock: 3, reorderThreshold: 5 };
+    const finished = prednisone({ cycleAnchor: new Date(2025, 11, 1) });
+
+    // when
+    const status = productReorderStatus(product, [finished], NOW);
+
+    // then
+    expect(status.isLow).toBe(true);
   });
 });

@@ -2,6 +2,7 @@ import { addDays, MS_PER_DAY, startOfDay } from '@/config/date-utils';
 import { averageDayShare, dayShareOn } from '@/schedules/rhythm-days';
 import { isPaused } from '@/schedules/schedule-pause';
 import type { Schedule } from '@/schedules/schedule-service';
+import { isTaperOver, quantityOn } from '@/schedules/step-days';
 
 import type { ReorderStatus } from './dto/reorder-status';
 
@@ -47,6 +48,7 @@ export function hasActiveSchedule(schedules: Schedule[], now: Date): boolean {
   return schedules.some(
     ({ endDate, ...period }) =>
       !isPaused(period, now) &&
+      !isTaperOver(period, now) &&
       (!endDate || startOfDay(now) <= startOfDay(endDate)),
   );
 }
@@ -132,13 +134,15 @@ function changesOverTime({
   pausedAt,
   weekdays,
   cycle,
+  steps,
 }: Schedule): boolean {
   return (
     startDate != null ||
     endDate != null ||
     pausedAt != null ||
     weekdays != null ||
-    cycle != null
+    cycle != null ||
+    steps != null
   );
 }
 
@@ -152,7 +156,9 @@ function totalConsumption(
     .reduce(
       (units, schedule) =>
         units +
-        schedule.timesOfDay.length * schedule.quantity * dayShare(schedule, on),
+        schedule.timesOfDay.length *
+          quantityOn(schedule, schedule.quantity, on) *
+          dayShare(schedule, on),
       0,
     );
 }

@@ -18,15 +18,16 @@ import {
 import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
 import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
 import type { Translate } from '@/config/translate';
-import type { Product, ProductUnit } from '@/products/product-service';
-import { formatAmount } from '@/products/product-unit';
+import type { Product } from '@/products/product-service';
 import { reorderStatus } from '@/products/reorder';
 import { useProducts } from '@/products/ui/use-products';
 import { courseProgress } from '@/schedules/schedule-list';
 import {
+  describeAmount,
   describeCourse,
   describeDays,
   describePeriod,
+  hasFiniteTaper,
   isPaused,
   previewOccurrences,
   type Schedule,
@@ -153,7 +154,12 @@ export default function ScheduleScreen() {
             />
             <FieldRow
               label={t('schedule.quantity')}
-              value={describeQuantity(schedule.quantity, product.unit, t)}
+              value={describeAmount(
+                schedule.quantity,
+                schedule.steps,
+                product.unit,
+                t,
+              )}
               onPress={() => setField('quantity')}
             />
             <FieldRow
@@ -243,19 +249,11 @@ function scheduleStockSufficiency(
         schedules.filter((s) => s.productId === product.id),
         now,
       ),
-      hasEndDate: schedule.endDate !== null,
+      hasEndDate: schedule.endDate !== null || hasFiniteTaper(schedule),
     },
     t,
     formatDate,
   );
-}
-
-function describeQuantity(
-  quantity: number,
-  unit: ProductUnit | null,
-  t: Translate,
-) {
-  return unit ? formatAmount(quantity, unit, t) : String(quantity);
 }
 
 const styles = StyleSheet.create({

@@ -141,6 +141,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           cyclePausedDays: 0,
           timesOfDay: ['08:00', '20:30'],
           quantity: 2,
+          steps: null,
           startDate: new Date('2026-01-01T00:00:00.000Z'),
           endDate: new Date('2026-03-01T00:00:00.000Z'),
           pausedAt: new Date('2026-02-01T09:00:00.000Z'),
@@ -156,6 +157,7 @@ describe('serializeBackup / parseBackup round trip', () => {
           cyclePausedDays: 0,
           timesOfDay: ['09:00'],
           quantity: 1,
+          steps: null,
           startDate: null,
           endDate: null,
           pausedAt: null,
@@ -1415,8 +1417,8 @@ describe('parseBackup: as-needed intakes', () => {
     const file = JSON.parse(serializeBackup(rows, EXPORTED_AT));
 
     // then
-    expect(BACKUP_FORMAT_VERSION).toBe(5);
-    expect(file.version).toBe(5);
+    expect(BACKUP_FORMAT_VERSION).toBe(6);
+    expect(file.version).toBe(6);
     expect(file.asNeededIntakes[0].takenAt).toBe('2026-02-11T14:20:00.000Z');
   });
 
@@ -1541,6 +1543,97 @@ describe('parseBackup: product store link target', () => {
     expect(error).toEqual({
       code: 'invalidRow',
       detail: 'products[0].storeLinkTarget',
+    });
+  });
+});
+
+describe('schedule steps in a backup', () => {
+  const steps = [
+    { days: 3, quantity: 4 },
+    { days: null, quantity: 1 },
+  ];
+  const anchor = '2026-01-05T00:00:00.000Z';
+
+  it('keeps steps with their anchor through a round trip', () => {
+    // given
+    const rows = rowsOf(
+      backupText({ schedules: [schedule({ steps, cycleAnchor: anchor })] }),
+    );
+
+    // when
+    const restored = rowsOf(serializeBackup(rows, EXPORTED_AT));
+
+    // then
+    expect(restored.schedules[0]).toMatchObject({
+      steps,
+      cycleAnchor: new Date(anchor),
+    });
+  });
+
+  it('imports a schedule from a backup made before steps without them', () => {
+    // given
+    const text = backupText({ version: 5, schedules: [schedule()] });
+
+    // when
+    const rows = rowsOf(text);
+
+    // then
+    expect(rows.schedules[0]).toMatchObject({ steps: null });
+  });
+
+  it('writes null steps for a schedule without them', () => {
+    // given
+    const rows = rowsOf(backupText());
+
+    // when
+    const file = JSON.parse(serializeBackup(rows, EXPORTED_AT));
+
+    // then
+    expect(file.schedules[0].steps).toBeNull();
+  });
+
+  it.each([
+    [[{ days: 3, quantity: 4 }]],
+    [
+      [
+        { days: null, quantity: 4 },
+        { days: 3, quantity: 1 },
+      ],
+    ],
+    [
+      [
+        { days: 3, quantity: 0 },
+        { days: 3, quantity: 1 },
+      ],
+    ],
+    ['4 then 1'],
+  ])('rejects the steps %j', (invalidSteps) => {
+    // given
+    const text = backupText({
+      schedules: [schedule({ steps: invalidSteps, cycleAnchor: anchor })],
+    });
+
+    // when
+    const result = parseBackup(text);
+
+    // then
+    expect(result).toEqual({
+      ok: false,
+      error: { code: 'invalidRow', detail: 'schedules[0].steps' },
+    });
+  });
+
+  it('rejects steps without an anchor day', () => {
+    // given
+    const text = backupText({ schedules: [schedule({ steps })] });
+
+    // when
+    const result = parseBackup(text);
+
+    // then
+    expect(result).toEqual({
+      ok: false,
+      error: { code: 'invalidRow', detail: 'schedules[0].cycleAnchor' },
     });
   });
 });
