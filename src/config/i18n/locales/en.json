@@ -345,6 +345,7 @@
   "products": {
     "active": "Active",
     "add": "Add product",
+    "added": "Product added",
     "all": "All",
     "archived": "Archived",
     "daysCount_one": "{{count}} day",

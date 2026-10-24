@@ -5,6 +5,8 @@ import { Alert, StyleSheet } from 'react-native';
 
 import { ThemedView } from '@/commons/ui/themed-view';
 import { useRunWithErrorAlert } from '@/commons/ui/use-run-with-error-alert';
+import { useUndoSnackbar } from '@/commons/ui/use-undo-snackbar';
+import { creationChange } from '@/config/undoable-change';
 import { addImage, DEFAULT_IMAGE_ROLE } from '@/images/image-service';
 import type { NewProductInput } from '@/products/dto/new-product-input';
 import { NewProductForm } from '@/products/ui/new-product-form';
@@ -14,23 +16,37 @@ import { useProducts } from '@/products/ui/use-products';
 export default function NewProductScreen() {
   const { t } = useTranslation();
   const { forSchedule } = useLocalSearchParams<{ forSchedule?: string }>();
-  const { addProduct } = useProducts();
+  const { addProduct, removeProduct } = useProducts();
+  const { runWithUndoOnNextScreen } = useUndoSnackbar();
 
   useEffect(() => {
     clearPendingUris();
     return clearPendingUris;
   }, []);
 
-  const runThenLeave = useRunWithErrorAlert((createdId: string) => {
-    if (!forSchedule) {
-      router.back();
-      return;
-    }
+  const runThenOpenSchedule = useRunWithErrorAlert((createdId: string) =>
     router.dismissTo({
       pathname: '/schedules/new',
       params: { productId: createdId },
-    });
-  });
+    }),
+  );
+
+  const submit = (input: NewProductInput, photoUris: string[]) =>
+    forSchedule
+      ? // no undo: the schedule form would take it and renders no snackbar
+        runThenOpenSchedule(
+          () => createProduct(input, photoUris),
+          'products.errorSave',
+        )
+      : runWithUndoOnNextScreen(
+          creationChange(
+            t('products.added'),
+            () => createProduct(input, photoUris),
+            removeProduct,
+          ),
+          'products.errorSave',
+          () => router.back(),
+        );
 
   const createProduct = async (input: NewProductInput, photoUris: string[]) => {
     const createdId = await addProduct(input);
@@ -55,12 +71,7 @@ export default function NewProductScreen() {
       />
       <NewProductForm
         onPhotosPress={() => router.push('/products/new-photos')}
-        onSubmit={(input, photoUris) =>
-          runThenLeave(
-            () => createProduct(input, photoUris),
-            'products.errorSave',
-          )
-        }
+        onSubmit={submit}
       />
     </ThemedView>
   );
