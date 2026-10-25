@@ -148,8 +148,8 @@ key is attached by **APK Signature Scheme v3 key rotation**: the lineage file
 (old key -> new key) lets devices with the old key update in place, data intact.
 
 - The keystore and the lineage live **outside the repo** (owner's backup and
-  GitHub secrets), never commit them. Create them once on the host with
-  `scripts/create-release-key.sh <android/app/debug.keystore>`.
+  GitHub secrets), never commit them. They were created once in #353; the
+  script is in history: `git show 81b7534:scripts/create-release-key.sh`.
 - Secrets: `RELEASE_KEYSTORE_BASE64`, `RELEASE_LINEAGE_BASE64`,
   `RELEASE_KEYSTORE_PASSWORD` (also the key password), `RELEASE_KEY_ALIAS`.
   CD fails when any is missing; it never falls back to the debug key.

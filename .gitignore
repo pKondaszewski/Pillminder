@@ -6,7 +6,6 @@ node_modules/
 # Expo
 .expo/
 dist/
-# expo-env.d.ts is committed so CI typecheck has the Expo types
 
 # Native
 .kotlin/
